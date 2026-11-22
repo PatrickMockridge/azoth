@@ -166,6 +166,53 @@ class BubbleTransferZoneReleaseStation:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class CcePoint:
+    """one row per pressure."""
+
+    #: the absolute pressure.
+    pressure: Q
+
+    #: the untranslated total volume.
+    total_volume: Q
+
+    #: the total volume over the saturation volume.
+    relative_volume: float
+
+    #: phase 0's mass density, volume-corrected where the fluid asks.
+    density: Q
+
+    #: phase 0's corrected extensive volume, the class's gas volume.
+    gas_volume: Q
+
+    #: the same amount at 288.15 K and 1.01325 bar, as an ideal gas.
+    gas_standard_volume: Q
+
+    #: the gas volume over the standard volume.
+    bg: float
+
+    #: phase 0's cubic compressibility.
+    z_gas: float
+
+    #: the oil phase's density; absent where the flash labels no oil.
+    oil_density: Q | None
+
+    #: the oil phase's viscosity; absent where the flash labels no oil.
+    oil_viscosity: Q | None
+
+    #: the oil phase's untranslated volume over the saturation volume; absent in a single phase.
+    liquid_relative_volume: float | None
+
+    #: the class's Y-factor; absent in a single phase.
+    y_factor: float | None
+
+    #: phase 0's viscosity; absent in a two-phase point.
+    viscosity: Q | None
+
+    #: phase 0's isothermal compressibility, in 1/Pa; absent in a two-phase point.
+    isothermal_compressibility: float | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class CharacterizationComponent:
     """The blended fluid's components: its merged base components first, in the fluids' order, then the combined pseudo-components in ascending cut order, named `PC1_PC`, `PC2_PC` and so on."""
 
@@ -409,6 +456,38 @@ class CostEstimationResultRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class CvdPoint:
+    """one row per pressure."""
+
+    #: the absolute pressure.
+    pressure: Q
+
+    #: the restored cell's volume-corrected volume.
+    total_volume: Q
+
+    #: the total volume over the saturation volume.
+    relative_volume: float
+
+    #: the fraction of the feed's moles removed through this point.
+    cumulative_mole_fraction_depleted: float
+
+    #: the absolute residual of initial = remaining + removed, over the initial amount; absent where it is at round-off, below 1e-12.
+    material_balance_relative_error: float | None
+
+    #: the mixture's volume-corrected compressibility.
+    zmix: float
+
+    #: the gas phase's volume-corrected compressibility; absent without a gas phase.
+    z_gas: float | None
+
+    #: the oil phase's volume-corrected volume; absent without an oil phase.
+    liquid_volume: Q | None
+
+    #: the oil volume over the saturation volume, which is the class's liquid dropout curve; absent without an oil phase.
+    liquid_volume_relative_to_vsat: float | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class DepositionSegmentRow:
     """One row per evaluated segment, in the profile's order."""
 
@@ -454,6 +533,50 @@ class DisciplineCostLine:
 
     #: the discipline's cost.
     cost: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class DlePoint:
+    """one row per pressure."""
+
+    #: the absolute pressure.
+    pressure: Q
+
+    #: the retained cell's translated volume.
+    total_volume: Q
+
+    #: the total volume over the saturation volume; absent without a saturation state.
+    relative_volume: float | None
+
+    #: the oil phase's translated volume.
+    liquid_volume: Q
+
+    #: the liquid volume over the saturation volume; absent in a single phase.
+    liquid_volume_relative_to_vsat: float | None
+
+    #: the oil phase's density.
+    oil_density: Q
+
+    #: the removed gas's translated volume; absent in a single phase.
+    gas_volume: Q | None
+
+    #: the removed gas at 288.15 K and 1.01325 bar; absent in a single phase.
+    gas_standard_volume: Q | None
+
+    #: the gas phase's cubic compressibility.
+    z_gas: float | None
+
+    #: the gas molar mass over the class's 0.028 kg/mol air constant.
+    relative_gas_gravity: float | None
+
+    #: the oil formation volume factor; absent without a stock-tank oil volume.
+    bo: float | None
+
+    #: the gas formation volume factor; absent in a single phase.
+    bg: float | None
+
+    #: the remaining solution gas per stock-tank oil volume; absent without one.
+    rs: float | None
 
 
 @dataclass(frozen=True, slots=True, eq=False)
@@ -1474,6 +1597,17 @@ class MinimalCutSet:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class MmpPoint:
+    """the slim tube's recovery curve; empty for the key tie line."""
+
+    #: the grid pressure.
+    pressure: Q
+
+    #: the recovery at that pressure, 0 to 1.
+    recovery: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class MultiVesselContributionRow:
     """each source's contribution at the peak, in first-appearance order."""
 
@@ -1924,6 +2058,44 @@ class ProjectCostLine:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class PropertyPoint:
+    """one row per state."""
+
+    #: the state's temperature.
+    temperature: Q
+
+    #: the state's pressure.
+    pressure: Q
+
+    #: the gas phase's density, in the density mode.
+    gas_density: Q | None
+
+    #: the oil phase's density, in the density mode.
+    oil_density: Q | None
+
+    #: the aqueous phase's density, in the density mode.
+    aqueous_density: Q | None
+
+    #: the gas phase's viscosity, in the viscosity mode.
+    gas_viscosity: Q | None
+
+    #: the oil phase's viscosity, in the viscosity mode.
+    oil_viscosity: Q | None
+
+    #: the aqueous phase's viscosity, in the viscosity mode.
+    aqueous_viscosity: Q | None
+
+    #: whether a gas phase is present.
+    gas_phase_available: bool
+
+    #: whether an oil phase is present.
+    oil_phase_available: bool
+
+    #: whether an aqueous phase is present.
+    aqueous_phase_available: bool
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class PulsationModeResult:
     """one row per evaluated acoustic mode, in mode order."""
 
@@ -2335,6 +2507,50 @@ class SelfHeatingTimePoint:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class SeparatorStageResult:
+    """one row per stage."""
+
+    #: the stage's 1-based position.
+    stage_number: float
+
+    #: the stage pressure.
+    pressure: Q
+
+    #: the stage temperature.
+    temperature: Q
+
+    #: the gas volume at the standard state, in the train.
+    gas_volume: Q | None
+
+    #: the stage gas-oil ratio.
+    stage_gor: float | None
+
+    #: the gas-oil ratio through this stage, in the train.
+    cumulative_gor: float | None
+
+    #: the stage oil formation factor, in the continuous and staged modes.
+    oil_fvf: float | None
+
+    #: the gas phase's density, in the train.
+    gas_density: Q | None
+
+    #: the oil phase's density at the stage.
+    oil_density: Q | None
+
+    #: the gas phase's molar mass, in the train.
+    gas_molar_mass: Q | None
+
+    #: the oil phase's molar mass, in the train.
+    oil_molar_mass: Q | None
+
+    #: the gas phase's compressibility, in the train.
+    gas_z_factor: float | None
+
+    #: the oil phase's viscosity, in the train.
+    oil_viscosity: Q | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class SettleOutCompartmentResult:
     """one row per compartment, in the caller's order, with its Z and moles."""
 
@@ -2434,6 +2650,20 @@ class SubFraction:
 
     #: The sub-fraction's normal boiling point, spread with its molar mass. Absent where its parent states none.
     boiling_point: Q | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SwellingPoint:
+    """one row per schedule entry."""
+
+    #: the cumulative injection, as a fraction of the original oil moles.
+    cumulative_gas_injected: float
+
+    #: the bubble-point pressure.
+    pressure: Q
+
+    #: the bubble-point volume over the base oil's.
+    relative_oil_volume: float
 
 
 @dataclass(frozen=True, slots=True, eq=False)

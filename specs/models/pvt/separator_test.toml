@@ -1,0 +1,280 @@
+id = "pvt.separator_test"
+name = "Separator test"
+kind = "direct"
+assumptions = [
+    "**three classes, one id**: `continuous` is `GOR`, where each stage reflashes the full feed and the class's gas-removal line is commented out; `staged` is `SeparatorTest`, where the gas leaves and phase 1 cascades; `train` is `MultiStageSeparatorTest`.",
+    "**the stage oil and gas volumes are untranslated**, as the classes' `getVolume()` is; a density or a viscosity is the phase's physical property.",
+    "**the standard state is 288.15 K and 1.01325 bar**: a gas volume is its uncorrected volume when the gas phase is re-initialised there, and the stock-tank volume is the oil phase's.",
+    "**the train's stage temperatures are Celsius in the class** (`stage + 273.15`); this id takes Kelvin everywhere and the probe converts.",
+    "**the train's stage oil density is read before the carried phase's physical properties are re-initialised**, so the class's field is the previous stage's density - the reservoir's 494.89 at stage 1. The id publishes the density at the stage; the capture records the lagged numbers as evidence.",
+    "**the first-stage optimisation minimises Bo over a P/T grid** and reports `1/Bo` as the maximum oil recovery; the optimal stage matches the class, while the cascade compounds a flash difference into a few percent of Bo and GOR.",
+    "**the stock-tank API is only defined inside the class's `(500, 1100) kg/m3` band**, against water at 999 kg/m3.",
+    "**inputs are SI** and the fluid is the characterization row list; SRK and the databank kij are the defaults.",
+]
+references = [
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/GOR.java`, `SeparatorTest.java` and `MultiStageSeparatorTest.java` at commit 118d9af are the port source.",
+    "`validation/neqsim/captures/pvt_separator.tsv` - the continuous and staged cascades on a binary, the upstream 11-component train, and its first-stage optimisation.",
+    "NeqSim #5208 - the train reads the carried phase's density before re-initialising it, so the stage row is the previous stage's density.",
+]
+[source]
+standard = "NeqSim pvtsimulation/simulation/{GOR,SeparatorTest,MultiStageSeparatorTest}.java"
+edition = "The continuous GOR, the staged cascade and the multi-stage train, with the stage densities, molar masses, Z, viscosity, stock-tank API and the optional first-stage optimisation."
+[inputs]
+[inputs.components]
+type = "record_list"
+row_type = "FluidComponent"
+description = "The fluids' components, one record each, in the order the fluids carry them. A record with a positive mole amount in the same fluid twice is one component at the summed amount; a non-positive amount is a row the class skips.\n"
+[inputs.components.fields.fluid]
+unit = "dimensionless"
+description = "Which fluid the row belongs to, 0-based. Fluids are ordered by first appearance, and a whole number from zero is required: a fractional or negative index is not a fluid.\n"
+[inputs.components.fields.name]
+type = "string"
+description = "The component's name. A base component merges by it across the fluids; a pseudo-component's is its own fluid's name and does not survive into the answer.\n"
+[inputs.components.fields.pseudo_component]
+type = "boolean"
+description = "Whether the row is a TBP or plus fraction rather than a base component. A base row's properties are absent and are the databank's at assembly.\n"
+[inputs.components.fields.moles]
+unit = "mol"
+description = "The component's mole amount. Only a positive one is read; a zero or negative amount is a row that is not on the grid.\n"
+[inputs.components.fields.molar_mass]
+unit = "kg/mol"
+optional = true
+description = "The pseudo-component's molar mass, which is what the row's mass is and what its sorting key falls back to. Required on a pseudo row and ignored on a base row.\n"
+[inputs.components.fields.density]
+unit = "kg/m**3"
+optional = true
+description = "The pseudo-component's normal liquid density, which a group's volume is the mass over. Required on a pseudo row and ignored on a base row.\n"
+[inputs.components.fields.normal_boiling_point]
+unit = "K"
+optional = true
+description = "The pseudo-component's normal boiling point, its sorting key where it states a finite positive one. A row without one sorts by its molar mass.\n"
+[inputs.components.fields.critical_temperature]
+unit = "K"
+optional = true
+description = "The pseudo-component's critical temperature, part of the blend's mole-fraction-weighted override.\n"
+[inputs.components.fields.critical_pressure]
+unit = "Pa"
+optional = true
+description = "The pseudo-component's critical pressure, part of the blend's mole-fraction-weighted override.\n"
+[inputs.components.fields.acentric_factor]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's acentric factor, part of the blend's mole-fraction-weighted override.\n"
+[inputs.components.fields.critical_volume]
+unit = "m**3/mol"
+optional = true
+description = "The pseudo-component's critical molar volume, mass-weighted into the group's.\n"
+[inputs.components.fields.racket_z]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's Rackett compressibility, mass-weighted into the group's and read again when the row becomes a component.\n"
+[inputs.components.fields.racket_z_cpa]
+unit = "dimensionless"
+optional = true
+description = "The same compressibility on the CPA basis, mass-weighted into the group's.\n"
+[inputs.components.fields.parachor]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's parachor, in NeqSim's mixed `(mN/m)**(1/4) * cm**3/mol`, mass-weighted into the group's.\n"
+[inputs.components.fields.critical_viscosity]
+unit = "Pa*s"
+optional = true
+description = "The pseudo-component's critical viscosity, mass-weighted into the group's.\n"
+[inputs.components.fields.triple_point_temperature]
+unit = "K"
+optional = true
+description = "The pseudo-component's triple-point temperature, mass-weighted into the group's.\n"
+[inputs.components.fields.heat_of_fusion]
+unit = "J/mol"
+optional = true
+description = "The pseudo-component's heat of fusion, mass-weighted into the group's.\n"
+[inputs.components.fields.ideal_gas_enthalpy_of_formation]
+unit = "J/mol"
+optional = true
+description = "The pseudo-component's ideal-gas enthalpy of formation, mass-weighted into the group's. It has no home on a `Component` and is dropped when a mixture is assembled.\n"
+[inputs.components.fields.cp_a]
+unit = "J/(mol*K)"
+optional = true
+description = "The constant term of the pseudo-component's ideal-gas heat capacity, mass-weighted into the group's.\n"
+[inputs.components.fields.cp_b]
+unit = "J/(mol*K**2)"
+optional = true
+description = "The coefficient of `T` in the pseudo-component's ideal-gas heat capacity.\n"
+[inputs.components.fields.cp_c]
+unit = "J/(mol*K**3)"
+optional = true
+description = "The coefficient of `T**2` in the pseudo-component's ideal-gas heat capacity.\n"
+[inputs.components.fields.cp_d]
+unit = "J/(mol*K**4)"
+optional = true
+description = "The coefficient of `T**3` in the pseudo-component's ideal-gas heat capacity, as `getCpD()` states it: the stored coefficient plus `1e-10`.\n"
+[inputs.components.fields.attractive_m]
+unit = "dimensionless"
+optional = true
+description = "The fitted coefficient of the pseudo-component's Soave alpha function, which NeqSim's `addTBPfraction` installs in place of the acentric factor's correlation.\n"
+
+[inputs.mode]
+type = "enum"
+values = ["continuous", "staged", "train"]
+description = "which of the three separator experiments this call runs.\n"
+[inputs.stages]
+type = "record_list"
+row_type = "SeparatorStageInput"
+description = "the separator stages, in order.\n"
+[inputs.stages.fields.pressure]
+unit = "Pa"
+description = "the stage pressure.\n"
+[inputs.stages.fields.temperature]
+unit = "K"
+description = "the stage temperature.\n"
+[inputs.eos]
+type = "enum"
+values = ["srk", "pr"]
+optional = true
+description = "the cubic; absent is srk.\n"
+[inputs.mixing_rule]
+type = "enum"
+values = ["classic", "zero"]
+optional = true
+description = "the interaction matrix; absent is classic.\n"
+[inputs.volume_correction]
+type = "boolean"
+optional = true
+description = "whether the Peneloux translation is applied; absent is true.\n"
+[inputs.reservoir_pressure]
+unit = "Pa"
+optional = true
+description = "the reservoir pressure, for the train.\n"
+[inputs.reservoir_temperature]
+unit = "K"
+optional = true
+description = "the reservoir temperature, for the train.\n"
+[inputs.optimize_first_stage]
+type = "boolean"
+optional = true
+description = "whether the train searches the first stage over a grid.\n"
+[inputs.first_stage_pressure_min]
+unit = "Pa"
+optional = true
+description = "the optimisation grid's lower pressure.\n"
+[inputs.first_stage_pressure_max]
+unit = "Pa"
+optional = true
+description = "the optimisation grid's upper pressure.\n"
+[inputs.first_stage_pressure_steps]
+unit = "dimensionless"
+optional = true
+description = "the optimisation grid's pressure points, inclusive.\n"
+[inputs.first_stage_temperature_min]
+unit = "K"
+optional = true
+description = "the optimisation grid's lower temperature.\n"
+[inputs.first_stage_temperature_max]
+unit = "K"
+optional = true
+description = "the optimisation grid's upper temperature.\n"
+[inputs.first_stage_temperature_steps]
+unit = "dimensionless"
+optional = true
+description = "the optimisation grid's temperature points, inclusive.\n"
+[outputs]
+[outputs.total_gor]
+unit = "dimensionless"
+optional = true
+description = "the train's total gas-oil ratio.\n"
+[outputs.bo]
+unit = "dimensionless"
+optional = true
+description = "the train's oil formation volume factor against the reservoir fluid.\n"
+[outputs.rs]
+unit = "dimensionless"
+optional = true
+description = "the train's Rs, which the class sets to the total GOR.\n"
+[outputs.stock_tank_oil_density]
+unit = "kg/m**3"
+optional = true
+description = "the train's stock-tank oil density.\n"
+[outputs.stock_tank_api]
+unit = "dimensionless"
+optional = true
+description = "the train's stock-tank API gravity, inside the class's density band.\n"
+[outputs.optimal_stage_pressure]
+unit = "Pa"
+optional = true
+description = "the optimal first-stage pressure.\n"
+[outputs.optimal_stage_temperature]
+unit = "K"
+optional = true
+description = "the optimal first-stage temperature.\n"
+[outputs.maximum_oil_recovery]
+unit = "dimensionless"
+optional = true
+description = "`1/Bo` at the optimum.\n"
+[outputs.gor_at_optimum]
+unit = "dimensionless"
+optional = true
+description = "the GOR at the optimum.\n"
+[outputs.bo_at_optimum]
+unit = "dimensionless"
+optional = true
+description = "the Bo at the optimum.\n"
+[outputs.api_at_optimum]
+unit = "dimensionless"
+optional = true
+description = "the API at the optimum.\n"
+[outputs.stages]
+type = "record_list"
+description = "one row per stage.\n"
+
+[outputs.stages.fields.stage_number]
+unit = "dimensionless"
+description = "the stage's 1-based position.\n"
+[outputs.stages.fields.pressure]
+unit = "Pa"
+description = "the stage pressure.\n"
+[outputs.stages.fields.temperature]
+unit = "K"
+description = "the stage temperature.\n"
+[outputs.stages.fields.gas_volume]
+unit = "m**3"
+optional = true
+description = "the gas volume at the standard state, in the train.\n"
+[outputs.stages.fields.stage_gor]
+unit = "dimensionless"
+optional = true
+description = "the stage gas-oil ratio.\n"
+[outputs.stages.fields.cumulative_gor]
+unit = "dimensionless"
+optional = true
+description = "the gas-oil ratio through this stage, in the train.\n"
+[outputs.stages.fields.oil_fvf]
+unit = "dimensionless"
+optional = true
+description = "the stage oil formation factor, in the continuous and staged modes.\n"
+[outputs.stages.fields.gas_density]
+unit = "kg/m**3"
+optional = true
+description = "the gas phase's density, in the train.\n"
+[outputs.stages.fields.oil_density]
+unit = "kg/m**3"
+optional = true
+description = "the oil phase's density at the stage.\n"
+[outputs.stages.fields.gas_molar_mass]
+unit = "kg/mol"
+optional = true
+description = "the gas phase's molar mass, in the train.\n"
+[outputs.stages.fields.oil_molar_mass]
+unit = "kg/mol"
+optional = true
+description = "the oil phase's molar mass, in the train.\n"
+[outputs.stages.fields.gas_z_factor]
+unit = "dimensionless"
+optional = true
+description = "the gas phase's compressibility, in the train.\n"
+[outputs.stages.fields.oil_viscosity]
+unit = "Pa*s"
+optional = true
+description = "the oil phase's viscosity, in the train.\n"
+[implementations]
+python = "azoth.pvt.separator_test"
+rust = "azoth_pvt::separator_test"

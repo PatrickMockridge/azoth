@@ -1,0 +1,269 @@
+id = "pvt.mmp"
+name = "Minimum miscibility pressure"
+kind = "direct"
+assumptions = [
+    "**three methods, one id**: `slim_tube` is the mixing-cell recovery curve, `key_tie_line` a 0.5-bar bisection on the tie-line length, and `rising_bubble` the class's own delegation to the slim tube.",
+    "**the injection composition is the gas phase's equilibrium composition at the pressure**; the class flashes the gas system first, and a gas component the oil does not carry is never injected, so such a gas is refused here rather than silently dropped.",
+    "**the slim-tube chain is the class's**: gas per step is the gas's total moles over the node count, half of a cell's gas moles move to the next cell, the cell keeps its oil phase, and a tenth of the last cell's oil is produced without being removed.",
+    "**the recovery is clamped to `[0, 1]`** and the MMP interpolated linearly at the threshold; a range that never reaches it leaves the MMP absent with the mechanism `immiscible`.",
+    "**the mechanism heuristic reads the second and the penultimate recovery**, so fewer than three pressure points is refused; `first_contact` is a recovery above 0.99 at the MMP.",
+    "**`setTemperature` takes Celsius in the class** despite its field comment; this id takes K and the probe converts.",
+    "**the key tie-line crossing is held at the measured 3e-2**: the two flashes measure the same tie-line length a little differently and the 0.5-bar bisection is sensitive to it.",
+    "**inputs are SI**; a gas sharing no component with the oil is refused, which the class does not do.",
+]
+references = [
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/MMPCalculator.java` at commit 118d9af is the port source.",
+    "`validation/neqsim/captures/pvt_mmp.tsv` - a three-point immiscible slim tube, its rising-bubble twin, the key tie line, a ten-point grid and a wide slim tube that reaches the threshold.",
+    "NeqSim #4566 - the rising-bubble delegation, the single-proportion first-contact test and the silent omission of an injection component the oil does not carry.",
+]
+[source]
+standard = "NeqSim pvtsimulation/simulation/MMPCalculator.java"
+edition = "The slim-tube recovery curve and its MMP interpolation, the key tie line's bisection, the mechanism heuristic, and the rising-bubble delegation."
+[inputs]
+[inputs.oil_components]
+type = "record_list"
+row_type = "FluidComponent"
+description = "The oil's components, one record each. A record with a positive mole amount in the same fluid twice is one component at the summed amount; a non-positive amount is a row the class skips.\n"
+[inputs.oil_components.fields.fluid]
+unit = "dimensionless"
+description = "Which fluid the row belongs to, 0-based. Fluids are ordered by first appearance, and a whole number from zero is required: a fractional or negative index is not a fluid.\n"
+[inputs.oil_components.fields.name]
+type = "string"
+description = "The component's name. A base component merges by it across the fluids; a pseudo-component's is its own fluid's name and does not survive into the answer.\n"
+[inputs.oil_components.fields.pseudo_component]
+type = "boolean"
+description = "Whether the row is a TBP or plus fraction rather than a base component. A base row's properties are absent and are the databank's at assembly.\n"
+[inputs.oil_components.fields.moles]
+unit = "mol"
+description = "The component's mole amount. Only a positive one is read; a zero or negative amount is a row that is not on the grid.\n"
+[inputs.oil_components.fields.molar_mass]
+unit = "kg/mol"
+optional = true
+description = "The pseudo-component's molar mass, which is what the row's mass is and what its sorting key falls back to. Required on a pseudo row and ignored on a base row.\n"
+[inputs.oil_components.fields.density]
+unit = "kg/m**3"
+optional = true
+description = "The pseudo-component's normal liquid density, which a group's volume is the mass over. Required on a pseudo row and ignored on a base row.\n"
+[inputs.oil_components.fields.normal_boiling_point]
+unit = "K"
+optional = true
+description = "The pseudo-component's normal boiling point, its sorting key where it states a finite positive one. A row without one sorts by its molar mass.\n"
+[inputs.oil_components.fields.critical_temperature]
+unit = "K"
+optional = true
+description = "The pseudo-component's critical temperature, part of the blend's mole-fraction-weighted override.\n"
+[inputs.oil_components.fields.critical_pressure]
+unit = "Pa"
+optional = true
+description = "The pseudo-component's critical pressure, part of the blend's mole-fraction-weighted override.\n"
+[inputs.oil_components.fields.acentric_factor]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's acentric factor, part of the blend's mole-fraction-weighted override.\n"
+[inputs.oil_components.fields.critical_volume]
+unit = "m**3/mol"
+optional = true
+description = "The pseudo-component's critical molar volume, mass-weighted into the group's.\n"
+[inputs.oil_components.fields.racket_z]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's Rackett compressibility, mass-weighted into the group's and read again when the row becomes a component.\n"
+[inputs.oil_components.fields.racket_z_cpa]
+unit = "dimensionless"
+optional = true
+description = "The same compressibility on the CPA basis, mass-weighted into the group's.\n"
+[inputs.oil_components.fields.parachor]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's parachor, in NeqSim's mixed `(mN/m)**(1/4) * cm**3/mol`, mass-weighted into the group's.\n"
+[inputs.oil_components.fields.critical_viscosity]
+unit = "Pa*s"
+optional = true
+description = "The pseudo-component's critical viscosity, mass-weighted into the group's.\n"
+[inputs.oil_components.fields.triple_point_temperature]
+unit = "K"
+optional = true
+description = "The pseudo-component's triple-point temperature, mass-weighted into the group's.\n"
+[inputs.oil_components.fields.heat_of_fusion]
+unit = "J/mol"
+optional = true
+description = "The pseudo-component's heat of fusion, mass-weighted into the group's.\n"
+[inputs.oil_components.fields.ideal_gas_enthalpy_of_formation]
+unit = "J/mol"
+optional = true
+description = "The pseudo-component's ideal-gas enthalpy of formation, mass-weighted into the group's. It has no home on a `Component` and is dropped when a mixture is assembled.\n"
+[inputs.oil_components.fields.cp_a]
+unit = "J/(mol*K)"
+optional = true
+description = "The constant term of the pseudo-component's ideal-gas heat capacity, mass-weighted into the group's.\n"
+[inputs.oil_components.fields.cp_b]
+unit = "J/(mol*K**2)"
+optional = true
+description = "The coefficient of `T` in the pseudo-component's ideal-gas heat capacity.\n"
+[inputs.oil_components.fields.cp_c]
+unit = "J/(mol*K**3)"
+optional = true
+description = "The coefficient of `T**2` in the pseudo-component's ideal-gas heat capacity.\n"
+[inputs.oil_components.fields.cp_d]
+unit = "J/(mol*K**4)"
+optional = true
+description = "The coefficient of `T**3` in the pseudo-component's ideal-gas heat capacity, as `getCpD()` states it: the stored coefficient plus `1e-10`.\n"
+[inputs.oil_components.fields.attractive_m]
+unit = "dimensionless"
+optional = true
+description = "The fitted coefficient of the pseudo-component's Soave alpha function, which NeqSim's `addTBPfraction` installs in place of the acentric factor's correlation.\n"
+[inputs.gas_components]
+type = "record_list"
+row_type = "FluidComponent"
+description = "The injection gas's components, one record each. A record with a positive mole amount in the same fluid twice is one component at the summed amount; a non-positive amount is a row the class skips.\n"
+[inputs.gas_components.fields.fluid]
+unit = "dimensionless"
+description = "Which fluid the row belongs to, 0-based. Fluids are ordered by first appearance, and a whole number from zero is required: a fractional or negative index is not a fluid.\n"
+[inputs.gas_components.fields.name]
+type = "string"
+description = "The component's name. A base component merges by it across the fluids; a pseudo-component's is its own fluid's name and does not survive into the answer.\n"
+[inputs.gas_components.fields.pseudo_component]
+type = "boolean"
+description = "Whether the row is a TBP or plus fraction rather than a base component. A base row's properties are absent and are the databank's at assembly.\n"
+[inputs.gas_components.fields.moles]
+unit = "mol"
+description = "The component's mole amount. Only a positive one is read; a zero or negative amount is a row that is not on the grid.\n"
+[inputs.gas_components.fields.molar_mass]
+unit = "kg/mol"
+optional = true
+description = "The pseudo-component's molar mass, which is what the row's mass is and what its sorting key falls back to. Required on a pseudo row and ignored on a base row.\n"
+[inputs.gas_components.fields.density]
+unit = "kg/m**3"
+optional = true
+description = "The pseudo-component's normal liquid density, which a group's volume is the mass over. Required on a pseudo row and ignored on a base row.\n"
+[inputs.gas_components.fields.normal_boiling_point]
+unit = "K"
+optional = true
+description = "The pseudo-component's normal boiling point, its sorting key where it states a finite positive one. A row without one sorts by its molar mass.\n"
+[inputs.gas_components.fields.critical_temperature]
+unit = "K"
+optional = true
+description = "The pseudo-component's critical temperature, part of the blend's mole-fraction-weighted override.\n"
+[inputs.gas_components.fields.critical_pressure]
+unit = "Pa"
+optional = true
+description = "The pseudo-component's critical pressure, part of the blend's mole-fraction-weighted override.\n"
+[inputs.gas_components.fields.acentric_factor]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's acentric factor, part of the blend's mole-fraction-weighted override.\n"
+[inputs.gas_components.fields.critical_volume]
+unit = "m**3/mol"
+optional = true
+description = "The pseudo-component's critical molar volume, mass-weighted into the group's.\n"
+[inputs.gas_components.fields.racket_z]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's Rackett compressibility, mass-weighted into the group's and read again when the row becomes a component.\n"
+[inputs.gas_components.fields.racket_z_cpa]
+unit = "dimensionless"
+optional = true
+description = "The same compressibility on the CPA basis, mass-weighted into the group's.\n"
+[inputs.gas_components.fields.parachor]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's parachor, in NeqSim's mixed `(mN/m)**(1/4) * cm**3/mol`, mass-weighted into the group's.\n"
+[inputs.gas_components.fields.critical_viscosity]
+unit = "Pa*s"
+optional = true
+description = "The pseudo-component's critical viscosity, mass-weighted into the group's.\n"
+[inputs.gas_components.fields.triple_point_temperature]
+unit = "K"
+optional = true
+description = "The pseudo-component's triple-point temperature, mass-weighted into the group's.\n"
+[inputs.gas_components.fields.heat_of_fusion]
+unit = "J/mol"
+optional = true
+description = "The pseudo-component's heat of fusion, mass-weighted into the group's.\n"
+[inputs.gas_components.fields.ideal_gas_enthalpy_of_formation]
+unit = "J/mol"
+optional = true
+description = "The pseudo-component's ideal-gas enthalpy of formation, mass-weighted into the group's. It has no home on a `Component` and is dropped when a mixture is assembled.\n"
+[inputs.gas_components.fields.cp_a]
+unit = "J/(mol*K)"
+optional = true
+description = "The constant term of the pseudo-component's ideal-gas heat capacity, mass-weighted into the group's.\n"
+[inputs.gas_components.fields.cp_b]
+unit = "J/(mol*K**2)"
+optional = true
+description = "The coefficient of `T` in the pseudo-component's ideal-gas heat capacity.\n"
+[inputs.gas_components.fields.cp_c]
+unit = "J/(mol*K**3)"
+optional = true
+description = "The coefficient of `T**2` in the pseudo-component's ideal-gas heat capacity.\n"
+[inputs.gas_components.fields.cp_d]
+unit = "J/(mol*K**4)"
+optional = true
+description = "The coefficient of `T**3` in the pseudo-component's ideal-gas heat capacity, as `getCpD()` states it: the stored coefficient plus `1e-10`.\n"
+[inputs.gas_components.fields.attractive_m]
+unit = "dimensionless"
+optional = true
+description = "The fitted coefficient of the pseudo-component's Soave alpha function, which NeqSim's `addTBPfraction` installs in place of the acentric factor's correlation.\n"
+
+[inputs.temperature]
+unit = "K"
+description = "the experiment temperature.\n"
+[inputs.eos]
+type = "enum"
+values = ["srk", "pr"]
+optional = true
+description = "the cubic; absent is srk.\n"
+[inputs.mixing_rule]
+type = "enum"
+values = ["classic", "zero"]
+optional = true
+description = "the interaction matrix; absent is classic.\n"
+[inputs.method]
+type = "enum"
+values = ["slim_tube", "key_tie_line", "rising_bubble"]
+optional = true
+description = "the MMP method; absent is slim_tube.\n"
+[inputs.recovery_threshold]
+unit = "dimensionless"
+optional = true
+description = "the recovery fraction defining the MMP; absent is 0.90.\n"
+[inputs.number_of_pressure_points]
+unit = "dimensionless"
+optional = true
+description = "the slim tube's pressure grid points; absent is 10.\n"
+[inputs.min_pressure]
+unit = "Pa"
+optional = true
+description = "the pressure range's lower bound; absent is 100 bar.\n"
+[inputs.max_pressure]
+unit = "Pa"
+optional = true
+description = "the pressure range's upper bound; absent is 500 bar.\n"
+[inputs.slim_tube_nodes]
+unit = "dimensionless"
+optional = true
+description = "the slim tube's cells; absent is 100.\n"
+[inputs.pv_injected]
+unit = "dimensionless"
+optional = true
+description = "the injected pore volumes; absent is 1.2.\n"
+[outputs]
+[outputs.mmp]
+unit = "Pa"
+optional = true
+description = "the minimum miscibility pressure; absent where the range never reaches the threshold.\n"
+[outputs.mechanism]
+type = "string"
+description = "one of first_contact, vaporizing, condensing, combined, immiscible, unknown.\n"
+[outputs.points]
+type = "record_list"
+description = "the slim tube's recovery curve; empty for the key tie line.\n"
+[outputs.points.fields.pressure]
+unit = "Pa"
+description = "the grid pressure.\n"
+[outputs.points.fields.recovery]
+unit = "dimensionless"
+description = "the recovery at that pressure, 0 to 1.\n"
+[implementations]
+python = "azoth.pvt.mmp"
+rust = "azoth_pvt::mmp"

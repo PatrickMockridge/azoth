@@ -151,7 +151,9 @@ dependencies = [
 name = "azoth-pvt"
 version = "0.1.3"
 dependencies = [
+ "azoth-characterization",
  "azoth-core",
+ "azoth-eos",
  "azoth-test-support",
 ]
 

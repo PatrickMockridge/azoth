@@ -28,15 +28,18 @@ from azoth.core.record_outputs_gen import (
     BlackOilResultRow,
     BrineMixingPointRow,
     BubbleTransferZoneReleaseStation,
+    CcePoint,
     CharacterizationComponent,
     ChemicalWarningRow,
     ComponentSelectiveReleaseStation,
     ConsequenceOutcomeResult,
     CostBomRow,
     CostEstimationResultRow,
+    CvdPoint,
     DepositionSegmentRow,
     DepressurizationPoint,
     DisciplineCostLine,
+    DlePoint,
     DriftFluxReleaseStation,
     EnvelopePoint,
     EnvelopeQuery,
@@ -73,6 +76,7 @@ from azoth.core.record_outputs_gen import (
     MahThreat,
     MineralEquilibriumRow,
     MinimalCutSet,
+    MmpPoint,
     MultiVesselContributionRow,
     MultiVesselProfileRow,
     NaceIssueRow,
@@ -91,6 +95,7 @@ from azoth.core.record_outputs_gen import (
     ProcessCostFlag,
     ProcessCostMtoRow,
     ProjectCostLine,
+    PropertyPoint,
     PulsationModeResult,
     RanzMarshallReleaseStation,
     RealGasFannoReleaseStation,
@@ -109,12 +114,14 @@ from azoth.core.record_outputs_gen import (
     ScenarioChangeRow,
     ScenarioIndexRow,
     SelfHeatingTimePoint,
+    SeparatorStageResult,
     SettleOutCompartmentResult,
     SilIssue,
     SterileRadius,
     StreamScaleMineralRow,
     Sts0131FindingResult,
     SubFraction,
+    SwellingPoint,
     TopsidesBreakdownLine,
     TopsidesCapitalLine,
     TopsidesFlag,
@@ -12262,6 +12269,62 @@ class BlackOilCorrelationsResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class ConstantMassExpansionResult(_HasWarnings):
+    """Result of ``pvt.constant_mass_expansion``."""
+
+    CALC_ID: ClassVar[str] = "pvt.constant_mass_expansion"
+
+    #: the saturation pressure at the last bisection midpoint.
+    saturation_pressure: Q
+
+    #: the untranslated saturation volume.
+    saturation_volume: Q
+
+    #: the mole-fraction-weighted compressibility at the saturation state.
+    z_saturation: float
+
+    #: the saturation state's isothermal compressibility, in 1/Pa; the vocabulary has no inverse-pressure unit.
+    saturation_isothermal_compressibility: float
+
+    #: one row per pressure.
+    points: tuple[CcePoint, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class ConstantVolumeDepletionResult(_HasWarnings):
+    """Result of ``pvt.constant_volume_depletion``."""
+
+    CALC_ID: ClassVar[str] = "pvt.constant_volume_depletion"
+
+    #: the saturation pressure on the feed.
+    saturation_pressure: Q
+
+    #: the volume-corrected saturation volume.
+    saturation_volume: Q
+
+    #: the volume-corrected compressibility at saturation.
+    z_saturation: float
+
+    #: the feed's total amount.
+    initial_moles: Q
+
+    #: the total moles the restore loop removed.
+    cumulative_moles_removed: Q
+
+    #: the per-step equilibrium K-values after restoration.
+    k_values: tuple[tuple[float, ...], ...]
+
+    #: one row per pressure.
+    points: tuple[CvdPoint, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class DeclineCurveResult(_HasWarnings):
     """Result of ``pvt.decline_curve``."""
 
@@ -12362,6 +12425,28 @@ class DeclineCurveResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class DifferentialLiberationResult(_HasWarnings):
+    """Result of ``pvt.differential_liberation``."""
+
+    CALC_ID: ClassVar[str] = "pvt.differential_liberation"
+
+    #: the saturation pressure on the partially depleted cell; absent when no point is two-phase.
+    saturation_pressure: Q | None
+
+    #: the translated saturation volume at that state.
+    saturation_volume: Q | None
+
+    #: the stock-tank oil volume from the final standard flash; absent when it leaves no oil.
+    voil_std: Q | None
+
+    #: one row per pressure.
+    points: tuple[DlePoint, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class GasCorrelationsResult(_HasWarnings):
     """Result of ``pvt.gas_correlations``."""
 
@@ -12406,6 +12491,25 @@ class GasMaterialBalanceResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class MmpResult(_HasWarnings):
+    """Result of ``pvt.mmp``."""
+
+    CALC_ID: ClassVar[str] = "pvt.mmp"
+
+    #: the minimum miscibility pressure; absent where the range never reaches the threshold.
+    mmp: Q | None
+
+    #: one of first_contact, vaporizing, condensing, combined, immiscible, unknown.
+    mechanism: str
+
+    #: the slim tube's recovery curve; empty for the key tie line.
+    points: tuple[MmpPoint, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class OilMaterialBalanceResult(_HasWarnings):
     """Result of ``pvt.oil_material_balance``."""
 
@@ -12443,6 +12547,100 @@ class OilMaterialBalanceResult(_HasWarnings):
 
     #: the expansion drive index.
     edi: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PropertySweepResult(_HasWarnings):
+    """Result of ``pvt.property_sweep``."""
+
+    CALC_ID: ClassVar[str] = "pvt.property_sweep"
+
+    #: one row per state.
+    points: tuple[PropertyPoint, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SaturationTestResult(_HasWarnings):
+    """Result of ``pvt.saturation_test``."""
+
+    CALC_ID: ClassVar[str] = "pvt.saturation_test"
+
+    #: the upper saturation pressure in pressure mode.
+    saturation_pressure: Q | None
+
+    #: the upper saturation temperature in temperature mode.
+    saturation_temperature: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SeparatorTestResult(_HasWarnings):
+    """Result of ``pvt.separator_test``."""
+
+    CALC_ID: ClassVar[str] = "pvt.separator_test"
+
+    #: the train's total gas-oil ratio.
+    total_gor: float | None
+
+    #: the train's oil formation volume factor against the reservoir fluid.
+    bo: float | None
+
+    #: the train's Rs, which the class sets to the total GOR.
+    rs: float | None
+
+    #: the train's stock-tank oil density.
+    stock_tank_oil_density: Q | None
+
+    #: the train's stock-tank API gravity, inside the class's density band.
+    stock_tank_api: float | None
+
+    #: the optimal first-stage pressure.
+    optimal_stage_pressure: Q | None
+
+    #: the optimal first-stage temperature.
+    optimal_stage_temperature: Q | None
+
+    #: `1/Bo` at the optimum.
+    maximum_oil_recovery: float | None
+
+    #: the GOR at the optimum.
+    gor_at_optimum: float | None
+
+    #: the Bo at the optimum.
+    bo_at_optimum: float | None
+
+    #: the API at the optimum.
+    api_at_optimum: float | None
+
+    #: one row per stage.
+    stages: tuple[SeparatorStageResult, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SwellingTestResult(_HasWarnings):
+    """Result of ``pvt.swelling_test``."""
+
+    CALC_ID: ClassVar[str] = "pvt.swelling_test"
+
+    #: the base oil's total amount.
+    original_oil_moles: Q
+
+    #: the base oil's bubble-point volume.
+    original_oil_volume: Q
+
+    #: one row per schedule entry.
+    points: tuple[SwellingPoint, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

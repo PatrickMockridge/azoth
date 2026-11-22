@@ -71,6 +71,42 @@ pub struct FluidComponent {
     pub attractive_m: Option<f64>,
 }
 
+impl FluidComponent {
+    /// A base row: a databank name and a mole amount, every property absent.
+    ///
+    /// This is the row a laboratory experiment's fluid is most often made of, and the
+    /// constructor states the contract the assembler enforces - a base row carries no
+    /// properties of its own.
+    #[must_use]
+    pub fn base(name: impl Into<String>, moles: f64) -> Self {
+        Self {
+            fluid: 0.0,
+            name: name.into(),
+            pseudo_component: false,
+            moles,
+            molar_mass: None,
+            density: None,
+            normal_boiling_point: None,
+            critical_temperature: None,
+            critical_pressure: None,
+            acentric_factor: None,
+            critical_volume: None,
+            racket_z: None,
+            racket_z_cpa: None,
+            parachor: None,
+            critical_viscosity: None,
+            triple_point_temperature: None,
+            heat_of_fusion: None,
+            ideal_gas_enthalpy_of_formation: None,
+            cp_a: None,
+            cp_b: None,
+            cp_c: None,
+            cp_d: None,
+            attractive_m: None,
+        }
+    }
+}
+
 /// One component of a blended or re-cut fluid, as a method returns it.
 ///
 /// The same row less its fluid index: the answer is one fluid, so which of the inputs a

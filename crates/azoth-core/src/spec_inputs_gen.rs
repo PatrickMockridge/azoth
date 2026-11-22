@@ -356,10 +356,18 @@
 //!   - specs/models/process/vessel_filling.toml
 //!   - specs/models/process/vessel_rupture.toml
 //!   - specs/models/pvt/black_oil_correlations.toml
+//!   - specs/models/pvt/constant_mass_expansion.toml
+//!   - specs/models/pvt/constant_volume_depletion.toml
 //!   - specs/models/pvt/decline_curve.toml
+//!   - specs/models/pvt/differential_liberation.toml
 //!   - specs/models/pvt/gas_correlations.toml
 //!   - specs/models/pvt/gas_material_balance.toml
+//!   - specs/models/pvt/mmp.toml
 //!   - specs/models/pvt/oil_material_balance.toml
+//!   - specs/models/pvt/property_sweep.toml
+//!   - specs/models/pvt/saturation_test.toml
+//!   - specs/models/pvt/separator_test.toml
+//!   - specs/models/pvt/swelling_test.toml
 //!   - specs/models/pvt/water_correlations.toml
 //!   - specs/models/reactions/chemical_equilibrium.toml
 //!   - specs/calcs/reactions/equilibrium_constant.toml
@@ -6825,6 +6833,18 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "tensile_strength_factor",
         "dimensionless",
     ),
+    (
+        "pvt.constant_mass_expansion",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    ("pvt.constant_mass_expansion", "pressures", "pressure"),
+    (
+        "pvt.constant_volume_depletion",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    ("pvt.constant_volume_depletion", "pressures", "pressure"),
     ("pvt.decline_curve", "qi", "dimensionless"),
     ("pvt.decline_curve", "di", "dimensionless"),
     ("pvt.decline_curve", "b", "dimensionless"),
@@ -6848,6 +6868,12 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("pvt.decline_curve", "end_index", "dimensionless"),
     ("pvt.decline_curve", "history_time", "dimensionless"),
     ("pvt.decline_curve", "history_rate", "dimensionless"),
+    (
+        "pvt.differential_liberation",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    ("pvt.differential_liberation", "pressures", "pressure"),
     ("pvt.gas_material_balance", "pressure", "pressure"),
     ("pvt.gas_material_balance", "z", "dimensionless"),
     ("pvt.gas_material_balance", "gp", "dimensionless"),
@@ -6860,6 +6886,13 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "thermodynamic_temperature",
     ),
     ("pvt.gas_material_balance", "gas_gravity", "dimensionless"),
+    ("pvt.mmp", "temperature", "thermodynamic_temperature"),
+    ("pvt.mmp", "recovery_threshold", "dimensionless"),
+    ("pvt.mmp", "number_of_pressure_points", "dimensionless"),
+    ("pvt.mmp", "min_pressure", "pressure"),
+    ("pvt.mmp", "max_pressure", "pressure"),
+    ("pvt.mmp", "slim_tube_nodes", "dimensionless"),
+    ("pvt.mmp", "pv_injected", "dimensionless"),
     ("pvt.oil_material_balance", "np", "dimensionless"),
     ("pvt.oil_material_balance", "rp", "dimensionless"),
     ("pvt.oil_material_balance", "bo", "dimensionless"),
@@ -6885,6 +6918,66 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("pvt.oil_material_balance", "eo_history", "dimensionless"),
     ("pvt.oil_material_balance", "eg_history", "dimensionless"),
     ("pvt.oil_material_balance", "we_history", "dimensionless"),
+    (
+        "pvt.property_sweep",
+        "temperatures",
+        "thermodynamic_temperature",
+    ),
+    ("pvt.property_sweep", "pressures", "pressure"),
+    (
+        "pvt.saturation_test",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    ("pvt.saturation_test", "pressure", "pressure"),
+    (
+        "pvt.saturation_test",
+        "temperature_search_min",
+        "thermodynamic_temperature",
+    ),
+    (
+        "pvt.saturation_test",
+        "temperature_search_max",
+        "thermodynamic_temperature",
+    ),
+    ("pvt.separator_test", "reservoir_pressure", "pressure"),
+    (
+        "pvt.separator_test",
+        "reservoir_temperature",
+        "thermodynamic_temperature",
+    ),
+    ("pvt.separator_test", "first_stage_pressure_min", "pressure"),
+    ("pvt.separator_test", "first_stage_pressure_max", "pressure"),
+    (
+        "pvt.separator_test",
+        "first_stage_pressure_steps",
+        "dimensionless",
+    ),
+    (
+        "pvt.separator_test",
+        "first_stage_temperature_min",
+        "thermodynamic_temperature",
+    ),
+    (
+        "pvt.separator_test",
+        "first_stage_temperature_max",
+        "thermodynamic_temperature",
+    ),
+    (
+        "pvt.separator_test",
+        "first_stage_temperature_steps",
+        "dimensionless",
+    ),
+    (
+        "pvt.swelling_test",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "pvt.swelling_test",
+        "cumulative_gas_injected",
+        "dimensionless",
+    ),
     (
         "reactions.chemical_equilibrium",
         "a_matrix",

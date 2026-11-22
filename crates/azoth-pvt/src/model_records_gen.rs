@@ -12,15 +12,57 @@
 use azoth_core::{CalcResult, Warning};
 
 use crate::black_oil_correlations::BlackOilCorrelationsResult;
+use crate::constant_mass_expansion::ConstantMassExpansionResult;
+use crate::constant_volume_depletion::ConstantVolumeDepletionResult;
 use crate::decline_curve::DeclineCurveResult;
+use crate::differential_liberation::DifferentialLiberationResult;
 use crate::gas_correlations::GasCorrelationsResult;
 use crate::gas_material_balance::GasMaterialBalanceResult;
+use crate::mmp::MmpResult;
 use crate::oil_material_balance::OilMaterialBalanceResult;
+use crate::property_sweep::PropertySweepResult;
+use crate::saturation_test::SaturationTestResult;
+use crate::separator_test::SeparatorTestResult;
+use crate::swelling_test::SwellingTestResult;
 use crate::water_correlations::WaterCorrelationsResult;
 
 impl CalcResult for BlackOilCorrelationsResult {
     const CALC_ID: &'static str = "pvt.black_oil_correlations";
     const FIELDS: &'static [&'static str] = &["queries", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for ConstantMassExpansionResult {
+    const CALC_ID: &'static str = "pvt.constant_mass_expansion";
+    const FIELDS: &'static [&'static str] = &[
+        "saturation_pressure",
+        "saturation_volume",
+        "z_saturation",
+        "saturation_isothermal_compressibility",
+        "points",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for ConstantVolumeDepletionResult {
+    const CALC_ID: &'static str = "pvt.constant_volume_depletion";
+    const FIELDS: &'static [&'static str] = &[
+        "saturation_pressure",
+        "saturation_volume",
+        "z_saturation",
+        "initial_moles",
+        "cumulative_moles_removed",
+        "k_values",
+        "points",
+        "warnings",
+    ];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings
@@ -68,6 +110,21 @@ impl CalcResult for DeclineCurveResult {
     }
 }
 
+impl CalcResult for DifferentialLiberationResult {
+    const CALC_ID: &'static str = "pvt.differential_liberation";
+    const FIELDS: &'static [&'static str] = &[
+        "saturation_pressure",
+        "saturation_volume",
+        "voil_std",
+        "points",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for GasCorrelationsResult {
     const CALC_ID: &'static str = "pvt.gas_correlations";
     const FIELDS: &'static [&'static str] = &["queries", "warnings"];
@@ -95,6 +152,15 @@ impl CalcResult for GasMaterialBalanceResult {
     }
 }
 
+impl CalcResult for MmpResult {
+    const CALC_ID: &'static str = "pvt.mmp";
+    const FIELDS: &'static [&'static str] = &["mmp", "mechanism", "points", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for OilMaterialBalanceResult {
     const CALC_ID: &'static str = "pvt.oil_material_balance";
     const FIELDS: &'static [&'static str] = &[
@@ -109,6 +175,62 @@ impl CalcResult for OilMaterialBalanceResult {
         "sdi",
         "wdi",
         "edi",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for PropertySweepResult {
+    const CALC_ID: &'static str = "pvt.property_sweep";
+    const FIELDS: &'static [&'static str] = &["points", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for SaturationTestResult {
+    const CALC_ID: &'static str = "pvt.saturation_test";
+    const FIELDS: &'static [&'static str] =
+        &["saturation_pressure", "saturation_temperature", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for SeparatorTestResult {
+    const CALC_ID: &'static str = "pvt.separator_test";
+    const FIELDS: &'static [&'static str] = &[
+        "total_gor",
+        "bo",
+        "rs",
+        "stock_tank_oil_density",
+        "stock_tank_api",
+        "optimal_stage_pressure",
+        "optimal_stage_temperature",
+        "maximum_oil_recovery",
+        "gor_at_optimum",
+        "bo_at_optimum",
+        "api_at_optimum",
+        "stages",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for SwellingTestResult {
+    const CALC_ID: &'static str = "pvt.swelling_test";
+    const FIELDS: &'static [&'static str] = &[
+        "original_oil_moles",
+        "original_oil_volume",
+        "points",
         "warnings",
     ];
 

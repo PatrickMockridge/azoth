@@ -22,28 +22,52 @@ from typing import Any
 from azoth._dispatch import resolve
 from azoth.core.result import (
     BlackOilCorrelationsResult,
+    ConstantMassExpansionResult,
+    ConstantVolumeDepletionResult,
     DeclineCurveResult,
+    DifferentialLiberationResult,
     GasCorrelationsResult,
     GasMaterialBalanceResult,
+    MmpResult,
     OilMaterialBalanceResult,
+    PropertySweepResult,
+    SaturationTestResult,
+    SeparatorTestResult,
+    SwellingTestResult,
     WaterCorrelationsResult,
 )
 from azoth.pvt import layers as layers
 
 _BLACK_OIL_CORRELATIONS = "pvt.black_oil_correlations"
+_CONSTANT_MASS_EXPANSION = "pvt.constant_mass_expansion"
+_CONSTANT_VOLUME_DEPLETION = "pvt.constant_volume_depletion"
 _DECLINE_CURVE = "pvt.decline_curve"
+_DIFFERENTIAL_LIBERATION = "pvt.differential_liberation"
 _GAS_CORRELATIONS = "pvt.gas_correlations"
 _GAS_MATERIAL_BALANCE = "pvt.gas_material_balance"
+_MMP = "pvt.mmp"
 _OIL_MATERIAL_BALANCE = "pvt.oil_material_balance"
+_PROPERTY_SWEEP = "pvt.property_sweep"
+_SATURATION_TEST = "pvt.saturation_test"
+_SEPARATOR_TEST = "pvt.separator_test"
+_SWELLING_TEST = "pvt.swelling_test"
 _WATER_CORRELATIONS = "pvt.water_correlations"
 
 __all__ = [
     "black_oil_correlations",
+    "constant_mass_expansion",
+    "constant_volume_depletion",
     "decline_curve",
+    "differential_liberation",
     "gas_correlations",
     "gas_material_balance",
     "layers",
+    "mmp",
     "oil_material_balance",
+    "property_sweep",
+    "saturation_test",
+    "separator_test",
+    "swelling_test",
     "water_correlations",
 ]
 
@@ -73,6 +97,254 @@ def black_oil_correlations(
     """
     return resolve(_BLACK_OIL_CORRELATIONS)(  # type: ignore[no-any-return]
         queries=queries,
+    )
+
+
+def differential_liberation(
+    components: Sequence[Mapping[str, Any]],
+    *,
+    pressures: Sequence[Any],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    temperature: Any = None,
+    volume_correction: bool | None = None,
+) -> DifferentialLiberationResult:
+    """The differential liberation of a fluid over a pressure schedule.
+
+    ``components`` is the characterization row list; the temperature and pressures are
+    absolute. The gas phase is removed after every two-phase step, and the retained liquid's
+    final 288.15 K / 1.01325 bar flash gives the stock-tank oil volume every Bo and Rs is
+    measured against. A single-phase point leaves its gas fields and its liquid relative
+    volume absent.
+
+    Returns:
+        The saturation scalars, the stock-tank volume and one ``points`` row per pressure.
+
+    Raises:
+        InvalidInputError: for an unknown ``eos`` or ``mixing_rule``, no pressures, or a
+            non-positive temperature or pressure.
+
+    See :func:`azoth.pvt.reference.differential_liberation.differential_liberation`.
+    """
+    return resolve(_DIFFERENTIAL_LIBERATION)(  # type: ignore[no-any-return]
+        components=components,
+        temperature=temperature,
+        pressures=pressures,
+        eos=eos,
+        mixing_rule=mixing_rule,
+        volume_correction=volume_correction,
+    )
+
+
+def constant_volume_depletion(
+    components: Sequence[Mapping[str, Any]],
+    *,
+    pressures: Sequence[Any],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    temperature: Any = None,
+    volume_correction: bool | None = None,
+) -> ConstantVolumeDepletionResult:
+    """The constant-volume depletion of a fluid over a pressure schedule.
+
+    ``components`` is the characterization row list; the temperature and pressures are
+    absolute. The saturation state is an upward scan on the feed. Each point whose volume
+    exceeds the saturation volume has gas removed until it is restored, and the cumulative
+    removed moles, the material-balance residual, Zmix, Zgas and the liquid dropout are
+    reported per point. The K-values are the per-step equilibrium, not the class's QC method.
+
+    Returns:
+        The saturation scalars and one ``points`` row per pressure.
+
+    Raises:
+        InvalidInputError: for an unknown ``eos`` or ``mixing_rule``, no pressures, or a
+            restore loop that overshoots, finds no gas, or fails to converge.
+
+    See :func:`azoth.pvt.reference.constant_volume_depletion.constant_volume_depletion`.
+    """
+    return resolve(_CONSTANT_VOLUME_DEPLETION)(  # type: ignore[no-any-return]
+        components=components,
+        temperature=temperature,
+        pressures=pressures,
+        eos=eos,
+        mixing_rule=mixing_rule,
+        volume_correction=volume_correction,
+    )
+
+
+def separator_test(
+    components: Sequence[Mapping[str, Any]],
+    mode: str,
+    *,
+    stages: Sequence[Mapping[str, Any]],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+    reservoir_pressure: Any = None,
+    reservoir_temperature: Any = None,
+    optimize_first_stage: bool | None = None,
+    first_stage_pressure_min: Any = None,
+    first_stage_pressure_max: Any = None,
+    first_stage_pressure_steps: Any = None,
+    first_stage_temperature_min: Any = None,
+    first_stage_temperature_max: Any = None,
+    first_stage_temperature_steps: Any = None,
+) -> SeparatorTestResult:
+    """The separator experiment over the stated stages.
+
+    ``mode`` is ``"continuous"`` (the GOR class, every stage reflashing the full feed),
+    ``"staged"`` (the gas leaves and the liquid cascades) or ``"train"`` (the multi-stage
+    train, which needs the reservoir conditions and may optimise its first stage over a
+    pressure/temperature grid). ``stages`` is the stage record list, each with a pressure in
+    Pa and a temperature in K.
+
+    Returns:
+        One ``stages`` row per stage, and in the train the total GOR, Bo, Rs, stock-tank
+        density and API - plus the optimum's fields when the optimisation ran.
+
+    Raises:
+        InvalidInputError: for an unknown ``mode``, no stages, a non-positive pressure or
+            temperature, a missing reservoir condition, or a bad optimisation grid.
+
+    See :func:`azoth.pvt.reference.separator_test.separator_test`.
+    """
+    return resolve(_SEPARATOR_TEST)(  # type: ignore[no-any-return]
+        components=components,
+        mode=mode,
+        stages=stages,
+        eos=eos,
+        mixing_rule=mixing_rule,
+        volume_correction=volume_correction,
+        reservoir_pressure=reservoir_pressure,
+        reservoir_temperature=reservoir_temperature,
+        optimize_first_stage=optimize_first_stage,
+        first_stage_pressure_min=first_stage_pressure_min,
+        first_stage_pressure_max=first_stage_pressure_max,
+        first_stage_pressure_steps=first_stage_pressure_steps,
+        first_stage_temperature_min=first_stage_temperature_min,
+        first_stage_temperature_max=first_stage_temperature_max,
+        first_stage_temperature_steps=first_stage_temperature_steps,
+    )
+
+
+def swelling_test(
+    components: Sequence[Mapping[str, Any]],
+    *,
+    cumulative_gas_injected: Sequence[Any],
+    injection_gas: Sequence[Mapping[str, Any]] | None = None,
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    temperature: Any = None,
+    volume_correction: bool | None = None,
+) -> SwellingTestResult:
+    """The swelling of an oil by an injection gas.
+
+    ``components`` is the base oil's row list and ``injection_gas`` the gas's; the schedule
+    states the cumulative injection as fractions of the original oil moles. At each entry the
+    mixture's bubble point is solved and its volume is reported against the base oil's.
+
+    Returns:
+        The base oil's amount and bubble-point volume, and one ``points`` row per entry.
+
+    Raises:
+        InvalidInputError: for an empty, negative or decreasing schedule, an injection without
+            a gas, a non-positive temperature, or a failed bubble point.
+
+    See :func:`azoth.pvt.reference.swelling_test.swelling_test`.
+    """
+    return resolve(_SWELLING_TEST)(  # type: ignore[no-any-return]
+        components=components,
+        injection_gas=injection_gas,
+        eos=eos,
+        mixing_rule=mixing_rule,
+        temperature=temperature,
+        cumulative_gas_injected=cumulative_gas_injected,
+        volume_correction=volume_correction,
+    )
+
+
+def mmp(
+    oil_components: Sequence[Mapping[str, Any]],
+    gas_components: Sequence[Mapping[str, Any]],
+    *,
+    temperature: Any,
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    method: str | None = None,
+    recovery_threshold: float | None = None,
+    number_of_pressure_points: int | None = None,
+    min_pressure: Any = None,
+    max_pressure: Any = None,
+    slim_tube_nodes: int | None = None,
+    pv_injected: float | None = None,
+) -> MmpResult:
+    """The minimum miscibility pressure of an oil and an injection gas.
+
+    ``oil_components`` and ``gas_components`` are the characterization row lists; every gas
+    component must be one the oil carries, because the class injects only the components a
+    cell already has. ``method`` is ``"slim_tube"`` (the default), ``"key_tie_line"`` or
+    ``"rising_bubble"``, which the class delegates to the slim tube.
+
+    Returns:
+        The MMP (absent where the range never reaches the threshold), the mechanism, and the
+        slim tube's ``points`` recovery curve.
+
+    Raises:
+        InvalidInputError: for a gas component the oil does not carry, an unknown method,
+            fewer than three pressure points, a bad grid, or a non-positive temperature.
+
+    See :func:`azoth.pvt.reference.mmp.mmp`.
+    """
+    return resolve(_MMP)(  # type: ignore[no-any-return]
+        oil_components=oil_components,
+        gas_components=gas_components,
+        temperature=temperature,
+        eos=eos,
+        mixing_rule=mixing_rule,
+        method=method,
+        recovery_threshold=recovery_threshold,
+        number_of_pressure_points=number_of_pressure_points,
+        min_pressure=min_pressure,
+        max_pressure=max_pressure,
+        slim_tube_nodes=slim_tube_nodes,
+        pv_injected=pv_injected,
+    )
+
+
+def property_sweep(
+    components: Sequence[Mapping[str, Any]],
+    mode: str,
+    *,
+    temperatures: Sequence[Any],
+    pressures: Sequence[Any],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+) -> PropertySweepResult:
+    """A density or viscosity sweep over a grid of states.
+
+    ``mode`` is ``"density"`` (the phase densities) or ``"viscosity"`` (the phase viscosities
+    and the availability flags). ``temperatures`` and ``pressures`` are parallel arrays of
+    absolute states. **The wax sweeps are owed** with NeqSim's TBP wax model, which a
+    characterization row cannot express.
+
+    Returns:
+        One ``points`` row per state.
+
+    Raises:
+        InvalidInputError: for an unknown mode, ``eos`` or ``mixing_rule``, empty or unequal
+            arrays, a non-positive temperature or pressure, or a wax mode.
+
+    See :func:`azoth.pvt.reference.property_sweep.property_sweep`.
+    """
+    return resolve(_PROPERTY_SWEEP)(  # type: ignore[no-any-return]
+        components=components,
+        mode=mode,
+        temperatures=temperatures,
+        pressures=pressures,
+        eos=eos,
+        mixing_rule=mixing_rule,
+        volume_correction=volume_correction,
     )
 
 
@@ -122,6 +394,44 @@ def water_correlations(
     """
     return resolve(_WATER_CORRELATIONS)(  # type: ignore[no-any-return]
         queries=queries,
+    )
+
+
+def constant_mass_expansion(
+    components: Sequence[Mapping[str, Any]],
+    *,
+    pressures: Sequence[Any],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    temperature: Any = None,
+    volume_correction: bool | None = None,
+) -> ConstantMassExpansionResult:
+    """The constant-mass expansion of a fluid over a pressure schedule.
+
+    ``components`` is the characterization row list; the temperature is absolute and the
+    pressures absolute. The saturation state is the class's upward scan's last bisection
+    midpoint, and the schedule is reported in its own order. The saturation and total volumes
+    are untranslated; the phase densities and the gas volume are translated where
+    ``volume_correction`` is not false. A two-phase point carries ``liquid_relative_volume``
+    and ``y_factor`` and leaves ``viscosity`` and ``isothermal_compressibility`` absent; a
+    single-phase point does the reverse.
+
+    Returns:
+        The saturation scalars and one ``points`` row per pressure.
+
+    Raises:
+        InvalidInputError: for an unknown ``eos`` or ``mixing_rule``, no pressures, or a
+            non-positive temperature or pressure.
+
+    See :func:`azoth.pvt.reference.constant_mass_expansion.constant_mass_expansion`.
+    """
+    return resolve(_CONSTANT_MASS_EXPANSION)(  # type: ignore[no-any-return]
+        components=components,
+        temperature=temperature,
+        pressures=pressures,
+        eos=eos,
+        mixing_rule=mixing_rule,
+        volume_correction=volume_correction,
     )
 
 
@@ -236,6 +546,49 @@ def gas_material_balance(
         z_value=z_value,
         temperature=temperature,
         gas_gravity=gas_gravity,
+    )
+
+
+def saturation_test(
+    components: Sequence[Mapping[str, Any]],
+    mode: str,
+    *,
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    temperature: Any = None,
+    pressure: Any = None,
+    temperature_search_min: Any = None,
+    temperature_search_max: Any = None,
+) -> SaturationTestResult:
+    """The upper saturation boundary of a fluid.
+
+    ``components`` is the characterization row list the fluid is built from, the same rows
+    :func:`azoth.characterization.mixture_from_characterization` takes. ``mode`` is
+    ``"pressure"``, which needs ``temperature``, or ``"temperature"``, which needs
+    ``pressure`` and accepts a pair of ``temperature_search_*`` bounds inside ``[30, 1200]``
+    K. The search is the classes' descending grid for the uppermost two-phase crossing; an
+    interval that brackets none returns the grid top with an ``OUT_OF_VALID_RANGE`` warning
+    rather than refusing.
+
+    Returns:
+        ``saturation_pressure`` in pressure mode or ``saturation_temperature`` in temperature
+        mode; the other is absent.
+
+    Raises:
+        InvalidInputError: for an unknown mode, ``eos`` or ``mixing_rule``, a missing fixed
+            state, one bound without the other, or bounds outside the class grid.
+
+    See :func:`azoth.pvt.reference.saturation_test.saturation_test`.
+    """
+    return resolve(_SATURATION_TEST)(  # type: ignore[no-any-return]
+        components=components,
+        mode=mode,
+        eos=eos,
+        mixing_rule=mixing_rule,
+        temperature=temperature,
+        pressure=pressure,
+        temperature_search_min=temperature_search_min,
+        temperature_search_max=temperature_search_max,
     )
 
 

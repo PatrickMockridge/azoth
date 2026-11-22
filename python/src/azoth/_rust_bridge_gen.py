@@ -54,6 +54,7 @@ from azoth.core.result import (
     BwrsPhaseResult,
     CalcIonicCompositionResult,
     CapillaryDewPointResult,
+    CcePoint,
     CdftSurfaceTensionResult,
     ChapmanEnskogDiffusivityResult,
     CharacterisePlusFractionResult,
@@ -79,6 +80,8 @@ from azoth.core.result import (
     ConductionPlaneWallResult,
     ConsequenceAnalysisResult,
     ConsequenceOutcomeResult,
+    ConstantMassExpansionResult,
+    ConstantVolumeDepletionResult,
     ControlValveCvResult,
     ControlValveFailureReliefResult,
     CooldownVerdict,
@@ -89,6 +92,7 @@ from azoth.core.result import (
     CostEstimationResult,
     CostEstimationResultRow,
     CriticalPointResult,
+    CvdPoint,
     DarcyWeisbachResult,
     DeadheadVerdict,
     DeclineCurveResult,
@@ -102,8 +106,10 @@ from azoth.core.result import (
     DeWaardMilliamsCorrosionResult,
     DewPressureResult,
     DewTemperatureResult,
+    DifferentialLiberationResult,
     DisciplineCostLine,
     DistillationColumnResult,
+    DlePoint,
     DriftFluxReleaseResult,
     DriftFluxReleaseStation,
     DynamicPsvSizingResult,
@@ -256,6 +262,8 @@ from azoth.core.result import (
     MineralEquilibriumRow,
     MinimalCutSet,
     MixerResult,
+    MmpPoint,
+    MmpResult,
     MolarEnthalpyEntropyResult,
     MollerupAlphaResult,
     MultiflashStabilityTestResult,
@@ -334,6 +342,8 @@ from azoth.core.result import (
     ProcessCostMtoRow,
     ProductionChemicalScaleScenarioResult,
     ProjectCostLine,
+    PropertyPoint,
+    PropertySweepResult,
     PrPenelouxShiftResult,
     PrsvKappaResult,
     PrZFactorResult,
@@ -392,6 +402,7 @@ from azoth.core.result import (
     SaftVrMiePhaseResult,
     SaltPrecipitationResult,
     SaturateWithWaterResult,
+    SaturationTestResult,
     ScaleControlAssessorResult,
     ScaleControlRiskRow,
     ScaleControlRow,
@@ -413,6 +424,8 @@ from azoth.core.result import (
     SeparatorCapacityAssessmentResult,
     SeparatorPerformanceResult,
     SeparatorResult,
+    SeparatorStageResult,
+    SeparatorTestResult,
     SetHeavyTbpToPlusResult,
     SettleOutCompartmentResult,
     SettleOutPressureResult,
@@ -449,6 +462,8 @@ from azoth.core.result import (
     SupplyVerdict,
     SurfCooldownResult,
     SwameeJainResult,
+    SwellingPoint,
+    SwellingTestResult,
     TankResult,
     TbpClosureResult,
     TbpCutBoundariesResult,
@@ -620,6 +635,8 @@ __all__ = [
     "compressor",
     "conduction_plane_wall",
     "consequence_analysis",
+    "constant_mass_expansion",
+    "constant_volume_depletion",
     "control_valve_cv",
     "control_valve_failure_relief",
     "cooler",
@@ -637,6 +654,7 @@ __all__ = [
     "desmukh_mather_phase",
     "dew_pressure",
     "dew_temperature",
+    "differential_liberation",
     "distillation_column",
     "drift_flux_release",
     "dynamic_psv_sizing",
@@ -746,6 +764,7 @@ __all__ = [
     "matcop_prumr_new_alpha",
     "mdmt",
     "mixer",
+    "mmp",
     "molar_enthalpy_entropy",
     "mollerup_alpha",
     "multi_mineral_scale_equilibrium",
@@ -805,6 +824,7 @@ __all__ = [
     "probit",
     "process_cost_estimate",
     "production_chemical_scale_scenario",
+    "property_sweep",
     "prsv_kappa",
     "ps_flash",
     "psv_fire_sizing",
@@ -845,6 +865,7 @@ __all__ = [
     "saft_vr_mie_phase",
     "salt_precipitation",
     "saturate_with_water",
+    "saturation_test",
     "scale_control_assessor",
     "scale_deposition_accumulator",
     "scale_inhibitor_performance",
@@ -859,6 +880,7 @@ __all__ = [
     "separator",
     "separator_capacity_assessment",
     "separator_performance",
+    "separator_test",
     "set_heavy_tbp_to_plus",
     "settle_out_pressure",
     "shah_condensation",
@@ -885,6 +907,7 @@ __all__ = [
     "stripping_column",
     "sts0131_gate",
     "surf_cooldown",
+    "swelling_test",
     "tank",
     "tbp_closure",
     "tbp_cut_boundaries",
@@ -10459,6 +10482,50 @@ def black_oil_correlations(queries: Sequence[Mapping[str, Any]]) -> BlackOilCorr
     )
 
 
+def constant_mass_expansion(components: Sequence[Mapping[str, Any]], *, pressures: Sequence[Any], eos: str | None=None, mixing_rule: str | None=None, temperature: Any=None, volume_correction: bool | None=None) -> ConstantMassExpansionResult:
+    """``pvt.constant_mass_expansion``, computed in Rust."""
+    spec = _models_gen.model("pvt.constant_mass_expansion")
+    result = _core.constant_mass_expansion(
+        input_records_to_si(spec, "components", components),
+        _si(spec, "temperature", temperature),
+        [_si(spec, "pressures", v) for v in pressures],
+        eos,
+        mixing_rule,
+        volume_correction,
+    )
+    return ConstantMassExpansionResult(
+        saturation_pressure=from_si(result.saturation_pressure.magnitude_si, result.saturation_pressure.unit),
+        saturation_volume=from_si(result.saturation_volume.magnitude_si, result.saturation_volume.unit),
+        z_saturation=result.z_saturation,
+        saturation_isothermal_compressibility=result.saturation_isothermal_compressibility,
+        points=tuple(CcePoint(pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), total_volume=from_si(c.total_volume.magnitude_si, c.total_volume.unit), relative_volume=c.relative_volume, density=from_si(c.density.magnitude_si, c.density.unit), gas_volume=from_si(c.gas_volume.magnitude_si, c.gas_volume.unit), gas_standard_volume=from_si(c.gas_standard_volume.magnitude_si, c.gas_standard_volume.unit), bg=c.bg, z_gas=c.z_gas, oil_density=None if c.oil_density is None else from_si(c.oil_density.magnitude_si, c.oil_density.unit), oil_viscosity=None if c.oil_viscosity is None else from_si(c.oil_viscosity.magnitude_si, c.oil_viscosity.unit), liquid_relative_volume=c.liquid_relative_volume, y_factor=c.y_factor, viscosity=None if c.viscosity is None else from_si(c.viscosity.magnitude_si, c.viscosity.unit), isothermal_compressibility=c.isothermal_compressibility) for c in result.points),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def constant_volume_depletion(components: Sequence[Mapping[str, Any]], *, pressures: Sequence[Any], eos: str | None=None, mixing_rule: str | None=None, temperature: Any=None, volume_correction: bool | None=None) -> ConstantVolumeDepletionResult:
+    """``pvt.constant_volume_depletion``, computed in Rust."""
+    spec = _models_gen.model("pvt.constant_volume_depletion")
+    result = _core.constant_volume_depletion(
+        input_records_to_si(spec, "components", components),
+        _si(spec, "temperature", temperature),
+        [_si(spec, "pressures", v) for v in pressures],
+        eos,
+        mixing_rule,
+        volume_correction,
+    )
+    return ConstantVolumeDepletionResult(
+        saturation_pressure=from_si(result.saturation_pressure.magnitude_si, result.saturation_pressure.unit),
+        saturation_volume=from_si(result.saturation_volume.magnitude_si, result.saturation_volume.unit),
+        z_saturation=result.z_saturation,
+        initial_moles=from_si(result.initial_moles.magnitude_si, result.initial_moles.unit),
+        cumulative_moles_removed=from_si(result.cumulative_moles_removed.magnitude_si, result.cumulative_moles_removed.unit),
+        k_values=tuple(tuple(row) for row in result.k_values),
+        points=tuple(CvdPoint(pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), total_volume=from_si(c.total_volume.magnitude_si, c.total_volume.unit), relative_volume=c.relative_volume, cumulative_mole_fraction_depleted=c.cumulative_mole_fraction_depleted, material_balance_relative_error=c.material_balance_relative_error, zmix=c.zmix, z_gas=c.z_gas, liquid_volume=None if c.liquid_volume is None else from_si(c.liquid_volume.magnitude_si, c.liquid_volume.unit), liquid_volume_relative_to_vsat=c.liquid_volume_relative_to_vsat) for c in result.points),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def decline_curve(calculation: str, *, qi: float | None=None, di: float | None=None, b: float | None=None, t: float | None=None, q_limit: float | None=None, d_nominal: float | None=None, d_effective: float | None=None, q1: float | None=None, t1: float | None=None, q2: float | None=None, t2: float | None=None, q3: float | None=None, t3: float | None=None, t_start: float | None=None, t_end: float | None=None, t_step: float | None=None, t_current: float | None=None, a: float | None=None, m: float | None=None, start_index: float | None=None, end_index: float | None=None, history_time: Sequence[float] | None=None, history_rate: Sequence[float] | None=None) -> DeclineCurveResult:
     """``pvt.decline_curve``, computed in Rust."""
     result = _core.decline_curve(
@@ -10522,6 +10589,26 @@ def decline_curve(calculation: str, *, qi: float | None=None, di: float | None=N
     )
 
 
+def differential_liberation(components: Sequence[Mapping[str, Any]], *, pressures: Sequence[Any], eos: str | None=None, mixing_rule: str | None=None, temperature: Any=None, volume_correction: bool | None=None) -> DifferentialLiberationResult:
+    """``pvt.differential_liberation``, computed in Rust."""
+    spec = _models_gen.model("pvt.differential_liberation")
+    result = _core.differential_liberation(
+        input_records_to_si(spec, "components", components),
+        _si(spec, "temperature", temperature),
+        [_si(spec, "pressures", v) for v in pressures],
+        eos,
+        mixing_rule,
+        volume_correction,
+    )
+    return DifferentialLiberationResult(
+        saturation_pressure=None if result.saturation_pressure is None else from_si(result.saturation_pressure.magnitude_si, result.saturation_pressure.unit),
+        saturation_volume=None if result.saturation_volume is None else from_si(result.saturation_volume.magnitude_si, result.saturation_volume.unit),
+        voil_std=None if result.voil_std is None else from_si(result.voil_std.magnitude_si, result.voil_std.unit),
+        points=tuple(DlePoint(pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), total_volume=from_si(c.total_volume.magnitude_si, c.total_volume.unit), relative_volume=c.relative_volume, liquid_volume=from_si(c.liquid_volume.magnitude_si, c.liquid_volume.unit), liquid_volume_relative_to_vsat=c.liquid_volume_relative_to_vsat, oil_density=from_si(c.oil_density.magnitude_si, c.oil_density.unit), gas_volume=None if c.gas_volume is None else from_si(c.gas_volume.magnitude_si, c.gas_volume.unit), gas_standard_volume=None if c.gas_standard_volume is None else from_si(c.gas_standard_volume.magnitude_si, c.gas_standard_volume.unit), z_gas=c.z_gas, relative_gas_gravity=c.relative_gas_gravity, bo=c.bo, bg=c.bg, rs=c.rs) for c in result.points),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def gas_correlations(queries: Sequence[Mapping[str, Any]]) -> GasCorrelationsResult:
     """``pvt.gas_correlations``, computed in Rust."""
     spec = _models_gen.model("pvt.gas_correlations")
@@ -10556,6 +10643,31 @@ def gas_material_balance(calculation: str, *, pressure: Sequence[Any] | None=Non
         r_squared=result.r_squared,
         cole_gp=None if result.cole_gp is None else tuple(result.cole_gp),
         cole_f_over_eg=None if result.cole_f_over_eg is None else tuple(result.cole_f_over_eg),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def mmp(oil_components: Sequence[Mapping[str, Any]], gas_components: Sequence[Mapping[str, Any]], *, temperature: Any, eos: str | None=None, mixing_rule: str | None=None, method: str | None=None, recovery_threshold: float | None=None, number_of_pressure_points: int | None=None, min_pressure: Any=None, max_pressure: Any=None, slim_tube_nodes: int | None=None, pv_injected: float | None=None) -> MmpResult:
+    """``pvt.mmp``, computed in Rust."""
+    spec = _models_gen.model("pvt.mmp")
+    result = _core.mmp(
+        input_records_to_si(spec, "oil_components", oil_components),
+        input_records_to_si(spec, "gas_components", gas_components),
+        _si(spec, "temperature", temperature),
+        eos,
+        mixing_rule,
+        method,
+        None if recovery_threshold is None else recovery_threshold,
+        None if number_of_pressure_points is None else _count("number_of_pressure_points", number_of_pressure_points),
+        None if min_pressure is None else _si(spec, "min_pressure", min_pressure),
+        None if max_pressure is None else _si(spec, "max_pressure", max_pressure),
+        None if slim_tube_nodes is None else _count("slim_tube_nodes", slim_tube_nodes),
+        None if pv_injected is None else pv_injected,
+    )
+    return MmpResult(
+        mmp=None if result.mmp is None else from_si(result.mmp.magnitude_si, result.mmp.unit),
+        mechanism=result.mechanism,
+        points=tuple(MmpPoint(pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), recovery=c.recovery) for c in result.points),
         warnings=_warnings(result.warnings),
     )
 
@@ -10602,6 +10714,101 @@ def oil_material_balance(calculation: str, *, np: float | None=None, rp: float |
         sdi=result.sdi,
         wdi=result.wdi,
         edi=result.edi,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def property_sweep(components: Sequence[Mapping[str, Any]], mode: str, *, temperatures: Sequence[Any], pressures: Sequence[Any], eos: str | None=None, mixing_rule: str | None=None, volume_correction: bool | None=None) -> PropertySweepResult:
+    """``pvt.property_sweep``, computed in Rust."""
+    spec = _models_gen.model("pvt.property_sweep")
+    result = _core.property_sweep(
+        input_records_to_si(spec, "components", components),
+        mode,
+        [_si(spec, "temperatures", v) for v in temperatures],
+        [_si(spec, "pressures", v) for v in pressures],
+        eos,
+        mixing_rule,
+        volume_correction,
+    )
+    return PropertySweepResult(
+        points=tuple(PropertyPoint(temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), oil_density=None if c.oil_density is None else from_si(c.oil_density.magnitude_si, c.oil_density.unit), aqueous_density=None if c.aqueous_density is None else from_si(c.aqueous_density.magnitude_si, c.aqueous_density.unit), gas_viscosity=None if c.gas_viscosity is None else from_si(c.gas_viscosity.magnitude_si, c.gas_viscosity.unit), oil_viscosity=None if c.oil_viscosity is None else from_si(c.oil_viscosity.magnitude_si, c.oil_viscosity.unit), aqueous_viscosity=None if c.aqueous_viscosity is None else from_si(c.aqueous_viscosity.magnitude_si, c.aqueous_viscosity.unit), gas_phase_available=c.gas_phase_available, oil_phase_available=c.oil_phase_available, aqueous_phase_available=c.aqueous_phase_available) for c in result.points),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def saturation_test(components: Sequence[Mapping[str, Any]], mode: str, *, eos: str | None=None, mixing_rule: str | None=None, temperature: Any=None, pressure: Any=None, temperature_search_min: Any=None, temperature_search_max: Any=None) -> SaturationTestResult:
+    """``pvt.saturation_test``, computed in Rust."""
+    spec = _models_gen.model("pvt.saturation_test")
+    result = _core.saturation_test(
+        input_records_to_si(spec, "components", components),
+        mode,
+        eos,
+        mixing_rule,
+        None if temperature is None else _si(spec, "temperature", temperature),
+        None if pressure is None else _si(spec, "pressure", pressure),
+        None if temperature_search_min is None else _si(spec, "temperature_search_min", temperature_search_min),
+        None if temperature_search_max is None else _si(spec, "temperature_search_max", temperature_search_max),
+    )
+    return SaturationTestResult(
+        saturation_pressure=None if result.saturation_pressure is None else from_si(result.saturation_pressure.magnitude_si, result.saturation_pressure.unit),
+        saturation_temperature=None if result.saturation_temperature is None else from_si(result.saturation_temperature.magnitude_si, result.saturation_temperature.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def separator_test(components: Sequence[Mapping[str, Any]], mode: str, *, stages: Sequence[Mapping[str, Any]], eos: str | None=None, mixing_rule: str | None=None, volume_correction: bool | None=None, reservoir_pressure: Any=None, reservoir_temperature: Any=None, optimize_first_stage: bool | None=None, first_stage_pressure_min: Any=None, first_stage_pressure_max: Any=None, first_stage_pressure_steps: Any=None, first_stage_temperature_min: Any=None, first_stage_temperature_max: Any=None, first_stage_temperature_steps: Any=None) -> SeparatorTestResult:
+    """``pvt.separator_test``, computed in Rust."""
+    spec = _models_gen.model("pvt.separator_test")
+    result = _core.separator_test(
+        input_records_to_si(spec, "components", components),
+        mode,
+        input_records_to_si(spec, "stages", stages),
+        eos,
+        mixing_rule,
+        volume_correction,
+        None if reservoir_pressure is None else _si(spec, "reservoir_pressure", reservoir_pressure),
+        None if reservoir_temperature is None else _si(spec, "reservoir_temperature", reservoir_temperature),
+        optimize_first_stage,
+        None if first_stage_pressure_min is None else _si(spec, "first_stage_pressure_min", first_stage_pressure_min),
+        None if first_stage_pressure_max is None else _si(spec, "first_stage_pressure_max", first_stage_pressure_max),
+        None if first_stage_pressure_steps is None else _count("first_stage_pressure_steps", first_stage_pressure_steps),
+        None if first_stage_temperature_min is None else _si(spec, "first_stage_temperature_min", first_stage_temperature_min),
+        None if first_stage_temperature_max is None else _si(spec, "first_stage_temperature_max", first_stage_temperature_max),
+        None if first_stage_temperature_steps is None else _count("first_stage_temperature_steps", first_stage_temperature_steps),
+    )
+    return SeparatorTestResult(
+        total_gor=result.total_gor,
+        bo=result.bo,
+        rs=result.rs,
+        stock_tank_oil_density=None if result.stock_tank_oil_density is None else from_si(result.stock_tank_oil_density.magnitude_si, result.stock_tank_oil_density.unit),
+        stock_tank_api=result.stock_tank_api,
+        optimal_stage_pressure=None if result.optimal_stage_pressure is None else from_si(result.optimal_stage_pressure.magnitude_si, result.optimal_stage_pressure.unit),
+        optimal_stage_temperature=None if result.optimal_stage_temperature is None else from_si(result.optimal_stage_temperature.magnitude_si, result.optimal_stage_temperature.unit),
+        maximum_oil_recovery=result.maximum_oil_recovery,
+        gor_at_optimum=result.gor_at_optimum,
+        bo_at_optimum=result.bo_at_optimum,
+        api_at_optimum=result.api_at_optimum,
+        stages=tuple(SeparatorStageResult(stage_number=c.stage_number, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), gas_volume=None if c.gas_volume is None else from_si(c.gas_volume.magnitude_si, c.gas_volume.unit), stage_gor=c.stage_gor, cumulative_gor=c.cumulative_gor, oil_fvf=c.oil_fvf, gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), oil_density=None if c.oil_density is None else from_si(c.oil_density.magnitude_si, c.oil_density.unit), gas_molar_mass=None if c.gas_molar_mass is None else from_si(c.gas_molar_mass.magnitude_si, c.gas_molar_mass.unit), oil_molar_mass=None if c.oil_molar_mass is None else from_si(c.oil_molar_mass.magnitude_si, c.oil_molar_mass.unit), gas_z_factor=c.gas_z_factor, oil_viscosity=None if c.oil_viscosity is None else from_si(c.oil_viscosity.magnitude_si, c.oil_viscosity.unit)) for c in result.stages),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def swelling_test(components: Sequence[Mapping[str, Any]], *, cumulative_gas_injected: Sequence[Any], injection_gas: Sequence[Mapping[str, Any]] | None=None, eos: str | None=None, mixing_rule: str | None=None, temperature: Any=None, volume_correction: bool | None=None) -> SwellingTestResult:
+    """``pvt.swelling_test``, computed in Rust."""
+    spec = _models_gen.model("pvt.swelling_test")
+    result = _core.swelling_test(
+        input_records_to_si(spec, "components", components),
+        list(cumulative_gas_injected),
+        None if injection_gas is None else input_records_to_si(spec, "injection_gas", injection_gas),
+        eos,
+        mixing_rule,
+        None if temperature is None else _si(spec, "temperature", temperature),
+        volume_correction,
+    )
+    return SwellingTestResult(
+        original_oil_moles=from_si(result.original_oil_moles.magnitude_si, result.original_oil_moles.unit),
+        original_oil_volume=from_si(result.original_oil_volume.magnitude_si, result.original_oil_volume.unit),
+        points=tuple(SwellingPoint(cumulative_gas_injected=c.cumulative_gas_injected, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), relative_oil_volume=c.relative_oil_volume) for c in result.points),
         warnings=_warnings(result.warnings),
     )
 

@@ -113,7 +113,8 @@ BINDING = REPO_ROOT / "crates" / "azoth-python" / "src"
 #: 75 -> 76 for `process.safety_system_performance`, whose fourteen record lists are.
 #: 76 -> 77 for `process.topsides_facility_cost`, whose record list and optional quantities
 #: are extracted by hand.
-KNOWN_HAND_WRITTEN = 77
+#: 77 -> 78 for `pvt.swelling_test`, whose injection gas is an optional record list.
+KNOWN_HAND_WRITTEN = 78
 
 
 def _tools_module(name: str) -> ModuleType:

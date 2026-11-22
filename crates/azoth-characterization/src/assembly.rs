@@ -39,7 +39,24 @@ use azoth_eos::{
 use crate::combiner::CP_D_GETTER_OFFSET;
 use crate::component_row::FluidComponent;
 
+/// Where the binary interaction coefficients of an assembled fluid come from.
+///
+/// NeqSim's `setMixingRule(1)` is a zero matrix and `setMixingRule(2)` is the database's -
+/// two different fluids built from the same components. The PVT laboratory experiments use
+/// both, so the source is stated rather than assumed.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum KijSource {
+    /// The databank's pair values, which is `setMixingRule(2)`.
+    #[default]
+    Database,
+    /// A zero matrix, which is `setMixingRule(1)`.
+    Zero,
+}
+
 /// A mixture and its ideal-gas model, from a characterization table.
+///
+/// The interaction coefficients are the databank's; [`mixture_from_characterization_with`]
+/// states the source for a fluid whose classes set a zero matrix.
 ///
 /// # Errors
 /// * [`azoth_core::AzothError::InvalidInput`] if a row is a pseudo-component without the
@@ -51,6 +68,18 @@ use crate::component_row::FluidComponent;
 pub fn mixture_from_characterization(
     components: &[FluidComponent],
     cubic: Cubic,
+) -> Result<(Mixture, IdealGasModel)> {
+    mixture_from_characterization_with(components, cubic, KijSource::Database)
+}
+
+/// A mixture and its ideal-gas model, with the interaction matrix's source stated.
+///
+/// # Errors
+/// The same as [`mixture_from_characterization`].
+pub fn mixture_from_characterization_with(
+    components: &[FluidComponent],
+    cubic: Cubic,
+    kij_source: KijSource,
 ) -> Result<(Mixture, IdealGasModel)> {
     if !matches!(cubic, Cubic::Pr | Cubic::Srk) {
         return Err(AzothError::invalid_input(
@@ -111,14 +140,16 @@ pub fn mixture_from_characterization(
 
     let n = built.len();
     let mut kij = vec![0.0; n * n];
-    for first in 0..n {
-        for second in (first + 1)..n {
-            let (Some(left), Some(right)) = (&base_names[first], &base_names[second]) else {
-                continue;
-            };
-            let value = databank::kij(left, right, cubic, None);
-            kij[first * n + second] = value;
-            kij[second * n + first] = value;
+    if kij_source == KijSource::Database {
+        for first in 0..n {
+            for second in (first + 1)..n {
+                let (Some(left), Some(right)) = (&base_names[first], &base_names[second]) else {
+                    continue;
+                };
+                let value = databank::kij(left, right, cubic, None);
+                kij[first * n + second] = value;
+                kij[second * n + first] = value;
+            }
         }
     }
 

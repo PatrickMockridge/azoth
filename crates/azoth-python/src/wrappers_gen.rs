@@ -10031,6 +10031,124 @@ pub fn black_oil_correlations(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// Constant mass expansion.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, temperature, pressures, eos, mixing_rule, volume_correction))]
+#[pyo3(
+    text_signature = "(components, temperature, pressures, eos, mixing_rule, volume_correction)"
+)]
+pub fn constant_mass_expansion(
+    py: Python<'_>,
+    components: Vec<crate::records_gen::FluidComponent>,
+    temperature: f64,
+    pressures: Vec<f64>,
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
+    volume_correction: Option<bool>,
+) -> PyResult<crate::transport_gen::PyConstantMassExpansionResult> {
+    let components_records: Vec<azoth_characterization::component_row::FluidComponent> = components
+        .into_iter()
+        .map(
+            |row| azoth_characterization::component_row::FluidComponent {
+                fluid: row.fluid,
+                name: row.name,
+                pseudo_component: row.pseudo_component,
+                moles: row.moles,
+                molar_mass: row.molar_mass,
+                density: row.density,
+                normal_boiling_point: row.normal_boiling_point,
+                critical_temperature: row.critical_temperature,
+                critical_pressure: row.critical_pressure,
+                acentric_factor: row.acentric_factor,
+                critical_volume: row.critical_volume,
+                racket_z: row.racket_z,
+                racket_z_cpa: row.racket_z_cpa,
+                parachor: row.parachor,
+                critical_viscosity: row.critical_viscosity,
+                triple_point_temperature: row.triple_point_temperature,
+                heat_of_fusion: row.heat_of_fusion,
+                ideal_gas_enthalpy_of_formation: row.ideal_gas_enthalpy_of_formation,
+                cp_a: row.cp_a,
+                cp_b: row.cp_b,
+                cp_c: row.cp_c,
+                cp_d: row.cp_d,
+                attractive_m: row.attractive_m,
+            },
+        )
+        .collect();
+    azoth_pvt::constant_mass_expansion::constant_mass_expansion(
+        &components_records,
+        kelvins(temperature),
+        &pressures,
+        eos,
+        mixing_rule,
+        volume_correction,
+    )
+    .map(|r| crate::transport_gen::PyConstantMassExpansionResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Constant volume depletion.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, temperature, pressures, eos, mixing_rule, volume_correction))]
+#[pyo3(
+    text_signature = "(components, temperature, pressures, eos, mixing_rule, volume_correction)"
+)]
+pub fn constant_volume_depletion(
+    py: Python<'_>,
+    components: Vec<crate::records_gen::FluidComponent>,
+    temperature: f64,
+    pressures: Vec<f64>,
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
+    volume_correction: Option<bool>,
+) -> PyResult<crate::transport_gen::PyConstantVolumeDepletionResult> {
+    let components_records: Vec<azoth_characterization::component_row::FluidComponent> = components
+        .into_iter()
+        .map(
+            |row| azoth_characterization::component_row::FluidComponent {
+                fluid: row.fluid,
+                name: row.name,
+                pseudo_component: row.pseudo_component,
+                moles: row.moles,
+                molar_mass: row.molar_mass,
+                density: row.density,
+                normal_boiling_point: row.normal_boiling_point,
+                critical_temperature: row.critical_temperature,
+                critical_pressure: row.critical_pressure,
+                acentric_factor: row.acentric_factor,
+                critical_volume: row.critical_volume,
+                racket_z: row.racket_z,
+                racket_z_cpa: row.racket_z_cpa,
+                parachor: row.parachor,
+                critical_viscosity: row.critical_viscosity,
+                triple_point_temperature: row.triple_point_temperature,
+                heat_of_fusion: row.heat_of_fusion,
+                ideal_gas_enthalpy_of_formation: row.ideal_gas_enthalpy_of_formation,
+                cp_a: row.cp_a,
+                cp_b: row.cp_b,
+                cp_c: row.cp_c,
+                cp_d: row.cp_d,
+                attractive_m: row.attractive_m,
+            },
+        )
+        .collect();
+    azoth_pvt::constant_volume_depletion::constant_volume_depletion(
+        &components_records,
+        kelvins(temperature),
+        &pressures,
+        eos,
+        mixing_rule,
+        volume_correction,
+    )
+    .map(|r| crate::transport_gen::PyConstantVolumeDepletionResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Decline-curve analysis.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -10094,6 +10212,65 @@ pub fn decline_curve(
         history_rate.as_deref(),
     )
     .map(|r| crate::transport_gen::PyDeclineCurveResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Differential liberation.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, temperature, pressures, eos, mixing_rule, volume_correction))]
+#[pyo3(
+    text_signature = "(components, temperature, pressures, eos, mixing_rule, volume_correction)"
+)]
+pub fn differential_liberation(
+    py: Python<'_>,
+    components: Vec<crate::records_gen::FluidComponent>,
+    temperature: f64,
+    pressures: Vec<f64>,
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
+    volume_correction: Option<bool>,
+) -> PyResult<crate::transport_gen::PyDifferentialLiberationResult> {
+    let components_records: Vec<azoth_characterization::component_row::FluidComponent> = components
+        .into_iter()
+        .map(
+            |row| azoth_characterization::component_row::FluidComponent {
+                fluid: row.fluid,
+                name: row.name,
+                pseudo_component: row.pseudo_component,
+                moles: row.moles,
+                molar_mass: row.molar_mass,
+                density: row.density,
+                normal_boiling_point: row.normal_boiling_point,
+                critical_temperature: row.critical_temperature,
+                critical_pressure: row.critical_pressure,
+                acentric_factor: row.acentric_factor,
+                critical_volume: row.critical_volume,
+                racket_z: row.racket_z,
+                racket_z_cpa: row.racket_z_cpa,
+                parachor: row.parachor,
+                critical_viscosity: row.critical_viscosity,
+                triple_point_temperature: row.triple_point_temperature,
+                heat_of_fusion: row.heat_of_fusion,
+                ideal_gas_enthalpy_of_formation: row.ideal_gas_enthalpy_of_formation,
+                cp_a: row.cp_a,
+                cp_b: row.cp_b,
+                cp_c: row.cp_c,
+                cp_d: row.cp_d,
+                attractive_m: row.attractive_m,
+            },
+        )
+        .collect();
+    azoth_pvt::differential_liberation::differential_liberation(
+        &components_records,
+        kelvins(temperature),
+        &pressures,
+        eos,
+        mixing_rule,
+        volume_correction,
+    )
+    .map(|r| crate::transport_gen::PyDifferentialLiberationResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 
@@ -10166,6 +10343,110 @@ pub fn gas_material_balance(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Minimum miscibility pressure.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (oil_components, gas_components, temperature, eos, mixing_rule, method, recovery_threshold, number_of_pressure_points, min_pressure, max_pressure, slim_tube_nodes, pv_injected))]
+#[pyo3(
+    text_signature = "(oil_components, gas_components, temperature, eos, mixing_rule, method, recovery_threshold, number_of_pressure_points, min_pressure, max_pressure, slim_tube_nodes, pv_injected)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn mmp(
+    py: Python<'_>,
+    oil_components: Vec<crate::records_gen::FluidComponent>,
+    gas_components: Vec<crate::records_gen::FluidComponent>,
+    temperature: f64,
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
+    method: Option<&str>,
+    recovery_threshold: Option<f64>,
+    number_of_pressure_points: Option<usize>,
+    min_pressure: Option<f64>,
+    max_pressure: Option<f64>,
+    slim_tube_nodes: Option<usize>,
+    pv_injected: Option<f64>,
+) -> PyResult<crate::transport_gen::PyMmpResult> {
+    let oil_components_records: Vec<azoth_characterization::component_row::FluidComponent> =
+        oil_components
+            .into_iter()
+            .map(
+                |row| azoth_characterization::component_row::FluidComponent {
+                    fluid: row.fluid,
+                    name: row.name,
+                    pseudo_component: row.pseudo_component,
+                    moles: row.moles,
+                    molar_mass: row.molar_mass,
+                    density: row.density,
+                    normal_boiling_point: row.normal_boiling_point,
+                    critical_temperature: row.critical_temperature,
+                    critical_pressure: row.critical_pressure,
+                    acentric_factor: row.acentric_factor,
+                    critical_volume: row.critical_volume,
+                    racket_z: row.racket_z,
+                    racket_z_cpa: row.racket_z_cpa,
+                    parachor: row.parachor,
+                    critical_viscosity: row.critical_viscosity,
+                    triple_point_temperature: row.triple_point_temperature,
+                    heat_of_fusion: row.heat_of_fusion,
+                    ideal_gas_enthalpy_of_formation: row.ideal_gas_enthalpy_of_formation,
+                    cp_a: row.cp_a,
+                    cp_b: row.cp_b,
+                    cp_c: row.cp_c,
+                    cp_d: row.cp_d,
+                    attractive_m: row.attractive_m,
+                },
+            )
+            .collect();
+    let gas_components_records: Vec<azoth_characterization::component_row::FluidComponent> =
+        gas_components
+            .into_iter()
+            .map(
+                |row| azoth_characterization::component_row::FluidComponent {
+                    fluid: row.fluid,
+                    name: row.name,
+                    pseudo_component: row.pseudo_component,
+                    moles: row.moles,
+                    molar_mass: row.molar_mass,
+                    density: row.density,
+                    normal_boiling_point: row.normal_boiling_point,
+                    critical_temperature: row.critical_temperature,
+                    critical_pressure: row.critical_pressure,
+                    acentric_factor: row.acentric_factor,
+                    critical_volume: row.critical_volume,
+                    racket_z: row.racket_z,
+                    racket_z_cpa: row.racket_z_cpa,
+                    parachor: row.parachor,
+                    critical_viscosity: row.critical_viscosity,
+                    triple_point_temperature: row.triple_point_temperature,
+                    heat_of_fusion: row.heat_of_fusion,
+                    ideal_gas_enthalpy_of_formation: row.ideal_gas_enthalpy_of_formation,
+                    cp_a: row.cp_a,
+                    cp_b: row.cp_b,
+                    cp_c: row.cp_c,
+                    cp_d: row.cp_d,
+                    attractive_m: row.attractive_m,
+                },
+            )
+            .collect();
+    azoth_pvt::mmp::mmp(
+        &oil_components_records,
+        &gas_components_records,
+        kelvins(temperature),
+        eos,
+        mixing_rule,
+        method,
+        recovery_threshold,
+        number_of_pressure_points,
+        min_pressure.map(pascals),
+        max_pressure.map(pascals),
+        slim_tube_nodes,
+        pv_injected,
+    )
+    .map(|r| crate::transport_gen::PyMmpResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Oil material balance.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -10233,6 +10514,217 @@ pub fn oil_material_balance(
         we_history.as_deref(),
     )
     .map(|r| crate::transport_gen::PyOilMaterialBalanceResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Property sweep.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, mode, temperatures, pressures, eos, mixing_rule, volume_correction))]
+#[pyo3(
+    text_signature = "(components, mode, temperatures, pressures, eos, mixing_rule, volume_correction)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn property_sweep(
+    py: Python<'_>,
+    components: Vec<crate::records_gen::FluidComponent>,
+    mode: &str,
+    temperatures: Vec<f64>,
+    pressures: Vec<f64>,
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
+    volume_correction: Option<bool>,
+) -> PyResult<crate::transport_gen::PyPropertySweepResult> {
+    let components_records: Vec<azoth_characterization::component_row::FluidComponent> = components
+        .into_iter()
+        .map(
+            |row| azoth_characterization::component_row::FluidComponent {
+                fluid: row.fluid,
+                name: row.name,
+                pseudo_component: row.pseudo_component,
+                moles: row.moles,
+                molar_mass: row.molar_mass,
+                density: row.density,
+                normal_boiling_point: row.normal_boiling_point,
+                critical_temperature: row.critical_temperature,
+                critical_pressure: row.critical_pressure,
+                acentric_factor: row.acentric_factor,
+                critical_volume: row.critical_volume,
+                racket_z: row.racket_z,
+                racket_z_cpa: row.racket_z_cpa,
+                parachor: row.parachor,
+                critical_viscosity: row.critical_viscosity,
+                triple_point_temperature: row.triple_point_temperature,
+                heat_of_fusion: row.heat_of_fusion,
+                ideal_gas_enthalpy_of_formation: row.ideal_gas_enthalpy_of_formation,
+                cp_a: row.cp_a,
+                cp_b: row.cp_b,
+                cp_c: row.cp_c,
+                cp_d: row.cp_d,
+                attractive_m: row.attractive_m,
+            },
+        )
+        .collect();
+    azoth_pvt::property_sweep::property_sweep(
+        &components_records,
+        mode,
+        &temperatures,
+        &pressures,
+        eos,
+        mixing_rule,
+        volume_correction,
+    )
+    .map(|r| crate::transport_gen::PyPropertySweepResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Saturation test.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, mode, eos, mixing_rule, temperature, pressure, temperature_search_min, temperature_search_max))]
+#[pyo3(
+    text_signature = "(components, mode, eos, mixing_rule, temperature, pressure, temperature_search_min, temperature_search_max)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn saturation_test(
+    py: Python<'_>,
+    components: Vec<crate::records_gen::FluidComponent>,
+    mode: &str,
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
+    temperature: Option<f64>,
+    pressure: Option<f64>,
+    temperature_search_min: Option<f64>,
+    temperature_search_max: Option<f64>,
+) -> PyResult<crate::transport_gen::PySaturationTestResult> {
+    let components_records: Vec<azoth_characterization::component_row::FluidComponent> = components
+        .into_iter()
+        .map(
+            |row| azoth_characterization::component_row::FluidComponent {
+                fluid: row.fluid,
+                name: row.name,
+                pseudo_component: row.pseudo_component,
+                moles: row.moles,
+                molar_mass: row.molar_mass,
+                density: row.density,
+                normal_boiling_point: row.normal_boiling_point,
+                critical_temperature: row.critical_temperature,
+                critical_pressure: row.critical_pressure,
+                acentric_factor: row.acentric_factor,
+                critical_volume: row.critical_volume,
+                racket_z: row.racket_z,
+                racket_z_cpa: row.racket_z_cpa,
+                parachor: row.parachor,
+                critical_viscosity: row.critical_viscosity,
+                triple_point_temperature: row.triple_point_temperature,
+                heat_of_fusion: row.heat_of_fusion,
+                ideal_gas_enthalpy_of_formation: row.ideal_gas_enthalpy_of_formation,
+                cp_a: row.cp_a,
+                cp_b: row.cp_b,
+                cp_c: row.cp_c,
+                cp_d: row.cp_d,
+                attractive_m: row.attractive_m,
+            },
+        )
+        .collect();
+    azoth_pvt::saturation_test::saturation_test(
+        &components_records,
+        mode,
+        eos,
+        mixing_rule,
+        temperature.map(kelvins),
+        pressure.map(pascals),
+        temperature_search_min.map(kelvins),
+        temperature_search_max.map(kelvins),
+    )
+    .map(|r| crate::transport_gen::PySaturationTestResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Separator test.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, mode, stages, eos, mixing_rule, volume_correction, reservoir_pressure, reservoir_temperature, optimize_first_stage, first_stage_pressure_min, first_stage_pressure_max, first_stage_pressure_steps, first_stage_temperature_min, first_stage_temperature_max, first_stage_temperature_steps))]
+#[pyo3(
+    text_signature = "(components, mode, stages, eos, mixing_rule, volume_correction, reservoir_pressure, reservoir_temperature, optimize_first_stage, first_stage_pressure_min, first_stage_pressure_max, first_stage_pressure_steps, first_stage_temperature_min, first_stage_temperature_max, first_stage_temperature_steps)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn separator_test(
+    py: Python<'_>,
+    components: Vec<crate::records_gen::FluidComponent>,
+    mode: &str,
+    stages: Vec<crate::records_gen::SeparatorStageInput>,
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
+    volume_correction: Option<bool>,
+    reservoir_pressure: Option<f64>,
+    reservoir_temperature: Option<f64>,
+    optimize_first_stage: Option<bool>,
+    first_stage_pressure_min: Option<f64>,
+    first_stage_pressure_max: Option<f64>,
+    first_stage_pressure_steps: Option<usize>,
+    first_stage_temperature_min: Option<f64>,
+    first_stage_temperature_max: Option<f64>,
+    first_stage_temperature_steps: Option<usize>,
+) -> PyResult<crate::transport_gen::PySeparatorTestResult> {
+    let components_records: Vec<azoth_characterization::component_row::FluidComponent> = components
+        .into_iter()
+        .map(
+            |row| azoth_characterization::component_row::FluidComponent {
+                fluid: row.fluid,
+                name: row.name,
+                pseudo_component: row.pseudo_component,
+                moles: row.moles,
+                molar_mass: row.molar_mass,
+                density: row.density,
+                normal_boiling_point: row.normal_boiling_point,
+                critical_temperature: row.critical_temperature,
+                critical_pressure: row.critical_pressure,
+                acentric_factor: row.acentric_factor,
+                critical_volume: row.critical_volume,
+                racket_z: row.racket_z,
+                racket_z_cpa: row.racket_z_cpa,
+                parachor: row.parachor,
+                critical_viscosity: row.critical_viscosity,
+                triple_point_temperature: row.triple_point_temperature,
+                heat_of_fusion: row.heat_of_fusion,
+                ideal_gas_enthalpy_of_formation: row.ideal_gas_enthalpy_of_formation,
+                cp_a: row.cp_a,
+                cp_b: row.cp_b,
+                cp_c: row.cp_c,
+                cp_d: row.cp_d,
+                attractive_m: row.attractive_m,
+            },
+        )
+        .collect();
+    let stages_records: Vec<azoth_pvt::separator_test::SeparatorStageInput> = stages
+        .into_iter()
+        .map(|row| azoth_pvt::separator_test::SeparatorStageInput {
+            pressure: row.pressure,
+            temperature: row.temperature,
+        })
+        .collect();
+    azoth_pvt::separator_test::separator_test(
+        &components_records,
+        mode,
+        &stages_records,
+        eos,
+        mixing_rule,
+        volume_correction,
+        reservoir_pressure.map(pascals),
+        reservoir_temperature.map(kelvins),
+        optimize_first_stage,
+        first_stage_pressure_min.map(pascals),
+        first_stage_pressure_max.map(pascals),
+        first_stage_pressure_steps,
+        first_stage_temperature_min.map(kelvins),
+        first_stage_temperature_max.map(kelvins),
+        first_stage_temperature_steps,
+    )
+    .map(|r| crate::transport_gen::PySeparatorTestResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 

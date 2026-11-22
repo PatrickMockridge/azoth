@@ -1,0 +1,124 @@
+model = "pvt.separator_test"
+[[cases]]
+id = "continuous_binary"
+tolerance = 1.0e-6
+source = "The class's cascade on the methane/n-decane binary, from `validation/neqsim/captures/pvt_separator.tsv`."
+[cases.inputs]
+mode = "continuous"
+stages = [
+    { pressure = 5000000.0, temperature = 323.15 },
+    { pressure = 2000000.0, temperature = 313.15 },
+    { pressure = 500000.0, temperature = 303.15 },
+    { pressure = 101325.0, temperature = 288.15 },
+]
+components = [
+    { fluid = 0, name = "methane", pseudo_component = false, moles = 0.7 },
+    { fluid = 0, name = "nC10", pseudo_component = false, moles = 0.3 },
+]
+[cases.expected]
+stages = [
+    { stage_number = 1, pressure = 5000000.0, temperature = 323.15, stage_gor = 210.19952704510527, oil_fvf = 1.0848181343719043 },
+    { stage_number = 2, pressure = 2000000.0, temperature = 313.15, stage_gor = 224.62300642231548, oil_fvf = 1.0411026475767087 },
+    { stage_number = 3, pressure = 500000.0, temperature = 303.15, stage_gor = 231.72675023111753, oil_fvf = 1.0159266848652933 },
+    { stage_number = 4, pressure = 101325.0, temperature = 288.15, stage_gor = 233.68586355180275, oil_fvf = 1.0 },
+]
+[[cases]]
+id = "staged_binary"
+tolerance = 1.0e-6
+source = "The class's cascade on the methane/n-decane binary, from `validation/neqsim/captures/pvt_separator.tsv`."
+[cases.inputs]
+mode = "staged"
+stages = [
+    { pressure = 5000000.0, temperature = 323.15 },
+    { pressure = 2000000.0, temperature = 313.15 },
+    { pressure = 500000.0, temperature = 303.15 },
+    { pressure = 101325.0, temperature = 288.15 },
+]
+components = [
+    { fluid = 0, name = "methane", pseudo_component = false, moles = 0.7 },
+    { fluid = 0, name = "nC10", pseudo_component = false, moles = 0.3 },
+]
+[cases.expected]
+stages = [
+    { stage_number = 1, pressure = 5000000.0, temperature = 323.15, stage_gor = 210.09985703850035, oil_fvf = 1.0843037477215727 },
+    { stage_number = 2, pressure = 2000000.0, temperature = 313.15, stage_gor = 14.472316569438366, oil_fvf = 1.0400644000970958 },
+    { stage_number = 3, pressure = 500000.0, temperature = 303.15, stage_gor = 7.063545010371176, oil_fvf = 1.0152522149046608 },
+    { stage_number = 4, pressure = 101325.0, temperature = 288.15, stage_gor = 1.893169014075703, oil_fvf = 1.0 },
+]
+[[cases]]
+id = "train_upstream"
+tolerance = 1.0e-6
+source = "The class's train on the upstream 11-component fluid, from `validation/neqsim/captures/pvt_separator.tsv`. The stage oil density is the id's physical density, not the class's one-stage-lagged cache read, which the capture records as evidence."
+[cases.inputs]
+mode = "train"
+stages = [
+    { pressure = 5000000.0, temperature = 313.15 },
+    { pressure = 1000000.0, temperature = 303.15 },
+    { pressure = 101325.0, temperature = 288.15 },
+]
+reservoir_pressure = 30000000.0
+reservoir_temperature = 373.15
+components = [
+    { fluid = 0, name = "nitrogen", pseudo_component = false, moles = 0.5 },
+    { fluid = 0, name = "CO2", pseudo_component = false, moles = 2.0 },
+    { fluid = 0, name = "methane", pseudo_component = false, moles = 45.0 },
+    { fluid = 0, name = "ethane", pseudo_component = false, moles = 8.0 },
+    { fluid = 0, name = "propane", pseudo_component = false, moles = 5.0 },
+    { fluid = 0, name = "i-butane", pseudo_component = false, moles = 1.5 },
+    { fluid = 0, name = "n-butane", pseudo_component = false, moles = 2.5 },
+    { fluid = 0, name = "i-pentane", pseudo_component = false, moles = 1.0 },
+    { fluid = 0, name = "n-pentane", pseudo_component = false, moles = 1.5 },
+    { fluid = 0, name = "n-hexane", pseudo_component = false, moles = 3.0 },
+    { fluid = 0, name = "n-heptane", pseudo_component = false, moles = 30.0 },
+]
+[cases.expected]
+total_gor = 239.47388503058167
+bo = 1.8173491732538267
+rs = 239.47388503058167
+stock_tank_oil_density = 685.0479302241214
+stock_tank_api = 74.84833529641193
+stages = [
+    { stage_number = 1, pressure = 5000000.0, temperature = 313.15, stage_gor = 161.49733028241317, cumulative_gor = 161.49733028241317, gas_volume = 0.9700963855280732, gas_density = 43.10040883414266, oil_density = 602.4395773, gas_molar_mass = 0.020066695492532725, oil_molar_mass = 0.07029480452644189, gas_z_factor = 0.8965717791566564, oil_viscosity = 2.067906493415124E-4 },
+    { stage_number = 2, pressure = 1000000.0, temperature = 303.15, stage_gor = 54.654079043237125, cumulative_gor = 216.1514093256503, gas_volume = 0.3283009350154175, gas_density = 9.79637094529145, oil_density = 654.6968420484538, gas_molar_mass = 0.023770235234470742, oil_molar_mass = 0.08474349865539309, gas_z_factor = 0.9634152718062052, oil_viscosity = 3.171126187698313E-4 },
+    { stage_number = 3, pressure = 101325.0, temperature = 288.15, stage_gor = 23.322475704931378, cumulative_gor = 239.47388503058167, gas_volume = 0.14009550091853168, gas_density = 1.618601751823603, oil_density = 685.0479302241214, gas_molar_mass = 0.03780947139315711, oil_molar_mass = 0.0919767753791744, gas_z_factor = 0.9881124153761884, oil_viscosity = 4.120574322080842E-4 },
+]
+[[cases]]
+id = "train_optimize"
+tolerance = 5.0e-2
+source = "The class's first-stage grid on the upstream fluid. The optimal stage matches; the cascade compounds a flash difference into a few percent of Bo and GOR, and the case is held at the measured 5e-2."
+[cases.inputs]
+mode = "train"
+stages = [
+    { pressure = 5000000.0, temperature = 313.15 },
+    { pressure = 1000000.0, temperature = 303.15 },
+    { pressure = 101325.0, temperature = 288.15 },
+]
+reservoir_pressure = 30000000.0
+reservoir_temperature = 373.15
+optimize_first_stage = true
+first_stage_pressure_min = 500000.0
+first_stage_pressure_max = 2000000.0
+first_stage_pressure_steps = 3
+first_stage_temperature_min = 293.15
+first_stage_temperature_max = 313.15
+first_stage_temperature_steps = 2
+components = [
+    { fluid = 0, name = "nitrogen", pseudo_component = false, moles = 0.5 },
+    { fluid = 0, name = "CO2", pseudo_component = false, moles = 2.0 },
+    { fluid = 0, name = "methane", pseudo_component = false, moles = 45.0 },
+    { fluid = 0, name = "ethane", pseudo_component = false, moles = 8.0 },
+    { fluid = 0, name = "propane", pseudo_component = false, moles = 5.0 },
+    { fluid = 0, name = "i-butane", pseudo_component = false, moles = 1.5 },
+    { fluid = 0, name = "n-butane", pseudo_component = false, moles = 2.5 },
+    { fluid = 0, name = "i-pentane", pseudo_component = false, moles = 1.0 },
+    { fluid = 0, name = "n-pentane", pseudo_component = false, moles = 1.5 },
+    { fluid = 0, name = "n-hexane", pseudo_component = false, moles = 3.0 },
+    { fluid = 0, name = "n-heptane", pseudo_component = false, moles = 30.0 },
+]
+[cases.expected]
+optimal_stage_pressure = 2000000.0
+optimal_stage_temperature = 293.15
+maximum_oil_recovery = 0.5542908106778528
+gor_at_optimum = 236.48088841268523
+bo_at_optimum = 1.8041071234377508
+api_at_optimum = 74.91833791937034

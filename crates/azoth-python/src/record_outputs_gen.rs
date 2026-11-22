@@ -434,6 +434,122 @@ impl From<&azoth_process::models::bubble_transfer_zone_release::BubbleTransferZo
     }
 }
 
+/// one row per pressure.
+#[pyclass(frozen, skip_from_py_object, module = "azoth._core", name = "CcePoint")]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyCcePoint {
+    /// the absolute pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the untranslated total volume.
+    #[pyo3(get)]
+    pub total_volume: PyQty,
+    /// the total volume over the saturation volume.
+    #[pyo3(get)]
+    pub relative_volume: f64,
+    /// phase 0's mass density, volume-corrected where the fluid asks.
+    #[pyo3(get)]
+    pub density: PyQty,
+    /// phase 0's corrected extensive volume, the class's gas volume.
+    #[pyo3(get)]
+    pub gas_volume: PyQty,
+    /// the same amount at 288.15 K and 1.01325 bar, as an ideal gas.
+    #[pyo3(get)]
+    pub gas_standard_volume: PyQty,
+    /// the gas volume over the standard volume.
+    #[pyo3(get)]
+    pub bg: f64,
+    /// phase 0's cubic compressibility.
+    #[pyo3(get)]
+    pub z_gas: f64,
+    /// the oil phase's density; absent where the flash labels no oil.
+    #[pyo3(get)]
+    pub oil_density: Option<PyQty>,
+    /// the oil phase's viscosity; absent where the flash labels no oil.
+    #[pyo3(get)]
+    pub oil_viscosity: Option<PyQty>,
+    /// the oil phase's untranslated volume over the saturation volume; absent in a single phase.
+    #[pyo3(get)]
+    pub liquid_relative_volume: Option<f64>,
+    /// the class's Y-factor; absent in a single phase.
+    #[pyo3(get)]
+    pub y_factor: Option<f64>,
+    /// phase 0's viscosity; absent in a two-phase point.
+    #[pyo3(get)]
+    pub viscosity: Option<PyQty>,
+    /// phase 0's isothermal compressibility, in 1/Pa; absent in a two-phase point.
+    #[pyo3(get)]
+    pub isothermal_compressibility: Option<f64>,
+}
+
+#[pymethods]
+impl PyCcePoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "CcePoint(pressure={:?}, total_volume={:?}, relative_volume={}, density={:?}, gas_volume={:?}, gas_standard_volume={:?}, bg={}, z_gas={}, oil_density={:?}, oil_viscosity={:?}, liquid_relative_volume={:?}, y_factor={:?}, viscosity={:?}, isothermal_compressibility={:?})",
+            self.pressure,
+            self.total_volume,
+            self.relative_volume,
+            self.density,
+            self.gas_volume,
+            self.gas_standard_volume,
+            self.bg,
+            self.z_gas,
+            self.oil_density,
+            self.oil_viscosity,
+            self.liquid_relative_volume,
+            self.y_factor,
+            self.viscosity,
+            self.isothermal_compressibility
+        )
+    }
+}
+
+impl From<&azoth_pvt::constant_mass_expansion::CcePoint> for PyCcePoint {
+    fn from(row: &azoth_pvt::constant_mass_expansion::CcePoint) -> Self {
+        Self {
+            pressure: PyQty {
+                magnitude_si: row.pressure,
+                unit: "Pa".to_string(),
+            },
+            total_volume: PyQty {
+                magnitude_si: row.total_volume,
+                unit: "m**3".to_string(),
+            },
+            relative_volume: row.relative_volume,
+            density: PyQty {
+                magnitude_si: row.density,
+                unit: "kg/m**3".to_string(),
+            },
+            gas_volume: PyQty {
+                magnitude_si: row.gas_volume,
+                unit: "m**3".to_string(),
+            },
+            gas_standard_volume: PyQty {
+                magnitude_si: row.gas_standard_volume,
+                unit: "m**3".to_string(),
+            },
+            bg: row.bg,
+            z_gas: row.z_gas,
+            oil_density: row.oil_density.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "kg/m**3".to_string(),
+            }),
+            oil_viscosity: row.oil_viscosity.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa*s".to_string(),
+            }),
+            liquid_relative_volume: row.liquid_relative_volume,
+            y_factor: row.y_factor,
+            viscosity: row.viscosity.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa*s".to_string(),
+            }),
+            isothermal_compressibility: row.isothermal_compressibility,
+        }
+    }
+}
+
 /// The blended fluid's components: its merged base components first, in the fluids' order, then the combined pseudo-components in ascending cut order, named `PC1_PC`, `PC2_PC` and so on.
 #[pyclass(
     frozen,
@@ -1044,6 +1160,82 @@ impl From<&azoth_process::models::cost_estimation::CostEstimationResultRow>
     }
 }
 
+/// one row per pressure.
+#[pyclass(frozen, skip_from_py_object, module = "azoth._core", name = "CvdPoint")]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyCvdPoint {
+    /// the absolute pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the restored cell's volume-corrected volume.
+    #[pyo3(get)]
+    pub total_volume: PyQty,
+    /// the total volume over the saturation volume.
+    #[pyo3(get)]
+    pub relative_volume: f64,
+    /// the fraction of the feed's moles removed through this point.
+    #[pyo3(get)]
+    pub cumulative_mole_fraction_depleted: f64,
+    /// the absolute residual of initial = remaining + removed, over the initial amount; absent where it is at round-off, below 1e-12.
+    #[pyo3(get)]
+    pub material_balance_relative_error: Option<f64>,
+    /// the mixture's volume-corrected compressibility.
+    #[pyo3(get)]
+    pub zmix: f64,
+    /// the gas phase's volume-corrected compressibility; absent without a gas phase.
+    #[pyo3(get)]
+    pub z_gas: Option<f64>,
+    /// the oil phase's volume-corrected volume; absent without an oil phase.
+    #[pyo3(get)]
+    pub liquid_volume: Option<PyQty>,
+    /// the oil volume over the saturation volume, which is the class's liquid dropout curve; absent without an oil phase.
+    #[pyo3(get)]
+    pub liquid_volume_relative_to_vsat: Option<f64>,
+}
+
+#[pymethods]
+impl PyCvdPoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "CvdPoint(pressure={:?}, total_volume={:?}, relative_volume={}, cumulative_mole_fraction_depleted={}, material_balance_relative_error={:?}, zmix={}, z_gas={:?}, liquid_volume={:?}, liquid_volume_relative_to_vsat={:?})",
+            self.pressure,
+            self.total_volume,
+            self.relative_volume,
+            self.cumulative_mole_fraction_depleted,
+            self.material_balance_relative_error,
+            self.zmix,
+            self.z_gas,
+            self.liquid_volume,
+            self.liquid_volume_relative_to_vsat
+        )
+    }
+}
+
+impl From<&azoth_pvt::constant_volume_depletion::CvdPoint> for PyCvdPoint {
+    fn from(row: &azoth_pvt::constant_volume_depletion::CvdPoint) -> Self {
+        Self {
+            pressure: PyQty {
+                magnitude_si: row.pressure,
+                unit: "Pa".to_string(),
+            },
+            total_volume: PyQty {
+                magnitude_si: row.total_volume,
+                unit: "m**3".to_string(),
+            },
+            relative_volume: row.relative_volume,
+            cumulative_mole_fraction_depleted: row.cumulative_mole_fraction_depleted,
+            material_balance_relative_error: row.material_balance_relative_error,
+            zmix: row.zmix,
+            z_gas: row.z_gas,
+            liquid_volume: row.liquid_volume.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "m**3".to_string(),
+            }),
+            liquid_volume_relative_to_vsat: row.liquid_volume_relative_to_vsat,
+        }
+    }
+}
+
 /// One row per evaluated segment, in the profile's order.
 #[pyclass(
     frozen,
@@ -1198,6 +1390,111 @@ impl From<&azoth_process::models::process_cost_estimate::DisciplineCostLine>
         Self {
             name: row.name.clone(),
             cost: row.cost,
+        }
+    }
+}
+
+/// one row per pressure.
+#[pyclass(frozen, skip_from_py_object, module = "azoth._core", name = "DlePoint")]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyDlePoint {
+    /// the absolute pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the retained cell's translated volume.
+    #[pyo3(get)]
+    pub total_volume: PyQty,
+    /// the total volume over the saturation volume; absent without a saturation state.
+    #[pyo3(get)]
+    pub relative_volume: Option<f64>,
+    /// the oil phase's translated volume.
+    #[pyo3(get)]
+    pub liquid_volume: PyQty,
+    /// the liquid volume over the saturation volume; absent in a single phase.
+    #[pyo3(get)]
+    pub liquid_volume_relative_to_vsat: Option<f64>,
+    /// the oil phase's density.
+    #[pyo3(get)]
+    pub oil_density: PyQty,
+    /// the removed gas's translated volume; absent in a single phase.
+    #[pyo3(get)]
+    pub gas_volume: Option<PyQty>,
+    /// the removed gas at 288.15 K and 1.01325 bar; absent in a single phase.
+    #[pyo3(get)]
+    pub gas_standard_volume: Option<PyQty>,
+    /// the gas phase's cubic compressibility.
+    #[pyo3(get)]
+    pub z_gas: Option<f64>,
+    /// the gas molar mass over the class's 0.028 kg/mol air constant.
+    #[pyo3(get)]
+    pub relative_gas_gravity: Option<f64>,
+    /// the oil formation volume factor; absent without a stock-tank oil volume.
+    #[pyo3(get)]
+    pub bo: Option<f64>,
+    /// the gas formation volume factor; absent in a single phase.
+    #[pyo3(get)]
+    pub bg: Option<f64>,
+    /// the remaining solution gas per stock-tank oil volume; absent without one.
+    #[pyo3(get)]
+    pub rs: Option<f64>,
+}
+
+#[pymethods]
+impl PyDlePoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "DlePoint(pressure={:?}, total_volume={:?}, relative_volume={:?}, liquid_volume={:?}, liquid_volume_relative_to_vsat={:?}, oil_density={:?}, gas_volume={:?}, gas_standard_volume={:?}, z_gas={:?}, relative_gas_gravity={:?}, bo={:?}, bg={:?}, rs={:?})",
+            self.pressure,
+            self.total_volume,
+            self.relative_volume,
+            self.liquid_volume,
+            self.liquid_volume_relative_to_vsat,
+            self.oil_density,
+            self.gas_volume,
+            self.gas_standard_volume,
+            self.z_gas,
+            self.relative_gas_gravity,
+            self.bo,
+            self.bg,
+            self.rs
+        )
+    }
+}
+
+impl From<&azoth_pvt::differential_liberation::DlePoint> for PyDlePoint {
+    fn from(row: &azoth_pvt::differential_liberation::DlePoint) -> Self {
+        Self {
+            pressure: PyQty {
+                magnitude_si: row.pressure,
+                unit: "Pa".to_string(),
+            },
+            total_volume: PyQty {
+                magnitude_si: row.total_volume,
+                unit: "m**3".to_string(),
+            },
+            relative_volume: row.relative_volume,
+            liquid_volume: PyQty {
+                magnitude_si: row.liquid_volume,
+                unit: "m**3".to_string(),
+            },
+            liquid_volume_relative_to_vsat: row.liquid_volume_relative_to_vsat,
+            oil_density: PyQty {
+                magnitude_si: row.oil_density,
+                unit: "kg/m**3".to_string(),
+            },
+            gas_volume: row.gas_volume.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "m**3".to_string(),
+            }),
+            gas_standard_volume: row.gas_standard_volume.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "m**3".to_string(),
+            }),
+            z_gas: row.z_gas,
+            relative_gas_gravity: row.relative_gas_gravity,
+            bo: row.bo,
+            bg: row.bg,
+            rs: row.rs,
         }
     }
 }
@@ -3979,6 +4276,40 @@ impl From<&azoth_process::models::fault_tree::MinimalCutSet> for PyMinimalCutSet
     }
 }
 
+/// the slim tube's recovery curve; empty for the key tie line.
+#[pyclass(frozen, skip_from_py_object, module = "azoth._core", name = "MmpPoint")]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMmpPoint {
+    /// the grid pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the recovery at that pressure, 0 to 1.
+    #[pyo3(get)]
+    pub recovery: f64,
+}
+
+#[pymethods]
+impl PyMmpPoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "MmpPoint(pressure={:?}, recovery={})",
+            self.pressure, self.recovery
+        )
+    }
+}
+
+impl From<&azoth_pvt::mmp::MmpPoint> for PyMmpPoint {
+    fn from(row: &azoth_pvt::mmp::MmpPoint) -> Self {
+        Self {
+            pressure: PyQty {
+                magnitude_si: row.pressure,
+                unit: "Pa".to_string(),
+            },
+            recovery: row.recovery,
+        }
+    }
+}
+
 /// each source's contribution at the peak, in first-appearance order.
 #[pyclass(
     frozen,
@@ -5173,6 +5504,112 @@ impl From<&azoth_process::models::process_cost_estimate::ProjectCostLine> for Py
     }
 }
 
+/// one row per state.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PropertyPoint"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPropertyPoint {
+    /// the state's temperature.
+    #[pyo3(get)]
+    pub temperature: PyQty,
+    /// the state's pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the gas phase's density, in the density mode.
+    #[pyo3(get)]
+    pub gas_density: Option<PyQty>,
+    /// the oil phase's density, in the density mode.
+    #[pyo3(get)]
+    pub oil_density: Option<PyQty>,
+    /// the aqueous phase's density, in the density mode.
+    #[pyo3(get)]
+    pub aqueous_density: Option<PyQty>,
+    /// the gas phase's viscosity, in the viscosity mode.
+    #[pyo3(get)]
+    pub gas_viscosity: Option<PyQty>,
+    /// the oil phase's viscosity, in the viscosity mode.
+    #[pyo3(get)]
+    pub oil_viscosity: Option<PyQty>,
+    /// the aqueous phase's viscosity, in the viscosity mode.
+    #[pyo3(get)]
+    pub aqueous_viscosity: Option<PyQty>,
+    /// whether a gas phase is present.
+    #[pyo3(get)]
+    pub gas_phase_available: bool,
+    /// whether an oil phase is present.
+    #[pyo3(get)]
+    pub oil_phase_available: bool,
+    /// whether an aqueous phase is present.
+    #[pyo3(get)]
+    pub aqueous_phase_available: bool,
+}
+
+#[pymethods]
+impl PyPropertyPoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "PropertyPoint(temperature={:?}, pressure={:?}, gas_density={:?}, oil_density={:?}, aqueous_density={:?}, gas_viscosity={:?}, oil_viscosity={:?}, aqueous_viscosity={:?}, gas_phase_available={:?}, oil_phase_available={:?}, aqueous_phase_available={:?})",
+            self.temperature,
+            self.pressure,
+            self.gas_density,
+            self.oil_density,
+            self.aqueous_density,
+            self.gas_viscosity,
+            self.oil_viscosity,
+            self.aqueous_viscosity,
+            self.gas_phase_available,
+            self.oil_phase_available,
+            self.aqueous_phase_available
+        )
+    }
+}
+
+impl From<&azoth_pvt::property_sweep::PropertyPoint> for PyPropertyPoint {
+    fn from(row: &azoth_pvt::property_sweep::PropertyPoint) -> Self {
+        Self {
+            temperature: PyQty {
+                magnitude_si: row.temperature,
+                unit: "K".to_string(),
+            },
+            pressure: PyQty {
+                magnitude_si: row.pressure,
+                unit: "Pa".to_string(),
+            },
+            gas_density: row.gas_density.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "kg/m**3".to_string(),
+            }),
+            oil_density: row.oil_density.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "kg/m**3".to_string(),
+            }),
+            aqueous_density: row.aqueous_density.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "kg/m**3".to_string(),
+            }),
+            gas_viscosity: row.gas_viscosity.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa*s".to_string(),
+            }),
+            oil_viscosity: row.oil_viscosity.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa*s".to_string(),
+            }),
+            aqueous_viscosity: row.aqueous_viscosity.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa*s".to_string(),
+            }),
+            gas_phase_available: row.gas_phase_available,
+            oil_phase_available: row.oil_phase_available,
+            aqueous_phase_available: row.aqueous_phase_available,
+        }
+    }
+}
+
 /// one row per evaluated acoustic mode, in mode order.
 #[pyclass(
     frozen,
@@ -6330,6 +6767,122 @@ impl From<&azoth_process::models::self_heating_induction::SelfHeatingTimePoint>
     }
 }
 
+/// one row per stage.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SeparatorStageResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySeparatorStageResult {
+    /// the stage's 1-based position.
+    #[pyo3(get)]
+    pub stage_number: usize,
+    /// the stage pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the stage temperature.
+    #[pyo3(get)]
+    pub temperature: PyQty,
+    /// the gas volume at the standard state, in the train.
+    #[pyo3(get)]
+    pub gas_volume: Option<PyQty>,
+    /// the stage gas-oil ratio.
+    #[pyo3(get)]
+    pub stage_gor: Option<f64>,
+    /// the gas-oil ratio through this stage, in the train.
+    #[pyo3(get)]
+    pub cumulative_gor: Option<f64>,
+    /// the stage oil formation factor, in the continuous and staged modes.
+    #[pyo3(get)]
+    pub oil_fvf: Option<f64>,
+    /// the gas phase's density, in the train.
+    #[pyo3(get)]
+    pub gas_density: Option<PyQty>,
+    /// the oil phase's density at the stage.
+    #[pyo3(get)]
+    pub oil_density: Option<PyQty>,
+    /// the gas phase's molar mass, in the train.
+    #[pyo3(get)]
+    pub gas_molar_mass: Option<PyQty>,
+    /// the oil phase's molar mass, in the train.
+    #[pyo3(get)]
+    pub oil_molar_mass: Option<PyQty>,
+    /// the gas phase's compressibility, in the train.
+    #[pyo3(get)]
+    pub gas_z_factor: Option<f64>,
+    /// the oil phase's viscosity, in the train.
+    #[pyo3(get)]
+    pub oil_viscosity: Option<PyQty>,
+}
+
+#[pymethods]
+impl PySeparatorStageResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SeparatorStageResult(stage_number={:?}, pressure={:?}, temperature={:?}, gas_volume={:?}, stage_gor={:?}, cumulative_gor={:?}, oil_fvf={:?}, gas_density={:?}, oil_density={:?}, gas_molar_mass={:?}, oil_molar_mass={:?}, gas_z_factor={:?}, oil_viscosity={:?})",
+            self.stage_number,
+            self.pressure,
+            self.temperature,
+            self.gas_volume,
+            self.stage_gor,
+            self.cumulative_gor,
+            self.oil_fvf,
+            self.gas_density,
+            self.oil_density,
+            self.gas_molar_mass,
+            self.oil_molar_mass,
+            self.gas_z_factor,
+            self.oil_viscosity
+        )
+    }
+}
+
+impl From<&azoth_pvt::separator_test::SeparatorStageResult> for PySeparatorStageResult {
+    fn from(row: &azoth_pvt::separator_test::SeparatorStageResult) -> Self {
+        Self {
+            stage_number: row.stage_number,
+            pressure: PyQty {
+                magnitude_si: row.pressure,
+                unit: "Pa".to_string(),
+            },
+            temperature: PyQty {
+                magnitude_si: row.temperature,
+                unit: "K".to_string(),
+            },
+            gas_volume: row.gas_volume.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "m**3".to_string(),
+            }),
+            stage_gor: row.stage_gor,
+            cumulative_gor: row.cumulative_gor,
+            oil_fvf: row.oil_fvf,
+            gas_density: row.gas_density.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "kg/m**3".to_string(),
+            }),
+            oil_density: row.oil_density.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "kg/m**3".to_string(),
+            }),
+            gas_molar_mass: row.gas_molar_mass.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "kg/mol".to_string(),
+            }),
+            oil_molar_mass: row.oil_molar_mass.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "kg/mol".to_string(),
+            }),
+            gas_z_factor: row.gas_z_factor,
+            oil_viscosity: row.oil_viscosity.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa*s".to_string(),
+            }),
+        }
+    }
+}
+
 /// one row per compartment, in the caller's order, with its Z and moles.
 #[pyclass(
     frozen,
@@ -6623,6 +7176,49 @@ impl From<&azoth_characterization::results::SubFraction> for PySubFraction {
                 magnitude_si: v,
                 unit: "K".to_string(),
             }),
+        }
+    }
+}
+
+/// one row per schedule entry.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SwellingPoint"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySwellingPoint {
+    /// the cumulative injection, as a fraction of the original oil moles.
+    #[pyo3(get)]
+    pub cumulative_gas_injected: f64,
+    /// the bubble-point pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the bubble-point volume over the base oil's.
+    #[pyo3(get)]
+    pub relative_oil_volume: f64,
+}
+
+#[pymethods]
+impl PySwellingPoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "SwellingPoint(cumulative_gas_injected={}, pressure={:?}, relative_oil_volume={})",
+            self.cumulative_gas_injected, self.pressure, self.relative_oil_volume
+        )
+    }
+}
+
+impl From<&azoth_pvt::swelling_test::SwellingPoint> for PySwellingPoint {
+    fn from(row: &azoth_pvt::swelling_test::SwellingPoint) -> Self {
+        Self {
+            cumulative_gas_injected: row.cumulative_gas_injected,
+            pressure: PyQty {
+                magnitude_si: row.pressure,
+                unit: "Pa".to_string(),
+            },
+            relative_oil_volume: row.relative_oil_volume,
         }
     }
 }

@@ -39,7 +39,7 @@ SAFT, reference/Helmholtz, electrolyte, solid/hydrate, bases), **~105 flash oper
 and ~60 saturation operations, **~60 physical-property methods**, 25 alpha functions and
 15 mixing rules, over a **~90-field component model**.
 
-azoth has **384 ids** — 98 calculations and 286 models.
+azoth has **392 ids** — 98 calculations and 294 models.
 
 ## The ledger
 
@@ -95,10 +95,10 @@ exclusion list, and the port's NeqSim probe and its capture.
 
 **Three surfaces the tranche has taken are not in that nine, because it took them: the pyo3
 wrapper, the bridge adapter and the Python result dataclass.** The wrapper is generated for
-**307** of the registered ids and hand-written for **77**: a kernel that takes a record or a
+**314** of the registered ids and hand-written for **78**: a kernel that takes a record or a
 mixture the spec does not name is one the generator refuses rather than guesses at, and so is one
 whose signature disagrees with the order the bridge passes it in. The bridge adapter is generated
-for **381** and hand-written for **3**, and its rule is narrower because its boundary is a Python
+for **389** and hand-written for **3**, and its rule is narrower because its boundary is a Python
 signature rather than a Rust one: its signature is the public wrapper's, its call is the
 `#[pyfunction]`'s own order, and every argument on either side must be an input the spec declares,
 a field of the `params` record the wrapper's annotation names, or one expression a boundary object
@@ -106,7 +106,7 @@ resolves into. A `molar_mass` is the one expansion that is not an expression - a
 carries none and the correlation cannot default one, so it crosses behind a guard whose sentence is
 read from the id's own reference implementation.
 
-**The result dataclass is generated for **384** and hand-written for **0**.** One frozen class per registered id, its fields
+**The result dataclass is generated for **392** and hand-written for **0**.** One frozen class per registered id, its fields
 in `CalcResult::FIELDS` order, each annotation from the transport's Rust type beside the unit the
 spec declares, and each doc from the spec's own `description` — so the field prose has one home
 and `tools/gen_python_result.py` can emit the whole file without a paraphrase. What stays
@@ -188,10 +188,13 @@ calculations, and each carryable one is backed: the seven scale ids, the de Waar
 corrosion, erosion, emulsion, pipeline and surface cooldown, and the hydrate risk map all
 have ids. **One class is left, and it is named rather than left waiting**:
 `CO2CorrosionAnalyzer` needs an electrolyte-CPA flash for pH that this tree has no system
-route for, and [the port roadmap](../../../ROADMAP.md) carries it under Tier 4. The rest
-of the tree is the simulation suite (`DifferentialLiberation`, `ConstantVolumeDepletion`,
-`SwellingTest`, `SaturationPressure`, `SeparatorTest`, `GOR`, `MMPCalculator`), the model
-tuning and the reservoir properties, and it is here.
+route for, and [the port roadmap](../../../ROADMAP.md) carries it under Tier 4. **The
+simulation suite is now eight ids**: `pvt.saturation_test`, `pvt.constant_mass_expansion`,
+`pvt.differential_liberation`, `pvt.constant_volume_depletion`, `pvt.separator_test`,
+`pvt.swelling_test`, `pvt.mmp` and `pvt.property_sweep`. The wax model is the one part
+owed: `WaxFractionSim` and `ViscosityWaxOilSim` need NeqSim's TBP wax
+(`getWaxModel().addTBPWax()`), whose fluid cannot cross as characterization rows, and the
+model tuning and the reservoir properties remain here as well.
 
 **P10 is nine ids and not the whole tree.** `reactions.equilibrium_constant` is
 `ChemicalReaction`'s `ln K`, its temperature derivative and its heat of reaction over each of

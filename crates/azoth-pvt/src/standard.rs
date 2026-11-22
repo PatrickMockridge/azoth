@@ -79,6 +79,75 @@ pub const SATURATION_TEMPERATURE_STEP_K: f64 = 10.0;
 /// `SaturationTemperature`'s bisection tolerance, in K.
 pub const SATURATION_TEMPERATURE_TOLERANCE_K: f64 = 1.0e-5;
 
+/// `DifferentialLiberation`'s air molar mass divisor for the relative gas gravity, kg/mol.
+pub const NEQSIM_AIR_MOLAR_MASS_KG_PER_MOL: f64 = 0.028;
+
+/// The `1e5` `ConstantMassExpansion` puts in its `Bg` and `DifferentialLiberation` does not.
+pub const CCE_BG_INTERNAL_FACTOR: f64 = 1.0e5;
+
+/// `ConstantVolumeDepletion`'s relative cell-volume tolerance.
+pub const CVD_CELL_VOLUME_RELATIVE_TOLERANCE: f64 = 1.0e-8;
+
+/// `ConstantVolumeDepletion`'s restore-loop iteration cap.
+pub const CVD_MAX_CELL_VOLUME_ITERATIONS: u32 = 100;
+
+/// `ConstantVolumeDepletion`'s per-iteration removal cap, as a fraction of the gas phase.
+pub const CVD_MAX_GAS_REMOVAL_FRACTION: f64 = 0.95;
+
+/// `MultiStageSeparatorTest`'s water density for the stock-tank API, kg/m3.
+pub const SEPARATOR_API_WATER_DENSITY: f64 = 999.0;
+
+/// `MultiStageSeparatorTest`'s API numerator.
+pub const SEPARATOR_API_NUMERATOR: f64 = 141.5;
+
+/// `MultiStageSeparatorTest`'s API offset.
+pub const SEPARATOR_API_OFFSET: f64 = 131.5;
+
+/// The density below which `MultiStageSeparatorTest` leaves the API absent, kg/m3.
+pub const SEPARATOR_API_DENSITY_MIN: f64 = 500.0;
+
+/// The density above which `MultiStageSeparatorTest` leaves the API absent, kg/m3.
+pub const SEPARATOR_API_DENSITY_MAX: f64 = 1100.0;
+
+/// The first waxy-oil dispersion coefficient.
+pub const WAXY_OIL_A1: f64 = 37.82;
+
+/// The second waxy-oil dispersion coefficient.
+pub const WAXY_OIL_A2: f64 = 83.96;
+
+/// The third waxy-oil dispersion coefficient.
+pub const WAXY_OIL_A3: f64 = 8.559e6;
+
+/// `PhysicalProperties.getViscosity`'s floor for a negative answer, Pa·s.
+pub const VISCOSITY_FLOOR_PA_S: f64 = 1.0e-5;
+
+/// `MMPCalculator`'s default recovery threshold.
+pub const MMP_DEFAULT_THRESHOLD: f64 = 0.90;
+
+/// `MMPCalculator`'s default number of pressure points.
+pub const MMP_DEFAULT_PRESSURE_POINTS: usize = 10;
+
+/// `MMPCalculator`'s default minimum pressure, in bar.
+pub const MMP_DEFAULT_MIN_PRESSURE_BAR: f64 = 100.0;
+
+/// `MMPCalculator`'s default maximum pressure, in bar.
+pub const MMP_DEFAULT_MAX_PRESSURE_BAR: f64 = 500.0;
+
+/// `MMPCalculator`'s default number of slim-tube cells.
+pub const MMP_DEFAULT_NODES: usize = 100;
+
+/// `MMPCalculator`'s default injected volume, in pore volumes.
+pub const MMP_DEFAULT_PV_INJECTED: f64 = 1.2;
+
+/// `MMPCalculator`'s key-tie-line bisection tolerance, in bar.
+pub const MMP_KEY_TIE_LINE_PRESSURE_TOLERANCE_BAR: f64 = 0.5;
+
+/// `MMPCalculator`'s key-tie-line miscibility threshold.
+pub const MMP_KEY_TIE_LINE_LENGTH_TOLERANCE: f64 = 0.01;
+
+/// The temperature `SwellingTest` inherits when none is set, in K.
+pub const SWELLING_DEFAULT_TEMPERATURE_K: f64 = 298.15;
+
 /// Bar to pascal, exact by the definition of the bar.
 #[must_use]
 pub fn bar_to_pa(bar: f64) -> f64 {
@@ -282,6 +351,33 @@ mod tests {
         assert_eq!(celsius_to_fahrenheit(100.0), 212.0);
         assert_eq!(fahrenheit_to_celsius(32.0), 0.0);
         assert_eq!(kelvin_to_rankine(273.15), 491.67);
+    }
+
+    #[test]
+    fn the_laboratory_literals_are_the_class_ones() {
+        assert_eq!(NEQSIM_AIR_MOLAR_MASS_KG_PER_MOL, 0.028);
+        assert_eq!(CCE_BG_INTERNAL_FACTOR, 1.0e5);
+        assert_eq!(CVD_CELL_VOLUME_RELATIVE_TOLERANCE, 1.0e-8);
+        assert_eq!(CVD_MAX_CELL_VOLUME_ITERATIONS, 100);
+        assert_eq!(CVD_MAX_GAS_REMOVAL_FRACTION, 0.95);
+        assert_eq!(SEPARATOR_API_WATER_DENSITY, 999.0);
+        assert_eq!(SEPARATOR_API_NUMERATOR, 141.5);
+        assert_eq!(SEPARATOR_API_OFFSET, 131.5);
+        assert_eq!(SEPARATOR_API_DENSITY_MIN, 500.0);
+        assert_eq!(SEPARATOR_API_DENSITY_MAX, 1100.0);
+        assert_eq!(WAXY_OIL_A1, 37.82);
+        assert_eq!(WAXY_OIL_A2, 83.96);
+        assert_eq!(WAXY_OIL_A3, 8.559e6);
+        assert_eq!(VISCOSITY_FLOOR_PA_S, 1.0e-5);
+        assert_eq!(MMP_DEFAULT_THRESHOLD, 0.90);
+        assert_eq!(MMP_DEFAULT_PRESSURE_POINTS, 10);
+        assert_eq!(MMP_DEFAULT_MIN_PRESSURE_BAR, 100.0);
+        assert_eq!(MMP_DEFAULT_MAX_PRESSURE_BAR, 500.0);
+        assert_eq!(MMP_DEFAULT_NODES, 100);
+        assert_eq!(MMP_DEFAULT_PV_INJECTED, 1.2);
+        assert_eq!(MMP_KEY_TIE_LINE_PRESSURE_TOLERANCE_BAR, 0.5);
+        assert_eq!(MMP_KEY_TIE_LINE_LENGTH_TOLERANCE, 0.01);
+        assert_eq!(SWELLING_DEFAULT_TEMPERATURE_K, 298.15);
     }
 
     #[test]

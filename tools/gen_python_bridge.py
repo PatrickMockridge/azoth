@@ -859,6 +859,12 @@ def emit_function(calc_id: str, used: set[str], external: set[str]) -> str:
     # `reactions.equilibrium_constant` declares `(reaction, source, T)` in the spec and takes
     # `(source, reaction, T)`, so a positional call built from the stub swaps two strings.
     types = wrapper_types().get(function, {})
+    if not types:
+        # **A hand-written `#[pyfunction]` has no generated signature to read the call's
+        # order from**, and an adapter built without one calls the extension with no
+        # arguments at all - a `TypeError` at run time rather than a refusal here. Those
+        # ids' adapters are hand-written in `_rust_bridge.py`.
+        raise Refusal("the wrapper is hand-written, so the call's order is not in wrappers_gen")
     core_params = list(types)
 
     spec = specs()[calc_id]

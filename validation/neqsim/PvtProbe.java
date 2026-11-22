@@ -1,11 +1,29 @@
 // The PVT probes. One subcommand per id; the states are the pinned tests' own where the
 // class is expressible in the id's boundary units, and each answer is printed as the id
 // publishes it.
+//
+// A few published diagnostics are private arrays in the classes and have no getter. The
+// probe reads those by reflection, walking the superclass chain. That is probe surface, not
+// class surface: the library never reflects, and a field rename at a later pin breaks this
+// file rather than an id.
 
 import java.util.Map;
 import neqsim.pvtsimulation.reservoirproperties.CompositionEstimation;
 import neqsim.pvtsimulation.reservoirproperties.materialbalance.GasMaterialBalance;
 import neqsim.pvtsimulation.reservoirproperties.materialbalance.OilMaterialBalance;
+import neqsim.pvtsimulation.simulation.ConstantMassExpansion;
+import neqsim.pvtsimulation.simulation.ConstantVolumeDepletion;
+import neqsim.pvtsimulation.simulation.GOR;
+import neqsim.pvtsimulation.simulation.MMPCalculator;
+import neqsim.pvtsimulation.simulation.MultiStageSeparatorTest;
+import neqsim.pvtsimulation.simulation.DensitySim;
+import neqsim.pvtsimulation.simulation.DifferentialLiberation;
+import neqsim.pvtsimulation.simulation.SaturationPressure;
+import neqsim.pvtsimulation.simulation.SaturationTemperature;
+import neqsim.pvtsimulation.simulation.SeparatorTest;
+import neqsim.pvtsimulation.simulation.SwellingTest;
+import neqsim.pvtsimulation.simulation.ViscositySim;
+import neqsim.pvtsimulation.simulation.WaxFractionSim;
 import neqsim.pvtsimulation.simulation.SolutionGasWaterRatio;
 import neqsim.pvtsimulation.util.BlackOilCorrelations;
 import neqsim.pvtsimulation.util.DeclineCurveAnalysis;
@@ -358,6 +376,519 @@ public final class PvtProbe {
     line("edi", indices[3]);
   }
 
+  // A databank binary at a stated state. The laboratory ids' cases are databank fluids
+  // because a FluidComponent row cannot carry a TBP cut; the upstream TBP states are
+  // recorded as owed, not retyped here.
+  private static SystemInterface binary(String first, double firstMoles, String second,
+      double secondMoles, double temperatureK, double pressureBara) {
+    SystemInterface system = new SystemSrkEos(temperatureK, pressureBara);
+    system.addComponent(first, firstMoles);
+    system.addComponent(second, secondMoles);
+    system.setMixingRule(2);
+    return system;
+  }
+
+  private static SystemInterface pure(String name, double moles, double temperatureK,
+      double pressureBara) {
+    SystemInterface system = new SystemSrkEos(temperatureK, pressureBara);
+    system.addComponent(name, moles);
+    system.setMixingRule(2);
+    return system;
+  }
+
+  private static void saturation() {
+    System.out.println("saturation");
+
+    System.out.println("[pressure_methane_nc10_323]");
+    SaturationPressure pressure = new SaturationPressure(
+        binary("methane", 0.70, "nC10", 0.30, 323.15, 50.0));
+    pressure.setTemperature(323.15);
+    line("saturation_pressure_pa", pressure.calcSaturationPressure() * 1.0e5);
+
+    System.out.println("[pressure_methane_nbutane_275]");
+    pressure = new SaturationPressure(
+        binary("methane", 0.95, "n-butane", 0.05, 275.0, 50.0));
+    pressure.setTemperature(275.0);
+    line("saturation_pressure_pa", pressure.calcSaturationPressure() * 1.0e5);
+
+    // Above methane's critical temperature no pressure brackets a two-phase region, so the
+    // class answers the top of its grid.
+    System.out.println("[pressure_fallback_methane_300]");
+    pressure = new SaturationPressure(pure("methane", 1.0, 300.0, 50.0));
+    pressure.setTemperature(300.0);
+    line("saturation_pressure_pa", pressure.calcSaturationPressure() * 1.0e5);
+
+    System.out.println("[temperature_methane_nc10_52bara]");
+    SaturationTemperature temperature = new SaturationTemperature(
+        binary("methane", 0.70, "nC10", 0.30, 300.0, 52.1));
+    line("saturation_temperature_k", temperature.calcSaturationTemperature());
+
+    System.out.println("[temperature_fallback_methane_100bara]");
+    temperature = new SaturationTemperature(pure("methane", 1.0, 300.0, 100.0));
+    line("saturation_temperature_k", temperature.calcSaturationTemperature());
+  }
+
+  // One private field, walking the superclass chain. Probe-only; see the header.
+  private static Object field(Object target, String name) {
+    Class<?> type = target.getClass();
+    while (type != null) {
+      try {
+        java.lang.reflect.Field found = type.getDeclaredField(name);
+        found.setAccessible(true);
+        return found.get(target);
+      } catch (NoSuchFieldException absent) {
+        type = type.getSuperclass();
+      } catch (IllegalAccessException denied) {
+        throw new IllegalStateException(denied);
+      }
+    }
+    throw new IllegalStateException("no field " + name + " on " + target.getClass().getName());
+  }
+
+  private static double[] array(Object target, String name) {
+    return (double[]) field(target, name);
+  }
+
+  private static double scalar(Object target, String name) {
+    return (Double) field(target, name);
+  }
+
+  private static void value(String key, double value) {
+    if (Double.isFinite(value)) {
+      line(key, value);
+    }
+  }
+
+  private static void cceBlock(String block, String first, double firstMoles, String second,
+      double secondMoles, double temperatureK, double[] pressuresBar) {
+    System.out.println("[" + block + "]");
+    ConstantMassExpansion expansion = new ConstantMassExpansion(
+        binary(first, firstMoles, second, secondMoles, temperatureK, pressuresBar[0]));
+    expansion.setTemperature(temperatureK);
+    expansion.setPressures(pressuresBar);
+    expansion.runCalc();
+
+    line("saturation_pressure_pa", expansion.getSaturationPressure() * 1.0e5);
+    line("saturation_volume_m3", scalar(expansion, "saturationVolume") / 1.0e5);
+    line("z_saturation", scalar(expansion, "Zsaturation"));
+    line("saturation_isothermal_compressibility",
+        expansion.getSaturationIsoThermalCompressibility() / 1.0e5);
+
+    double[] total = array(expansion, "totalVolume");
+    double[] gas = array(expansion, "gasVolume");
+    double[] gasStandard = array(expansion, "gasStandardVolume");
+    double[] relative = expansion.getRelativeVolume();
+    double[] liquidRelative = expansion.getLiquidRelativeVolume();
+    double[] yFactor = expansion.getYfactor();
+    double[] density = expansion.getDensity();
+    double[] viscosity = expansion.getViscosity();
+    double[] oilDensity = expansion.getOilDensity();
+    double[] oilViscosity = expansion.getOilViscosity();
+    double[] bg = expansion.getBg();
+    double[] zGas = expansion.getZgas();
+    double[] compressibility = expansion.getIsoThermalCompressibility();
+    for (int i = 0; i < pressuresBar.length; i++) {
+      String at = "point_" + i + "_";
+      line(at + "pressure_pa", pressuresBar[i] * 1.0e5);
+      line(at + "total_volume_m3", total[i] / 1.0e5);
+      line(at + "relative_volume", relative[i]);
+      line(at + "density", density[i]);
+      line(at + "gas_volume_m3", gas[i]);
+      line(at + "gas_standard_volume_m3", gasStandard[i] / 1.0e5);
+      line(at + "bg", bg[i]);
+      line(at + "z_gas", zGas[i]);
+      value(at + "oil_density", oilDensity[i]);
+      value(at + "oil_viscosity", oilViscosity[i]);
+      value(at + "liquid_relative_volume", liquidRelative[i] / 100.0);
+      value(at + "y_factor", yFactor[i]);
+      value(at + "viscosity", viscosity[i]);
+      value(at + "isothermal_compressibility", compressibility[i] / 1.0e5);
+    }
+  }
+
+  private static void cce() {
+    System.out.println("cce");
+    cceBlock("cce_methane_nc10_323", "methane", 0.70, "nC10", 0.30, 323.15,
+        new double[] {300.0, 250.0, 200.0, 150.0, 100.0, 50.0, 10.0});
+    cceBlock("cce_unsaturate_323", "methane", 0.70, "nC10", 0.30, 323.15,
+        new double[] {400.0, 350.0, 300.0, 250.0});
+    cceBlock("cce_methane_nbutane_275", "methane", 0.95, "n-butane", 0.05, 275.0,
+        new double[] {100.0, 50.0, 20.0, 10.0, 5.0});
+  }
+
+  private static void dleBlock(String block, String first, double firstMoles, String second,
+      double secondMoles, double temperatureK, double[] pressuresBar) {
+    System.out.println("[" + block + "]");
+    DifferentialLiberation liberation = new DifferentialLiberation(
+        binary(first, firstMoles, second, secondMoles, temperatureK, pressuresBar[0]));
+    liberation.setTemperature(temperatureK);
+    liberation.setPressures(pressuresBar);
+    liberation.runCalc();
+
+    line("saturation_pressure_pa", liberation.getSaturationPressure() * 1.0e5);
+    line("saturation_volume_m3", scalar(liberation, "saturationVolume"));
+    line("voil_std_m3", scalar(liberation, "VoilStd"));
+
+    double[] total = array(liberation, "totalVolume");
+    double[] liquid = array(liberation, "liquidVolume");
+    double[] liquidRelative = array(liberation, "liquidVolumeRelativeToVsat");
+    double[] gas = array(liberation, "gasVolume");
+    double[] relative = liberation.getRelativeVolume();
+    double[] bo = liberation.getBo();
+    double[] bg = liberation.getBg();
+    double[] rs = liberation.getRs();
+    double[] zGas = liberation.getZgas();
+    double[] gasGravity = liberation.getRelGasGravity();
+    double[] gasStandard = liberation.getGasStandardVolume();
+    double[] oilDensity = liberation.getOilDensity();
+    for (int i = 0; i < pressuresBar.length; i++) {
+      String at = "point_" + i + "_";
+      line(at + "pressure_pa", pressuresBar[i] * 1.0e5);
+      line(at + "total_volume_m3", total[i]);
+      line(at + "relative_volume", relative[i]);
+      line(at + "liquid_volume_m3", liquid[i]);
+      line(at + "oil_density", oilDensity[i]);
+      if (gasStandard[i] > 1.0e-30) {
+        line(at + "liquid_volume_relative_to_vsat", liquidRelative[i]);
+        line(at + "gas_volume_m3", gas[i]);
+        line(at + "gas_standard_volume_m3", gasStandard[i]);
+        line(at + "z_gas", zGas[i]);
+        line(at + "relative_gas_gravity", gasGravity[i]);
+      }
+      line(at + "bo", bo[i]);
+      if (zGas[i] > 1.0e-10) {
+        line(at + "bg", bg[i]);
+      }
+      line(at + "rs", rs[i]);
+    }
+  }
+
+  private static void dle() {
+    System.out.println("dle");
+    dleBlock("dle_methane_nc10_323", "methane", 0.70, "nC10", 0.30, 323.15,
+        new double[] {250.0, 200.0, 150.0, 100.0, 70.0, 50.0, 30.0, 20.0, 10.0, 1.0});
+    dleBlock("dle_methane_nc10_350", "methane", 0.70, "nC10", 0.30, 350.0,
+        new double[] {300.0, 250.0, 200.0, 150.0, 100.0, 50.0, 20.0, 5.0});
+    dleBlock("dle_methane_nc10_323_rich", "methane", 0.60, "nC10", 0.40, 323.15,
+        new double[] {250.0, 200.0, 150.0, 100.0, 50.0, 20.0, 5.0});
+  }
+
+  private static void cvdBlock(String block, String first, double firstMoles, String second,
+      double secondMoles, double temperatureK, double[] pressuresBar) {
+    System.out.println("[" + block + "]");
+    ConstantVolumeDepletion depletion = new ConstantVolumeDepletion(
+        binary(first, firstMoles, second, secondMoles, temperatureK, pressuresBar[0]));
+    depletion.setTemperature(temperatureK);
+    depletion.setPressures(pressuresBar);
+    depletion.runCalc();
+
+    line("saturation_pressure_pa", depletion.getSaturationPressure() * 1.0e5);
+    line("saturation_volume_m3", scalar(depletion, "saturationVolume"));
+    line("z_saturation", scalar(depletion, "Zsaturation"));
+    line("initial_moles", scalar(depletion, "initialMoles"));
+    line("cumulative_moles_removed", scalar(depletion, "cumulativeMolesRemoved"));
+
+    double[] total = array(depletion, "totalVolume");
+    double[] liquid = array(depletion, "liquidVolume");
+    double[] liquidRelative = array(depletion, "liquidVolumeRelativeToVsat");
+    double[] balance = array(depletion, "materialBalanceRelativeError");
+    double[] relative = depletion.getRelativeVolume();
+    double[] zmix = depletion.getZmix();
+    double[] zGas = depletion.getZgas();
+    double[] depleted = depletion.getCummulativeMolePercDepleted();
+    double[] dropout = depletion.getLiquidDropoutCurve();
+    for (int i = 0; i < pressuresBar.length; i++) {
+      String at = "point_" + i + "_";
+      line(at + "pressure_pa", pressuresBar[i] * 1.0e5);
+      line(at + "total_volume_m3", total[i]);
+      line(at + "relative_volume", relative[i]);
+      line(at + "cumulative_mole_fraction_depleted", depleted[i] / 100.0);
+      line(at + "material_balance_relative_error", balance[i]);
+      line(at + "zmix", zmix[i]);
+      if (zGas[i] > 1.0e-10) {
+        line(at + "z_gas", zGas[i]);
+      }
+      if (liquid[i] > 0.0) {
+        line(at + "liquid_volume_m3", liquid[i]);
+        line(at + "liquid_volume_relative_to_vsat", liquidRelative[i]);
+        line(at + "liquid_dropout", dropout[i] / 100.0);
+      }
+    }
+  }
+
+  private static void cvd() {
+    System.out.println("cvd");
+    cvdBlock("cvd_methane_nc10_323", "methane", 0.70, "nC10", 0.30, 323.15,
+        new double[] {400.0, 350.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0});
+    cvdBlock("cvd_methane_nc10_350", "methane", 0.70, "nC10", 0.30, 350.0,
+        new double[] {350.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0});
+    cvdBlock("cvd_rich_323", "methane", 0.60, "nC10", 0.40, 323.15,
+        new double[] {300.0, 250.0, 200.0, 150.0, 100.0, 50.0});
+  }
+
+
+  private static SystemInterface multiStage() {
+    SystemInterface system = new SystemSrkEos(373.15, 300.0);
+    system.addComponent("nitrogen", 0.5);
+    system.addComponent("CO2", 2.0);
+    system.addComponent("methane", 45.0);
+    system.addComponent("ethane", 8.0);
+    system.addComponent("propane", 5.0);
+    system.addComponent("i-butane", 1.5);
+    system.addComponent("n-butane", 2.5);
+    system.addComponent("i-pentane", 1.0);
+    system.addComponent("n-pentane", 1.5);
+    system.addComponent("n-hexane", 3.0);
+    system.addComponent("n-heptane", 30.0);
+    system.setMixingRule(2);
+    system.setMultiPhaseCheck(true);
+    return system;
+  }
+
+  private static MultiStageSeparatorTest train() {
+    MultiStageSeparatorTest run = new MultiStageSeparatorTest(multiStage());
+    run.setReservoirConditions(300.0, 100.0);
+    run.addSeparatorStage(50.0, 40.0);
+    run.addSeparatorStage(10.0, 30.0);
+    run.addStockTankStage();
+    return run;
+  }
+
+  private static void stageRows(MultiStageSeparatorTest run) {
+    for (MultiStageSeparatorTest.SeparatorStageResult stage : run.getStageResults()) {
+      String at = "stage_" + stage.getStageNumber() + "_";
+      line(at + "pressure_pa", stage.getPressure() * 1.0e5);
+      line(at + "temperature_k", stage.getTemperature() + 273.15);
+      line(at + "stage_gor", stage.getStageGOR());
+      line(at + "cumulative_gor", stage.getCumulativeGOR());
+      value(at + "gas_volume_m3", stage.getGasRate() / 1.0e5);
+      value(at + "gas_density", stage.getGasDensity());
+      value(at + "oil_density", stage.getOilDensity());
+      value(at + "gas_molar_mass", stage.getGasMW() / 1000.0);
+      value(at + "oil_molar_mass", stage.getOilMW() / 1000.0);
+      value(at + "gas_z_factor", stage.getGasZFactor());
+      value(at + "oil_viscosity", stage.getOilViscosity() / 1000.0);
+    }
+  }
+
+  private static void separator() {
+    System.out.println("separator");
+    double[] temperatures = {323.15, 313.15, 303.15, 288.15};
+    double[] pressures = {50.0, 20.0, 5.0, 1.01325};
+
+    System.out.println("[continuous_binary]");
+    GOR gor = new GOR(binary("methane", 0.70, "nC10", 0.30, 323.15, 50.0));
+    gor.setTemperaturesAndPressures(temperatures, pressures);
+    gor.runCalc();
+    for (int i = 0; i < pressures.length; i++) {
+      String at = "stage_" + (i + 1) + "_";
+      line(at + "pressure_pa", pressures[i] * 1.0e5);
+      line(at + "temperature_k", temperatures[i]);
+      line(at + "stage_gor", gor.getGOR()[i]);
+      line(at + "oil_fvf", gor.getBofactor()[i]);
+    }
+
+    System.out.println("[staged_binary]");
+    SeparatorTest staged = new SeparatorTest(binary("methane", 0.70, "nC10", 0.30, 323.15, 50.0));
+    staged.setSeparatorConditions(temperatures, pressures);
+    staged.runCalc();
+    for (int i = 0; i < pressures.length; i++) {
+      String at = "stage_" + (i + 1) + "_";
+      line(at + "pressure_pa", pressures[i] * 1.0e5);
+      line(at + "temperature_k", temperatures[i]);
+      line(at + "stage_gor", staged.getGOR()[i]);
+      line(at + "oil_fvf", staged.getBofactor()[i]);
+    }
+
+    System.out.println("[train_upstream]");
+    MultiStageSeparatorTest run = train();
+    run.run();
+    line("total_gor", run.getTotalGOR());
+    line("bo", run.getBo());
+    line("rs", run.getRs());
+    line("stock_tank_oil_density", run.getStockTankOilDensity());
+    value("stock_tank_api", run.getStockTankAPIGravity());
+    stageRows(run);
+
+    System.out.println("[train_optimize]");
+    MultiStageSeparatorTest optimized = train();
+    optimized.run();
+    MultiStageSeparatorTest.OptimizationResult best =
+        optimized.optimizeFirstStageSeparator(5.0, 20.0, 3, 20.0, 40.0, 2);
+    line("optimal_stage_pressure_pa", best.getOptimalPressure() * 1.0e5);
+    line("optimal_stage_temperature_k", best.getOptimalTemperature() + 273.15);
+    line("maximum_oil_recovery", best.getMaximumOilRecovery());
+    line("gor_at_optimum", best.getGorAtOptimum());
+    line("bo_at_optimum", best.getBoAtOptimum());
+    value("api_at_optimum", best.getApiAtOptimum());
+  }
+
+  private static void swellingBlock(String block, String[] oilNames, double[] oilMoles,
+      String[] gasNames, double[] gasMoles, double temperatureK, double[] schedule) {
+    System.out.println("[" + block + "]");
+    SystemInterface oil = new SystemSrkEos(temperatureK, 50.0);
+    for (int i = 0; i < oilNames.length; i++) oil.addComponent(oilNames[i], oilMoles[i]);
+    oil.setMixingRule(1);
+    oil.useVolumeCorrection(false);
+    SystemInterface gas = new SystemSrkEos(temperatureK, 50.0);
+    for (int i = 0; i < gasNames.length; i++) gas.addComponent(gasNames[i], gasMoles[i]);
+    gas.setMixingRule(1);
+    gas.useVolumeCorrection(false);
+
+    SwellingTest swelling = new SwellingTest(oil);
+    swelling.setInjectionGas(gas);
+    swelling.setCummulativeMolePercentGasInjected(schedule);
+    swelling.setTemperature(temperatureK);
+    swelling.runCalc();
+    double[] pressures = swelling.getPressures();
+    double[] volumes = swelling.getRelativeOilVolume();
+    for (int i = 0; i < schedule.length; i++) {
+      String at = "point_" + i + "_";
+      line(at + "cumulative_gas_injected", schedule[i] / 100.0);
+      line(at + "pressure_pa", pressures[i] * 1.0e5);
+      line(at + "relative_oil_volume", volumes[i]);
+    }
+  }
+
+  private static void swelling() {
+    System.out.println("swelling");
+    swellingBlock("swelling_upstream", new String[] {"methane", "nC10"}, new double[] {0.2, 0.8},
+        new String[] {"methane"}, new double[] {1.0}, 353.15, new double[] {0.0, 10.0, 20.0});
+    swellingBlock("swelling_mixed_gas", new String[] {"methane", "nC10"}, new double[] {0.5, 0.5},
+        new String[] {"methane", "ethane"}, new double[] {0.7, 0.3}, 323.15,
+        new double[] {0.0, 5.0, 15.0, 25.0});
+    swellingBlock("swelling_zero_injection", new String[] {"methane", "nC10"},
+        new double[] {0.5, 0.5}, new String[] {"methane"}, new double[] {1.0}, 323.15,
+        new double[] {0.0, 0.0});
+  }
+
+  private static void mmpBlock(String block, double temperatureCelsius, String method,
+      double minBar, double maxBar, int points, int nodes, double pv, double threshold) {
+    mmpBlock(block, "methane", temperatureCelsius, method, minBar, maxBar, points, nodes, pv, threshold);
+  }
+
+  private static void mmpBlock(String block, String gasName, double temperatureCelsius,
+      String method, double minBar, double maxBar, int points, int nodes, double pv,
+      double threshold) {
+    System.out.println("[" + block + "]");
+    SystemInterface oil = new SystemSrkEos(temperatureCelsius + 273.15, minBar);
+    oil.addComponent("methane", 0.70);
+    oil.addComponent("nC10", 0.30);
+    oil.setMixingRule(2);
+    SystemInterface gas = new SystemSrkEos(temperatureCelsius + 273.15, minBar);
+    gas.addComponent(gasName, 1.0);
+    gas.setMixingRule(2);
+    MMPCalculator calculator = new MMPCalculator(oil, gas);
+    calculator.setTemperature(temperatureCelsius);
+    calculator.setMethod(MMPCalculator.CalculationMethod.valueOf(method));
+    calculator.setPressureRange(minBar, maxBar);
+    calculator.setNumberOfPressurePoints(points);
+    calculator.setSlimTubeParameters(nodes, pv);
+    calculator.setRecoveryThreshold(threshold);
+    calculator.run();
+    line("mmp_pa", calculator.getMMP() * 1.0e5);
+    System.out.println("mechanism=" + calculator.getMiscibilityMechanism().name());
+    double[] pressures = calculator.getPressures();
+    double[] recoveries = calculator.getRecoveries();
+    if (pressures != null) {
+      for (int i = 0; i < pressures.length; i++) {
+        line("point_" + i + "_pressure_pa", pressures[i] * 1.0e5);
+        line("point_" + i + "_recovery", recoveries[i]);
+      }
+    }
+  }
+
+  private static void mmp() {
+    System.out.println("mmp");
+    mmpBlock("mmp_slim_tube_small", 50.0, "SLIM_TUBE", 100.0, 300.0, 3, 6, 0.4, 0.90);
+    mmpBlock("mmp_key_tie_line", 50.0, "KEY_TIE_LINE", 100.0, 500.0, 3, 6, 0.4, 0.90);
+    mmpBlock("mmp_rising_bubble", 50.0, "RISING_BUBBLE", 100.0, 300.0, 3, 6, 0.4, 0.90);
+    mmpBlock("mmp_default_grid", 50.0, "SLIM_TUBE", 100.0, 300.0, 10, 8, 0.5, 0.90);
+    mmpBlock("mmp_slim_tube_wide", "methane", 50.0, "SLIM_TUBE", 100.0, 1000.0, 5, 6, 0.4, 0.50);
+  }
+
+  private static void propertySweep() {
+    System.out.println("property_sweep");
+    double[] temperatures = {323.15, 313.15, 303.15};
+    double[] pressures = {5.0, 5.0, 5.0};
+
+    System.out.println("[density_binary]");
+    DensitySim density = new DensitySim(binary("methane", 0.70, "nC10", 0.30, 323.15, 5.0));
+    density.setTemperaturesAndPressures(temperatures, pressures);
+    density.runCalc();
+    for (int i = 0; i < temperatures.length; i++) {
+      String at = "point_" + i + "_";
+      line(at + "temperature_k", temperatures[i]);
+      line(at + "pressure_pa", pressures[i] * 1.0e5);
+      if (density.getGasDensity()[i] > 0.0) {
+        line(at + "gas_density", density.getGasDensity()[i]);
+      }
+      if (density.getOilDensity()[i] > 0.0) {
+        line(at + "oil_density", density.getOilDensity()[i]);
+      }
+      if (density.getAqueousDensity()[i] > 0.0) {
+        line(at + "aqueous_density", density.getAqueousDensity()[i]);
+      }
+    }
+
+    System.out.println("[density_gas_binary]");
+    DensitySim gasDensity = new DensitySim(pure("methane", 1.0, 300.0, 5.0));
+    double[] gasTemperatures = {300.0, 290.0, 280.0};
+    double[] gasPressures = {5.0, 5.0, 5.0};
+    gasDensity.setTemperaturesAndPressures(gasTemperatures, gasPressures);
+    gasDensity.runCalc();
+    for (int i = 0; i < gasTemperatures.length; i++) {
+      String at = "point_" + i + "_";
+      line(at + "temperature_k", gasTemperatures[i]);
+      line(at + "pressure_pa", gasPressures[i] * 1.0e5);
+      if (gasDensity.getGasDensity()[i] > 0.0) {
+        line(at + "gas_density", gasDensity.getGasDensity()[i]);
+      }
+      if (gasDensity.getOilDensity()[i] > 0.0) {
+        line(at + "oil_density", gasDensity.getOilDensity()[i]);
+      }
+      if (gasDensity.getAqueousDensity()[i] > 0.0) {
+        line(at + "aqueous_density", gasDensity.getAqueousDensity()[i]);
+      }
+    }
+
+    System.out.println("[viscosity_binary]");
+    ViscositySim viscosity = new ViscositySim(binary("methane", 0.70, "nC10", 0.30, 323.15, 5.0));
+    viscosity.setTemperaturesAndPressures(temperatures, pressures);
+    viscosity.runCalc();
+    for (int i = 0; i < temperatures.length; i++) {
+      String at = "point_" + i + "_";
+      line(at + "temperature_k", temperatures[i]);
+      line(at + "pressure_pa", pressures[i] * 1.0e5);
+      if (viscosity.getGasViscosity()[i] > 0.0) {
+        line(at + "gas_viscosity", viscosity.getGasViscosity()[i]);
+      }
+      if (viscosity.getOilViscosity()[i] > 0.0) {
+        line(at + "oil_viscosity", viscosity.getOilViscosity()[i]);
+      }
+      line(at + "gas_phase_available", viscosity.getGasPhaseAvailable()[i] ? 1.0 : 0.0);
+      line(at + "oil_phase_available", viscosity.getOilPhaseAvailable()[i] ? 1.0 : 0.0);
+    }
+
+    System.out.println("[viscosity_gas_binary]");
+    ViscositySim gasViscosity = new ViscositySim(pure("methane", 1.0, 300.0, 5.0));
+    gasViscosity.setTemperaturesAndPressures(gasTemperatures, gasPressures);
+    gasViscosity.runCalc();
+    for (int i = 0; i < gasTemperatures.length; i++) {
+      String at = "point_" + i + "_";
+      line(at + "temperature_k", gasTemperatures[i]);
+      line(at + "pressure_pa", gasPressures[i] * 1.0e5);
+      if (gasViscosity.getGasViscosity()[i] > 0.0) {
+        line(at + "gas_viscosity", gasViscosity.getGasViscosity()[i]);
+      }
+      if (gasViscosity.getOilViscosity()[i] > 0.0) {
+        line(at + "oil_viscosity", gasViscosity.getOilViscosity()[i]);
+      }
+      line(at + "gas_phase_available", gasViscosity.getGasPhaseAvailable()[i] ? 1.0 : 0.0);
+      line(at + "oil_phase_available", gasViscosity.getOilPhaseAvailable()[i] ? 1.0 : 0.0);
+    }
+  }
+
   public static void main(String[] args) {
     String which = args.length > 0 ? args[0] : "black_oil";
     switch (which) {
@@ -378,6 +909,30 @@ public final class PvtProbe {
         break;
       case "oil_mb":
         oilMaterialBalance();
+        break;
+      case "saturation":
+        saturation();
+        break;
+      case "cce":
+        cce();
+        break;
+      case "dle":
+        dle();
+        break;
+      case "cvd":
+        cvd();
+        break;
+      case "separator":
+        separator();
+        break;
+      case "swelling":
+        swelling();
+        break;
+      case "mmp":
+        mmp();
+        break;
+      case "property_sweep":
+        propertySweep();
         break;
       default:
         System.err.println("unknown subcommand: " + which);

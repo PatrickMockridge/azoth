@@ -467,10 +467,18 @@ Five sections, and the difference between them is the point:
 *Models* — whose specs fix a procedure rather than an equation:
 
 - [`pvt.black_oil_correlations`](./pvt/black_oil_correlations.md) — Black-oil correlation table
+- [`pvt.constant_mass_expansion`](./pvt/constant_mass_expansion.md) — Constant mass expansion
+- [`pvt.constant_volume_depletion`](./pvt/constant_volume_depletion.md) — Constant volume depletion
 - [`pvt.decline_curve`](./pvt/decline_curve.md) — Decline-curve analysis
+- [`pvt.differential_liberation`](./pvt/differential_liberation.md) — Differential liberation
 - [`pvt.gas_correlations`](./pvt/gas_correlations.md) — Gas correlation table
 - [`pvt.gas_material_balance`](./pvt/gas_material_balance.md) — Gas material balance
+- [`pvt.mmp`](./pvt/mmp.md) — Minimum miscibility pressure
 - [`pvt.oil_material_balance`](./pvt/oil_material_balance.md) — Oil material balance
+- [`pvt.property_sweep`](./pvt/property_sweep.md) — Property sweep
+- [`pvt.saturation_test`](./pvt/saturation_test.md) — Saturation test
+- [`pvt.separator_test`](./pvt/separator_test.md) — Separator test
+- [`pvt.swelling_test`](./pvt/swelling_test.md) — Swelling test
 - [`pvt.water_correlations`](./pvt/water_correlations.md) — Water and brine correlation table
 
 **Reactions** - [`reactions/index.md`](./reactions/index.md):

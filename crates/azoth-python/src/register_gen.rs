@@ -374,10 +374,18 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyVesselFillingResult>()?;
     m.add_class::<crate::transport_gen::PyVesselRuptureResult>()?;
     m.add_class::<crate::transport_gen::PyBlackOilCorrelationsResult>()?;
+    m.add_class::<crate::transport_gen::PyConstantMassExpansionResult>()?;
+    m.add_class::<crate::transport_gen::PyConstantVolumeDepletionResult>()?;
     m.add_class::<crate::transport_gen::PyDeclineCurveResult>()?;
+    m.add_class::<crate::transport_gen::PyDifferentialLiberationResult>()?;
     m.add_class::<crate::transport_gen::PyGasCorrelationsResult>()?;
     m.add_class::<crate::transport_gen::PyGasMaterialBalanceResult>()?;
+    m.add_class::<crate::transport_gen::PyMmpResult>()?;
     m.add_class::<crate::transport_gen::PyOilMaterialBalanceResult>()?;
+    m.add_class::<crate::transport_gen::PyPropertySweepResult>()?;
+    m.add_class::<crate::transport_gen::PySaturationTestResult>()?;
+    m.add_class::<crate::transport_gen::PySeparatorTestResult>()?;
+    m.add_class::<crate::transport_gen::PySwellingTestResult>()?;
     m.add_class::<crate::transport_gen::PyWaterCorrelationsResult>()?;
     m.add_class::<crate::transport_gen::PyChemicalEquilibriumResult>()?;
     m.add_class::<crate::transport_gen::PyEquilibriumConstantResult>()?;
@@ -409,15 +417,18 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyBlackOilResultRow>()?;
     m.add_class::<crate::record_outputs_gen::PyBrineMixingPointRow>()?;
     m.add_class::<crate::record_outputs_gen::PyBubbleTransferZoneReleaseStation>()?;
+    m.add_class::<crate::record_outputs_gen::PyCcePoint>()?;
     m.add_class::<crate::record_outputs_gen::PyCharacterizationComponent>()?;
     m.add_class::<crate::record_outputs_gen::PyChemicalWarningRow>()?;
     m.add_class::<crate::record_outputs_gen::PyComponentSelectiveReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyConsequenceOutcomeResult>()?;
     m.add_class::<crate::record_outputs_gen::PyCostBomRow>()?;
     m.add_class::<crate::record_outputs_gen::PyCostEstimationResultRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyCvdPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyDepositionSegmentRow>()?;
     m.add_class::<crate::record_outputs_gen::PyDepressurizationPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyDisciplineCostLine>()?;
+    m.add_class::<crate::record_outputs_gen::PyDlePoint>()?;
     m.add_class::<crate::record_outputs_gen::PyDriftFluxReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyEnvelopePoint>()?;
     m.add_class::<crate::record_outputs_gen::PyEnvelopeQuery>()?;
@@ -454,6 +465,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyMahThreat>()?;
     m.add_class::<crate::record_outputs_gen::PyMineralEquilibriumRow>()?;
     m.add_class::<crate::record_outputs_gen::PyMinimalCutSet>()?;
+    m.add_class::<crate::record_outputs_gen::PyMmpPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyMultiVesselContributionRow>()?;
     m.add_class::<crate::record_outputs_gen::PyMultiVesselProfileRow>()?;
     m.add_class::<crate::record_outputs_gen::PyNaceIssueRow>()?;
@@ -472,6 +484,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyProcessCostFlag>()?;
     m.add_class::<crate::record_outputs_gen::PyProcessCostMtoRow>()?;
     m.add_class::<crate::record_outputs_gen::PyProjectCostLine>()?;
+    m.add_class::<crate::record_outputs_gen::PyPropertyPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyPulsationModeResult>()?;
     m.add_class::<crate::record_outputs_gen::PyRanzMarshallReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyRealGasFannoReleaseStation>()?;
@@ -490,12 +503,14 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyScenarioChangeRow>()?;
     m.add_class::<crate::record_outputs_gen::PyScenarioIndexRow>()?;
     m.add_class::<crate::record_outputs_gen::PySelfHeatingTimePoint>()?;
+    m.add_class::<crate::record_outputs_gen::PySeparatorStageResult>()?;
     m.add_class::<crate::record_outputs_gen::PySettleOutCompartmentResult>()?;
     m.add_class::<crate::record_outputs_gen::PySilIssue>()?;
     m.add_class::<crate::record_outputs_gen::PySterileRadius>()?;
     m.add_class::<crate::record_outputs_gen::PyStreamScaleMineralRow>()?;
     m.add_class::<crate::record_outputs_gen::PySts0131FindingResult>()?;
     m.add_class::<crate::record_outputs_gen::PySubFraction>()?;
+    m.add_class::<crate::record_outputs_gen::PySwellingPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyTopsidesBreakdownLine>()?;
     m.add_class::<crate::record_outputs_gen::PyTopsidesCapitalLine>()?;
     m.add_class::<crate::record_outputs_gen::PyTopsidesFlag>()?;
@@ -1361,16 +1376,33 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         crate::wrappers_gen::black_oil_correlations,
         m
     )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::constant_mass_expansion,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::constant_volume_depletion,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::decline_curve, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::differential_liberation,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_correlations, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::gas_material_balance,
         m
     )?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::mmp, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::oil_material_balance,
         m
     )?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::property_sweep, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::saturation_test, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::separator_test, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::pvt::swelling_test, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::water_correlations,
         m

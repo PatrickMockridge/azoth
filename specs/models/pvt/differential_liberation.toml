@@ -1,0 +1,206 @@
+id = "pvt.differential_liberation"
+name = "Differential liberation"
+kind = "direct"
+assumptions = [
+    "**the ledger removes the gas phase after every two-phase step**, as the class's `removePhase(0)` does; each step is a fresh flash of the retained composition.",
+    "**the class's saturation scan is entered from a two-phase state**, so its first loop - which increments the pressure without flashing - exits at 11 bar and has no effect beyond that; the port carries the same entry.",
+    "**the saturation volume is the phase carrying the material at the last bisection midpoint.** At 350 K the class's phase 0 there is a trace phase and its volume is 7e-10 m3, which makes its relative volumes 2e5; the id publishes the material phase's volume and names that block evidence, not a case.",
+    "**the standard state is 288.15 K and 1.01325 bar**: the final flash of the retained liquid gives the stock-tank oil volume, and its gas phase's corrected volume is added to the produced gas.",
+    "**Rs is remaining solution gas**: the total produced gas less the gas removed through the point, over the stock-tank oil volume. Bg is absent where the gas compressibility is below 1e-10.",
+    "**a single-phase point's gas fields and its liquid relative volume are absent**, not the class's uninitialised zeros.",
+    "**the gas gravity is the gas molar mass over 0.028**, the class's air constant; the class's pressure index is the gas phase, which the ordered flash makes phase 0.",
+    "**inputs are SI** and the fluid is the characterization row list; SRK and the databank kij are the defaults.",
+    "**the two-phase flash's boundary differs from NeqSim's `TPflash` by about `5e-6` relative**, measured on the CCE; the saturation-dependent fields are held at `1e-4`, the ledger-driven fields at `1e-6`.",
+]
+references = [
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/DifferentialLiberation.java` at commit 118d9af is the port source.",
+    "`validation/neqsim/captures/pvt_differential_liberation.tsv` - a ten-point schedule, a 350 K evidence block, and a seven-point schedule whose first point is single phase.",
+    "NeqSim #5209 - the saturation volume is phase 0 at the last bisection midpoint; at 350 K that is a trace gas and the relative volumes reach 2e5.",
+    "NeqSim #5195 (closed) - the relative gas gravity divides by 28.0 g/mol rather than air's, and the gas Z is not volume-corrected; the pin predates the fix.",
+]
+[source]
+standard = "NeqSim pvtsimulation/simulation/DifferentialLiberation.java"
+edition = "The gas-removal ledger, the stock-tank oil volume from the final standard flash, and Bo, Bg, Rs, Zgas, the gas gravity, the standard gas volume and the oil density."
+[inputs]
+[inputs.components]
+type = "record_list"
+row_type = "FluidComponent"
+description = "The fluids' components, one record each, in the order the fluids carry them. A record with a positive mole amount in the same fluid twice is one component at the summed amount; a non-positive amount is a row the class skips.\n"
+[inputs.components.fields.fluid]
+unit = "dimensionless"
+description = "Which fluid the row belongs to, 0-based. Fluids are ordered by first appearance, and a whole number from zero is required: a fractional or negative index is not a fluid.\n"
+[inputs.components.fields.name]
+type = "string"
+description = "The component's name. A base component merges by it across the fluids; a pseudo-component's is its own fluid's name and does not survive into the answer.\n"
+[inputs.components.fields.pseudo_component]
+type = "boolean"
+description = "Whether the row is a TBP or plus fraction rather than a base component. A base row's properties are absent and are the databank's at assembly.\n"
+[inputs.components.fields.moles]
+unit = "mol"
+description = "The component's mole amount. Only a positive one is read; a zero or negative amount is a row that is not on the grid.\n"
+[inputs.components.fields.molar_mass]
+unit = "kg/mol"
+optional = true
+description = "The pseudo-component's molar mass, which is what the row's mass is and what its sorting key falls back to. Required on a pseudo row and ignored on a base row.\n"
+[inputs.components.fields.density]
+unit = "kg/m**3"
+optional = true
+description = "The pseudo-component's normal liquid density, which a group's volume is the mass over. Required on a pseudo row and ignored on a base row.\n"
+[inputs.components.fields.normal_boiling_point]
+unit = "K"
+optional = true
+description = "The pseudo-component's normal boiling point, its sorting key where it states a finite positive one. A row without one sorts by its molar mass.\n"
+[inputs.components.fields.critical_temperature]
+unit = "K"
+optional = true
+description = "The pseudo-component's critical temperature, part of the blend's mole-fraction-weighted override.\n"
+[inputs.components.fields.critical_pressure]
+unit = "Pa"
+optional = true
+description = "The pseudo-component's critical pressure, part of the blend's mole-fraction-weighted override.\n"
+[inputs.components.fields.acentric_factor]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's acentric factor, part of the blend's mole-fraction-weighted override.\n"
+[inputs.components.fields.critical_volume]
+unit = "m**3/mol"
+optional = true
+description = "The pseudo-component's critical molar volume, mass-weighted into the group's.\n"
+[inputs.components.fields.racket_z]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's Rackett compressibility, mass-weighted into the group's and read again when the row becomes a component.\n"
+[inputs.components.fields.racket_z_cpa]
+unit = "dimensionless"
+optional = true
+description = "The same compressibility on the CPA basis, mass-weighted into the group's.\n"
+[inputs.components.fields.parachor]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's parachor, in NeqSim's mixed `(mN/m)**(1/4) * cm**3/mol`, mass-weighted into the group's.\n"
+[inputs.components.fields.critical_viscosity]
+unit = "Pa*s"
+optional = true
+description = "The pseudo-component's critical viscosity, mass-weighted into the group's.\n"
+[inputs.components.fields.triple_point_temperature]
+unit = "K"
+optional = true
+description = "The pseudo-component's triple-point temperature, mass-weighted into the group's.\n"
+[inputs.components.fields.heat_of_fusion]
+unit = "J/mol"
+optional = true
+description = "The pseudo-component's heat of fusion, mass-weighted into the group's.\n"
+[inputs.components.fields.ideal_gas_enthalpy_of_formation]
+unit = "J/mol"
+optional = true
+description = "The pseudo-component's ideal-gas enthalpy of formation, mass-weighted into the group's. It has no home on a `Component` and is dropped when a mixture is assembled.\n"
+[inputs.components.fields.cp_a]
+unit = "J/(mol*K)"
+optional = true
+description = "The constant term of the pseudo-component's ideal-gas heat capacity, mass-weighted into the group's.\n"
+[inputs.components.fields.cp_b]
+unit = "J/(mol*K**2)"
+optional = true
+description = "The coefficient of `T` in the pseudo-component's ideal-gas heat capacity.\n"
+[inputs.components.fields.cp_c]
+unit = "J/(mol*K**3)"
+optional = true
+description = "The coefficient of `T**2` in the pseudo-component's ideal-gas heat capacity.\n"
+[inputs.components.fields.cp_d]
+unit = "J/(mol*K**4)"
+optional = true
+description = "The coefficient of `T**3` in the pseudo-component's ideal-gas heat capacity, as `getCpD()` states it: the stored coefficient plus `1e-10`.\n"
+[inputs.components.fields.attractive_m]
+unit = "dimensionless"
+optional = true
+description = "The fitted coefficient of the pseudo-component's Soave alpha function, which NeqSim's `addTBPfraction` installs in place of the acentric factor's correlation.\n"
+
+[inputs.temperature]
+unit = "K"
+description = "the experiment temperature.\n"
+[inputs.pressures]
+type = "vector"
+unit = "Pa"
+description = "the schedule's absolute pressures, in the order they are reported.\n"
+[inputs.eos]
+type = "enum"
+values = ["srk", "pr"]
+optional = true
+description = "the cubic the fluid is built for; absent is srk, the classes' `SystemSrkEos`.\n"
+[inputs.mixing_rule]
+type = "enum"
+values = ["classic", "zero"]
+optional = true
+description = "the interaction matrix; absent is classic, NeqSim's `setMixingRule(2)`.\n"
+[inputs.volume_correction]
+type = "boolean"
+optional = true
+description = "whether the Peneloux translation is applied; absent is true, NeqSim's default.\n"
+[outputs]
+[outputs.saturation_pressure]
+unit = "Pa"
+optional = true
+description = "the saturation pressure on the partially depleted cell; absent when no point is two-phase.\n"
+[outputs.saturation_volume]
+unit = "m**3"
+optional = true
+description = "the translated saturation volume at that state.\n"
+[outputs.voil_std]
+unit = "m**3"
+optional = true
+description = "the stock-tank oil volume from the final standard flash; absent when it leaves no oil.\n"
+[outputs.points]
+type = "record_list"
+description = "one row per pressure.\n"
+
+[outputs.points.fields.pressure]
+unit = "Pa"
+description = "the absolute pressure.\n"
+[outputs.points.fields.total_volume]
+unit = "m**3"
+description = "the retained cell's translated volume.\n"
+[outputs.points.fields.relative_volume]
+unit = "dimensionless"
+optional = true
+description = "the total volume over the saturation volume; absent without a saturation state.\n"
+[outputs.points.fields.liquid_volume]
+unit = "m**3"
+description = "the oil phase's translated volume.\n"
+[outputs.points.fields.liquid_volume_relative_to_vsat]
+unit = "dimensionless"
+optional = true
+description = "the liquid volume over the saturation volume; absent in a single phase.\n"
+[outputs.points.fields.oil_density]
+unit = "kg/m**3"
+description = "the oil phase's density.\n"
+[outputs.points.fields.gas_volume]
+unit = "m**3"
+optional = true
+description = "the removed gas's translated volume; absent in a single phase.\n"
+[outputs.points.fields.gas_standard_volume]
+unit = "m**3"
+optional = true
+description = "the removed gas at 288.15 K and 1.01325 bar; absent in a single phase.\n"
+[outputs.points.fields.z_gas]
+unit = "dimensionless"
+optional = true
+description = "the gas phase's cubic compressibility.\n"
+[outputs.points.fields.relative_gas_gravity]
+unit = "dimensionless"
+optional = true
+description = "the gas molar mass over the class's 0.028 kg/mol air constant.\n"
+[outputs.points.fields.bo]
+unit = "dimensionless"
+optional = true
+description = "the oil formation volume factor; absent without a stock-tank oil volume.\n"
+[outputs.points.fields.bg]
+unit = "dimensionless"
+optional = true
+description = "the gas formation volume factor; absent in a single phase.\n"
+[outputs.points.fields.rs]
+unit = "dimensionless"
+optional = true
+description = "the remaining solution gas per stock-tank oil volume; absent without one.\n"
+[implementations]
+python = "azoth.pvt.differential_liberation"
+rust = "azoth_pvt::differential_liberation"

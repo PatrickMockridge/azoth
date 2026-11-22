@@ -1,0 +1,142 @@
+model = "pvt.mmp"
+[[cases]]
+id = "mmp_slim_tube_small"
+tolerance = 1e-06
+source = "The class's MMP at the stated method and grid, from `validation/neqsim/captures/pvt_mmp.tsv`."
+[cases.inputs]
+oil_components = [
+    { fluid = 0, name = "methane", pseudo_component = false, moles = 0.70 },
+    { fluid = 0, name = "nC10", pseudo_component = false, moles = 0.30 },
+]
+gas_components = [
+    { fluid = 0, name = "methane", pseudo_component = false, moles = 1.0 },
+]
+temperature = 323.15
+method = "slim_tube"
+recovery_threshold = 0.9
+number_of_pressure_points = 3
+min_pressure = 10000000.0
+max_pressure = 30000000.0
+slim_tube_nodes = 6
+pv_injected = 0.4
+[cases.expected]
+mechanism = "immiscible"
+points = [
+    { pressure = 1.0E7, recovery = 0.0912307824495534 },
+    { pressure = 2.0E7, recovery = 0.13584739431169818 },
+    { pressure = 3.0E7, recovery = 0.2 },
+]
+[[cases]]
+id = "mmp_key_tie_line"
+tolerance = 0.03
+source = "The class's MMP at the stated method and grid, from `validation/neqsim/captures/pvt_mmp.tsv`."
+[cases.inputs]
+oil_components = [
+    { fluid = 0, name = "methane", pseudo_component = false, moles = 0.70 },
+    { fluid = 0, name = "nC10", pseudo_component = false, moles = 0.30 },
+]
+gas_components = [
+    { fluid = 0, name = "methane", pseudo_component = false, moles = 1.0 },
+]
+temperature = 323.15
+method = "key_tie_line"
+recovery_threshold = 0.9
+number_of_pressure_points = 3
+min_pressure = 10000000.0
+max_pressure = 50000000.0
+slim_tube_nodes = 6
+pv_injected = 0.4
+[cases.expected]
+mmp = 4.001953125E7
+mechanism = "combined"
+[[cases]]
+id = "mmp_rising_bubble"
+tolerance = 1e-06
+source = "The class's MMP at the stated method and grid, from `validation/neqsim/captures/pvt_mmp.tsv`."
+[cases.inputs]
+oil_components = [
+    { fluid = 0, name = "methane", pseudo_component = false, moles = 0.70 },
+    { fluid = 0, name = "nC10", pseudo_component = false, moles = 0.30 },
+]
+gas_components = [
+    { fluid = 0, name = "methane", pseudo_component = false, moles = 1.0 },
+]
+temperature = 323.15
+method = "rising_bubble"
+recovery_threshold = 0.9
+number_of_pressure_points = 3
+min_pressure = 10000000.0
+max_pressure = 30000000.0
+slim_tube_nodes = 6
+pv_injected = 0.4
+[cases.expected]
+mechanism = "immiscible"
+points = [
+    { pressure = 1.0E7, recovery = 0.0912307824495534 },
+    { pressure = 2.0E7, recovery = 0.13584739431169818 },
+    { pressure = 3.0E7, recovery = 0.2 },
+]
+[[cases]]
+id = "mmp_default_grid"
+tolerance = 1e-06
+source = "The class's MMP at the stated method and grid, from `validation/neqsim/captures/pvt_mmp.tsv`."
+[cases.inputs]
+oil_components = [
+    { fluid = 0, name = "methane", pseudo_component = false, moles = 0.70 },
+    { fluid = 0, name = "nC10", pseudo_component = false, moles = 0.30 },
+]
+gas_components = [
+    { fluid = 0, name = "methane", pseudo_component = false, moles = 1.0 },
+]
+temperature = 323.15
+method = "slim_tube"
+recovery_threshold = 0.9
+number_of_pressure_points = 10
+min_pressure = 10000000.0
+max_pressure = 30000000.0
+slim_tube_nodes = 8
+pv_injected = 0.5
+[cases.expected]
+mechanism = "immiscible"
+points = [
+    { pressure = 1.0E7, recovery = 0.18246156489913284 },
+    { pressure = 1.2222222222222222E7, recovery = 0.1995014165972221 },
+    { pressure = 1.4444444444444446E7, recovery = 0.21793215523326237 },
+    { pressure = 1.6666666666666666E7, recovery = 0.23796434982960396 },
+    { pressure = 1.8888888888888888E7, recovery = 0.2598941151185444 },
+    { pressure = 2.1111111111111112E7, recovery = 0.2841381722056466 },
+    { pressure = 2.3333333333333332E7, recovery = 0.3112892026074105 },
+    { pressure = 2.5555555555555556E7, recovery = 0.34221018718791324 },
+    { pressure = 2.7777777777777776E7, recovery = 0.3782061820360592 },
+    { pressure = 3.0E7, recovery = 0.4 },
+]
+[[cases]]
+id = "mmp_slim_tube_wide"
+tolerance = 1e-06
+source = "The class's MMP at the stated method and grid, from `validation/neqsim/captures/pvt_mmp.tsv`."
+[cases.inputs]
+oil_components = [
+    { fluid = 0, name = "methane", pseudo_component = false, moles = 0.70 },
+    { fluid = 0, name = "nC10", pseudo_component = false, moles = 0.30 },
+]
+gas_components = [
+    { fluid = 0, name = "methane", pseudo_component = false, moles = 1.0 },
+]
+temperature = 323.15
+method = "slim_tube"
+recovery_threshold = 0.5
+number_of_pressure_points = 5
+min_pressure = 10000000.0
+max_pressure = 100000000.0
+slim_tube_nodes = 6
+pv_injected = 0.4
+[cases.expected]
+mmp = 4.09375E7
+mechanism = "combined"
+points = [
+    { pressure = 1.0E7, recovery = 0.0912307824495534 },
+    { pressure = 3.25E7, recovery = 0.2 },
+    { pressure = 5.5E7, recovery = 1.0 },
+    { pressure = 7.75E7, recovery = 1.0 },
+    { pressure = 1.0E8, recovery = 1.0 },
+]

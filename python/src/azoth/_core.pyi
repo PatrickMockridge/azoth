@@ -1209,6 +1209,12 @@ class GasQuery(TypedDict):
     ppr: float | None
     molar_mass: float | None
 
+class SeparatorStageInput(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    pressure: float
+    temperature: float
+
 class WaterQuery(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -2460,6 +2466,57 @@ class BlackOilResultRow:
     petrosky_farshad: Qty | None
 
 @final
+class CcePoint:
+    """one row per pressure."""
+
+    pressure: Qty
+    total_volume: Qty
+    relative_volume: float
+    density: Qty
+    gas_volume: Qty
+    gas_standard_volume: Qty
+    bg: float
+    z_gas: float
+    oil_density: Qty | None
+    oil_viscosity: Qty | None
+    liquid_relative_volume: float | None
+    y_factor: float | None
+    viscosity: Qty | None
+    isothermal_compressibility: float | None
+
+@final
+class CvdPoint:
+    """one row per pressure."""
+
+    pressure: Qty
+    total_volume: Qty
+    relative_volume: float
+    cumulative_mole_fraction_depleted: float
+    material_balance_relative_error: float | None
+    zmix: float
+    z_gas: float | None
+    liquid_volume: Qty | None
+    liquid_volume_relative_to_vsat: float | None
+
+@final
+class DlePoint:
+    """one row per pressure."""
+
+    pressure: Qty
+    total_volume: Qty
+    relative_volume: float | None
+    liquid_volume: Qty
+    liquid_volume_relative_to_vsat: float | None
+    oil_density: Qty
+    gas_volume: Qty | None
+    gas_standard_volume: Qty | None
+    z_gas: float | None
+    relative_gas_gravity: float | None
+    bo: float | None
+    bg: float | None
+    rs: float | None
+
+@final
 class GasResultRow:
     """one row per input row, in caller order; only the fields the calculation answers are present."""
 
@@ -2471,6 +2528,55 @@ class GasResultRow:
     gas_fvf: float | None
     pseudo_pressure: float | None
     h2s_fraction: float | None
+
+@final
+class MmpPoint:
+    """the slim tube's recovery curve; empty for the key tie line."""
+
+    pressure: Qty
+    recovery: float
+
+@final
+class PropertyPoint:
+    """one row per state."""
+
+    temperature: Qty
+    pressure: Qty
+    gas_density: Qty | None
+    oil_density: Qty | None
+    aqueous_density: Qty | None
+    gas_viscosity: Qty | None
+    oil_viscosity: Qty | None
+    aqueous_viscosity: Qty | None
+    gas_phase_available: bool
+    oil_phase_available: bool
+    aqueous_phase_available: bool
+
+@final
+class SeparatorStageResult:
+    """one row per stage."""
+
+    stage_number: float
+    pressure: Qty
+    temperature: Qty
+    gas_volume: Qty | None
+    stage_gor: float | None
+    cumulative_gor: float | None
+    oil_fvf: float | None
+    gas_density: Qty | None
+    oil_density: Qty | None
+    gas_molar_mass: Qty | None
+    oil_molar_mass: Qty | None
+    gas_z_factor: float | None
+    oil_viscosity: Qty | None
+
+@final
+class SwellingPoint:
+    """one row per schedule entry."""
+
+    cumulative_gas_injected: float
+    pressure: Qty
+    relative_oil_volume: float
 
 @final
 class WaterResultRow:
@@ -6755,6 +6861,26 @@ class BlackOilCorrelationsResult:
     warnings: list[Warning]
 
 @final
+class ConstantMassExpansionResult:
+    saturation_pressure: Qty
+    saturation_volume: Qty
+    z_saturation: float
+    saturation_isothermal_compressibility: float
+    points: list[CcePoint]
+    warnings: list[Warning]
+
+@final
+class ConstantVolumeDepletionResult:
+    saturation_pressure: Qty
+    saturation_volume: Qty
+    z_saturation: float
+    initial_moles: Qty
+    cumulative_moles_removed: Qty
+    k_values: list[list[float]]
+    points: list[CvdPoint]
+    warnings: list[Warning]
+
+@final
 class DeclineCurveResult:
     time: list[float] | None
     rate: list[float] | None
@@ -6789,6 +6915,14 @@ class DeclineCurveResult:
     warnings: list[Warning]
 
 @final
+class DifferentialLiberationResult:
+    saturation_pressure: Qty | None
+    saturation_volume: Qty | None
+    voil_std: Qty | None
+    points: list[DlePoint]
+    warnings: list[Warning]
+
+@final
 class GasCorrelationsResult:
     queries: list[GasResultRow]
     warnings: list[Warning]
@@ -6805,6 +6939,13 @@ class GasMaterialBalanceResult:
     warnings: list[Warning]
 
 @final
+class MmpResult:
+    mmp: Qty | None
+    mechanism: str
+    points: list[MmpPoint]
+    warnings: list[Warning]
+
+@final
 class OilMaterialBalanceResult:
     f: float | None
     eo_value: float | None
@@ -6817,6 +6958,40 @@ class OilMaterialBalanceResult:
     sdi: float | None
     wdi: float | None
     edi: float | None
+    warnings: list[Warning]
+
+@final
+class PropertySweepResult:
+    points: list[PropertyPoint]
+    warnings: list[Warning]
+
+@final
+class SaturationTestResult:
+    saturation_pressure: Qty | None
+    saturation_temperature: Qty | None
+    warnings: list[Warning]
+
+@final
+class SeparatorTestResult:
+    total_gor: float | None
+    bo: float | None
+    rs: float | None
+    stock_tank_oil_density: Qty | None
+    stock_tank_api: float | None
+    optimal_stage_pressure: Qty | None
+    optimal_stage_temperature: Qty | None
+    maximum_oil_recovery: float | None
+    gor_at_optimum: float | None
+    bo_at_optimum: float | None
+    api_at_optimum: float | None
+    stages: list[SeparatorStageResult]
+    warnings: list[Warning]
+
+@final
+class SwellingTestResult:
+    original_oil_moles: Qty
+    original_oil_volume: Qty
+    points: list[SwellingPoint]
     warnings: list[Warning]
 
 @final
@@ -10943,6 +11118,22 @@ def vessel_rupture(
     tensile_strength_factor: float | None = None,
 ) -> VesselRuptureResult: ...
 def black_oil_correlations(queries: list[BlackOilQuery]) -> BlackOilCorrelationsResult: ...
+def constant_mass_expansion(
+    components: list[FluidComponent],
+    temperature: float,
+    pressures: list[float],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+) -> ConstantMassExpansionResult: ...
+def constant_volume_depletion(
+    components: list[FluidComponent],
+    temperature: float,
+    pressures: list[float],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+) -> ConstantVolumeDepletionResult: ...
 def decline_curve(
     calculation: str,
     qi: float | None = None,
@@ -10969,6 +11160,14 @@ def decline_curve(
     history_time: list[float] | None = None,
     history_rate: list[float] | None = None,
 ) -> DeclineCurveResult: ...
+def differential_liberation(
+    components: list[FluidComponent],
+    temperature: float,
+    pressures: list[float],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+) -> DifferentialLiberationResult: ...
 def gas_correlations(queries: list[GasQuery]) -> GasCorrelationsResult: ...
 def gas_material_balance(
     calculation: str,
@@ -10981,6 +11180,20 @@ def gas_material_balance(
     temperature: float | None = None,
     gas_gravity: float | None = None,
 ) -> GasMaterialBalanceResult: ...
+def mmp(
+    oil_components: list[FluidComponent],
+    gas_components: list[FluidComponent],
+    temperature: float,
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    method: str | None = None,
+    recovery_threshold: float | None = None,
+    number_of_pressure_points: float | None = None,
+    min_pressure: float | None = None,
+    max_pressure: float | None = None,
+    slim_tube_nodes: float | None = None,
+    pv_injected: float | None = None,
+) -> MmpResult: ...
 def oil_material_balance(
     calculation: str,
     np: float | None = None,
@@ -11009,6 +11222,51 @@ def oil_material_balance(
     eg_history: list[float] | None = None,
     we_history: list[float] | None = None,
 ) -> OilMaterialBalanceResult: ...
+def property_sweep(
+    components: list[FluidComponent],
+    mode: str,
+    temperatures: list[float],
+    pressures: list[float],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+) -> PropertySweepResult: ...
+def saturation_test(
+    components: list[FluidComponent],
+    mode: str,
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    temperature: float | None = None,
+    pressure: float | None = None,
+    temperature_search_min: float | None = None,
+    temperature_search_max: float | None = None,
+) -> SaturationTestResult: ...
+def separator_test(
+    components: list[FluidComponent],
+    mode: str,
+    stages: list[SeparatorStageInput],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+    reservoir_pressure: float | None = None,
+    reservoir_temperature: float | None = None,
+    optimize_first_stage: bool | None = None,
+    first_stage_pressure_min: float | None = None,
+    first_stage_pressure_max: float | None = None,
+    first_stage_pressure_steps: float | None = None,
+    first_stage_temperature_min: float | None = None,
+    first_stage_temperature_max: float | None = None,
+    first_stage_temperature_steps: float | None = None,
+) -> SeparatorTestResult: ...
+def swelling_test(
+    components: list[FluidComponent],
+    cumulative_gas_injected: list[float],
+    injection_gas: list[FluidComponent] | None = None,
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    temperature: float | None = None,
+    volume_correction: bool | None = None,
+) -> SwellingTestResult: ...
 def water_correlations(queries: list[WaterQuery]) -> WaterCorrelationsResult: ...
 def chemical_equilibrium(
     a_matrix: list[list[float]],
