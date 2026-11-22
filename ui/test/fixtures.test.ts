@@ -197,6 +197,52 @@ describe("the catalogue", () => {
     expect(JSON.stringify(safetyCalcs).toLowerCase()).not.toContain("neqsim");
   });
 
+  it("carries the family registry, and every calculation's family is in it", () => {
+    // **The registry is the only list of families the workspace draws.** The tabs, the deck
+    // copy and the catalogue come from it, so a family missing here disappears from the GUI.
+    const families = catalogue.safety_families ?? [];
+    const safetyCalcs = catalogue.safety ?? [];
+    expect(families).toHaveLength(23);
+    expect(new Set(families.map((family) => family.id)).size).toBe(23);
+    expect(families.filter((family) => family.deck !== null).map((family) => family.id)).toEqual([
+      "depressurization",
+      "dispersion",
+      "equipmentsafety",
+      "fire",
+      "firewater",
+      "overpressure",
+      "processsafetysystem",
+      "risk",
+      "safetyassessment",
+      "vibration",
+    ]);
+    const declared = new Set(families.map((family) => family.id));
+    for (const entry of safetyCalcs) {
+      expect(declared.has(entry.family), `${entry.id} has no family row`).toBe(true);
+    }
+    for (const family of families) {
+      expect(
+        safetyCalcs.some((entry) => entry.family === family.id),
+        `${family.id} has no calculation`,
+      ).toBe(true);
+      expect(family.label.trim(), family.id).not.toBe("");
+      expect(family.blurb.trim(), family.id).not.toBe("");
+      if (family.deck === null) {
+        continue;
+      }
+      for (const field of [
+        family.deck.tab,
+        family.deck.title,
+        family.deck.heading,
+        family.deck.search,
+        family.deck.step,
+      ]) {
+        expect(field.trim(), family.id).not.toBe("");
+      }
+    }
+    expect(JSON.stringify(families).toLowerCase()).not.toContain("neqsim");
+  });
+
   it("carries the kind a field needs, which is nowhere in the palette", () => {
     const pump = catalogue.unit_ops.find((entry) => entry.id === "unit_ops.pump");
     expect(pump).toBeDefined();

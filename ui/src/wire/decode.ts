@@ -75,9 +75,11 @@ import type {
   SafetyCalculation,
   SafetyConsequenceView,
   SafetyCounts,
+  SafetyDeck,
   SafetyDerived,
   SafetyDiagnostic,
   SafetyEnvelope,
+  SafetyFamily,
   SafetyFunction,
   SafetyGraph,
   SafetyGraphEdge,
@@ -829,6 +831,27 @@ function safetyCalculation(value: unknown, path: string): SafetyCalculation {
   return calculation;
 }
 
+function safetyDeck(value: unknown, path: string): SafetyDeck {
+  const raw = obj(value, path);
+  return {
+    tab: str(raw.tab, `${path}.tab`),
+    title: str(raw.title, `${path}.title`),
+    heading: str(raw.heading, `${path}.heading`),
+    search: str(raw.search, `${path}.search`),
+    step: str(raw.step, `${path}.step`),
+  };
+}
+
+function safetyFamily(value: unknown, path: string): SafetyFamily {
+  const raw = obj(value, path);
+  return {
+    id: str(raw.id, `${path}.id`),
+    label: str(raw.label, `${path}.label`),
+    blurb: str(raw.blurb, `${path}.blurb`),
+    deck: nullable(raw.deck, `${path}.deck`, safetyDeck),
+  };
+}
+
 function safetyDiagnostic(value: unknown, path: string): SafetyDiagnostic {
   const raw = obj(value, path);
   return {
@@ -1124,6 +1147,9 @@ export function decodeCatalogue(value: unknown): Catalogue {
   const safety = nullable(raw.safety, `${path}.safety`, (entry, at) =>
     list(entry, at, safetyCalculation),
   );
+  const safetyFamilies = nullable(raw.safety_families, `${path}.safety_families`, (entry, at) =>
+    list(entry, at, safetyFamily),
+  );
   const catalogue: Catalogue = {
     unit_ops: list(raw.unit_ops, `${path}.unit_ops`, form),
   };
@@ -1132,6 +1158,9 @@ export function decodeCatalogue(value: unknown): Catalogue {
   }
   if (safety !== null) {
     catalogue.safety = safety;
+  }
+  if (safetyFamilies !== null) {
+    catalogue.safety_families = safetyFamilies;
   }
   if (units !== null) {
     catalogue.units = units;
