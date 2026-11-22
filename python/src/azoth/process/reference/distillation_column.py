@@ -299,6 +299,8 @@ class _States(NamedTuple):
     reboiler_duty: float
     #: Iterations taken.
     iterations: int
+    #: **The strategy that produced this state**, which the factory's guards may route elsewhere.
+    solver_used: str
     #: The mean tray-temperature change at the last iteration, K.
     temperature_residual: float
     #: The products' worst component imbalance against the feed, relative.
@@ -1816,6 +1818,7 @@ def _states(
             tuple(stream["z"]) if (stream := liquid[i]) is not None else ()
             for i in range(tray_count)
         ),
+        solver_used=solver_type or "direct_substitution",
         distillate_n=distillate["n"],
         distillate_z=tuple(distillate["z"]),
         distillate_h=distillate["h"],

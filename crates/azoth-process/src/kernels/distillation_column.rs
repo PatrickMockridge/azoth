@@ -248,6 +248,9 @@ pub struct ColumnOutcome {
     pub reboiler_duty: Power,
     /// Iterations taken.
     pub iterations: u32,
+    /// **The strategy that produced this state**, which is not always the one requested: the
+    /// factory's guards route some names onto another solve.
+    pub solver_used: SolverType,
     /// The mean tray-temperature change at the last iteration, K.
     pub temperature_residual: f64,
     /// The products' worst component imbalance against the feed, relative.
@@ -299,22 +302,31 @@ pub struct PumparoundDiagnostics {
 
 /// Which of the class's ten solving strategies the column runs.
 ///
-/// **Two of the ten are ported and eight are refused by name.** `DIRECT_SUBSTITUTION` is the
-/// class's own default and the sequential-substitution core; `NAPHTALI_SANDHOLM` is the
-/// simultaneous MESH correction, which is a *different* answer only where the substitution
-/// core's own path matters - and it is the only strategy under which NeqSim converges the
-/// deethanizer at all, which is why it is the second solve rather than a later one. The
-/// remaining eight are `ColumnSolverFactory`'s:
-/// `DAMPED_SUBSTITUTION`, `WEGSTEIN`, `SUM_RATES`, `NEWTON`, `INSIDE_OUT`,
-/// `MATRIX_INSIDE_OUT`, `MESH_RESIDUAL` and `AUTO` - and `AUTO` is a *ladder* over the
-/// others rather than a method, which is what `ColumnSolverFactory`'s `candidateSolvers`
-/// makes it: the ladder is stated and refused rather than silently resolved.
+/// **All ten are named here.** `DIRECT_SUBSTITUTION` is the class's own default and this port's
+/// sequential core, and `NAPHTALI_SANDHOLM` is the simultaneous MESH correction. The other eight
+/// are `ColumnSolverFactory`'s, and `AUTO` is a *ladder* over the others rather than a method.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SolverType {
-    /// Sequential substitution with the class's own adaptive relaxation.
+    /// Sequential substitution with relaxation one.
     DirectSubstitution,
+    /// The same sweeps with the link streams relaxed, `solveSequential(0.5)`.
+    DampedSubstitution,
+    /// The inside-out outer loop.
+    InsideOut,
+    /// Inside-out with the matrix warm start above twelve trays.
+    MatrixInsideOut,
+    /// The class's guarded Wegstein, which runs direct substitution.
+    Wegstein,
+    /// Damped substitution with a condenser; the flow-corrected loop without one.
+    SumRates,
+    /// The finite-difference temperature Newton.
+    Newton,
     /// Full MESH simultaneous correction, by `NaphtaliSandholmSolver`.
     NaphtaliSandholm,
+    /// Inside-out with the MESH residual monitor.
+    MeshResidual,
+    /// The ladder over the other strategies.
+    Auto,
 }
 
 impl SolverType {
@@ -323,7 +335,33 @@ impl SolverType {
     pub fn name(self) -> &'static str {
         match self {
             Self::DirectSubstitution => "direct_substitution",
+            Self::DampedSubstitution => "damped_substitution",
+            Self::InsideOut => "inside_out",
+            Self::MatrixInsideOut => "matrix_inside_out",
+            Self::Wegstein => "wegstein",
+            Self::SumRates => "sum_rates",
+            Self::Newton => "newton",
             Self::NaphtaliSandholm => "naphtali_sandholm",
+            Self::MeshResidual => "mesh_residual",
+            Self::Auto => "auto",
+        }
+    }
+
+    /// The strategy a declared name chooses, or `None` where the name is not one of the ten.
+    #[must_use]
+    pub fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "direct_substitution" => Some(Self::DirectSubstitution),
+            "damped_substitution" => Some(Self::DampedSubstitution),
+            "inside_out" => Some(Self::InsideOut),
+            "matrix_inside_out" => Some(Self::MatrixInsideOut),
+            "wegstein" => Some(Self::Wegstein),
+            "sum_rates" => Some(Self::SumRates),
+            "newton" => Some(Self::Newton),
+            "naphtali_sandholm" => Some(Self::NaphtaliSandholm),
+            "mesh_residual" => Some(Self::MeshResidual),
+            "auto" => Some(Self::Auto),
+            _ => None,
         }
     }
 }
@@ -1413,6 +1451,7 @@ fn solve_once(setup: &ColumnSetup) -> Result<ColumnOutcome> {
         condenser_duty: watts(condenser_duty),
         reboiler_duty: watts(reboiler_duty),
         iterations,
+        solver_used: setup.solver_type,
         temperature_residual,
         mass_residual,
         energy_residual,
