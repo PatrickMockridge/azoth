@@ -457,6 +457,68 @@ def test_the_draw_vectors_reach_the_kernel_one_tray_each() -> None:
     assert plain.distillate_n != out.distillate_n
 
 
+def test_the_damped_strategy_lands_on_the_captured_state() -> None:
+    """**The damped solve is ``solveSequential(0.5)``**: the links are blended rather than taken
+    whole, and the capture's binary row lands within ``5.8e-6`` K of direct. The capture takes
+    40 iterations against direct's 13; this port's count is its own, because its controller
+    reads the temperature term alone where the class reads three - the difference the spec
+    states - so the assertion here is the state."""
+    direct = process.distillation_column(**_binary_args())
+    damped = process.distillation_column(**_binary_args(), solver_type="damped_substitution")
+    worst = max(
+        abs(float(a.to("K").magnitude) - float(b.to("K").magnitude))
+        for a, b in zip(direct.tray_temperature, damped.tray_temperature, strict=True)
+    )
+    assert worst < 2.0e-5, f"the damped and direct states differ by {worst} K"
+
+
+def test_the_inside_out_strategies_land_on_the_captured_state() -> None:
+    """**Inside-out is the class's three-sweep map with a stripping correction**, and on the
+    captured binary it reaches the substitution core's state exactly; matrix inside-out below
+    twelve trays is that same solve."""
+    direct = process.distillation_column(**_binary_args())
+    for strategy in ("inside_out", "matrix_inside_out", "mesh_residual"):
+        out = process.distillation_column(**_binary_args(), solver_type=strategy)
+        worst = max(
+            abs(float(a.to("K").magnitude) - float(b.to("K").magnitude))
+            for a, b in zip(direct.tray_temperature, out.tray_temperature, strict=True)
+        )
+        assert worst < 2.0e-5, f"{strategy} moved the state by {worst} K"
+
+
+def test_the_guarded_accelerators_report_the_solve_they_run() -> None:
+    """Wegstein is the class's unconditional guard onto direct substitution, and sum-rates is
+    its condenser guard onto damped; without a condenser the flow-corrected loop runs."""
+    direct = process.distillation_column(**_binary_args())
+    wegstein = process.distillation_column(**_binary_args(), solver_type="wegstein")
+    damped = process.distillation_column(**_binary_args(), solver_type="damped_substitution")
+    sum_rates = process.distillation_column(**_binary_args(), solver_type="sum_rates")
+    auto = process.distillation_column(**_binary_args(), solver_type="auto")
+
+    for expected, actual, name in (
+        (direct, wegstein, "wegstein"),
+        (damped, sum_rates, "sum_rates"),
+        (damped, auto, "auto"),
+    ):
+        worst = max(
+            abs(float(a.to("K").magnitude) - float(b.to("K").magnitude))
+            for a, b in zip(expected.tray_temperature, actual.tray_temperature, strict=True)
+        )
+        assert worst < 1.0e-6, f"{name} moved the state by {worst} K"
+
+
+def test_the_newton_route_lands_on_the_captured_state() -> None:
+    """**Newton's perturbation is inert** (`SimpleTray.setTemperature` is overwritten by
+    `run`), so the reachable solve is the unrelaxed sweep below and the state is direct's."""
+    direct = process.distillation_column(**_binary_args())
+    out = process.distillation_column(**_binary_args(), solver_type="newton")
+    worst = max(
+        abs(float(a.to("K").magnitude) - float(b.to("K").magnitude))
+        for a, b in zip(direct.tray_temperature, out.tray_temperature, strict=True)
+    )
+    assert worst < 2.0e-5, f"newton moved the state by {worst} K"
+
+
 def test_a_swapped_pair_of_draw_vectors_is_a_different_column() -> None:
     """**Two of the three swapped, and the answer moves.** The gas and liquid vectors are both
     `dimensionless` vectors of the same length, so a transposition between them is exactly the

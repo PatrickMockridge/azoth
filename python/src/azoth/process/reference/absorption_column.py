@@ -186,25 +186,21 @@ def absorption_column(
             ),
         ).checked(len(gas_components))
     )
-    # **The same eight `process.distillation_column` refuses, from this id's own declaration**,
-    # one literal arm each so `tools/check_unported.py` reads the same shape in both halves.
-    if solver_type is not None and solver_type not in ("direct_substitution", "naphtali_sandholm"):
-        if solver_type == "damped_substitution":
-            raise _unported.refuse("solver_type=damped_substitution")
-        if solver_type == "inside_out":
-            raise _unported.refuse("solver_type=inside_out")
-        if solver_type == "matrix_inside_out":
-            raise _unported.refuse("solver_type=matrix_inside_out")
-        if solver_type == "wegstein":
-            raise _unported.refuse("solver_type=wegstein")
-        if solver_type == "sum_rates":
-            raise _unported.refuse("solver_type=sum_rates")
-        if solver_type == "newton":
-            raise _unported.refuse("solver_type=newton")
-        if solver_type == "mesh_residual":
-            raise _unported.refuse("solver_type=mesh_residual")
-        if solver_type == "auto":
-            raise _unported.refuse("solver_type=auto")
+    # **The same strategies `process.distillation_column` refuses, from this id's own
+    # declaration**, one literal arm each so `tools/check_unported.py` reads the same shape in
+    # both halves.
+    if solver_type is not None and solver_type not in (
+        "direct_substitution",
+        "damped_substitution",
+        "inside_out",
+        "matrix_inside_out",
+        "wegstein",
+        "sum_rates",
+        "newton",
+        "naphtali_sandholm",
+        "mesh_residual",
+        "auto",
+    ):
         raise InvalidInputError(
             "solver_type",
             f"`{solver_type}` is not one of `ColumnSolverFactory`'s ten strategies, which are "

@@ -1151,6 +1151,7 @@ impl Mesh {
             condenser_duty,
             reboiler_duty,
             iterations: iterations as u32,
+            solver_used: SolverType::NaphtaliSandholm,
             // **The temperature residual is the scaled MESH norm here**, which is this
             // solver's own convergence measure: NeqSim's column reports `NaN` under
             // `NAPHTALI_SANDHOLM` because the class's mean tray-temperature change is a

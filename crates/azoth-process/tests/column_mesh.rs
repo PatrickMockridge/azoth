@@ -379,41 +379,192 @@ fn a_specification_is_refused_by_name() {
     );
 }
 
-/// **Every strategy this port does not carry is refused with the class that would close it.**
-///
-/// The eight are `ColumnSolverFactory`'s own nested solvers, and the refusal names the one the
-/// caller asked for rather than the family: a caller who states `wegstein` is owed
-/// `WegsteinSolver`, not "the inside-out family". The boundary is the model layer, so this
-/// calls it rather than the kernel - the strategy never reaches the kernel at all.
+/// **The damped solve is `solveSequential(0.5)`**: the links are blended rather than taken
+/// whole, and it lands on the captured binary column's state. The capture reports 40 iterations
+/// against direct's 13; **this port's count is its own**, because its controller reads the
+/// temperature term alone where the class reads three - the difference the spec states - so the
+/// oracle here is the state.
 #[test]
-fn an_unported_strategy_is_refused_by_its_class() {
-    for (strategy, class) in [
-        ("damped_substitution", "DampedSubstitutionSolver"),
-        ("inside_out", "InsideOutSolver"),
-        ("matrix_inside_out", "MatrixInsideOutSolver"),
-        ("wegstein", "WegsteinSolver"),
-        ("sum_rates", "SumRatesSolver"),
-        ("newton", "TemperatureNewtonSolver"),
-        ("mesh_residual", "MeshResidualSolver"),
-        ("auto", "AutoSolver"),
+fn the_damped_substitution_relaxes_the_links() {
+    let direct = distillation_column(&binary(SolverType::DirectSubstitution))
+        .expect("the direct solve converges");
+    let damped = distillation_column(&binary(SolverType::DampedSubstitution))
+        .expect("the damped solve converges");
+
+    assert_eq!(damped.solver_used, SolverType::DampedSubstitution);
+    let spread = direct
+        .trays
+        .iter()
+        .zip(&damped.trays)
+        .map(|(a, b)| (a.temperature.value - b.temperature.value).abs())
+        .fold(0.0_f64, f64::max);
+    assert!(
+        spread < 2.0e-5,
+        "the damped and direct states differ by {spread} K"
+    );
+
+    model(
+        binary(SolverType::DampedSubstitution),
+        Some("damped_substitution"),
+        None,
+    )
+    .expect("the model accepts the declared strategy");
+}
+
+/// **Inside-out is the class's three-sweep map with a stripping correction**, and on the
+/// captured binary it reaches the substitution core's state exactly. Matrix inside-out below
+/// twelve trays is that same solve, and reports its own strategy.
+#[test]
+fn the_inside_out_strategies_reach_the_substitution_state() {
+    let direct = distillation_column(&binary(SolverType::DirectSubstitution))
+        .expect("the direct solve converges");
+    for strategy in [SolverType::InsideOut, SolverType::MatrixInsideOut] {
+        let out = distillation_column(&binary(strategy)).expect("the strategy converges");
+        assert_eq!(out.solver_used, strategy);
+        let spread = direct
+            .trays
+            .iter()
+            .zip(&out.trays)
+            .map(|(a, b)| (a.temperature.value - b.temperature.value).abs())
+            .fold(0.0_f64, f64::max);
+        assert!(spread < 2.0e-5, "{strategy:?} moved {spread} K");
+        model(binary(strategy), Some(strategy.name()), None)
+            .expect("the model accepts the declared strategy");
+    }
+}
+
+/// **Wegstein is the class's unconditional guard onto direct substitution**, and sum-rates is
+/// its condenser guard onto damped; without a condenser the flow-corrected loop runs.
+#[test]
+fn the_guarded_accelerators_report_the_solve_they_run() {
+    let direct = distillation_column(&binary(SolverType::DirectSubstitution))
+        .expect("the direct solve converges");
+    let wegstein =
+        distillation_column(&binary(SolverType::Wegstein)).expect("the guarded Wegstein solves");
+    assert_eq!(wegstein.solver_used, SolverType::DirectSubstitution);
+    let spread = direct
+        .trays
+        .iter()
+        .zip(&wegstein.trays)
+        .map(|(a, b)| (a.temperature.value - b.temperature.value).abs())
+        .fold(0.0_f64, f64::max);
+    assert!(spread < 1.0e-9, "Wegstein moved the state by {spread} K");
+
+    let damped = distillation_column(&binary(SolverType::DampedSubstitution))
+        .expect("the damped solve converges");
+    let sum_rates =
+        distillation_column(&binary(SolverType::SumRates)).expect("the guarded sum-rates solves");
+    assert_eq!(sum_rates.solver_used, SolverType::DampedSubstitution);
+    let spread = damped
+        .trays
+        .iter()
+        .zip(&sum_rates.trays)
+        .map(|(a, b)| (a.temperature.value - b.temperature.value).abs())
+        .fold(0.0_f64, f64::max);
+    assert!(spread < 1.0e-9, "sum-rates moved the state by {spread} K");
+
+    // **Without a condenser the guard does not fire**, and the flow-corrected loop runs. The
+    // capture has no such row; the closure is what this holds.
+    let mut open = binary(SolverType::SumRates);
+    open.has_condenser = false;
+    open.condenser_temperature = None;
+    let out = distillation_column(&open).expect("the flow-corrected loop converges");
+    assert_eq!(out.solver_used, SolverType::SumRates);
+    assert!(out.mass_residual < 1.0e-6, "mass {}", out.mass_residual);
+}
+
+/// **Newton's perturbation is inert**, so the reachable solve is the unrelaxed sweep below; the
+/// state is the captured damped row's, and the reported strategy is whichever gate accepted.
+#[test]
+fn the_newton_strategy_runs_its_reachable_sweep_and_falls_back_on_the_gate() {
+    let direct = distillation_column(&binary(SolverType::DirectSubstitution))
+        .expect("the direct solve converges");
+    let out = distillation_column(&binary(SolverType::Newton)).expect("the Newton route solves");
+    assert!(matches!(
+        out.solver_used,
+        SolverType::Newton | SolverType::DampedSubstitution
+    ));
+    let spread = direct
+        .trays
+        .iter()
+        .zip(&out.trays)
+        .map(|(a, b)| (a.temperature.value - b.temperature.value).abs())
+        .fold(0.0_f64, f64::max);
+    assert!(spread < 2.0e-5, "Newton moved the state by {spread} K");
+    model(binary(SolverType::Newton), Some("newton"), None)
+        .expect("the model accepts the declared strategy");
+}
+
+/// **The mesh-residual strategy is the class's inside-out solve**, whose monitor and polish
+/// no captured row reaches.
+#[test]
+fn the_mesh_residual_strategy_is_inside_out() {
+    let direct = distillation_column(&binary(SolverType::DirectSubstitution))
+        .expect("the direct solve converges");
+    let out = distillation_column(&binary(SolverType::MeshResidual))
+        .expect("the mesh-residual route solves");
+    assert_eq!(out.solver_used, SolverType::MeshResidual);
+    let spread = direct
+        .trays
+        .iter()
+        .zip(&out.trays)
+        .map(|(a, b)| (a.temperature.value - b.temperature.value).abs())
+        .fold(0.0_f64, f64::max);
+    assert!(
+        spread < 2.0e-5,
+        "the mesh route moved the state by {spread} K"
+    );
+    model(
+        binary(SolverType::MeshResidual),
+        Some("mesh_residual"),
+        None,
+    )
+    .expect("the model accepts the declared strategy");
+}
+
+/// **AUTO accepts its damped warm base on the captured binary**, which is why the capture's
+/// row reports damped substitution: both ends, six trays and no adjustable specification.
+#[test]
+fn the_auto_strategy_accepts_its_damped_warm_base() {
+    let damped = distillation_column(&binary(SolverType::DampedSubstitution))
+        .expect("the damped solve converges");
+    let auto = distillation_column(&binary(SolverType::Auto)).expect("the ladder solves");
+    assert_eq!(auto.solver_used, SolverType::DampedSubstitution);
+    let spread = damped
+        .trays
+        .iter()
+        .zip(&auto.trays)
+        .map(|(a, b)| (a.temperature.value - b.temperature.value).abs())
+        .fold(0.0_f64, f64::max);
+    assert!(spread < 1.0e-9, "AUTO moved the state by {spread} K");
+    model(binary(SolverType::Auto), Some("auto"), None)
+        .expect("the model accepts the declared strategy");
+}
+
+/// **Each strategy reports the route the capture's `solver` column records**, including the
+/// guards that report another solve. The binary `naphtali_sandholm` ladder row is a known
+/// divergence (the port's mesh solve converges where NeqSim's falls back) and is tested in its
+/// own file; `newton` is either accepted or the damped fallback, tested above.
+#[test]
+fn each_strategy_reports_the_route_the_capture_records() {
+    for (strategy, used) in [
+        (
+            SolverType::DirectSubstitution,
+            SolverType::DirectSubstitution,
+        ),
+        (
+            SolverType::DampedSubstitution,
+            SolverType::DampedSubstitution,
+        ),
+        (SolverType::InsideOut, SolverType::InsideOut),
+        (SolverType::MatrixInsideOut, SolverType::MatrixInsideOut),
+        (SolverType::Wegstein, SolverType::DirectSubstitution),
+        (SolverType::SumRates, SolverType::DampedSubstitution),
+        (SolverType::MeshResidual, SolverType::MeshResidual),
+        (SolverType::Auto, SolverType::DampedSubstitution),
     ] {
-        let error = model(binary(SolverType::DirectSubstitution), Some(strategy), None)
-            .expect_err("the boundary refuses it");
-        let message = error.to_string();
-        assert!(
-            message.contains(class),
-            "{strategy} must name {class}: {message}"
-        );
-        // **And the pair is countable rather than merely informative.** The class comes from
-        // the row the spec declares for this strategy, so the message this boundary produces
-        // and the message the Python half produces are the same two facts in the same order.
-        let row = azoth_process::unported::row(&format!("solver_type={strategy}"))
-            .unwrap_or_else(|| panic!("{strategy} has no declared row"));
-        assert_eq!(row.class, class);
-        assert!(
-            message.contains(row.capture),
-            "the refusal points at the capture that measures it: {message}"
-        );
+        let out = distillation_column(&binary(strategy)).expect("the strategy converges");
+        assert_eq!(out.solver_used, used, "{strategy:?}");
     }
 }
 

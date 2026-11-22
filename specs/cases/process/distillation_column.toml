@@ -594,3 +594,81 @@ vessel_diameter = 0.5
 flooding_factor = 0.02498497166919999
 total_pressure_drop_bar = 0.017755928607031072
 weir_loading = 4.992709047038033
+
+[[cases]]
+id = "binary_damped_substitution"
+tolerance = 0.0002
+source = "The captured binary column under `solver_type = \"damped_substitution\"`, from `validation/neqsim/captures/process_column_solvers.tsv`: the class's `solveSequential(0.5)` blends the link streams and reaches the substitution core's state within `5.76e-6` K, in 40 iterations against direct's 13. **The case holds the state**; the port's count is its own, because its relaxation controller reads the temperature term alone where the class reads three."
+[cases.inputs]
+components = ["methane", "n-butane"]
+feed_n = 7.490704036290964
+feed_z = [0.49999999999999994, 0.49999999999999994]
+feed_p = 2000000.0
+feed_t = 300.0
+number_of_stages = 4
+feed_stage = 2
+has_reboiler = true
+has_condenser = true
+top_pressure = 1900000.0
+bottom_pressure = 2000000.0
+reboiler_temperature = 373.15
+condenser_temperature = 253.14999999999998
+temperature_tolerance = 1e-06
+max_iterations = 200
+solver_type = "damped_substitution"
+[cases.expected]
+tray_temperature = [373.15, 336.1539703631348, 303.07108867990183, 302.12257275701415, 296.84211335492125, 253.14999999999998]
+tray_pressure = [2000000.0, 1980000.0, 1960000.0000000002, 1939999.9999999998, 1920000.0, 1900000.0]
+tray_gas_n = [1.3732727411596135, 0.5259046486978001, 4.5761829181316305, 4.558041205789183, 4.451761493307675, 3.791499526895495]
+tray_liquid_n = [3.699204509395469, 5.072479267900522, 4.225109934775816, 0.784683685998157, 0.7665414021377106, 0.6602610568403722]
+distillate_n = 3.791499526895495
+distillate_z = [0.965909922881036, 0.03409007711896402]
+distillate_p = 1900000.0
+distillate_t = 253.14999999999998
+distillate_h = -1258.4147626610797
+bottoms_n = 3.699204509395469
+bottoms_z = [0.022465641547336688, 0.9775343584526633]
+bottoms_p = 2000000.0
+bottoms_t = 373.15
+bottoms_h = -6819.067437899543
+condenser_duty = -21322.661064287233
+reboiler_duty = 47785.57360621658
+
+[[cases]]
+id = "binary_inside_out"
+tolerance = 0.0002
+source = "The same binary column under `solver_type = \"inside_out\"`, from the same capture: the class's three relaxed sweeps, stripping-factor correction and faster ramp reach the substitution core's state exactly, in 13 iterations. **The case holds the state**; the port's count is its own, for the same controller difference."
+[cases.inputs]
+components = ["methane", "n-butane"]
+feed_n = 7.490704036290964
+feed_z = [0.49999999999999994, 0.49999999999999994]
+feed_p = 2000000.0
+feed_t = 300.0
+number_of_stages = 4
+feed_stage = 2
+has_reboiler = true
+has_condenser = true
+top_pressure = 1900000.0
+bottom_pressure = 2000000.0
+reboiler_temperature = 373.15
+condenser_temperature = 253.14999999999998
+temperature_tolerance = 1e-06
+max_iterations = 200
+solver_type = "inside_out"
+[cases.expected]
+tray_temperature = [373.15, 336.153964602352, 303.07108430092944, 302.1225666951362, 296.8421077059119, 253.14999999999998]
+tray_pressure = [2000000.0, 1980000.0, 1960000.0000000002, 1939999.9999999998, 1920000.0, 1900000.0]
+tray_gas_n = [1.3732722928832153, 0.5259043590927822, 4.576182521269338, 4.558040479262634, 4.45176036896435, 3.791499723822102]
+tray_liquid_n = [3.6992043124688627, 5.072476796966144, 4.2251086602316015, 0.7846827861171938, 0.7665407477402717, 0.6602606461702679]
+distillate_n = 3.791499723822102
+distillate_z = [0.9659099052324754, 0.034090094767524615]
+distillate_p = 1900000.0
+distillate_t = 253.14999999999998
+distillate_h = -1258.4148220816903
+bottoms_n = 3.6992043124688627
+bottoms_z = [0.02246562977682569, 0.9775343702231742]
+bottoms_p = 2000000.0
+bottoms_t = 373.15
+bottoms_h = -6819.068486180799
+condenser_duty = -21322.65036127608
+reboiler_duty = 47785.5327440701

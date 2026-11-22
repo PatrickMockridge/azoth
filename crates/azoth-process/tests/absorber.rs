@@ -14,6 +14,38 @@ use azoth_process::kernels::distillation_column::{
     ColumnSetup, SolverType, distillation_column, tray_streams,
 };
 
+/// **The absorber takes every ported strategy**, and sum-rates runs its own flow-corrected
+/// route because there is no condenser to guard it onto damped substitution. The capture has
+/// no such row, so the band here is self-consistency: every route must reach the direct state.
+#[test]
+fn the_absorber_takes_every_ported_strategy() {
+    let direct = distillation_column(&lean_oil()).expect("the direct solve converges");
+    for strategy in [
+        SolverType::DampedSubstitution,
+        SolverType::InsideOut,
+        SolverType::MatrixInsideOut,
+        SolverType::Wegstein,
+        SolverType::SumRates,
+    ] {
+        let mut setup = lean_oil();
+        setup.solver_type = strategy;
+        let out = distillation_column(&setup).expect("the strategy converges");
+        if strategy == SolverType::SumRates {
+            assert_eq!(out.solver_used, SolverType::SumRates);
+        }
+        let spread = direct
+            .trays
+            .iter()
+            .zip(&out.trays)
+            .map(|(a, b)| (a.temperature.value - b.temperature.value).abs())
+            .fold(0.0_f64, f64::max);
+        assert!(
+            spread < 5.0e-3,
+            "{strategy:?} moved the absorber by {spread} K"
+        );
+    }
+}
+
 fn relative(actual: f64, expected: f64, tolerance: f64, what: &str) {
     let scale = 1.0 + actual.abs().max(expected.abs());
     assert!(
