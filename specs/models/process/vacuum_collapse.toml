@@ -22,6 +22,7 @@ standard = "NeqSim process/safety/vacuum/VacuumCollapseAnalyzer.java"
 edition = "Its `analyze`: the constant-volume cooling sweep, the minimum pressure, the rating verdict and the make-up gas."
 [algorithm]
 scheme = "constant_volume_cooling_sweep"
+initialisation = "stated_initial_state"
 convergence = "absolute"
 tolerance = 1.0e-4
 max_iterations = 20

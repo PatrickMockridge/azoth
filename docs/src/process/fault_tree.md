@@ -22,6 +22,7 @@ not an equation, and both implementations read it from here.
 | Convergence | `absolute` |
 | Tolerance | `1e-12` |
 | Max iterations | `20` |
+| Initialisation | `stated_leaf_probabilities` |
 
 ## Inputs
 

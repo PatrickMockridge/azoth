@@ -20,6 +20,7 @@ standard = "NeqSim process/safety/depressurization/VesselFillingSimulator.java"
 edition = "Its `run`: the inlet enthalpy, the mole alignment, the VU-flash march, the lumped wall, the Woodfield coefficient and the liner limits."
 [algorithm]
 scheme = "explicit_euler_vessel_filling"
+initialisation = "stated_initial_state"
 convergence = "relative"
 tolerance = 1.0e-12
 max_iterations = 1000000

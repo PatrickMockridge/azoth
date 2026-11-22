@@ -19,7 +19,7 @@ references = [
 standard = "NeqSim process/safety/vibration/AcousticInducedVibrationScreening.java"
 edition = "Its `screen` and `bandFor`."
 [algorithm]
-scheme = "carucci_mueller_acoustic_vibration"
+scheme = "closed_form_carucci_mueller_acoustic_vibration"
 convergence = "absolute"
 tolerance = 1.0e-12
 max_iterations = 1

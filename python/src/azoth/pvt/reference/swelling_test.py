@@ -6,6 +6,7 @@ volume, and the relative volume after each cumulative gas injection.
 
 from __future__ import annotations
 
+import math
 from collections.abc import Mapping, Sequence
 from typing import Any
 
@@ -73,7 +74,7 @@ def swelling_test(
     ]
     previous = 0.0
     for index, cumulative in enumerate(schedule):
-        if cumulative < 0.0:
+        if not math.isfinite(cumulative) or cumulative < 0.0:
             raise InvalidInputError(
                 f"cumulative_gas_injected[{index}]", f"a cumulative injection is {cumulative}"
             )

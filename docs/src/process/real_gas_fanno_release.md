@@ -22,6 +22,7 @@ not an equation, and both implementations read it from here.
 | Convergence | `relative` |
 | Tolerance | `2e-07` |
 | Max iterations | `42` |
+| Initialisation | `stated_inlet_state` |
 
 ## Inputs
 

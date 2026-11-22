@@ -18,7 +18,7 @@ not an equation, and both implementations read it from here.
 
 | Setting | Value |
 |---|---|
-| Scheme | `carucci_mueller_acoustic_vibration` |
+| Scheme | `closed_form_carucci_mueller_acoustic_vibration` |
 | Convergence | `absolute` |
 | Tolerance | `1e-12` |
 | Max iterations | `1` |

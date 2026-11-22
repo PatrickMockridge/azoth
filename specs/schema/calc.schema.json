@@ -395,7 +395,8 @@
             "TRANSITIONAL_FLOW",
             "SOLVER_NOT_CONVERGED",
             "TRIVIAL_SOLUTION",
-            "FALLBACK_TO_INPUT"
+            "FALLBACK_TO_INPUT",
+            "MISSING_EVIDENCE"
           ],
           "default": "OUT_OF_VALID_RANGE",
           "description": "Which warning code a violation emits. Defaults to OUT_OF_VALID_RANGE; override it when the violation has a more specific meaning, e.g. the transitional-flow band emits TRANSITIONAL_FLOW."

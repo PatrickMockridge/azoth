@@ -22,6 +22,7 @@ standard = "NeqSim process/safety/depressurization/NonEquilibriumBlowdownModel.j
 edition = "Its `run`: the zone split, the vapour-controlled pressure, the wetted-wall boiling, the interfacial coupling, the boil-off and the clamps."
 [algorithm]
 scheme = "explicit_euler_two_zone_blowdown"
+initialisation = "stated_initial_state"
 convergence = "relative"
 tolerance = 1.0e-12
 max_iterations = 1000000

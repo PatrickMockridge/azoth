@@ -651,6 +651,9 @@ fn map_warning(warning: &Warning) -> OutWarning {
         // answer is an absence rather than a number to trust less - a `WARNING` and not the
         // `CAUTION` the two-phase codes carry.
         azoth_core::warning::WarningCode::FallbackToInput => ("MODEL_LIMITATION", "WARNING"),
+        // The answer rests on a segment whose evidence is absent; nothing was out of range and
+        // no check was skipped, so the missing basis is their reference-data code.
+        azoth_core::warning::WarningCode::MissingEvidence => ("MISSING_REFERENCE_DATA", "WARNING"),
     };
     OutWarning::new(
         code,

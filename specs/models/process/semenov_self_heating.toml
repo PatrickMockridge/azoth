@@ -21,6 +21,7 @@ standard = "NeqSim process/safety/selfheating/SemenovSelfHeatingAnalyzer.java"
 edition = "Its `analyze`: the Semenov criticality parameter, the critical-temperature bisection and the verdict."
 [algorithm]
 scheme = "semenov_criticality"
+initialisation = "critical_temperature_bisection_150_2000_k"
 convergence = "absolute"
 tolerance = 1.0e-4
 max_iterations = 200

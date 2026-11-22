@@ -24,6 +24,7 @@ standard = "NeqSim process/safety/rupture/PipeFireRuptureStudy.java"
 edition = "Its `run`, over `PipeFireRuptureInput`'s geometry and fluid, `PipeFireRuptureMaterial`'s tables and `PipeFireRuptureScenario`'s three factories."
 [algorithm]
 scheme = "strain_rate_pipe_fire_rupture"
+initialisation = "stated_initial_state"
 convergence = "absolute"
 tolerance = 1.0e-12
 max_iterations = 100000

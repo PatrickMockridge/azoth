@@ -22,6 +22,7 @@ not an equation, and both implementations read it from here.
 | Convergence | `absolute` |
 | Tolerance | `0.0001` |
 | Max iterations | `200` |
+| Initialisation | `critical_temperature_bisection_150_2000_k` |
 
 ## Inputs
 

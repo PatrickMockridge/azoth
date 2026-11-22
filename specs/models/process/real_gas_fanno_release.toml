@@ -22,6 +22,7 @@ standard = "NeqSim process/safety/release/RealGasFannoPipeReleaseModel.java"
 edition = "Its `calculate` and `trace`: the one-gas-phase check, the entropy inlet root, the ten-step predictor-corrector march, the nested flux bisections and the three closures."
 [algorithm]
 scheme = "real_gas_fanno_march"
+initialisation = "stated_inlet_state"
 convergence = "relative"
 tolerance = 2.0e-7
 max_iterations = 42

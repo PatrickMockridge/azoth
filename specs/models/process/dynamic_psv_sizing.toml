@@ -21,6 +21,7 @@ standard = "NeqSim process/safety/depressurization/DynamicPsvSizingStudy.java"
 edition = "Its `run`: the steady API 521 area, the ideal-gas PSV-cycling march and the bisection over the orifice area."
 [algorithm]
 scheme = "bisection_over_psv_area"
+initialisation = "stated_bisection_bracket"
 convergence = "relative"
 tolerance = 1.0e-9
 max_iterations = 42

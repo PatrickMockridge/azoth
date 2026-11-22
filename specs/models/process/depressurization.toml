@@ -22,6 +22,7 @@ standard = "NeqSim process/safety/depressurization/DepressurizationSimulator.jav
 edition = "Its `run`: the mole alignment, the discharge selection, the mass and energy balance, the lumped wall, the fire boundary, the VU flash and the API 521 evaluation."
 [algorithm]
 scheme = "explicit_euler_equilibrium_blowdown"
+initialisation = "stated_initial_state"
 convergence = "relative"
 tolerance = 1.0e-12
 max_iterations = 1000000
