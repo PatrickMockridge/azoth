@@ -122,7 +122,7 @@ description = "the last reactive middle tray, inclusive.\n"
 type = "enum"
 values = ["direct_substitution", "damped_substitution", "inside_out", "matrix_inside_out", "wegstein", "sum_rates", "newton", "naphtali_sandholm", "mesh_residual", "auto"]
 optional = true
-description = "**`direct_substitution` and `naphtali_sandholm` are ported**; the other eight are refused by name, each with the `ColumnSolverFactory` solver behind it.\n"
+description = "**`direct_substitution`, `damped_substitution` and `naphtali_sandholm` are ported**; the other seven are refused by name, each with the `ColumnSolverFactory` solver behind it.\n"
 [inputs.top_specification_type]
 type = "enum"
 values = ["product_purity", "reflux_ratio", "component_recovery", "product_flow_rate", "duty"]

@@ -457,6 +457,21 @@ def test_the_draw_vectors_reach_the_kernel_one_tray_each() -> None:
     assert plain.distillate_n != out.distillate_n
 
 
+def test_the_damped_strategy_lands_on_the_captured_state() -> None:
+    """**The damped solve is ``solveSequential(0.5)``**: the links are blended rather than taken
+    whole, and the capture's binary row lands within ``5.8e-6`` K of direct. The capture takes
+    40 iterations against direct's 13; this port's count is its own, because its controller
+    reads the temperature term alone where the class reads three - the difference the spec
+    states - so the assertion here is the state."""
+    direct = process.distillation_column(**_binary_args())
+    damped = process.distillation_column(**_binary_args(), solver_type="damped_substitution")
+    worst = max(
+        abs(float(a.to("K").magnitude) - float(b.to("K").magnitude))
+        for a, b in zip(direct.tray_temperature, damped.tray_temperature, strict=True)
+    )
+    assert worst < 2.0e-5, f"the damped and direct states differ by {worst} K"
+
+
 def test_a_swapped_pair_of_draw_vectors_is_a_different_column() -> None:
     """**Two of the three swapped, and the answer moves.** The gas and liquid vectors are both
     `dimensionless` vectors of the same length, so a transposition between them is exactly the

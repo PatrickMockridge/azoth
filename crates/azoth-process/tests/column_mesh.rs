@@ -379,16 +379,47 @@ fn a_specification_is_refused_by_name() {
     );
 }
 
+/// **The damped solve is `solveSequential(0.5)`**: the links are blended rather than taken
+/// whole, and it lands on the captured binary column's state. The capture reports 40 iterations
+/// against direct's 13; **this port's count is its own**, because its controller reads the
+/// temperature term alone where the class reads three - the difference the spec states - so the
+/// oracle here is the state.
+#[test]
+fn the_damped_substitution_relaxes_the_links() {
+    let direct = distillation_column(&binary(SolverType::DirectSubstitution))
+        .expect("the direct solve converges");
+    let damped = distillation_column(&binary(SolverType::DampedSubstitution))
+        .expect("the damped solve converges");
+
+    assert_eq!(damped.solver_used, SolverType::DampedSubstitution);
+    let spread = direct
+        .trays
+        .iter()
+        .zip(&damped.trays)
+        .map(|(a, b)| (a.temperature.value - b.temperature.value).abs())
+        .fold(0.0_f64, f64::max);
+    assert!(
+        spread < 2.0e-5,
+        "the damped and direct states differ by {spread} K"
+    );
+
+    model(
+        binary(SolverType::DampedSubstitution),
+        Some("damped_substitution"),
+        None,
+    )
+    .expect("the model accepts the declared strategy");
+}
+
 /// **Every strategy this port does not carry is refused with the class that would close it.**
 ///
-/// The eight are `ColumnSolverFactory`'s own nested solvers, and the refusal names the one the
+/// The seven are `ColumnSolverFactory`'s own nested solvers, and the refusal names the one the
 /// caller asked for rather than the family: a caller who states `wegstein` is owed
 /// `WegsteinSolver`, not "the inside-out family". The boundary is the model layer, so this
 /// calls it rather than the kernel - the strategy never reaches the kernel at all.
 #[test]
 fn an_unported_strategy_is_refused_by_its_class() {
     for (strategy, class) in [
-        ("damped_substitution", "DampedSubstitutionSolver"),
         ("inside_out", "InsideOutSolver"),
         ("matrix_inside_out", "MatrixInsideOutSolver"),
         ("wegstein", "WegsteinSolver"),

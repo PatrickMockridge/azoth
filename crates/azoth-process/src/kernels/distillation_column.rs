@@ -836,28 +836,19 @@ struct Network {
 impl Network {
     /// The inlets a tray sees, from its neighbours' current outlets.
     ///
-    /// **`seed` re-states each inlet at the tray's own temperature, and only `init` passes
-    /// it.** `SimpleTray.init()` sets every inlet stream's temperature to the tray's before
-    /// its first run, which is the mechanism by which `DistillationColumn.init`'s linear
-    /// temperature profile reaches the trays at all; the sweeps call `run` without it, so
-    /// there the inlets keep their own states. The external feed is never re-stated, which is
-    /// what the class's own `refreshInternalExternalFeedSystems` restores.
-    fn inlets_of(&self, i: usize, seed: Option<&[f64]>) -> Vec<Stream> {
+    /// **The external feed is never re-stated**, which is what the class's own
+    /// `refreshInternalExternalFeedSystems` restores. `init`'s temperature seed enters through
+    /// [`Self::run_with`]'s explicit list instead.
+    fn inlets_of(&self, i: usize) -> Vec<Stream> {
         let mut inlets: Vec<Stream> = Vec::new();
-        let at = |stream: &Stream| match seed {
-            Some(temperatures) if temperatures[i].is_finite() => {
-                at_temperature(stream, temperatures[i])
-            }
-            _ => stream.clone(),
-        };
         if i > 0 {
             if let Some(g) = self.gas[i - 1].as_ref() {
-                inlets.push(at(g));
+                inlets.push(g.clone());
             }
         }
         if i + 1 < self.tray_count {
             if let Some(l) = self.liquid[i + 1].as_ref() {
-                inlets.push(at(l));
+                inlets.push(l.clone());
             }
         }
         inlets.extend(self.feeds_at(i).into_iter().cloned());
@@ -886,18 +877,14 @@ impl Network {
         feeds
     }
 
-    /// Run one tray from its neighbours' current state.
-    fn run(&mut self, i: usize, seed: Option<&[f64]>) -> Result<TrayOutcome> {
-        let inlets = self.inlets_of(i, seed);
-        self.run_with(i, &inlets)
-    }
-
     /// Run one tray from an explicit inlet list.
     ///
-    /// **`init` needs this and the sweeps do not.** During `init` each link is an `addStream`
-    /// on a specific neighbour - the reboiler against the *feed stage's* liquid, and not the
-    /// first tray's, which is what the sweeps use - so the inlet list is the class's sequence
-    /// of calls rather than a rule about the geometry.
+    /// **The sweeps own the inlet list because they own the links**: a relaxed link is a
+    /// stream the tray receives and no neighbour produced, so the list is what
+    /// `applyRelaxationFast` hands the tray. During `init` each link is an `addStream` on a
+    /// specific neighbour - the reboiler against the *feed stage's* liquid, and not the first
+    /// tray's, which is what the sweeps use - so there the list is the class's sequence of
+    /// calls rather than a rule about the geometry.
     /// The draws a tray states, from the three vectors - a zero where a vector is absent or the
     /// tray states nothing.
     fn draws_at(&self, i: usize) -> SideDraws {
@@ -1028,10 +1015,7 @@ impl Network {
 
     /// A tray's inlets' total enthalpy, W.
     fn inlet_enthalpy(&self, i: usize) -> f64 {
-        self.inlets_of(i, None)
-            .iter()
-            .map(|s| s.n * s.h.value)
-            .sum()
+        self.inlets_of(i).iter().map(|s| s.n * s.h.value).sum()
     }
 
     /// A tray's outlets' total enthalpy, W.
@@ -1258,10 +1242,16 @@ fn solve_once(setup: &ColumnSetup) -> Result<ColumnOutcome> {
         Some(state) => install_state(&mut net, state)?,
         None => seed_network(&mut net, setup)?,
     };
+    let options = SequentialOptions::for_strategy(setup.solver_type);
     let (iterations, temperature_residual) = if adjustable_specification(setup) {
-        specification_loop(&mut net, setup, &mut temperatures)?
+        specification_loop(
+            &mut net,
+            setup,
+            &mut temperatures,
+            |net, setup, temperatures| sequential_sweep(net, setup, temperatures, options),
+        )?
     } else {
-        sweep(&mut net, setup, &mut temperatures)?
+        sequential_sweep(&mut net, setup, &mut temperatures, options)?
     };
 
     // ---- The products, the duties and the closure ----
@@ -1762,13 +1752,113 @@ fn seed_network(net: &mut Network, setup: &ColumnSetup) -> Result<Vec<f64>> {
     Ok(temperatures)
 }
 
-/// `DistillationColumn.solveSequential`: the sweeps, once, to the temperature gate.
+/// What a sequential sweep takes beyond the setup: `solveSequential`'s initial relaxation.
+#[derive(Debug, Clone, Copy)]
+struct SequentialOptions {
+    initial_relaxation: f64,
+}
+
+impl SequentialOptions {
+    /// The class's own starting point for each strategy that runs the sequential sweeps.
+    fn for_strategy(solver: SolverType) -> Self {
+        let initial_relaxation = match solver {
+            SolverType::DampedSubstitution => 0.5,
+            _ => 1.0,
+        };
+        Self { initial_relaxation }
+    }
+}
+
+/// `applyRelaxationInternal`: the previous and current links blended by `relaxation`.
 ///
-/// Returns the iterations taken and the mean tray-temperature change at the last one. A call
-/// after an earlier one starts from where the last stopped, which is what the class's outer
-/// specification loop relies on - it passes `setDoInitializion(false)` after its first pass and
-/// keeps the profile.
-fn sweep(net: &mut Network, setup: &ColumnSetup, temperatures: &mut [f64]) -> Result<(u32, f64)> {
+/// A relaxation at or above one, or no previous link, is the class's fast path: the current
+/// stream is the link. Below one the component molar flows, flow, temperature and pressure are
+/// blended, and the mixed composition is renormalised over the components that stayed positive.
+fn relax_link(
+    previous: Option<&Stream>,
+    current: Option<&Stream>,
+    relaxation: f64,
+) -> Result<Option<Stream>> {
+    let Some(current) = current else {
+        return Ok(None);
+    };
+    if relaxation >= 1.0 {
+        return Ok(Some(current.clone()));
+    }
+    let Some(previous) = previous else {
+        return Ok(Some(current.clone()));
+    };
+    let step = relaxation.clamp(0.0, 1.0);
+    let n = previous.n + step * (current.n - previous.n);
+    let t = previous.t.value + step * (current.t.value - previous.t.value);
+    let p = previous.p.value + step * (current.p.value - previous.p.value);
+    let mut z: Vec<f64> = previous
+        .z
+        .iter()
+        .zip(current.z.iter())
+        .map(|(before, after)| {
+            let mixed = before * previous.n + step * (after * current.n - before * previous.n);
+            if mixed.is_finite() && mixed > 0.0 {
+                mixed
+            } else {
+                0.0
+            }
+        })
+        .collect();
+    let total: f64 = z.iter().sum();
+    if total > 1.0e-12 {
+        for fraction in &mut z {
+            *fraction /= total;
+        }
+    } else {
+        z.clone_from(&current.z);
+    }
+    Ok(Some(Stream::from_pt(
+        current.components.clone(),
+        z,
+        n,
+        pascals(p),
+        kelvins(t),
+    )?))
+}
+
+/// The inlets a tray sees when its links are the relaxed ones rather than its neighbours' raw
+/// outlets.
+fn linked_inlets(
+    net: &Network,
+    i: usize,
+    gas: Option<&Stream>,
+    liquid: Option<&Stream>,
+) -> Vec<Stream> {
+    let mut inlets = Vec::new();
+    if i > 0 {
+        if let Some(gas) = gas {
+            inlets.push(gas.clone());
+        }
+    }
+    if i + 1 < net.tray_count {
+        if let Some(liquid) = liquid {
+            inlets.push(liquid.clone());
+        }
+    }
+    inlets.extend(net.feeds_at(i).into_iter().cloned());
+    if let Some(returned) = net.returns.get(i).and_then(Option::as_ref) {
+        inlets.push(returned.clone());
+    }
+    inlets
+}
+
+/// The direct path: `solveSequential(1.0)` as this port has always run it.
+///
+/// **The links are the neighbours' own outlets**, which is NeqSim's fast path while its
+/// relaxation stays at one. Its controller can dip below one on a struggling column, and then
+/// it blends the links; that state is not on any capture, and this path is kept as measured so
+/// the direct answers do not move.
+fn direct_sweep(
+    net: &mut Network,
+    setup: &ColumnSetup,
+    temperatures: &mut [f64],
+) -> Result<(u32, f64)> {
     let first_feed = setup.feed_stage;
     let tray_count = net.tray_count;
     let mut relaxation = 1.0_f64;
@@ -1778,34 +1868,27 @@ fn sweep(net: &mut Network, setup: &ColumnSetup, temperatures: &mut [f64]) -> Re
 
     for iter in 1..=setup.max_iterations {
         iterations = iter as u32;
-        // **`oldtemps` is the *damped* profile the previous pass wrote back, not the trays'
-        // own temperatures.** `DistillationColumn` ends a pass with
-        // `trays.get(i).setTemperature(newTemp)` and reads `oldtemps[i] = getTemperature()`
-        // at the top of the next one, so the residual it reports is measured against the
-        // value it *applied* rather than the one the flash produced. The difference is the
-        // whole of `temperature_step_residual` in the capture: `9.58e-7` against `5.75e-7`
-        // on the `0.6` row, an `effectiveRelaxation` of about `0.60`.
-        //
-        // **`SimpleTray.setTemperature` writes only its own field**, so this does not move a
-        // tray: `run` re-flashes from the inlets and `setTemperature(mixedStream.getTemperature())`
-        // overwrites it. What carries is the *residual*, and through it the controller.
         let old: Vec<f64> = temperatures.to_vec();
 
         // Down the column: each tray takes the liquid from the one above it.
         for i in (2..=first_feed).rev() {
-            net.run(i - 1, None)?;
+            let inlets = net.inlets_of(i - 1);
+            net.run_with(i - 1, &inlets)?;
         }
         // The reboiler takes the first stage's liquid.
         if setup.has_reboiler {
-            net.run(0, None)?;
+            let inlets = net.inlets_of(0);
+            net.run_with(0, &inlets)?;
         }
         // Up the column: each tray takes the vapour from the one below it.
         for i in 1..tray_count {
-            net.run(i, None)?;
+            let inlets = net.inlets_of(i);
+            net.run_with(i, &inlets)?;
         }
         // And down again, from below the condenser to the feed stage.
         for i in (first_feed..tray_count.saturating_sub(1)).rev() {
-            net.run(i, None)?;
+            let inlets = net.inlets_of(i);
+            net.run_with(i, &inlets)?;
         }
 
         // The temperature update, with the class's own floor on the step.
@@ -1827,6 +1910,165 @@ fn sweep(net: &mut Network, setup: &ColumnSetup, temperatures: &mut [f64]) -> Re
             relaxation = (relaxation * RELAXATION_INCREASE_FACTOR).min(MAX_ADAPTIVE_RELAXATION);
         }
         previous_combined = combined;
+
+        if temperature_residual <= setup.temperature_tolerance {
+            break;
+        }
+    }
+    Ok((iterations, temperature_residual))
+}
+
+/// `DistillationColumn.solveSequential`: the sweeps, once, to the temperature gate.
+///
+/// Returns the iterations taken and the mean tray-temperature change at the last one. A call
+/// after an earlier one starts from where the last stopped, which is what the class's outer
+/// specification loop relies on - it passes `setDoInitializion(false)` after its first pass and
+/// keeps the profile.
+///
+/// **The links are what `initial_relaxation` reaches**: `applyRelaxationFast` blends the
+/// previous and current link streams at the adaptive relaxation, and the temperature write-back
+/// uses the class's separate floor. Relaxation one is [`direct_sweep`], whose links are the
+/// neighbours' own outlets; below one this path blends them.
+fn sequential_sweep(
+    net: &mut Network,
+    setup: &ColumnSetup,
+    temperatures: &mut [f64],
+    options: SequentialOptions,
+) -> Result<(u32, f64)> {
+    if options.initial_relaxation >= 1.0 {
+        return direct_sweep(net, setup, temperatures);
+    }
+    let first_feed = setup.feed_stage;
+    let tray_count = net.tray_count;
+    let mut relaxation = options
+        .initial_relaxation
+        .clamp(MIN_SEQUENTIAL_RELAXATION, MAX_ADAPTIVE_RELAXATION);
+    let mut previous_combined = f64::INFINITY;
+    let mut temperature_residual = f64::INFINITY;
+    let mut iterations = 0_u32;
+
+    // The links installed on each tray, indexed by the tray that produced them. The seeded
+    // state is the first pass's links, which is the profile `init` leaves behind.
+    let mut gas_link: Vec<Option<Stream>> = net.gas.clone();
+    let mut liquid_link: Vec<Option<Stream>> = net.liquid.clone();
+    // `previousGasStreams`/`previousLiquidStreams`: null until a pass has produced a link.
+    let mut previous_gas: Vec<Option<Stream>> = vec![None; tray_count];
+    let mut previous_liquid: Vec<Option<Stream>> = vec![None; tray_count];
+
+    for iter in 1..=setup.max_iterations {
+        iterations = iter as u32;
+        // **`oldtemps` is the *damped* profile the previous pass wrote back, not the trays'
+        // own temperatures.** `DistillationColumn` ends a pass with
+        // `trays.get(i).setTemperature(newTemp)` and reads `oldtemps[i] = getTemperature()`
+        // at the top of the next one, so the residual it reports is measured against the
+        // value it *applied* rather than the one the flash produced. The difference is the
+        // whole of `temperature_step_residual` in the capture: `9.58e-7` against `5.75e-7`
+        // on the `0.6` row, an `effectiveRelaxation` of about `0.60`.
+        //
+        // **`SimpleTray.setTemperature` writes only its own field**, so this does not move a
+        // tray: `run` re-flashes from the inlets and `setTemperature(mixedStream.getTemperature())`
+        // overwrites it. What carries is the *residual*, and through it the controller.
+        let old: Vec<f64> = temperatures.to_vec();
+        let mut current_gas: Vec<Option<Stream>> = vec![None; tray_count];
+        let mut current_liquid: Vec<Option<Stream>> = vec![None; tray_count];
+
+        // Down the column: each tray takes the liquid from the one above it.
+        for i in (2..=first_feed).rev() {
+            let relaxed = relax_link(
+                previous_liquid[i].as_ref(),
+                net.liquid[i].as_ref(),
+                relaxation,
+            )?;
+            liquid_link[i] = relaxed.clone();
+            current_liquid[i] = relaxed;
+            let tray = i - 1;
+            let gas = if tray > 0 {
+                gas_link[tray - 1].as_ref()
+            } else {
+                None
+            };
+            let inlets = linked_inlets(net, tray, gas, liquid_link[i].as_ref());
+            net.run_with(tray, &inlets)?;
+        }
+        // The reboiler takes the first stage's liquid.
+        if setup.has_reboiler {
+            let relaxed = relax_link(
+                previous_liquid[1].as_ref(),
+                net.liquid[1].as_ref(),
+                relaxation,
+            )?;
+            liquid_link[1] = relaxed.clone();
+            current_liquid[1] = relaxed;
+            let inlets = linked_inlets(net, 0, None, liquid_link[1].as_ref());
+            net.run_with(0, &inlets)?;
+        }
+        // Up the column: each tray takes the vapour from the one below it.
+        for i in 1..tray_count {
+            let relaxed = relax_link(
+                previous_gas[i - 1].as_ref(),
+                net.gas[i - 1].as_ref(),
+                relaxation,
+            )?;
+            gas_link[i - 1] = relaxed.clone();
+            current_gas[i - 1] = relaxed;
+            let liquid = if i + 1 < tray_count {
+                liquid_link[i + 1].as_ref()
+            } else {
+                None
+            };
+            let inlets = linked_inlets(net, i, gas_link[i - 1].as_ref(), liquid);
+            net.run_with(i, &inlets)?;
+        }
+        // And down again, from below the condenser to the feed stage.
+        for i in (first_feed..tray_count.saturating_sub(1)).rev() {
+            let relaxed = relax_link(
+                previous_liquid[i + 1].as_ref(),
+                net.liquid[i + 1].as_ref(),
+                relaxation,
+            )?;
+            liquid_link[i + 1] = relaxed.clone();
+            current_liquid[i + 1] = relaxed;
+            let gas = if i > 0 {
+                gas_link[i - 1].as_ref()
+            } else {
+                None
+            };
+            let inlets = linked_inlets(net, i, gas, liquid_link[i + 1].as_ref());
+            net.run_with(i, &inlets)?;
+        }
+
+        // The temperature update, with the class's own floor on the step. **The controller
+        // reads the undamped residual**, which is the class's `err` and the gate; its
+        // `tempScaled` is the applied step, but the two differ by a constant within a pass, so
+        // the increase and decrease decisions that compare successive values are the same.
+        let effective = relaxation.clamp(MIN_TEMPERATURE_RELAXATION, 1.0);
+        let mut sum = 0.0;
+        for i in 0..tray_count {
+            let updated = net.temperature(i);
+            let updated = if updated.is_finite() { updated } else { old[i] };
+            sum += (updated - old[i]).abs();
+            temperatures[i] = old[i] + effective * (updated - old[i]);
+        }
+        temperature_residual = sum / tray_count as f64;
+
+        // The adaptive controller, on the term this port carries of the class's three.
+        let combined = temperature_residual / setup.temperature_tolerance;
+        if combined > previous_combined * 1.05 {
+            relaxation = (relaxation * RELAXATION_DECREASE_FACTOR).max(MIN_SEQUENTIAL_RELAXATION);
+        } else if combined < previous_combined * 0.98 {
+            relaxation = (relaxation * RELAXATION_INCREASE_FACTOR).min(MAX_ADAPTIVE_RELAXATION);
+        }
+        previous_combined = combined;
+
+        // `previousGasStreams`/`previousLiquidStreams` take only the links this pass produced.
+        for i in 0..tray_count {
+            if current_gas[i].is_some() {
+                previous_gas[i] = current_gas[i].clone();
+            }
+            if current_liquid[i].is_some() {
+                previous_liquid[i] = current_liquid[i].clone();
+            }
+        }
 
         // **The class's gate is three residuals, and the other two do not bind here.**
         // `withinBaseTolerance` is `err <= baseTempTolerance && massErr <= baseMassTolerance &&
@@ -1873,11 +2115,15 @@ const SECANT_FIRST_OFFSET: f64 = 5.0;
 /// returns three stages only when `solverType == AUTO`, and the field it otherwise reads is
 /// one - so the staged continuation the class does carry belongs to the solver this port
 /// refuses, and the secant loop is the whole of the specification machinery it needs.
-fn specification_loop(
+fn specification_loop<F>(
     net: &mut Network,
     setup: &ColumnSetup,
     temperatures: &mut [f64],
-) -> Result<(u32, f64)> {
+    mut inner: F,
+) -> Result<(u32, f64)>
+where
+    F: FnMut(&mut Network, &ColumnSetup, &mut [f64]) -> Result<(u32, f64)>,
+{
     let tray_count = net.tray_count;
     let top = setup.top_specification.clone();
     let bottom = setup.bottom_specification.clone();
@@ -1913,7 +2159,7 @@ fn specification_loop(
             };
             net.modes[0] = EndMode::Temperature(guess);
         }
-        let (taken, residual) = sweep(net, setup, temperatures)?;
+        let (taken, residual) = inner(net, setup, temperatures)?;
         // **The *last* inner solve's count, which is the class's own `lastIterationCount`** -
         // it is overwritten by every `solveSequential` call and the outer loop makes twenty of
         // them. Summing them here would report a number the capture has no counterpart for.

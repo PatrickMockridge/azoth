@@ -275,11 +275,11 @@ pub fn absorption_column(
             .clone(),
         )
     };
-    // The same eight `process.distillation_column` refuses, from this id's own declaration.
+    // The same strategies `process.distillation_column` refuses, from this id's own declaration.
     let solver = match solver_type.unwrap_or("direct_substitution") {
         "direct_substitution" => SolverType::DirectSubstitution,
         "naphtali_sandholm" => SolverType::NaphtaliSandholm,
-        "damped_substitution" => return Err(unported::refuse("solver_type=damped_substitution")),
+        "damped_substitution" => SolverType::DampedSubstitution,
         "inside_out" => return Err(unported::refuse("solver_type=inside_out")),
         "matrix_inside_out" => return Err(unported::refuse("solver_type=matrix_inside_out")),
         "wegstein" => return Err(unported::refuse("solver_type=wegstein")),

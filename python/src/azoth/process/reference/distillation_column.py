@@ -384,7 +384,8 @@ def _distillation_column_states(
             different correction.
         tray_murphree_efficiency: one override per stage, ``NaN`` where a stage falls through
             to ``murphree_efficiency``; a length that is not ``number_of_stages`` is refused.
-        solver_type: **only ``direct_substitution`` is ported**, which is the class's default.
+        solver_type: **``direct_substitution``, ``damped_substitution`` and
+            ``naphtali_sandholm`` are ported**; the class's default is the first.
         top_specification_type: the top product's degree of freedom, one of
             :data:`SPECIFICATION_KINDS`; omitted, the top is pinned by temperature instead.
         top_specification_target: its target, in the unit its type implies: dimensionless for a
@@ -840,7 +841,8 @@ def distillation_column(
         condenser_temperature: the condenser's temperature, which pins the top tray.
         murphree_efficiency: the column-wide Murphree tray efficiency.
         tray_murphree_efficiency: one override per stage, ``NaN`` where a stage falls through.
-        solver_type: **only ``direct_substitution`` and ``naphtali_sandholm`` are ported**.
+        solver_type: **``direct_substitution``, ``damped_substitution`` and
+            ``naphtali_sandholm`` are ported**.
         top_specification_type: the top product's degree of freedom.
         top_specification_target: its target value.
         top_specification_component: the component a purity or a recovery constrains.
@@ -1488,30 +1490,98 @@ def _states(
         )
 
     # ---- the sweeps, once, or under the outer specification loop ----
-    def sweep(temperatures: list[float]) -> tuple[int, float]:
-        """`solveSequential`: the sweeps, once, to the temperature gate."""
-        relaxation = 1.0
+    def relax_link(
+        previous: StreamRecord | None, current: StreamRecord | None, relaxation: float
+    ) -> StreamRecord | None:
+        """`applyRelaxationInternal`: the previous and current links blended."""
+        if current is None:
+            return None
+        if previous is None or relaxation >= 1.0:
+            return current
+        step = min(max(relaxation, 0.0), 1.0)
+        mixed_n = previous["n"] + step * (current["n"] - previous["n"])
+        mixed_t = previous["t"] + step * (current["t"] - previous["t"])
+        mixed_p = previous["p"] + step * (current["p"] - previous["p"])
+        moles = []
+        for before, after in zip(previous["z"], current["z"], strict=True):
+            mixed = before * previous["n"] + step * (after * current["n"] - before * previous["n"])
+            moles.append(mixed if math.isfinite(mixed) and mixed > 0.0 else 0.0)
+        total = sum(moles)
+        z = [value / total for value in moles] if total > 1.0e-12 else list(current["z"])
+        return _feed(components, mixed_n, z, mixed_t, mixed_p)
+
+    def linked_inlets(
+        i: int, gas_link: StreamRecord | None, liquid_link: StreamRecord | None
+    ) -> list[StreamRecord]:
+        """The inlets a tray sees when its links are the relaxed ones."""
+        inlets: list[StreamRecord] = []
+        if i > 0 and gas_link is not None:
+            inlets.append(gas_link)
+        if i + 1 < tray_count and liquid_link is not None:
+            inlets.append(liquid_link)
+        if i == feed_stage:
+            inlets.append(_feed(components, feed_n, feed_z, feed_t, feed_p))
+        if top_feed is not None and i == tray_count - 1:
+            inlets.append(top_feed)
+        returned = returns[i]
+        if returned is not None:
+            inlets.append(returned)
+        return inlets
+
+    gas_link = list(gas)
+    liquid_link = list(liquid)
+
+    def sweep(temperatures: list[float], initial_relaxation: float = 1.0) -> tuple[int, float]:
+        """`solveSequential`: the sweeps, once, to the temperature gate.
+
+        **The links are what `initial_relaxation` reaches**, which is why direct and damped are
+        one method: `applyRelaxationFast` blends the previous and current link streams at the
+        adaptive relaxation, and the temperature write-back uses the class's separate floor.
+        """
+        relaxation = min(
+            max(initial_relaxation, MIN_SEQUENTIAL_RELAXATION), MAX_ADAPTIVE_RELAXATION
+        )
         previous_combined = float("inf")
         temperature_residual = float("inf")
         took = 0
+        previous_gas: list[StreamRecord | None] = [None] * tray_count
+        previous_liquid: list[StreamRecord | None] = [None] * tray_count
         for iteration in range(1, max_iterations + 1):
             took = iteration
             old = [temperature(i) for i in range(tray_count)]
+            current_gas: list[StreamRecord | None] = [None] * tray_count
+            current_liquid: list[StreamRecord | None] = [None] * tray_count
 
             for i in range(feed_stage, 1, -1):
-                run_with(i - 1, inlets_of(i - 1, None))
+                relaxed = relax_link(previous_liquid[i], liquid[i], relaxation)
+                liquid_link[i] = relaxed
+                current_liquid[i] = relaxed
+                tray = i - 1
+                lower = gas_link[tray - 1] if tray > 0 else None
+                run_with(tray, linked_inlets(tray, lower, liquid_link[i]))
             if has_reboiler:
-                run_with(0, inlets_of(0, None))
+                relaxed = relax_link(previous_liquid[1], liquid[1], relaxation)
+                liquid_link[1] = relaxed
+                current_liquid[1] = relaxed
+                run_with(0, linked_inlets(0, None, liquid_link[1]))
             for i in range(1, tray_count):
-                run_with(i, inlets_of(i, None))
+                relaxed = relax_link(previous_gas[i - 1], gas[i - 1], relaxation)
+                gas_link[i - 1] = relaxed
+                current_gas[i - 1] = relaxed
+                upper = liquid_link[i + 1] if i + 1 < tray_count else None
+                run_with(i, linked_inlets(i, gas_link[i - 1], upper))
             for i in range(tray_count - 2, feed_stage - 1, -1):
-                run_with(i, inlets_of(i, None))
+                relaxed = relax_link(previous_liquid[i + 1], liquid[i + 1], relaxation)
+                liquid_link[i + 1] = relaxed
+                current_liquid[i + 1] = relaxed
+                lower = gas_link[i - 1] if i > 0 else None
+                run_with(i, linked_inlets(i, lower, liquid_link[i + 1]))
 
             effective = min(max(relaxation, MIN_TEMPERATURE_RELAXATION), 1.0)
             total = 0.0
             for i in range(tray_count):
                 updated = temperature(i)
-                if updated != updated or updated in (float("inf"), float("-inf")):
+                if not math.isfinite(updated):
                     updated = old[i]
                 total += abs(updated - old[i])
                 temperatures[i] = old[i] + effective * (updated - old[i])
@@ -1523,6 +1593,12 @@ def _states(
             elif combined < previous_combined * 0.98:
                 relaxation = min(MAX_ADAPTIVE_RELAXATION, relaxation * RELAXATION_INCREASE_FACTOR)
             previous_combined = combined
+
+            for i in range(tray_count):
+                if current_gas[i] is not None:
+                    previous_gas[i] = current_gas[i]
+                if current_liquid[i] is not None:
+                    previous_liquid[i] = current_liquid[i]
 
             if temperature_residual <= temperature_tolerance:
                 break
@@ -1553,6 +1629,7 @@ def _states(
             for spec in (top_specification, bottom_specification)
         )
 
+    initial_relaxation = 0.5 if solver_type == "damped_substitution" else 1.0
     if adjustable():
         # `solveWithSpecificationTargets`: the outer secant on the ends' temperatures.
         #
@@ -1578,7 +1655,7 @@ def _states(
             if adjust_bottom:
                 modes[0] = ("temperature", bottom_pair[0] if outer == 0 else bottom_pair[1])
 
-            iterations, temperature_residual = sweep(temperatures)
+            iterations, temperature_residual = sweep(temperatures, initial_relaxation)
 
             top_error = 0.0
             bottom_error = 0.0
@@ -1616,7 +1693,7 @@ def _states(
 
             raise SolverNotConvergedError(iterations, temperature_residual, SPECIFICATION_TOLERANCE)
     else:
-        iterations, temperature_residual = sweep(temperatures)
+        iterations, temperature_residual = sweep(temperatures, initial_relaxation)
 
     def outlet_enthalpy(i: int) -> float:
         total = 0.0
@@ -2159,10 +2236,12 @@ def _refuse_unported(solver_type: str | None, murphree_efficiency: _Murphree | N
     # against the vapour entering it.
     if solver_type == "naphtali_sandholm" and murphree_efficiency is not None:
         raise _unported.refuse("murphree_efficiency@solver_type=naphtali_sandholm")
-    if solver_type is None or solver_type in ("direct_substitution", "naphtali_sandholm"):
+    if solver_type is None or solver_type in (
+        "direct_substitution",
+        "damped_substitution",
+        "naphtali_sandholm",
+    ):
         return
-    if solver_type == "damped_substitution":
-        raise _unported.refuse("solver_type=damped_substitution")
     if solver_type == "inside_out":
         raise _unported.refuse("solver_type=inside_out")
     if solver_type == "matrix_inside_out":

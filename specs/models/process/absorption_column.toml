@@ -9,7 +9,7 @@ assumptions = [
     "**the products are the class's own getters**: `getGasOutStream` is the treated gas leaving the top stage and `getLiquidOutStream` the loaded solvent leaving the bottom, which is what the terminal trays publish when there are no ends.",
     "**both inlets carry the same substances in the same order.** The class indexes every tray's components by one list built from its first feed, so a solvent naming different substances is a different fluid rather than an inlet, and this refuses it.",
     "**the fluid is PR with the classic mixing rule**, because `Stream::mixture()` resolves `databank::mixture_of(names, Cubic::Pr, None)` and has no other route.",
-    "**`murphree_efficiency` and `component_murphree_efficiency` are declared and refused**, as are the eight strategies of `solver_type` this port does not carry. Each refusal names the class that would close it. What is owed here is the override, which corrects both phases.",
+    "**`murphree_efficiency` and `component_murphree_efficiency` are declared and refused**, as are the seven strategies of `solver_type` this port does not carry. Each refusal names the class that would close it. What is owed here is the override, which corrects both phases.",
     "**`reactive` is measured rather than assumed**: no sibling test calls `setReactive`. On a fluid with no independent reaction the reactive route *is* the equilibrium one - bit-identical across all sixty-nine captured keys of the packed column's oracle.",
     "**On a reacting fluid the class does not converge it**: the hydrocarbon absorber at this port's own gate ends `FALLBACK_PRODUCTS`, mass residual `6.4e5` - its own log calls that not a rigorous result. The states neither library converges are refused.\n",
     "**the column's own mechanical design is ported and the absorber's is not a target**: the trayed internals are `column/designer.rs`, the vessel around them `column/mechanical.rs`. `AbsorberMechanicalDesign` is a *measured non-port*, because its only caller is `SimpleAbsorber.getMechanicalDesign()`.\n",
@@ -386,11 +386,6 @@ rationale = "`calcDesign` divides the tray count by it with no guard, so a non-p
 python = "azoth.process.absorption_column"
 rust = "azoth_process::absorption_column"
 
-[[unported]]
-parameter = "solver_type"
-value = "damped_substitution"
-class = "DampedSubstitutionSolver"
-capture = "validation/neqsim/captures/process_column_solvers.tsv"
 [[unported]]
 parameter = "solver_type"
 value = "inside_out"

@@ -428,15 +428,15 @@ pub(crate) fn distillation_column_outcome(
         &mut warnings,
     )?;
 
-    // **The eight this port does not carry are refused from the declaration, one arm each.**
-    // The arm is what makes the pair countable: the key is a literal here and in the Python
-    // half, so `tools/check_unported.py` reads two sets of the same shape rather than two
+    // **The strategies this port does not carry are refused from the declaration, one arm
+    // each.** The arm is what makes the pair countable: the key is a literal here and in the
+    // Python half, so `tools/check_unported.py` reads two sets of the same shape rather than two
     // sentences. The class that would close each gap comes from the row, so the map that used
     // to be hand-written in both languages is gone with the sentences that needed it.
     let solver = match solver_type.unwrap_or("direct_substitution") {
         "direct_substitution" => kernel::SolverType::DirectSubstitution,
         "naphtali_sandholm" => kernel::SolverType::NaphtaliSandholm,
-        "damped_substitution" => return Err(unported::refuse("solver_type=damped_substitution")),
+        "damped_substitution" => kernel::SolverType::DampedSubstitution,
         "inside_out" => return Err(unported::refuse("solver_type=inside_out")),
         "matrix_inside_out" => return Err(unported::refuse("solver_type=matrix_inside_out")),
         "wegstein" => return Err(unported::refuse("solver_type=wegstein")),

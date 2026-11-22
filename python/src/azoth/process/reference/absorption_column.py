@@ -186,11 +186,14 @@ def absorption_column(
             ),
         ).checked(len(gas_components))
     )
-    # **The same eight `process.distillation_column` refuses, from this id's own declaration**,
-    # one literal arm each so `tools/check_unported.py` reads the same shape in both halves.
-    if solver_type is not None and solver_type not in ("direct_substitution", "naphtali_sandholm"):
-        if solver_type == "damped_substitution":
-            raise _unported.refuse("solver_type=damped_substitution")
+    # **The same strategies `process.distillation_column` refuses, from this id's own
+    # declaration**, one literal arm each so `tools/check_unported.py` reads the same shape in
+    # both halves.
+    if solver_type is not None and solver_type not in (
+        "direct_substitution",
+        "damped_substitution",
+        "naphtali_sandholm",
+    ):
         if solver_type == "inside_out":
             raise _unported.refuse("solver_type=inside_out")
         if solver_type == "matrix_inside_out":
