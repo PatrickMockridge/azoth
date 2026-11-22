@@ -22,6 +22,7 @@ not an equation, and both implementations read it from here.
 | Convergence | `absolute` |
 | Tolerance | `0.1` |
 | Max iterations | `20000000` |
+| Initialisation | `stated_initial_temperature` |
 
 ## Inputs
 

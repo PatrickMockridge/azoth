@@ -45,6 +45,10 @@ pub enum WarningCode {
     /// able to tell the two apart, because a number that was never computed is not a number
     /// to trust less - it is not a number at all.
     FallbackToInput,
+    /// A result rests on an input or a segment for which the model declares evidence, and no
+    /// such evidence was supplied. Distinct from a range check: nothing was out of bounds and
+    /// no check was skipped - the answer's basis is untraceable.
+    MissingEvidence,
 }
 
 impl WarningCode {
@@ -60,6 +64,7 @@ impl WarningCode {
             Self::SolverNotConverged => "SOLVER_NOT_CONVERGED",
             Self::TrivialSolution => "TRIVIAL_SOLUTION",
             Self::FallbackToInput => "FALLBACK_TO_INPUT",
+            Self::MissingEvidence => "MISSING_EVIDENCE",
         }
     }
 
@@ -73,6 +78,7 @@ impl WarningCode {
             Self::SolverNotConverged,
             Self::TrivialSolution,
             Self::FallbackToInput,
+            Self::MissingEvidence,
         ]
     }
 

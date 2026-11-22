@@ -193,7 +193,7 @@ def trapped_inventory(
         if not any(str(item.get("segment_id", "")) == segment_id for item in evidence):
             warnings.append(
                 Warning(
-                    WarningCode.RANGE_CHECK_SKIPPED,
+                    WarningCode.MISSING_EVIDENCE,
                     f"Segment {segment_id} has no traceable document evidence.",
                     "segments",
                 )

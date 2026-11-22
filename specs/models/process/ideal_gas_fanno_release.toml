@@ -22,6 +22,7 @@ standard = "NeqSim process/safety/release/IdealGasFannoPipeReleaseModel.java"
 edition = "Its `calculate`: the one-gas-phase check, the Fanno function and its two bisections, the `1/M` stagnation-pressure ratio, the stations and the mass-flux closure."
 [algorithm]
 scheme = "ideal_gas_fanno_pipe"
+initialisation = "stated_inlet_state"
 convergence = "relative"
 tolerance = 1.0e-9
 max_iterations = 120

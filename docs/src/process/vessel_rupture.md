@@ -22,6 +22,7 @@ not an equation, and both implementations read it from here.
 | Convergence | `absolute` |
 | Tolerance | `1e-12` |
 | Max iterations | `100000` |
+| Initialisation | `stated_strength_curve_t_zero` |
 
 ## Inputs
 

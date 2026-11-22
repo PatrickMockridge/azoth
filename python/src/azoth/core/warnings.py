@@ -55,6 +55,11 @@ class WarningCode(StrEnum):
     #: which returns an unconverged answer: here there is no answer at all.
     FALLBACK_TO_INPUT = "FALLBACK_TO_INPUT"
 
+    #: A result rests on an input or a segment for which the model declares
+    #: evidence, and none was supplied. Distinct from a range check: nothing was
+    #: out of bounds and no check was skipped - the answer's basis is untraceable.
+    MISSING_EVIDENCE = "MISSING_EVIDENCE"
+
 
 @dataclass(frozen=True, slots=True)
 class Warning:

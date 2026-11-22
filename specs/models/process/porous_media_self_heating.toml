@@ -22,6 +22,7 @@ standard = "NeqSim process/safety/selfheating/PorousMediaSelfHeatingAnalyzer.jav
 edition = "Its `analyze`: the criticality parameter, the critical temperature and half-dimension, and the verdict."
 [algorithm]
 scheme = "frank_kamenetskii_criticality"
+initialisation = "critical_temperature_bisection_150_2000_k"
 convergence = "absolute"
 tolerance = 1.0e-4
 max_iterations = 200

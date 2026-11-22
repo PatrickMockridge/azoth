@@ -21,6 +21,7 @@ standard = "NeqSim process/safety/selfheating/SelfHeatingInductionSolver.java"
 edition = "Its `solve`: the explicit Euler march, the adaptive step, the three termination states and the retained history."
 [algorithm]
 scheme = "explicit_euler_induction"
+initialisation = "stated_initial_temperature"
 convergence = "absolute"
 tolerance = 0.1
 max_iterations = 20000000

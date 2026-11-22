@@ -25,6 +25,7 @@ standard = "NeqSim process/safety/risk/fta/FaultTreeAnalyzer.java"
 edition = "Its `topEventProbability` and `minimalCutSets`, and the factories and `withCCF` in `FaultTreeNode`."
 [algorithm]
 scheme = "recursive_gate_evaluation"
+initialisation = "stated_leaf_probabilities"
 convergence = "absolute"
 tolerance = 1.0e-12
 max_iterations = 20

@@ -23,6 +23,7 @@ standard = "NeqSim process/safety/rupture/VesselRuptureAnalyzer.java"
 edition = "Its `analyze`, over `MaterialStrengthCurve`'s `forApi5LPipeGrade` and `carbonSteel`, and `VesselRuptureCalculator.vonMisesStress`."
 [algorithm]
 scheme = "thin_wall_vessel_rupture_crossover"
+initialisation = "stated_strength_curve_t_zero"
 convergence = "absolute"
 tolerance = 1.0e-12
 max_iterations = 100000

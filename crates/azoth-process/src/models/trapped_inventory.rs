@@ -331,7 +331,7 @@ pub fn trapped_inventory(
             .any(|item| item.segment_id == row.segment_id)
         {
             warnings.push(Warning::for_field(
-                WarningCode::RangeCheckSkipped,
+                WarningCode::MissingEvidence,
                 "segments",
                 format!(
                     "Segment {} has no traceable document evidence.",
