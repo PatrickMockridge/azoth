@@ -68,7 +68,9 @@ CASES = _active_cases()
 #: Models whose cross-implementation case runs thousands of PH flashes in the Python
 #: mirror: the real-gas Fanno march. Their cases run in ``test_cross_impl_slow`` under
 #: the ``slow_sweep`` marker, so the nightly carries them and the lanes stay inside budget.
-SLOW_MODELS: frozenset[str] = frozenset({"process.real_gas_fanno_release"})
+SLOW_MODELS: frozenset[str] = frozenset(
+    {"process.real_gas_fanno_release", "pvt.regression"}
+)
 
 
 def _model_cases() -> list[tuple[dict[str, Any], dict[str, Any]]]:

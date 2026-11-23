@@ -12,7 +12,7 @@ see `azoth._rust_bridge`.
 
 from typing import TypedDict, final
 
-from azoth.core.result_base import BeggsBrillRegime, BlowbyVerdict, CooldownVerdict, CorrosionSeverity, DeadheadVerdict, EmulsionType, ErosionRiskLevel, FailureMode, FeSMorphology, FivLikelihood, FlowRegime, FluidBasis, GoverningCriterion, HenryStatus, HydrateRiskLevel, HydrateStructure, MultiflashSeedPath, OpenDrainVerdict, OverallVerdict, PerformanceVerdict, Phase, PlusModel, ReliefPhase, RootStructure, RunawayVerdict, RuptureStatus, SelfHeatingGeometry, SelfHeatingVerdict, SettleOutVerdict, StabilityVerdict, SupplyVerdict, TpMultiflashSeed, VacuumVerdict
+from azoth.core.result_base import BeggsBrillRegime, BlowbyVerdict, ConvergenceReason, CooldownVerdict, CorrosionSeverity, DeadheadVerdict, EmulsionType, ErosionRiskLevel, FailureMode, FeSMorphology, FivLikelihood, FlowRegime, FluidBasis, GoverningCriterion, HenryStatus, HydrateRiskLevel, HydrateStructure, MultiflashSeedPath, OpenDrainVerdict, OverallVerdict, PerformanceVerdict, Phase, PlusModel, ReliefPhase, RootStructure, RunawayVerdict, RuptureStatus, SelfHeatingGeometry, SelfHeatingVerdict, SettleOutVerdict, StabilityVerdict, SupplyVerdict, TpMultiflashSeed, VacuumVerdict
 
 # --- transport types ------------------------------------------------------
 # The values that cross the boundary and are not results. Hand-written here
@@ -1208,6 +1208,49 @@ class GasQuery(TypedDict):
     tpr: float | None
     ppr: float | None
     molar_mass: float | None
+
+class RegressionParameterRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    parameter: str
+    initial: float
+    lower: float
+    upper: float
+
+class RegressionCceRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    experiment: float
+    temperature: float
+    pressure: float
+    relative_volume: float
+
+class RegressionCvdRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    experiment: float
+    temperature: float
+    pressure: float
+    liquid_dropout: float
+    z_factor: float
+
+class RegressionDleRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    experiment: float
+    temperature: float
+    pressure: float
+    rs: float
+    bo: float
+    oil_density: float
+
+class RegressionViscosityRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    temperature: float
+    pressure: float
+    viscosity: float
+    phase: str
 
 class SeparatorStageInput(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
@@ -2551,6 +2594,22 @@ class PropertyPoint:
     gas_phase_available: bool
     oil_phase_available: bool
     aqueous_phase_available: bool
+
+@final
+class FittedParameterRow:
+    """One row per fitting parameter, in the caller's order."""
+
+    parameter: str
+    value: float
+    lower: float
+    upper: float
+
+@final
+class RegressionObjectiveRow:
+    """One row per experiment that had observations, in the class's declaration order."""
+
+    experiment: str
+    value: float
 
 @final
 class SeparatorStageResult:
@@ -6966,6 +7025,21 @@ class PropertySweepResult:
     warnings: list[Warning]
 
 @final
+class RegressionResult:
+    fitted_parameters: list[FittedParameterRow]
+    standard_errors: list[float]
+    half_widths_95: list[float]
+    objectives: list[RegressionObjectiveRow]
+    final_chi_square: float
+    total_objective: float
+    degrees_of_freedom: float
+    residual_variance: float
+    average_absolute_deviation_percent: float
+    iterations: float
+    convergence_reason: ConvergenceReason
+    warnings: list[Warning]
+
+@final
 class SaturationTestResult:
     saturation_pressure: Qty | None
     saturation_temperature: Qty | None
@@ -6992,6 +7066,14 @@ class SwellingTestResult:
     original_oil_moles: Qty
     original_oil_volume: Qty
     points: list[SwellingPoint]
+    warnings: list[Warning]
+
+@final
+class TuneToSaturationResult:
+    tuned_molar_mass: Qty
+    final_saturation_pressure: Qty
+    iterations: float
+    converged: bool
     warnings: list[Warning]
 
 @final
@@ -11233,6 +11315,22 @@ def property_sweep(
     mixing_rule: str | None = None,
     volume_correction: bool | None = None,
 ) -> PropertySweepResult: ...
+def regression(
+    components: list[FluidComponent],
+    parameters: list[RegressionParameterRow],
+    cce: list[RegressionCceRow] | None = None,
+    cvd: list[RegressionCvdRow] | None = None,
+    dle: list[RegressionDleRow] | None = None,
+    viscosity: list[RegressionViscosityRow] | None = None,
+    cce_weight: float | None = None,
+    cvd_weight: float | None = None,
+    dle_weight: float | None = None,
+    viscosity_weight: float | None = None,
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+    max_iterations: float | None = None,
+) -> RegressionResult: ...
 def saturation_test(
     components: list[FluidComponent],
     mode: str,
@@ -11269,6 +11367,18 @@ def swelling_test(
     temperature: float | None = None,
     volume_correction: bool | None = None,
 ) -> SwellingTestResult: ...
+def tune_to_saturation(
+    components: list[FluidComponent],
+    plus_component: str,
+    saturation_temperature: float,
+    saturation_pressure: float,
+    plus_model: str | None = None,
+    number_of_lumps: float | None = None,
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+    max_iterations: float | None = None,
+) -> TuneToSaturationResult: ...
 def water_correlations(queries: list[WaterQuery]) -> WaterCorrelationsResult: ...
 def chemical_equilibrium(
     a_matrix: list[list[float]],

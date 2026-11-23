@@ -22,7 +22,7 @@ def _mixture() -> Any:
 
 
 def _mu(result: Any) -> float:
-    return result.mu.to("Pa*s").magnitude
+    return float(result.mu.to("Pa*s").magnitude)
 
 
 def test_unit_factors_are_the_published_correlation() -> None:

@@ -90,8 +90,8 @@ def test_the_co2_bip_reproduces_the_capture_observation() -> None:
     bo = [1.297774285932201, 1.3196221126198664, 1.1668447141587335]
     rho = [657.1251440903429, 642.5894780343832, 684.8946122783024]
     for index, point in enumerate(dle.points):
-        _close(float(point.rs), rs[index], 1e-6, f"Rs[{index}]")
-        _close(float(point.bo), bo[index], 1e-6, f"Bo[{index}]")
+        _close(float(point.rs or 0.0), rs[index], 1e-6, f"Rs[{index}]")
+        _close(float(point.bo or 1.0), bo[index], 1e-6, f"Bo[{index}]")
         density = float(point.oil_density.to("kg/m**3").magnitude)
         _close(density, rho[index], 1e-6, f"density[{index}]")
 

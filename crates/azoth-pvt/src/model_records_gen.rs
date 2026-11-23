@@ -21,9 +21,11 @@ use crate::gas_material_balance::GasMaterialBalanceResult;
 use crate::mmp::MmpResult;
 use crate::oil_material_balance::OilMaterialBalanceResult;
 use crate::property_sweep::PropertySweepResult;
+use crate::regression::RegressionResult;
 use crate::saturation_test::SaturationTestResult;
 use crate::separator_test::SeparatorTestResult;
 use crate::swelling_test::SwellingTestResult;
+use crate::tune_to_saturation::TuneToSaturationResult;
 use crate::water_correlations::WaterCorrelationsResult;
 
 impl CalcResult for BlackOilCorrelationsResult {
@@ -192,6 +194,28 @@ impl CalcResult for PropertySweepResult {
     }
 }
 
+impl CalcResult for RegressionResult {
+    const CALC_ID: &'static str = "pvt.regression";
+    const FIELDS: &'static [&'static str] = &[
+        "fitted_parameters",
+        "standard_errors",
+        "half_widths_95",
+        "objectives",
+        "final_chi_square",
+        "total_objective",
+        "degrees_of_freedom",
+        "residual_variance",
+        "average_absolute_deviation_percent",
+        "iterations",
+        "convergence_reason",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for SaturationTestResult {
     const CALC_ID: &'static str = "pvt.saturation_test";
     const FIELDS: &'static [&'static str] =
@@ -231,6 +255,21 @@ impl CalcResult for SwellingTestResult {
         "original_oil_moles",
         "original_oil_volume",
         "points",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for TuneToSaturationResult {
+    const CALC_ID: &'static str = "pvt.tune_to_saturation";
+    const FIELDS: &'static [&'static str] = &[
+        "tuned_molar_mass",
+        "final_saturation_pressure",
+        "iterations",
+        "converged",
         "warnings",
     ];
 

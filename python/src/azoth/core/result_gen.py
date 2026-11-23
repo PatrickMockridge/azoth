@@ -52,6 +52,7 @@ from azoth.core.record_outputs_gen import (
     EsdContribution,
     EventTreeOutcome,
     FiniteRateReleaseStation,
+    FittedParameterRow,
     FlowlineScaleSegment,
     FmeaRankedEntry,
     GasResultRow,
@@ -100,6 +101,7 @@ from azoth.core.record_outputs_gen import (
     RanzMarshallReleaseStation,
     RealGasFannoReleaseStation,
     RegisterFinding,
+    RegressionObjectiveRow,
     ReliefDisposalRow,
     RemediationOptionRow,
     ReviewAssessment,
@@ -142,6 +144,7 @@ from azoth.core.record_outputs_gen import (
 from azoth.core.result_base import (
     BeggsBrillRegime,
     BlowbyVerdict,
+    ConvergenceReason,
     CooldownVerdict,
     CorrosionSeverity,
     DeadheadVerdict,
@@ -12566,6 +12569,49 @@ class PropertySweepResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class RegressionResult(_HasWarnings):
+    """Result of ``pvt.regression``."""
+
+    CALC_ID: ClassVar[str] = "pvt.regression"
+
+    #: One row per fitting parameter, in the caller's order.
+    fitted_parameters: tuple[FittedParameterRow, ...]
+
+    #: The simplified standard error, `sqrt(chi-square/dof) * (upper - lower) * 0.1`.
+    standard_errors: tuple[float, ...]
+
+    #: `1.96` times the standard error.
+    half_widths_95: tuple[float, ...]
+
+    #: One row per experiment that had observations, in the class's declaration order.
+    objectives: tuple[RegressionObjectiveRow, ...]
+
+    #: The weighted chi-square the optimizer minimised.
+    final_chi_square: float
+
+    #: The objectives' sum, in declaration order.
+    total_objective: float
+
+    #: The observation count less the parameter count, floored at one.
+    degrees_of_freedom: float
+
+    #: The class's residual variance, which is the final chi-square itself.
+    residual_variance: float
+
+    #: `sqrt(chi-square) * 100`.
+    average_absolute_deviation_percent: float
+
+    #: The steps the optimizer took.
+    iterations: float
+
+    #: Why the optimizer stopped.
+    convergence_reason: ConvergenceReason
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class SaturationTestResult(_HasWarnings):
     """Result of ``pvt.saturation_test``."""
 
@@ -12641,6 +12687,28 @@ class SwellingTestResult(_HasWarnings):
 
     #: one row per schedule entry.
     points: tuple[SwellingPoint, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TuneToSaturationResult(_HasWarnings):
+    """Result of ``pvt.tune_to_saturation``."""
+
+    CALC_ID: ClassVar[str] = "pvt.tune_to_saturation"
+
+    #: The plus fraction's molar mass after the last update, which is the one the last run used.
+    tuned_molar_mass: Q
+
+    #: The saturation pressure of the last run.
+    final_saturation_pressure: Q
+
+    #: The steps taken; zero is the class's early return.
+    iterations: float
+
+    #: Whether the loop exited on its own tolerance rather than the iteration cap.
+    converged: bool
 
     #: Caveats.
     warnings: tuple[Warning, ...]

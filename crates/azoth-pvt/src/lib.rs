@@ -31,6 +31,7 @@ pub mod separator_test;
 pub mod standard;
 pub mod swelling_test;
 pub mod transport;
+pub mod tune_to_saturation;
 pub mod volume;
 pub mod water_correlations;
 
@@ -56,18 +57,20 @@ pub use mmp::{MmpPoint, MmpResult, mmp};
 pub use oil_material_balance::{OilMaterialBalanceResult, oil_material_balance};
 pub use property_sweep::{PropertyPoint, PropertySweepResult, property_sweep};
 pub use regression::{
-    CceExperiment, ConvergenceReason, CvdExperiment, CvdProperty, DleExperiment, DleProperty,
-    ExperimentType, ExperimentWeights, LM_CHI_SQUARE_TOLERANCE, LM_GRADIENT_TOLERANCE,
-    LM_MAXIMUM_ITERATIONS, LM_MINIMUM_ITERATIONS, LmResult, Objectives, RegressionData,
-    RegressionFluid, RegressionParameter, RegressionParameterConfig, Sample, SampleKind,
-    ViscosityPhase, ViscosityPoint, build_fluid, chi_square, levenberg_marquardt, objectives,
-    sample_value,
+    CceExperiment, CceRow, ConvergenceReason, CvdExperiment, CvdProperty, CvdRow, DleExperiment,
+    DleProperty, DleRow, ExperimentType, ExperimentWeights, FittedParameterRow,
+    LM_CHI_SQUARE_TOLERANCE, LM_GRADIENT_TOLERANCE, LM_MAXIMUM_ITERATIONS, LM_MINIMUM_ITERATIONS,
+    LmResult, Objectives, RegressionData, RegressionFit, RegressionFluid, RegressionObjectiveRow,
+    RegressionParameter, RegressionParameterConfig, RegressionParameterRow, RegressionResult,
+    Sample, SampleKind, ViscosityPhase, ViscosityPoint, ViscosityRow, build_fluid, chi_square, fit,
+    levenberg_marquardt, objectives, regression, sample_value, sample_values,
 };
 pub use saturation_test::{SaturationTestResult, saturation_test};
 pub use separator_test::{
     SeparatorStageInput, SeparatorStageResult, SeparatorTestResult, separator_test,
 };
 pub use swelling_test::{SwellingPoint, SwellingTestResult, swelling_test};
+pub use tune_to_saturation::{TuneToSaturationResult, tune_to_saturation};
 pub use water_correlations::{
     WaterCorrelationsResult, WaterQuery, WaterResultRow, water_correlations,
 };

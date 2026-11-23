@@ -365,9 +365,11 @@
 //!   - specs/models/pvt/mmp.toml
 //!   - specs/models/pvt/oil_material_balance.toml
 //!   - specs/models/pvt/property_sweep.toml
+//!   - specs/models/pvt/regression.toml
 //!   - specs/models/pvt/saturation_test.toml
 //!   - specs/models/pvt/separator_test.toml
 //!   - specs/models/pvt/swelling_test.toml
+//!   - specs/models/pvt/tune_to_saturation.toml
 //!   - specs/models/pvt/water_correlations.toml
 //!   - specs/models/reactions/chemical_equilibrium.toml
 //!   - specs/calcs/reactions/equilibrium_constant.toml
@@ -6930,6 +6932,11 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "thermodynamic_temperature",
     ),
     ("pvt.property_sweep", "pressures", "pressure"),
+    ("pvt.regression", "cce_weight", "dimensionless"),
+    ("pvt.regression", "cvd_weight", "dimensionless"),
+    ("pvt.regression", "dle_weight", "dimensionless"),
+    ("pvt.regression", "viscosity_weight", "dimensionless"),
+    ("pvt.regression", "max_iterations", "dimensionless"),
     (
         "pvt.saturation_test",
         "temperature",
@@ -6984,6 +6991,14 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "cumulative_gas_injected",
         "dimensionless",
     ),
+    (
+        "pvt.tune_to_saturation",
+        "saturation_temperature",
+        "thermodynamic_temperature",
+    ),
+    ("pvt.tune_to_saturation", "saturation_pressure", "pressure"),
+    ("pvt.tune_to_saturation", "number_of_lumps", "dimensionless"),
+    ("pvt.tune_to_saturation", "max_iterations", "dimensionless"),
     (
         "reactions.chemical_equilibrium",
         "a_matrix",

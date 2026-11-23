@@ -19,6 +19,8 @@ from dataclasses import dataclass, field, replace
 from typing import Any
 
 from azoth.core.errors import InvalidInputError
+from azoth.core.result import FittedParameterRow, RegressionObjectiveRow, RegressionResult
+from azoth.core.result_base import ConvergenceReason
 
 from ._fluid import Fluid
 
@@ -384,35 +386,35 @@ def sample_value(
     if kind[0] == "cce":
         from .constant_mass_expansion import _constant_mass_expansion_of
 
-        experiment = data.cce[kind[1]]
-        result = _constant_mass_expansion_of(
-            fluid, experiment.temperature, [experiment.pressures[kind[2]]]
+        cce_experiment = data.cce[kind[1]]
+        cce_result = _constant_mass_expansion_of(
+            fluid, cce_experiment.temperature, [cce_experiment.pressures[kind[2]]]
         )
-        return float(result.points[0].relative_volume)
+        return float(cce_result.points[0].relative_volume)
     if kind[0] == "cvd":
         from .constant_volume_depletion import _constant_volume_depletion_of
 
-        experiment = data.cvd[kind[1]]
-        result = _constant_volume_depletion_of(
-            fluid, experiment.temperature, list(experiment.pressures)
+        cvd_experiment = data.cvd[kind[1]]
+        cvd_result = _constant_volume_depletion_of(
+            fluid, cvd_experiment.temperature, list(cvd_experiment.pressures)
         )
-        point = result.points[kind[2]]
+        cvd_point = cvd_result.points[kind[2]]
         if kind[3] == "liquid_dropout":
-            return float(point.liquid_volume_relative_to_vsat or 0.0)
-        return float(point.z_gas or 0.0)
+            return float(cvd_point.liquid_volume_relative_to_vsat or 0.0)
+        return float(cvd_point.z_gas or 0.0)
     if kind[0] == "dle":
         from .differential_liberation import _differential_liberation_of
 
-        experiment = data.dle[kind[1]]
-        result = _differential_liberation_of(
-            fluid, experiment.temperature, list(experiment.pressures)
+        dle_experiment = data.dle[kind[1]]
+        dle_result = _differential_liberation_of(
+            fluid, dle_experiment.temperature, list(dle_experiment.pressures)
         )
-        point = result.points[kind[2]]
+        dle_point = dle_result.points[kind[2]]
         if kind[3] == "rs":
-            return float(point.rs or 0.0)
+            return float(dle_point.rs or 0.0)
         if kind[3] == "bo":
-            return float(point.bo or 1.0)
-        return float(point.oil_density.to("kg/m**3").magnitude)
+            return float(dle_point.bo or 1.0)
+        return float(dle_point.oil_density.to("kg/m**3").magnitude)
     if kind[0] == "viscosity":
         return _viscosity_value(fluid, csp, data.viscosity[kind[1]])
     raise InvalidInputError("samples", f"unknown sample kind {kind!r}")
@@ -437,13 +439,15 @@ def objectives(fluid: Fluid, csp: tuple[float, ...], data: RegressionData) -> Ob
         from .constant_mass_expansion import _constant_mass_expansion_of
 
         temperature = data.cce[0].temperature
-        pressures = [pressure for experiment in data.cce for pressure in experiment.pressures]
-        result = _constant_mass_expansion_of(fluid, temperature, pressures)
+        pressures = [
+            pressure for cce_experiment in data.cce for pressure in cce_experiment.pressures
+        ]
+        cce_result = _constant_mass_expansion_of(fluid, temperature, pressures)
         total = 0.0
         index = 0
-        for experiment in data.cce:
-            for observed in experiment.relative_volumes:
-                calculated = float(result.points[index].relative_volume)
+        for cce_experiment in data.cce:
+            for observed in cce_experiment.relative_volumes:
+                calculated = float(cce_result.points[index].relative_volume)
                 total += ((calculated - observed) / observed) ** 2
                 index += 1
         if index:
@@ -453,18 +457,18 @@ def objectives(fluid: Fluid, csp: tuple[float, ...], data: RegressionData) -> Ob
 
         total = 0.0
         points = 0
-        for experiment in data.cvd:
-            result = _constant_volume_depletion_of(
-                fluid, experiment.temperature, list(experiment.pressures)
+        for cvd_experiment in data.cvd:
+            cvd_result = _constant_volume_depletion_of(
+                fluid, cvd_experiment.temperature, list(cvd_experiment.pressures)
             )
-            for row, point in enumerate(result.points):
-                dropout = float(point.liquid_volume_relative_to_vsat or 0.0)
-                observed = experiment.liquid_dropout[row]
+            for row, cvd_point in enumerate(cvd_result.points):
+                dropout = float(cvd_point.liquid_volume_relative_to_vsat or 0.0)
+                observed = cvd_experiment.liquid_dropout[row]
                 total += ((dropout - observed) / max(observed, 0.01)) ** 2
-                z = float(point.z_gas or 0.0)
-                observed_z = experiment.z_factor[row]
+                z = float(cvd_point.z_gas or 0.0)
+                observed_z = cvd_experiment.z_factor[row]
                 total += ((z - observed_z) / max(abs(observed_z), 1e-12)) ** 2
-            points += len(experiment.pressures)
+            points += len(cvd_experiment.pressures)
         if points:
             values = replace(values, cvd=total / (2 * points))
     if data.dle:
@@ -472,33 +476,33 @@ def objectives(fluid: Fluid, csp: tuple[float, ...], data: RegressionData) -> Ob
 
         total = 0.0
         points = 0
-        for experiment in data.dle:
-            result = _differential_liberation_of(
-                fluid, experiment.temperature, list(experiment.pressures)
+        for dle_experiment in data.dle:
+            dle_result = _differential_liberation_of(
+                fluid, dle_experiment.temperature, list(dle_experiment.pressures)
             )
-            for row, point in enumerate(result.points):
-                calculated = (
-                    float(point.rs or 0.0),
-                    float(point.bo or 1.0),
-                    float(point.oil_density.to("kg/m**3").magnitude),
+            for row, dle_point in enumerate(dle_result.points):
+                dle_calculated = (
+                    float(dle_point.rs or 0.0),
+                    float(dle_point.bo or 1.0),
+                    float(dle_point.oil_density.to("kg/m**3").magnitude),
                 )
-                observed = (
-                    experiment.rs[row],
-                    experiment.bo[row],
-                    experiment.oil_density[row],
+                dle_observed = (
+                    dle_experiment.rs[row],
+                    dle_experiment.bo[row],
+                    dle_experiment.oil_density[row],
                 )
-                for value, target in zip(calculated, observed, strict=True):
+                for value, target in zip(dle_calculated, dle_observed, strict=True):
                     if target > 0.0:
                         total += ((value - target) / target) ** 2
-            points += len(experiment.pressures)
+            points += len(dle_experiment.pressures)
         if points:
             values = replace(values, dle=total / (3 * points))
     if data.viscosity:
         total = 0.0
-        for point in data.viscosity:
-            calculated = _viscosity_value(fluid, csp, point)
-            if point.viscosity > 0.0:
-                total += ((calculated - point.viscosity) / point.viscosity) ** 2
+        for viscosity_point in data.viscosity:
+            calculated = _viscosity_value(fluid, csp, viscosity_point)
+            if viscosity_point.viscosity > 0.0:
+                total += ((calculated - viscosity_point.viscosity) / viscosity_point.viscosity) ** 2
         values = replace(values, viscosity=total / len(data.viscosity))
     return values
 
@@ -704,4 +708,289 @@ def levenberg_marquardt(
         reason=reason,
         chi_square=chi,
         gradient_norm=gradient_norm,
+    )
+
+
+@dataclass(frozen=True)
+class RegressionFit:
+    """The whole fit."""
+
+    values: tuple[float, ...]
+    csp: tuple[float, float, float, float]
+    objectives: Objectives
+    chi_square: float
+    iterations: int
+    reason: str
+    gradient_norm: float
+    standard_errors: tuple[float, ...]
+    half_widths_95: tuple[float, ...]
+    degrees_of_freedom: int
+    residual_variance: float
+
+
+def sample_values(
+    fluid: Fluid, csp: tuple[float, ...], rows: Sequence[Sample], data: RegressionData
+) -> list[float]:
+    """Every sample's model value, with each CVD and DLE experiment evaluated once."""
+    from .constant_volume_depletion import _constant_volume_depletion_of
+    from .differential_liberation import _differential_liberation_of
+
+    cvd_results = [
+        _constant_volume_depletion_of(fluid, experiment.temperature, list(experiment.pressures))
+        for experiment in data.cvd
+    ]
+    dle_results = [
+        _differential_liberation_of(fluid, experiment.temperature, list(experiment.pressures))
+        for experiment in data.dle
+    ]
+    values: list[float] = []
+    for sample in rows:
+        kind = sample.kind
+        if kind[0] == "cce":
+            values.append(sample_value(fluid, csp, sample, data))
+        elif kind[0] == "cvd":
+            cvd_point = cvd_results[kind[1]].points[kind[2]]
+            values.append(
+                float(cvd_point.liquid_volume_relative_to_vsat or 0.0)
+                if kind[3] == "liquid_dropout"
+                else float(cvd_point.z_gas or 0.0)
+            )
+        elif kind[0] == "dle":
+            dle_point = dle_results[kind[1]].points[kind[2]]
+            if kind[3] == "rs":
+                values.append(float(dle_point.rs or 0.0))
+            elif kind[3] == "bo":
+                values.append(float(dle_point.bo or 1.0))
+            else:
+                values.append(float(dle_point.oil_density.to("kg/m**3").magnitude))
+        else:
+            values.append(sample_value(fluid, csp, sample, data))
+    return values
+
+
+def fit(
+    components: Sequence[Mapping[str, Any]],
+    *,
+    eos: str = "srk",
+    kij: str = "database",
+    corrected: bool = True,
+    parameters: Sequence[Mapping[str, Any]],
+    data: RegressionData,
+    max_iterations: int = LM_MAXIMUM_ITERATIONS,
+) -> RegressionFit:
+    """Run ``PVTRegression``'s fit over a fluid the caller describes."""
+    if not parameters:
+        raise InvalidInputError("parameters", "a regression needs at least one parameter")
+    for config in parameters:
+        lower = float(config["lower"])
+        upper = float(config["upper"])
+        guess = float(config["initial"])
+        if not (math.isfinite(lower) and math.isfinite(upper) and math.isfinite(guess)):
+            raise InvalidInputError("parameters", "bounds and guesses must be finite")
+        if lower > upper:
+            raise InvalidInputError("parameters", "a lower bound is above its upper")
+    rows = samples(data)
+    if not rows:
+        raise InvalidInputError("observations", "a regression needs at least one observation")
+    observed = [sample.observed for sample in rows]
+    sigma = [sample.sigma for sample in rows]
+    bounds = [(float(config["lower"]), float(config["upper"])) for config in parameters]
+    initial = [float(config["initial"]) for config in parameters]
+
+    def evaluate(values: Sequence[float]) -> list[float]:
+        fluid, csp = build_fluid(
+            components, eos=eos, kij=kij, corrected=corrected, parameters=parameters, values=values
+        )
+        return sample_values(fluid, csp, rows, data)
+
+    result = levenberg_marquardt(bounds, initial, max_iterations, observed, sigma, evaluate)
+    fluid, csp = build_fluid(
+        components,
+        eos=eos,
+        kij=kij,
+        corrected=corrected,
+        parameters=parameters,
+        values=result.parameters,
+    )
+    ledger = objectives(fluid, csp, data)
+    observations = (
+        sum(len(experiment.pressures) for experiment in data.cce)
+        + sum(2 * len(experiment.pressures) for experiment in data.cvd)
+        + sum(3 * len(experiment.pressures) for experiment in data.dle)
+        + len(data.viscosity)
+    )
+    degrees_of_freedom = max(1, observations - len(parameters))
+    residual_variance = result.chi_square
+    standard_errors = tuple(
+        math.sqrt(residual_variance / degrees_of_freedom)
+        * (float(config["upper"]) - float(config["lower"]))
+        * 0.1
+        for config in parameters
+    )
+    return RegressionFit(
+        values=result.parameters,
+        csp=csp,
+        objectives=ledger,
+        chi_square=result.chi_square,
+        iterations=result.iterations,
+        reason=result.reason,
+        gradient_norm=result.gradient_norm,
+        standard_errors=standard_errors,
+        half_widths_95=tuple(1.96 * error for error in standard_errors),
+        degrees_of_freedom=degrees_of_freedom,
+        residual_variance=residual_variance,
+    )
+
+
+def _experiment_index(value: Any, label: str) -> int:
+    number = float(value)
+    if math.isfinite(number) and number >= 0.0 and number == int(number) and number <= 1e9:
+        return int(number)
+    raise InvalidInputError(label, f"an experiment index is a whole number from zero; got {number}")
+
+
+def _groups(rows: Sequence[Mapping[str, Any]], label: str) -> list[list[int]]:
+    """Row indices grouped by experiment, in first-appearance order, refusing a gap."""
+    out: list[list[int]] = []
+    closed: set[int] = set()
+    for position, row in enumerate(rows):
+        experiment = _experiment_index(row["experiment"], label)
+        if out and _experiment_index(rows[out[-1][0]]["experiment"], label) == experiment:
+            out[-1].append(position)
+        else:
+            if experiment in closed:
+                raise InvalidInputError(label, f"experiment {experiment} is not contiguous")
+            closed.add(experiment)
+            out.append([position])
+    return out
+
+
+def _same_temperature(
+    rows: Sequence[Mapping[str, Any]], members: Sequence[int], label: str
+) -> float:
+    first = float(rows[members[0]]["temperature"])
+    for position in members:
+        if abs(float(rows[position]["temperature"]) - first) > 1e-9:
+            raise InvalidInputError(label, "one experiment carries more than one temperature")
+    return first
+
+
+def regression(
+    components: Sequence[Mapping[str, Any]],
+    parameters: Sequence[Mapping[str, Any]],
+    *,
+    cce: Sequence[Mapping[str, Any]] | None = None,
+    cvd: Sequence[Mapping[str, Any]] | None = None,
+    dle: Sequence[Mapping[str, Any]] | None = None,
+    viscosity: Sequence[Mapping[str, Any]] | None = None,
+    cce_weight: float | None = None,
+    cvd_weight: float | None = None,
+    dle_weight: float | None = None,
+    viscosity_weight: float | None = None,
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+    max_iterations: int | None = None,
+) -> RegressionResult:
+    """``PVTRegression`` as the id exposes it: rows in, the fit and its two ledgers out."""
+    from azoth import _models_gen
+    from azoth.core.units import input_records_to_si
+
+    spec = _models_gen.model("pvt.regression")
+    component_rows: list[dict[str, Any]] = input_records_to_si(spec, "components", list(components))
+    cce_rows: list[dict[str, Any]] = input_records_to_si(spec, "cce", list(cce or ()))
+    cvd_rows: list[dict[str, Any]] = input_records_to_si(spec, "cvd", list(cvd or ()))
+    dle_rows: list[dict[str, Any]] = input_records_to_si(spec, "dle", list(dle or ()))
+    viscosity_rows: list[dict[str, Any]] = input_records_to_si(
+        spec, "viscosity", list(viscosity or ())
+    )
+    parameter_rows: list[dict[str, Any]] = input_records_to_si(spec, "parameters", list(parameters))
+    data = RegressionData(
+        cce=tuple(
+            CceExperiment(
+                temperature=_same_temperature(cce_rows, members, "cce"),
+                pressures=tuple(float(cce_rows[at]["pressure"]) for at in members),
+                relative_volumes=tuple(float(cce_rows[at]["relative_volume"]) for at in members),
+            )
+            for members in _groups(cce_rows, "cce")
+        ),
+        cvd=tuple(
+            CvdExperiment(
+                temperature=_same_temperature(cvd_rows, members, "cvd"),
+                pressures=tuple(float(cvd_rows[at]["pressure"]) for at in members),
+                liquid_dropout=tuple(float(cvd_rows[at]["liquid_dropout"]) for at in members),
+                z_factor=tuple(float(cvd_rows[at]["z_factor"]) for at in members),
+            )
+            for members in _groups(cvd_rows, "cvd")
+        ),
+        dle=tuple(
+            DleExperiment(
+                temperature=_same_temperature(dle_rows, members, "dle"),
+                pressures=tuple(float(dle_rows[at]["pressure"]) for at in members),
+                rs=tuple(float(dle_rows[at]["rs"]) for at in members),
+                bo=tuple(float(dle_rows[at]["bo"]) for at in members),
+                oil_density=tuple(float(dle_rows[at]["oil_density"]) for at in members),
+            )
+            for members in _groups(dle_rows, "dle")
+        ),
+        viscosity=tuple(
+            ViscosityPoint(
+                temperature=float(row["temperature"]),
+                pressure=float(row["pressure"]),
+                viscosity=float(row["viscosity"]),
+                phase=PHASES.get(str(row["phase"]), str(row["phase"])),
+            )
+            for row in viscosity_rows
+        ),
+        weights=ExperimentWeights(
+            cce=1.0 if cce_weight is None else float(cce_weight),
+            cvd=1.0 if cvd_weight is None else float(cvd_weight),
+            dle=1.0 if dle_weight is None else float(dle_weight),
+            viscosity=0.5 if viscosity_weight is None else float(viscosity_weight),
+        ),
+    )
+    rule = mixing_rule or "classic"
+    if rule not in ("classic", "zero"):
+        raise InvalidInputError("mixing_rule", f"{rule!r} is not one of classic and zero")
+    result = fit(
+        component_rows,
+        eos=eos or "srk",
+        kij="database" if rule == "classic" else "zero",
+        corrected=True if volume_correction is None else volume_correction,
+        parameters=parameter_rows,
+        data=data,
+        max_iterations=LM_MAXIMUM_ITERATIONS if max_iterations is None else int(max_iterations),
+    )
+    objectives_rows = []
+    for experiment, value in (
+        ("cce", result.objectives.cce),
+        ("cvd", result.objectives.cvd),
+        ("dle", result.objectives.dle),
+        ("viscosity", result.objectives.viscosity),
+    ):
+        if value is not None:
+            objectives_rows.append(
+                RegressionObjectiveRow(experiment=experiment, value=float(value))
+            )
+    return RegressionResult(
+        fitted_parameters=tuple(
+            FittedParameterRow(
+                parameter=str(config["parameter"]),
+                value=float(result.values[index]),
+                lower=float(config["lower"]),
+                upper=float(config["upper"]),
+            )
+            for index, config in enumerate(parameter_rows)
+        ),
+        standard_errors=tuple(float(value) for value in result.standard_errors),
+        half_widths_95=tuple(float(value) for value in result.half_widths_95),
+        objectives=tuple(objectives_rows),
+        final_chi_square=float(result.chi_square),
+        total_objective=float(result.objectives.total()),
+        degrees_of_freedom=float(result.degrees_of_freedom),
+        residual_variance=float(result.residual_variance),
+        average_absolute_deviation_percent=math.sqrt(result.chi_square) * 100.0,
+        iterations=float(result.iterations),
+        convergence_reason=ConvergenceReason(result.reason),
+        warnings=(),
     )

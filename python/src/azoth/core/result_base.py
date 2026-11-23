@@ -511,6 +511,20 @@ class SettleOutVerdict(StrEnum):
     EXCEEDS_RATING = "exceeds_rating"
 
 
+class ConvergenceReason(StrEnum):
+    """Why a fitting optimizer stopped.
+
+    `CHI_SQUARE_TOLERANCE` and `GRADIENT_TOLERANCE` are convergence; `MAX_ITERATIONS_REACHED`
+    and `SINGULAR_MATRIX` are not, and a caller that reads only the chi-square will miss the
+    difference.
+    """
+
+    CHI_SQUARE_TOLERANCE = "chi_square_tolerance"
+    GRADIENT_TOLERANCE = "gradient_tolerance"
+    MAX_ITERATIONS_REACHED = "max_iterations_reached"
+    SINGULAR_MATRIX = "singular_matrix"
+
+
 class RunawayVerdict(StrEnum):
     """The runaway-reaction screening band."""
 

@@ -23,7 +23,9 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`pvt.mmp`](./mmp.md) | `direct composition` | NeqSim pvtsimulation/simulation/MMPCalculator.java |
 | [`pvt.oil_material_balance`](./oil_material_balance.md) | `direct composition` | NeqSim reservoirproperties/materialbalance/OilMaterialBalance.java |
 | [`pvt.property_sweep`](./property_sweep.md) | `direct composition` | NeqSim pvtsimulation/simulation/DensitySim.java and ViscositySim.java |
+| [`pvt.regression`](./regression.md) | `levenberg_marquardt` | NeqSim pvtsimulation/regression/PVTRegression.java |
 | [`pvt.saturation_test`](./saturation_test.md) | `direct composition` | NeqSim pvtsimulation/simulation/SaturationPressure.java and SaturationTemperature.java |
 | [`pvt.separator_test`](./separator_test.md) | `direct composition` | NeqSim pvtsimulation/simulation/{GOR,SeparatorTest,MultiStageSeparatorTest}.java |
 | [`pvt.swelling_test`](./swelling_test.md) | `direct composition` | NeqSim pvtsimulation/simulation/SwellingTest.java |
+| [`pvt.tune_to_saturation`](./tune_to_saturation.md) | `plus_molar_mass_search` | NeqSim pvtsimulation/modeltuning/TuneToSaturation.java |
 | [`pvt.water_correlations`](./water_correlations.md) | `water_correlation_dispatch` | NeqSim pvtsimulation/util/WaterPropertyCorrelations.java and SolutionGasWaterRatio.java |

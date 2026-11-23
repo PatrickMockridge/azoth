@@ -392,6 +392,14 @@ NO_INTERIOR: dict[str, str] = {
         "the answer is the boundary itself; the scan's trial flashes are the search, not a "
         "state the capture records"
     ),
+    "pvt.regression": (
+        "the answer is the fitted vector and its two ledgers; the optimizer's sample values "
+        "are its steps, not a state a capture names"
+    ),
+    "pvt.tune_to_saturation": (
+        "the answer is the tuned molar mass and the last saturation pressure; the iteration "
+        "path is the loop's own and no intermediate state is published"
+    ),
 }
 
 #: Capture blocks that are evidence rather than a case - a refusal, a fallback or a fluid the

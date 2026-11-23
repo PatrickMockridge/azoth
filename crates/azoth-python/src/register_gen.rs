@@ -383,9 +383,11 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyMmpResult>()?;
     m.add_class::<crate::transport_gen::PyOilMaterialBalanceResult>()?;
     m.add_class::<crate::transport_gen::PyPropertySweepResult>()?;
+    m.add_class::<crate::transport_gen::PyRegressionResult>()?;
     m.add_class::<crate::transport_gen::PySaturationTestResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorTestResult>()?;
     m.add_class::<crate::transport_gen::PySwellingTestResult>()?;
+    m.add_class::<crate::transport_gen::PyTuneToSaturationResult>()?;
     m.add_class::<crate::transport_gen::PyWaterCorrelationsResult>()?;
     m.add_class::<crate::transport_gen::PyChemicalEquilibriumResult>()?;
     m.add_class::<crate::transport_gen::PyEquilibriumConstantResult>()?;
@@ -441,6 +443,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyEsdContribution>()?;
     m.add_class::<crate::record_outputs_gen::PyEventTreeOutcome>()?;
     m.add_class::<crate::record_outputs_gen::PyFiniteRateReleaseStation>()?;
+    m.add_class::<crate::record_outputs_gen::PyFittedParameterRow>()?;
     m.add_class::<crate::record_outputs_gen::PyFlowlineScaleSegment>()?;
     m.add_class::<crate::record_outputs_gen::PyFmeaRankedEntry>()?;
     m.add_class::<crate::record_outputs_gen::PyGasResultRow>()?;
@@ -489,6 +492,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyRanzMarshallReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyRealGasFannoReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyRegisterFinding>()?;
+    m.add_class::<crate::record_outputs_gen::PyRegressionObjectiveRow>()?;
     m.add_class::<crate::record_outputs_gen::PyReliefDisposalRow>()?;
     m.add_class::<crate::record_outputs_gen::PyRemediationOptionRow>()?;
     m.add_class::<crate::record_outputs_gen::PyReviewAssessment>()?;
@@ -1400,9 +1404,14 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::property_sweep, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::pvt::regression, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::saturation_test, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::separator_test, m)?)?;
     m.add_function(wrap_pyfunction!(crate::pvt::swelling_test, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::tune_to_saturation,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::water_correlations,
         m

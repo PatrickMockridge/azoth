@@ -674,21 +674,24 @@ a claim nothing holds.
   currency dimension is added; the JSON adapters, the reports and the serialization remain
   session surface. Held to four captures and the class's own tests.
 
-- **The PVT simulation package's core is ported, as fourteen ids.** The six correlation and
+- **The PVT simulation package's core is ported, as sixteen ids.** The six correlation and
   reservoir ids are `pvt.black_oil_correlations` (the `BlackOilCorrelations`/
   `SaturationPressureCorrelation` table with the two classes' conversion literals kept apart
   and the `_p_sat` clamp), `pvt.gas_correlations` (the Z-factor, pseudo-critical and
   pseudo-pressure set with both Hall-Yarborough forms), `pvt.water_correlations` (the water
   and brine table with its three salinity conventions), `pvt.decline_curve` (the Arps and
   Duong arithmetic with its two fits), and the p/Z, Cole, Havlena-Odeh and drive-index
-  material balances. The eight laboratory ids are `pvt.saturation_test` (both saturation
+  material balances. The ten laboratory ids are `pvt.saturation_test` (both saturation
   searches and their grid-top fallbacks), `pvt.constant_mass_expansion`,
   `pvt.differential_liberation` (the gas-removal ledger and the stock-tank flash),
   `pvt.constant_volume_depletion` (the restoration loop and its material-balance residual),
   `pvt.separator_test` (the continuous, staged and train modes with the first-stage
   optimisation), `pvt.swelling_test` (the pinned upstream case), `pvt.mmp` (the slim tube,
-  the key tie line and the delegated rising bubble) and `pvt.property_sweep` (the density and
-  viscosity sweeps). **The classes' own contradictions travel with the arithmetic**: the
+  the key tie line and the delegated rising bubble), `pvt.property_sweep` (the density and
+  viscosity sweeps), `pvt.regression` (`PVTRegression`'s twelve parameters, the four
+  experiment targets, the two ledgers and the simplified uncertainty) and
+  `pvt.tune_to_saturation` (`TuneToSaturation`'s sign-flipping plus-molar-mass search over
+  the saturation scan). **The classes' own contradictions travel with the arithmetic**: the
   `_p_sat` Vasquez-Beggs exponent's opposite sign, the BlackOil Glaso's specific-gravity
   divisor, the gas-FVF standard state's 288.71 K, the CCE's midpoint saturation state and
   `1e5` Bg, the separator train's one-stage-lagged stage density, and the MMP's Celsius
@@ -696,7 +699,9 @@ a claim nothing holds.
   (`DepletionSnapshot`, `CvdMaterialBalance`, `PvtGasDensityConsistency`, `PvtSeparatorPath`,
   `PVTFluidStudy`, `CalibratedPvtModel`, `CompositionalReservoirHistory`,
   `DepletionPvtHistoryGenerator`, `MaterialBalancePvtHistory`, `ReservoirHistoryEnsemble`),
-  the regression and tuning (`PVTRegression`, `TuneToSaturation`, `util/parameterfitting/`),
+  the five regression parameters this port does not carry (the plus-molar-mass multiplier,
+  the gamma shape and minimum molecular weight, and the LBC and Pedersen viscosity
+  parameters), the regression's separator experiment, `pvtsimulation/util/parameterfitting/`,
   the reservoir properties (`VanEverdingenHurstAquifer`, `FetkovichAquifer`,
   `GeneralizedMaterialBalance`, `RadialInfiniteInfluence`, `RelativePermeabilityGenerator`),
   `BlackOilTableValidator.validate`, `SlimTubeSim`, the reports (`PVTReportGenerator`,
@@ -705,8 +710,9 @@ a claim nothing holds.
   `getWaxModel().addTBPWax()`, whose fluid cannot cross as characterization rows, and the
   class's model refuses a databank n-alkane wax former, so no expressible wax state exists to
   hold a parity to), the **upstream TBP parity** (`lab_upstream_tbp_parity`: the saturation,
-  CCE, DLE, CVD and separator classes' own tests use TBP fluids the id cannot take), and the
-  CVD's `cvd_kvalue_qc_method`.
+  DLE, CVD and separator classes' own tests use TBP fluids those ids cannot take; the
+  regression's CCE case is the first PVT laboratory case on a TBP fluid), and the CVD's
+  `cvd_kvalue_qc_method`.
 
 - **The mechanical-design tree** — `process/mechanicaldesign/` and the `*MechanicalDesign`
   class beside each equipment class — is where most of them are. **The entries that carry a

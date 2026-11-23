@@ -12,7 +12,7 @@
 
 use azoth_characterization::KijSource;
 use azoth_characterization::component_row::FluidComponent;
-use azoth_core::{AzothError, Result};
+use azoth_core::{AzothError, Result, Warning};
 use azoth_eos::Cubic;
 
 use crate::fluid::Fluid;
@@ -738,6 +738,107 @@ pub fn sample_value(
     }
 }
 
+/// Every sample's model value, with each CVD and DLE experiment evaluated once.
+///
+/// The class's observation clones share one full-experiment result per parameter vector.
+/// This is the same: a schedule is solved once, not once per dependent row, which is the
+/// difference between a six-second fit and an eighty-second one.
+///
+/// # Errors
+/// Propagates the kernels' refusals.
+pub fn sample_values(
+    fluid: &Fluid,
+    csp: [f64; 4],
+    samples: &[Sample],
+    data: &RegressionData,
+) -> Result<Vec<f64>> {
+    let cvd_results = data
+        .cvd
+        .iter()
+        .map(|experiment| {
+            crate::constant_volume_depletion_of(
+                fluid,
+                azoth_core::units::kelvins(experiment.temperature),
+                &experiment.pressures,
+            )
+        })
+        .collect::<Result<Vec<_>>>()?;
+    let dle_results = data
+        .dle
+        .iter()
+        .map(|experiment| {
+            crate::differential_liberation_of(
+                fluid,
+                azoth_core::units::kelvins(experiment.temperature),
+                &experiment.pressures,
+            )
+        })
+        .collect::<Result<Vec<_>>>()?;
+    let mut values = Vec::with_capacity(samples.len());
+    for sample in samples {
+        values.push(match sample.kind {
+            SampleKind::Cce { experiment, point } => {
+                let data = &data.cce[experiment];
+                let result = crate::constant_mass_expansion_of(
+                    fluid,
+                    azoth_core::units::kelvins(data.temperature),
+                    &[data.pressures[point]],
+                )?;
+                result.points[0].relative_volume
+            }
+            SampleKind::Cvd {
+                experiment,
+                row,
+                property,
+            } => {
+                let point = &cvd_results[experiment].points[row];
+                match property {
+                    CvdProperty::LiquidDropout => {
+                        point.liquid_volume_relative_to_vsat.unwrap_or(0.0)
+                    }
+                    CvdProperty::GasZ => point.z_gas.unwrap_or(0.0),
+                }
+            }
+            SampleKind::Dle {
+                experiment,
+                row,
+                property,
+            } => {
+                let point = &dle_results[experiment].points[row];
+                match property {
+                    DleProperty::Rs => point.rs.unwrap_or(0.0),
+                    DleProperty::Bo => point.bo.unwrap_or(1.0),
+                    DleProperty::OilDensity => point.oil_density,
+                }
+            }
+            SampleKind::Viscosity { point } => {
+                let point = &data.viscosity[point];
+                let flash = fluid.flash(
+                    point.temperature,
+                    point.pressure,
+                    crate::FlashMode::TwoPhase,
+                )?;
+                let phase = match point.phase {
+                    ViscosityPhase::Gas => flash.gas(),
+                    ViscosityPhase::Oil => flash.oil(),
+                    ViscosityPhase::Aqueous => flash.aqueous(),
+                };
+                match phase {
+                    None => 0.0,
+                    Some(phase) => crate::transport::phase_viscosity_with_csp(
+                        &fluid.mixture,
+                        point.temperature,
+                        point.pressure,
+                        &phase.x,
+                        csp,
+                    )?,
+                }
+            }
+        });
+    }
+    Ok(values)
+}
+
 /// The weighted chi-square the optimizer minimises.
 ///
 /// # Errors
@@ -1193,5 +1294,476 @@ where
         reason,
         chi_square: chi,
         gradient_norm,
+    })
+}
+
+/// The whole fit: the optimizer, the final fluid, both ledgers and the class's simplified
+/// uncertainty.
+#[derive(Debug, Clone, PartialEq)]
+pub struct RegressionFit {
+    /// The fitted values, in the parameter list's order.
+    pub values: Vec<f64>,
+    /// The fluid at the fitted values.
+    pub fluid: Fluid,
+    /// Its four PFCT correction factors.
+    pub csp: [f64; 4],
+    /// The final objectives.
+    pub objectives: Objectives,
+    /// The final weighted chi-square.
+    pub chi_square: f64,
+    /// The steps taken.
+    pub iterations: usize,
+    /// Why the optimizer stopped.
+    pub reason: ConvergenceReason,
+    /// The final weighted gradient norm.
+    pub gradient_norm: f64,
+    /// Each parameter's simplified standard error.
+    pub standard_errors: Vec<f64>,
+    /// Each parameter's 95 % half-width.
+    pub half_widths_95: Vec<f64>,
+    /// The observation count less the parameter count, floored at one.
+    pub degrees_of_freedom: usize,
+    /// The final chi-square, which the class calls the residual variance.
+    pub residual_variance: f64,
+}
+
+/// Run `PVTRegression`'s fit over a fluid the caller describes.
+///
+/// # Errors
+/// * [`AzothError::InvalidInput`] for no parameters, no observations, a non-finite bound or
+///   a lower bound above its upper.
+/// * Propagates the kernels' and the assembler's refusals.
+pub fn fit(
+    rows: &[FluidComponent],
+    cubic: Cubic,
+    kij: KijSource,
+    corrected: bool,
+    parameters: &[RegressionParameterConfig],
+    data: &RegressionData,
+    max_iterations: usize,
+) -> Result<RegressionFit> {
+    if parameters.is_empty() {
+        return Err(AzothError::invalid_input(
+            "parameters",
+            "a regression needs at least one parameter",
+        ));
+    }
+    for config in parameters {
+        if !(config.lower.is_finite() && config.upper.is_finite() && config.initial.is_finite())
+            || config.lower > config.upper
+        {
+            return Err(AzothError::invalid_input(
+                "parameters",
+                format!(
+                    "{} needs finite bounds with lower <= upper and a finite guess",
+                    config.parameter.name()
+                ),
+            ));
+        }
+    }
+    let samples = data.samples()?;
+    if samples.is_empty() {
+        return Err(AzothError::invalid_input(
+            "observations",
+            "a regression needs at least one observation",
+        ));
+    }
+    let observed: Vec<f64> = samples.iter().map(|sample| sample.observed).collect();
+    let sigma: Vec<f64> = samples.iter().map(|sample| sample.sigma).collect();
+    let bounds: Vec<(f64, f64)> = parameters
+        .iter()
+        .map(|config| (config.lower, config.upper))
+        .collect();
+    let initial: Vec<f64> = parameters.iter().map(|config| config.initial).collect();
+    let result = levenberg_marquardt(
+        &bounds,
+        &initial,
+        max_iterations,
+        &observed,
+        &sigma,
+        |values| {
+            let built = build_fluid(rows, cubic, kij, corrected, parameters, values)?;
+            sample_values(&built.fluid, built.csp, &samples, data)
+        },
+    )?;
+    let built = build_fluid(rows, cubic, kij, corrected, parameters, &result.parameters)?;
+    let objectives = objectives(&built.fluid, built.csp, data)?;
+    let observations: usize = data
+        .cce
+        .iter()
+        .map(|experiment| experiment.pressures.len())
+        .sum::<usize>()
+        + data
+            .cvd
+            .iter()
+            .map(|experiment| 2 * experiment.pressures.len())
+            .sum::<usize>()
+        + data
+            .dle
+            .iter()
+            .map(|experiment| 3 * experiment.pressures.len())
+            .sum::<usize>()
+        + data.viscosity.len();
+    let degrees_of_freedom = observations.saturating_sub(parameters.len()).max(1);
+    let residual_variance = result.chi_square;
+    let mut standard_errors = Vec::with_capacity(parameters.len());
+    let mut half_widths_95 = Vec::with_capacity(parameters.len());
+    for config in parameters {
+        let error = (residual_variance / degrees_of_freedom as f64).sqrt()
+            * (config.upper - config.lower)
+            * 0.1;
+        standard_errors.push(error);
+        half_widths_95.push(1.96 * error);
+    }
+    Ok(RegressionFit {
+        values: result.parameters,
+        fluid: built.fluid,
+        csp: built.csp,
+        objectives,
+        chi_square: result.chi_square,
+        iterations: result.iterations,
+        reason: result.reason,
+        gradient_norm: result.gradient_norm,
+        standard_errors,
+        half_widths_95,
+        degrees_of_freedom,
+        residual_variance,
+    })
+}
+
+/// One parameter row as the spec states it.
+#[derive(Debug, Clone, PartialEq)]
+pub struct RegressionParameterRow {
+    /// The spec's enum spelling.
+    pub parameter: String,
+    /// The initial guess.
+    pub initial: f64,
+    /// The lower bound.
+    pub lower: f64,
+    /// The upper bound.
+    pub upper: f64,
+}
+
+/// One CCE observation row.
+#[derive(Debug, Clone, PartialEq)]
+pub struct CceRow {
+    /// Which experiment the row belongs to.
+    pub experiment: f64,
+    /// The experiment's temperature, in K.
+    pub temperature: f64,
+    /// The point's pressure, in Pa.
+    pub pressure: f64,
+    /// The measured relative volume.
+    pub relative_volume: f64,
+}
+
+/// One CVD observation row.
+#[derive(Debug, Clone, PartialEq)]
+pub struct CvdRow {
+    /// Which experiment the row belongs to.
+    pub experiment: f64,
+    /// The experiment's temperature, in K.
+    pub temperature: f64,
+    /// The point's pressure, in Pa.
+    pub pressure: f64,
+    /// The measured liquid volume over the saturation volume.
+    pub liquid_dropout: f64,
+    /// The measured gas compressibility.
+    pub z_factor: f64,
+}
+
+/// One DLE observation row.
+#[derive(Debug, Clone, PartialEq)]
+pub struct DleRow {
+    /// Which experiment the row belongs to.
+    pub experiment: f64,
+    /// The experiment's temperature, in K.
+    pub temperature: f64,
+    /// The point's pressure, in Pa.
+    pub pressure: f64,
+    /// The measured solution gas-oil ratio.
+    pub rs: f64,
+    /// The measured formation volume factor.
+    pub bo: f64,
+    /// The measured oil density, in kg/m3.
+    pub oil_density: f64,
+}
+
+/// One viscosity observation row.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ViscosityRow {
+    /// The state's temperature, in K.
+    pub temperature: f64,
+    /// The state's pressure, in Pa.
+    pub pressure: f64,
+    /// The measured dynamic viscosity, in Pa*s.
+    pub viscosity: f64,
+    /// The spec's phase enum spelling.
+    pub phase: String,
+}
+
+/// One fitted parameter as the id publishes it.
+#[derive(Debug, Clone, PartialEq)]
+pub struct FittedParameterRow {
+    /// The spec's enum spelling.
+    pub parameter: String,
+    /// The fitted value.
+    pub value: f64,
+    /// The lower bound.
+    pub lower: f64,
+    /// The upper bound.
+    pub upper: f64,
+}
+
+/// One objective as the id publishes it.
+#[derive(Debug, Clone, PartialEq)]
+pub struct RegressionObjectiveRow {
+    /// The spec's enum spelling.
+    pub experiment: String,
+    /// The unweighted objective.
+    pub value: f64,
+}
+
+/// The id's answer.
+#[derive(Debug, Clone, PartialEq)]
+pub struct RegressionResult {
+    /// One row per fitted parameter, in the caller's order.
+    pub fitted_parameters: Vec<FittedParameterRow>,
+    /// Each parameter's simplified standard error, aligned with `fitted_parameters`.
+    pub standard_errors: Vec<f64>,
+    /// Each parameter's 95 % half-width, aligned with `fitted_parameters`.
+    pub half_widths_95: Vec<f64>,
+    /// One row per experiment that had observations, in `ExperimentType` declaration order.
+    pub objectives: Vec<RegressionObjectiveRow>,
+    /// The final weighted chi-square.
+    pub final_chi_square: f64,
+    /// The objectives' sum.
+    pub total_objective: f64,
+    /// The observation count less the parameter count, floored at one.
+    pub degrees_of_freedom: f64,
+    /// The class's residual variance, which is the chi-square itself.
+    pub residual_variance: f64,
+    /// `sqrt(chi-square) * 100`.
+    pub average_absolute_deviation_percent: f64,
+    /// The steps taken.
+    pub iterations: f64,
+    /// Why the optimizer stopped.
+    pub convergence_reason: ConvergenceReason,
+    /// Caveats.
+    pub warnings: Vec<Warning>,
+}
+
+fn experiment_index(value: f64, label: &str) -> Result<usize> {
+    if value.is_finite() && value >= 0.0 && value.fract() == 0.0 && value <= 1.0e9 {
+        return Ok(value as usize);
+    }
+    Err(AzothError::invalid_input(
+        label,
+        format!("an experiment index is a whole number from zero; got {value}"),
+    ))
+}
+
+/// Row indices grouped by experiment, in first-appearance order, refusing a gap.
+fn groups<T>(
+    rows: &[T],
+    index: impl Fn(&T) -> f64,
+    label: &str,
+) -> Result<Vec<(usize, Vec<usize>)>> {
+    let mut out: Vec<(usize, Vec<usize>)> = Vec::new();
+    let mut closed = std::collections::HashSet::new();
+    for (position, row) in rows.iter().enumerate() {
+        let experiment = experiment_index(index(row), label)?;
+        match out.last_mut() {
+            Some((held, members)) if *held == experiment => members.push(position),
+            _ => {
+                if !closed.insert(experiment) {
+                    return Err(AzothError::invalid_input(
+                        label,
+                        format!("experiment {experiment} is not contiguous"),
+                    ));
+                }
+                out.push((experiment, vec![position]));
+            }
+        }
+    }
+    Ok(out)
+}
+
+fn same_temperature(values: &[f64], label: &str) -> Result<f64> {
+    let first = values.first().copied().unwrap_or(0.0);
+    if values.iter().any(|value| (value - first).abs() > 1e-9) {
+        return Err(AzothError::invalid_input(
+            label,
+            "one experiment carries more than one temperature",
+        ));
+    }
+    Ok(first)
+}
+
+/// `PVTRegression` as the id exposes it: rows in, the fit and its two ledgers out.
+///
+/// # Errors
+/// * [`AzothError::InvalidInput`] for an unknown parameter or phase name, a malformed or
+///   non-contiguous experiment index, or an experiment with no rows.
+/// * Propagates [`fit`]'s refusals.
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn regression(
+    components: &[FluidComponent],
+    parameters: &[RegressionParameterRow],
+    cce: Option<&[CceRow]>,
+    cvd: Option<&[CvdRow]>,
+    dle: Option<&[DleRow]>,
+    viscosity: Option<&[ViscosityRow]>,
+    cce_weight: Option<f64>,
+    cvd_weight: Option<f64>,
+    dle_weight: Option<f64>,
+    viscosity_weight: Option<f64>,
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
+    volume_correction: Option<bool>,
+    max_iterations: Option<u32>,
+) -> Result<RegressionResult> {
+    let mut configs = Vec::with_capacity(parameters.len());
+    for row in parameters {
+        let parameter = RegressionParameter::from_name(&row.parameter).ok_or_else(|| {
+            AzothError::invalid_input(
+                "parameters",
+                format!(
+                    "{:?} is not one of the twelve carried parameters",
+                    row.parameter
+                ),
+            )
+        })?;
+        configs.push(RegressionParameterConfig {
+            parameter,
+            initial: row.initial,
+            lower: row.lower,
+            upper: row.upper,
+        });
+    }
+    let mut data = RegressionData {
+        cce: Vec::new(),
+        cvd: Vec::new(),
+        dle: Vec::new(),
+        viscosity: Vec::new(),
+        weights: ExperimentWeights {
+            cce: cce_weight.unwrap_or(1.0),
+            cvd: cvd_weight.unwrap_or(1.0),
+            dle: dle_weight.unwrap_or(1.0),
+            viscosity: viscosity_weight.unwrap_or(0.5),
+        },
+    };
+    if let Some(rows) = cce {
+        for (_, members) in groups(rows, |row| row.experiment, "cce")? {
+            let temperature = same_temperature(
+                &members
+                    .iter()
+                    .map(|&at| rows[at].temperature)
+                    .collect::<Vec<_>>(),
+                "cce",
+            )?;
+            data.cce.push(CceExperiment {
+                temperature,
+                pressures: members.iter().map(|&at| rows[at].pressure).collect(),
+                relative_volumes: members.iter().map(|&at| rows[at].relative_volume).collect(),
+            });
+        }
+    }
+    if let Some(rows) = cvd {
+        for (_, members) in groups(rows, |row| row.experiment, "cvd")? {
+            let temperature = same_temperature(
+                &members
+                    .iter()
+                    .map(|&at| rows[at].temperature)
+                    .collect::<Vec<_>>(),
+                "cvd",
+            )?;
+            data.cvd.push(CvdExperiment {
+                temperature,
+                pressures: members.iter().map(|&at| rows[at].pressure).collect(),
+                liquid_dropout: members.iter().map(|&at| rows[at].liquid_dropout).collect(),
+                z_factor: members.iter().map(|&at| rows[at].z_factor).collect(),
+            });
+        }
+    }
+    if let Some(rows) = dle {
+        for (_, members) in groups(rows, |row| row.experiment, "dle")? {
+            let temperature = same_temperature(
+                &members
+                    .iter()
+                    .map(|&at| rows[at].temperature)
+                    .collect::<Vec<_>>(),
+                "dle",
+            )?;
+            data.dle.push(DleExperiment {
+                temperature,
+                pressures: members.iter().map(|&at| rows[at].pressure).collect(),
+                rs: members.iter().map(|&at| rows[at].rs).collect(),
+                bo: members.iter().map(|&at| rows[at].bo).collect(),
+                oil_density: members.iter().map(|&at| rows[at].oil_density).collect(),
+            });
+        }
+    }
+    if let Some(rows) = viscosity {
+        for row in rows {
+            let phase = ViscosityPhase::from_name(&row.phase).ok_or_else(|| {
+                AzothError::invalid_input(
+                    "viscosity",
+                    format!("{:?} is not a phase the class names", row.phase),
+                )
+            })?;
+            data.viscosity.push(ViscosityPoint {
+                temperature: row.temperature,
+                pressure: row.pressure,
+                viscosity: row.viscosity,
+                phase,
+            });
+        }
+    }
+    let result = fit(
+        components,
+        crate::fluid::cubic_named(eos)?,
+        crate::fluid::kij_named(mixing_rule)?,
+        volume_correction.unwrap_or(true),
+        &configs,
+        &data,
+        max_iterations.map_or(LM_MAXIMUM_ITERATIONS, |value| value as usize),
+    )?;
+    let mut fitted_parameters = Vec::with_capacity(configs.len());
+    for (index, config) in configs.iter().enumerate() {
+        fitted_parameters.push(FittedParameterRow {
+            parameter: config.parameter.name().to_owned(),
+            value: result.values[index],
+            lower: config.lower,
+            upper: config.upper,
+        });
+    }
+    let mut objective_rows = Vec::new();
+    for (experiment, value) in [
+        ("cce", result.objectives.cce),
+        ("cvd", result.objectives.cvd),
+        ("dle", result.objectives.dle),
+        ("viscosity", result.objectives.viscosity),
+    ] {
+        if let Some(value) = value {
+            objective_rows.push(RegressionObjectiveRow {
+                experiment: experiment.to_owned(),
+                value,
+            });
+        }
+    }
+    Ok(RegressionResult {
+        fitted_parameters,
+        standard_errors: result.standard_errors,
+        half_widths_95: result.half_widths_95,
+        objectives: objective_rows,
+        final_chi_square: result.chi_square,
+        total_objective: result.objectives.total(),
+        degrees_of_freedom: result.degrees_of_freedom as f64,
+        residual_variance: result.residual_variance,
+        average_absolute_deviation_percent: result.chi_square.sqrt() * 100.0,
+        iterations: result.iterations as f64,
+        convergence_reason: result.reason,
+        warnings: Vec::new(),
     })
 }

@@ -77,3 +77,103 @@ pub fn swelling_test(
     .map(|r| crate::transport_gen::PySwellingTestResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
+
+/// The PVT multi-target regression.
+///
+/// All arguments are SI magnitudes. The four experiment lists are optional `record_list`
+/// inputs, which the wrapper generator does not derive, so this binding is hand-written.
+#[pyfunction]
+#[pyo3(signature = (components, parameters, cce, cvd, dle, viscosity, cce_weight, cvd_weight, dle_weight, viscosity_weight, eos, mixing_rule, volume_correction, max_iterations))]
+#[pyo3(
+    text_signature = "(components, parameters, cce, cvd, dle, viscosity, cce_weight, cvd_weight, dle_weight, viscosity_weight, eos, mixing_rule, volume_correction, max_iterations)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn regression(
+    py: Python<'_>,
+    components: Vec<crate::records_gen::FluidComponent>,
+    parameters: Vec<crate::records_gen::RegressionParameterRow>,
+    cce: Option<Vec<crate::records_gen::RegressionCceRow>>,
+    cvd: Option<Vec<crate::records_gen::RegressionCvdRow>>,
+    dle: Option<Vec<crate::records_gen::RegressionDleRow>>,
+    viscosity: Option<Vec<crate::records_gen::RegressionViscosityRow>>,
+    cce_weight: Option<f64>,
+    cvd_weight: Option<f64>,
+    dle_weight: Option<f64>,
+    viscosity_weight: Option<f64>,
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
+    volume_correction: Option<bool>,
+    max_iterations: Option<u32>,
+) -> PyResult<crate::transport_gen::PyRegressionResult> {
+    let rows: Vec<FluidComponent> = components.into_iter().map(component).collect();
+    let parameters: Vec<azoth_pvt::regression::RegressionParameterRow> = parameters
+        .into_iter()
+        .map(|row| azoth_pvt::regression::RegressionParameterRow {
+            parameter: row.parameter,
+            initial: row.initial,
+            lower: row.lower,
+            upper: row.upper,
+        })
+        .collect();
+    let cce: Option<Vec<azoth_pvt::regression::CceRow>> = cce.map(|rows| {
+        rows.into_iter()
+            .map(|row| azoth_pvt::regression::CceRow {
+                experiment: row.experiment,
+                temperature: row.temperature,
+                pressure: row.pressure,
+                relative_volume: row.relative_volume,
+            })
+            .collect()
+    });
+    let cvd: Option<Vec<azoth_pvt::regression::CvdRow>> = cvd.map(|rows| {
+        rows.into_iter()
+            .map(|row| azoth_pvt::regression::CvdRow {
+                experiment: row.experiment,
+                temperature: row.temperature,
+                pressure: row.pressure,
+                liquid_dropout: row.liquid_dropout,
+                z_factor: row.z_factor,
+            })
+            .collect()
+    });
+    let dle: Option<Vec<azoth_pvt::regression::DleRow>> = dle.map(|rows| {
+        rows.into_iter()
+            .map(|row| azoth_pvt::regression::DleRow {
+                experiment: row.experiment,
+                temperature: row.temperature,
+                pressure: row.pressure,
+                rs: row.rs,
+                bo: row.bo,
+                oil_density: row.oil_density,
+            })
+            .collect()
+    });
+    let viscosity: Option<Vec<azoth_pvt::regression::ViscosityRow>> = viscosity.map(|rows| {
+        rows.into_iter()
+            .map(|row| azoth_pvt::regression::ViscosityRow {
+                temperature: row.temperature,
+                pressure: row.pressure,
+                viscosity: row.viscosity,
+                phase: row.phase,
+            })
+            .collect()
+    });
+    azoth_pvt::regression::regression(
+        &rows,
+        &parameters,
+        cce.as_deref(),
+        cvd.as_deref(),
+        dle.as_deref(),
+        viscosity.as_deref(),
+        cce_weight,
+        cvd_weight,
+        dle_weight,
+        viscosity_weight,
+        eos,
+        mixing_rule,
+        volume_correction,
+        max_iterations,
+    )
+    .map(|r| crate::transport_gen::PyRegressionResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
