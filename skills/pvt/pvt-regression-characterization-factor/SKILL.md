@@ -51,10 +51,10 @@ import azoth
 # `rows` is the base and characterized pseudo-component row list.
 result = azoth.pvt.regression(
     components=rows,
-    parameters=[{"parameter": "tc_multiplier_c7plus", "initial": 1.0,
-                 "lower": 0.95, "upper": 1.05}],
-    cce=[{"experiment": 0.0, "temperature": 373.15,
-          "pressure": 2.5e7, "relative_volume": 0.998}],
+    parameters=[
+        {"parameter": "tc_multiplier_c7plus", "initial": 1.0, "lower": 0.95, "upper": 1.05}
+    ],
+    cce=[{"experiment": 0.0, "temperature": 373.15, "pressure": 2.5e7, "relative_volume": 0.998}],
     max_iterations=50,
 )
 print(result.fitted_parameters[0].value, result.final_chi_square)
