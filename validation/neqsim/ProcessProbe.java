@@ -895,6 +895,9 @@ public class ProcessProbe {
       case "valve_sizing":
         valveSizingRows();
         break;
+      case "valve_standards":
+        valveStandardRows();
+        break;
       case "pump_curve":
         pumpCurveRows();
         break;
@@ -12009,6 +12012,130 @@ public class ProcessProbe {
     valve.setOutletPressure(outletBara);
     valve.run();
     System.out.println("stated_kv=" + valve.getKv());
+    System.out.println("flow_mode_molar_flow=" + valve.calculateMolarFlow());
+    System.out.println();
+  }
+
+  /// **The eight ``setValveSizingStandard`` alternatives**, which the default capture does not
+  /// hold.
+  ///
+  /// The order is the factory's: the valve is built, then the standard is selected, then the
+  /// choke geometry and discharge coefficient, and only then a stated ``allowChoked`` - because
+  /// ``setValveSizingStandard`` constructs a new method object and resets the flag. The
+  /// single-phase rows reuse the default capture's rich gas and water states; the two-phase rows
+  /// are the separator capture's methane/n-butane feed, whose flash is already measured.
+  static void valveStandardRows() {
+    String[] rich = new String[] { "methane", "ethane", "propane", "n-butane" };
+    double[] richZ = new double[] { 0.1, 0.2, 0.4, 0.3 };
+    String[] water = new String[] { "water" };
+    double[] waterZ = new double[] { 1.0 };
+    String[] well = new String[] { "methane", "n-butane" };
+    double[] wellZ = new double[] { 0.7, 0.3 };
+
+    for (String standard : new String[] { "IEC 60534", "IEC 60534 full", "prod choke" }) {
+      String tail = standard.toLowerCase().replace(' ', '_');
+      valveStandardRow("standard_gas_" + tail, rich, richZ, 296.25, 1.82925, 14942.5, 1.41325,
+          100.0, null, standard, 0.0, 0.0, false);
+      valveStandardRow("standard_water_" + tail, water, waterZ, 289.15, 14.8, 1.69272e6, 4.46,
+          100.0, null, standard, 0.0, 0.0, false);
+    }
+    // The flag is per constructor: the IEC classes start `true`, so a stated `false` is the
+    // only row that shows the factory's reset.
+    valveStandardRow("standard_gas_iec_60534_allow_false", rich, richZ, 296.25, 1.82925, 14942.5,
+        1.41325, 100.0, false, "IEC 60534", 0.0, 0.0, false);
+    valveStandardRow("standard_gas_iec_60534_pressure_mode", rich, richZ, 296.25, 1.82925,
+        14942.5, 1.41325, 100.0, null, "IEC 60534", 0.0, 0.0, true);
+
+    for (String standard : new String[] { "Sachdeva", "Gilbert", "Baxendell", "Ros", "Achong" }) {
+      String tail = standard.toLowerCase();
+      // 20 bara upstream: 15 is subcritical against Sachdeva's critical ratio, 5 is critical.
+      valveStandardRow("standard_subcritical_" + tail, well, wellZ, 300.0, 20.0, 103.2, 15.0,
+          100.0, null, standard, 0.0127, 0.0, false);
+      valveStandardRow("standard_critical_" + tail, well, wellZ, 300.0, 20.0, 103.2, 5.0,
+          100.0, null, standard, 0.0127, 0.0, false);
+    }
+    valveStandardRow("standard_sachdeva_cd", well, wellZ, 300.0, 20.0, 103.2, 5.0, 100.0, null,
+        "Sachdeva", 0.0127, 0.9, false);
+    valveStandardRow("standard_sachdeva_pressure_mode", well, wellZ, 300.0, 20.0, 103.2, 5.0,
+        100.0, null, "Sachdeva", 0.0127, 0.0, true);
+    // The nominal diameter before any opening adjustment: the class's own 1 inch.
+    valveStandardRow("standard_gilbert_default_diameter", well, wellZ, 300.0, 20.0, 103.2, 5.0,
+        100.0, null, "Gilbert", 0.0, 0.0, false);
+    // An all-gas inlet: `calculateGLR` answers +infinity, the correlation 0 flow, and the mass
+    // flow 0 * infinity. Captured as evidence, never as a case.
+    valveStandardRow("standard_gilbert_all_gas_evidence", rich, richZ, 296.25, 1.82925, 14942.5,
+        1.41325, 100.0, null, "Gilbert", 0.0127, 0.0, false);
+  }
+
+  static void valveStandardRow(String label, String[] names, double[] z, double temperatureK,
+      double pressureBara, double kgPerHour, double outletBara, double openingPercent,
+      Boolean allowChoked, String standard, double chokeDiameter, double dischargeCoefficient,
+      boolean calcPressure) {
+    Stream inlet = feedMass(label + "_inlet", names, z, temperatureK, pressureBara, kgPerHour);
+
+    neqsim.process.equipment.valve.ThrottlingValve valve =
+        new neqsim.process.equipment.valve.ThrottlingValve(label, inlet);
+    valve.setOutletPressure(outletBara);
+    valve.setPercentValveOpening(openingPercent);
+    neqsim.process.mechanicaldesign.valve.ValveMechanicalDesign design =
+        (neqsim.process.mechanicaldesign.valve.ValveMechanicalDesign) valve.getMechanicalDesign();
+    design.setValveSizingStandard(standard);
+    if (chokeDiameter > 0.0) {
+      design.setChokeDiameter(chokeDiameter, "m");
+    }
+    if (dischargeCoefficient > 0.0) {
+      design.setChokeDischargeCoefficient(dischargeCoefficient);
+    }
+    if (allowChoked != null) {
+      design.getValveSizingMethod().setAllowChoked(allowChoked);
+    }
+
+    System.out.println(label);
+    System.out.println("sizing_standard=" + standard);
+    System.out.println("allow_choked_state=" + design.getValveSizingMethod().isAllowChoked());
+    System.out.println("xt_state=" + design.getValveSizingMethod().getxT());
+    System.out.println("choke_diameter_state=" + design.getChokeDiameter());
+    print("inlet", inlet);
+    System.out.println("phase_count=" + inlet.getThermoSystem().getNumberOfPhases());
+    for (int i = 0; i < inlet.getThermoSystem().getNumberOfPhases(); i++) {
+      neqsim.thermo.phase.PhaseInterface phase = inlet.getThermoSystem().getPhase(i);
+      System.out.println("phase" + i + "_type=" + phase.getPhaseTypeName());
+      System.out.println("phase" + i + "_density_kg_m3=" + phase.getDensity("kg/m3"));
+      System.out.println("phase" + i + "_molar_mass_kg_mol=" + phase.getMolarMass("kg/mol"));
+      System.out.println("phase" + i + "_kg_per_sec=" + phase.getFlowRate("kg/sec"));
+      System.out.println("phase" + i + "_m3_per_sec=" + phase.getFlowRate("m3/sec"));
+      System.out.println("phase" + i + "_z=" + phase.getZ());
+    }
+    System.out.println("outlet_p_stated_bara=" + outletBara);
+    System.out.println("opening_percent=" + openingPercent);
+    System.out.println("is_calc_pressure=" + calcPressure);
+
+    // The first run sizes the valve: no Kv is stated.
+    valve.run();
+    System.out.println("gas_valve=" + valve.isGasValve());
+    System.out.println("kv=" + valve.getKv());
+    System.out.println("cv=" + valve.getCv());
+    System.out.println("cg=" + valve.getCg());
+    java.util.Map<String, Object> sized =
+        new java.util.TreeMap<>(design.calcValveSize());
+    for (java.util.Map.Entry<String, Object> entry : sized.entrySet()) {
+      System.out.println("size_" + entry.getKey() + "=" + entry.getValue());
+    }
+    print("outlet", valve.getOutletStream());
+    System.out.println("calculated_molar_flow=" + valve.calculateMolarFlow());
+
+    // The pressure mode: the drop the trim answers, at the same opening.
+    valve.setIsCalcOutPressure(true);
+    valve.run();
+    System.out.println("solved_outlet_p_bara=" + valve.getOutletPressure());
+    System.out.println("solved_outlet_stream_t_k=" + valve.getOutletStream().getTemperature("K"));
+
+    // The flow mode, with the Kv the sizing produced stated explicitly.
+    double sizedKv = valve.getKv();
+    valve.setIsCalcOutPressure(false);
+    valve.setKv(sizedKv);
+    valve.setOutletPressure(outletBara);
+    valve.run();
     System.out.println("flow_mode_molar_flow=" + valve.calculateMolarFlow());
     System.out.println();
   }

@@ -6387,6 +6387,12 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "dimensionless",
     ),
     ("process.throttling_valve", "xt", "dimensionless"),
+    ("process.throttling_valve", "choke_diameter", "length"),
+    (
+        "process.throttling_valve",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
     (
         "process.topsides_facility_cost",
         "location_factor",

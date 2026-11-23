@@ -10938,6 +10938,8 @@ def throttling_valve(
     is_calc_pressure: bool | None = None,
     is_isothermal: bool | None = None,
     sizing_standard: str | None = None,
+    choke_diameter: float | None = None,
+    discharge_coefficient: float | None = None,
 ) -> ThrottlingValveResult: ...
 def topsides_facility_cost(
     equipment: list[TopsidesEquipment],

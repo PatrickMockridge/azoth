@@ -28764,10 +28764,10 @@ pub struct PyThrottlingValveResult {
     /// `getCg()`: `Cv * 1360`.
     #[pyo3(get)]
     pub cg: f64,
-    /// `calcValveSize`'s `choked`: on a gas valve, `x >= Fgamma * xT`. Reported whether or not `allow_choked` caps it.
+    /// `calcValveSize`'s `choked`: on the gas routes, `x >= Fgamma * xT`; on the five choke standards, the model's `flowRegime == CRITICAL`. Reported whether or not `allow_choked` caps it.
     #[pyo3(get)]
     pub choked: bool,
-    /// `isGasValve()`: a gas phase carrying more than half the volume. It selects the branch the whole sizing runs.
+    /// `isGasValve()`: a gas phase carrying more than half the volume. It selects the default, production-choke and IEC branches; the five choke standards read their own labelled phases, and the flag is reported unchanged.
     #[pyo3(get)]
     pub gas_valve: bool,
     /// `calculateMolarFlow()`: the mole flow the adjusted `Kv` and the drop give - the inverse of the sizing, and the class's own consistency check.

@@ -9585,9 +9585,9 @@ pub fn three_phase_separator(
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
 #[pyfunction]
-#[pyo3(signature = (components, inlet_n, inlet_z, inlet_p, inlet_t, outlet_pressure, valve_opening, kv, fouling_fraction, valve_characterization, xt, allow_choked, is_calc_pressure, is_isothermal, sizing_standard))]
+#[pyo3(signature = (components, inlet_n, inlet_z, inlet_p, inlet_t, outlet_pressure, valve_opening, kv, fouling_fraction, valve_characterization, xt, allow_choked, is_calc_pressure, is_isothermal, sizing_standard, choke_diameter, discharge_coefficient))]
 #[pyo3(
-    text_signature = "(components, inlet_n, inlet_z, inlet_p, inlet_t, outlet_pressure, valve_opening, kv, fouling_fraction, valve_characterization, xt, allow_choked, is_calc_pressure, is_isothermal, sizing_standard)"
+    text_signature = "(components, inlet_n, inlet_z, inlet_p, inlet_t, outlet_pressure, valve_opening, kv, fouling_fraction, valve_characterization, xt, allow_choked, is_calc_pressure, is_isothermal, sizing_standard, choke_diameter, discharge_coefficient)"
 )]
 #[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
 pub fn throttling_valve(
@@ -9607,6 +9607,8 @@ pub fn throttling_valve(
     is_calc_pressure: Option<bool>,
     is_isothermal: Option<bool>,
     sizing_standard: Option<&str>,
+    choke_diameter: Option<f64>,
+    discharge_coefficient: Option<f64>,
 ) -> PyResult<crate::transport_gen::PyThrottlingValveResult> {
     azoth_process::models::throttling_valve::throttling_valve(
         &components,
@@ -9624,6 +9626,8 @@ pub fn throttling_valve(
         is_calc_pressure,
         is_isothermal,
         sizing_standard,
+        choke_diameter.map(meters),
+        discharge_coefficient,
     )
     .map(|r| crate::transport_gen::PyThrottlingValveResult::from(&r))
     .map_err(|e| to_pyerr(py, e))

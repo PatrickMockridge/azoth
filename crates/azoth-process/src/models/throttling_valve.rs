@@ -10,15 +10,15 @@
 //! taken at face value, exactly as this does. The entry was wrong about its *parameters*,
 //! not about its arithmetic.
 
-use azoth_core::units::{MolarEnergy, Pressure, ThermodynamicTemperature, joules_per_mole};
+use azoth_core::units::{Length, MolarEnergy, Pressure, ThermodynamicTemperature, joules_per_mole};
 use azoth_core::{AzothError, Result, Warning, apply_checks};
 
 use crate::kernels::throttling_valve as kernel;
 use crate::model_gen;
 use crate::stream::Stream;
-use crate::unported;
 use crate::valve::{
-    DEFAULT_OPENING_PERCENT, DEFAULT_XT, ValveCharacteristic, ValveSizingGeometry, sizing_report,
+    DEFAULT_OPENING_PERCENT, DEFAULT_XT, SizingStandard, ValveCharacteristic, ValveSizingGeometry,
+    sizing_report_for,
 };
 
 /// Result of `process.throttling_valve`.
@@ -56,7 +56,7 @@ pub struct ThrottlingValveResult {
 /// # Errors
 /// [`azoth_core::AzothError::InvalidInput`] if the inlet pressure is not positive and
 /// whatever the databank refuses.
-#[allow(clippy::too_many_arguments)] // one parameter per declared input, and there are fifteen
+#[allow(clippy::too_many_arguments)] // one parameter per declared input, and there are seventeen
 pub fn throttling_valve(
     components: &[String],
     inlet_n: f64,
@@ -73,6 +73,8 @@ pub fn throttling_valve(
     is_calc_pressure: Option<bool>,
     is_isothermal: Option<bool>,
     sizing_standard: Option<&str>,
+    choke_diameter: Option<Length>,
+    discharge_coefficient: Option<f64>,
 ) -> Result<ThrottlingValveResult> {
     let spec = &model_gen::THROTTLING_VALVE_SPEC;
     let mut warnings = Vec::new();
@@ -88,25 +90,23 @@ pub fn throttling_valve(
         &mut warnings,
     )?;
 
-    // **The eight other standards are second machines**, each refused by name from the
-    // declaration's `[[unported]]` rows.
-    match sizing_standard.unwrap_or("default") {
-        "default" => {}
-        "iec_60534" => return Err(unported::refuse("sizing_standard=iec_60534")),
-        "iec_60534_full" => return Err(unported::refuse("sizing_standard=iec_60534_full")),
-        "prod_choke" => return Err(unported::refuse("sizing_standard=prod_choke")),
-        "sachdeva" => return Err(unported::refuse("sizing_standard=sachdeva")),
-        "gilbert" => return Err(unported::refuse("sizing_standard=gilbert")),
-        "baxendell" => return Err(unported::refuse("sizing_standard=baxendell")),
-        "ros" => return Err(unported::refuse("sizing_standard=ros")),
-        "achong" => return Err(unported::refuse("sizing_standard=achong")),
+    let standard = match sizing_standard.unwrap_or("default") {
+        "default" => SizingStandard::Default,
+        "iec_60534" => SizingStandard::Iec60534,
+        "iec_60534_full" => SizingStandard::Iec60534Full,
+        "prod_choke" => SizingStandard::ProdChoke,
+        "sachdeva" => SizingStandard::Sachdeva,
+        "gilbert" => SizingStandard::Gilbert,
+        "baxendell" => SizingStandard::Baxendell,
+        "ros" => SizingStandard::Ros,
+        "achong" => SizingStandard::Achong,
         other => {
             return Err(AzothError::invalid_input(
                 "sizing_standard",
                 format!("'{other}' is not one of the nine declared standards"),
             ));
         }
-    }
+    };
 
     let geometry = ValveSizingGeometry {
         kv,
@@ -114,7 +114,11 @@ pub fn throttling_valve(
         fouling_fraction: fouling_fraction.unwrap_or(0.0),
         characteristic: ValveCharacteristic::named(valve_characterization.unwrap_or("linear"))?,
         xt: xt.unwrap_or(DEFAULT_XT),
-        allow_choked: allow_choked.unwrap_or(false),
+        allow_choked: allow_choked.unwrap_or(standard.default_allow_choked()),
+        choke_diameter_m: choke_diameter
+            .map(|diameter| diameter.value)
+            .unwrap_or(crate::valve::DEFAULT_CHOKE_DIAMETER_M),
+        discharge_coefficient,
     };
 
     let feed = Stream::from_pt(
@@ -126,7 +130,7 @@ pub fn throttling_valve(
     )?;
     // **The sizing runs on the inlet and the stated drop**, which is what the class's `calcKv`
     // reads; the pressure mode then replaces the drop with the one the trim answers.
-    let report = sizing_report(&feed, outlet_pressure.value / 1.0e5, &geometry)?;
+    let report = sizing_report_for(&feed, outlet_pressure.value / 1.0e5, standard, &geometry)?;
     let out_pressure = if is_calc_pressure.unwrap_or(false) {
         crate::valve::outlet_pressure(&report)
     } else {

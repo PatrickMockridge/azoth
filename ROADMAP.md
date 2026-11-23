@@ -817,12 +817,12 @@ a claim nothing holds.
   own size. **`process.shortcut_distillation_column`'s `setNumberOfTrays` override is inert, and
   says so** — the class computes the stages, it has no tray hydraulics or tray optimization, and
   `getResultsJson` only serialises fields the result already carries.
-- **`process.throttling_valve`'s controller** — the laminar branch belongs to
-  `ControlValveSizing_IEC_60534_full`, which the spec refuses by name, and the controller is a
-  transient surface. The `ControlValveSizing`
-  default, its inverse flow and `isCalcPressure` solve, the choked cap, the fouling fraction and
-  the isothermal mode are ported; **the eight other sizing standards are refused by name** in
-  the spec's `[[unported]]` rows, each naming its class.
+- **`process.throttling_valve`'s eight other sizing standards are carried**, each as the class's
+  own machine: the IEC pair, the production choke and the five multiphase choke correlations,
+  held to `process_valve_standards.tsv`. **`ControlValveSizing_IEC_60534_full`'s Reynolds, laminar
+  and piping branches are unreachable through `ValveMechanicalDesign`** (`D1` and `D` are `0`,
+  and no setter reaches them), so the reachable route is the simplified sizing with
+  `Rev = Infinity`. The controller remains a transient surface.
 - **The `eos` family's**: `ComponentGE.fugcoef`'s **Henry's-law branch is complete** - the
   four `eos.ge_*_phase` ids resolve both reference states, which the vendored table's
   `REFERENCESTATETYPE` selects on 116 of its 349 rows (114 `solute` and the two literal

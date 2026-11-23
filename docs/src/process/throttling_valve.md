@@ -8,7 +8,7 @@
 
 **NeqSim process/equipment/valve/ThrottlingValve.java**
 
-Its steady-state `run`: the isenthalpic drop to the stated pressure, with `ControlValveSizing` sizing the trim on the first pass - `calcKv`, the flow inverse and the `isCalcPressure` solve - and the four opening characteristics. **The eight other sizing standards are refused by name.**
+Its steady-state `run`: the isenthalpic drop to the stated pressure, with the selected standard sizing the trim on the first pass - `calcKv`, the flow inverse and the `isCalcPressure` solve - and the four opening characteristics. **All nine standards are carried.**
 
 
 ## What this model is
@@ -30,10 +30,12 @@ A **direct** model: a computation over vectors, with no iteration and therefore 
 | `fouling_fraction` | dimensionless | *Optional.* `foulingFraction`: the effective `Kv` is the adjusted one times `1 - this`. **Absent is `0.0`.** |
 | `valve_characterization` | linear / equal_percentage / quick_opening / modified_parabolic | *Optional.* the opening characteristic `getOpeningFactor` applies: `x`, `R^(x-1)` with `R = 50`, `sqrt(x)`, or `x^2`. **Absent is `linear`**, `ValveMechanicalDesign`'s constructor default. |
 | `xt` | dimensionless | *Optional.* `xT`, the pressure-drop ratio factor of the gas branch. **Absent is `0.137`.** |
-| `allow_choked` | - | *Optional.* `allowChoked`: whether the sizing caps the flow at the choked limit. **Absent is `false`**, the class's initialiser - so the choked state is reported and not capped. |
+| `allow_choked` | - | *Optional.* `allowChoked`: whether the sizing caps the flow at the choked limit. **Absent is the selected standard's initialiser: `false` on `default`, `true` on the other eight**, whose constructors set it. A stated value is applied after the standard is selected. |
 | `is_calc_pressure` | - | *Optional.* `isCalcPressure`: solve the outlet pressure from the trim instead of dropping to `outlet_pressure`. **Absent is `false`**, the class's initialiser. **The stated `outlet_pressure` is then ignored and the solved one published.** |
 | `is_isothermal` | - | *Optional.* `isIsoThermal`: flash at the inlet temperature at the outlet pressure instead of isenthalpically. **Absent is `false`.** |
-| `sizing_standard` | default / iec_60534 / iec_60534_full / prod_choke / sachdeva / gilbert / baxendell / ros / achong | *Optional.* `setValveSizingStandard`: which `ControlValveSizingInterface` the sizing runs. **Absent is `default`**, `ControlValveSizing`; the other eight are refused by name, each naming its class. |
+| `sizing_standard` | default / iec_60534 / iec_60534_full / prod_choke / sachdeva / gilbert / baxendell / ros / achong | *Optional.* `setValveSizingStandard`: which `ControlValveSizingInterface` the sizing runs. **Absent is `default`**, `ControlValveSizing`; the other eight are carried, each naming its class in the assumptions. |
+| `choke_diameter` | m | *Optional.* `setChokeDiameter`: the throat the five multiphase correlations size. **Absent is `0.0254` m**, the class's initialiser. The four single-phase standards ignore it, as the setter does. |
+| `discharge_coefficient` | dimensionless | *Optional.* `setChokeDischargeCoefficient`: the multiphase `Cd`. **Absent is the model's own** - `0.84` for Sachdeva, and the four Gilbert-type correlations embed `1.0` and do not read it. |
 
 
 ## Outputs
@@ -43,8 +45,8 @@ A **direct** model: a computation over vectors, with no iteration and therefore 
 | `kv` | dimensionless | `getKv()`: the rated `Kv` at 100% opening, stated or sized, in the class's `(m3/h)*sqrt(bar)`. |
 | `cv` | dimensionless | `getCv()`: `Kv * 1.156`. |
 | `cg` | dimensionless | `getCg()`: `Cv * 1360`. |
-| `choked` | - | `calcValveSize`'s `choked`: on a gas valve, `x >= Fgamma * xT`. Reported whether or not `allow_choked` caps it. |
-| `gas_valve` | - | `isGasValve()`: a gas phase carrying more than half the volume. It selects the branch the whole sizing runs. |
+| `choked` | - | `calcValveSize`'s `choked`: on the gas routes, `x >= Fgamma * xT`; on the five choke standards, the model's `flowRegime == CRITICAL`. Reported whether or not `allow_choked` caps it. |
+| `gas_valve` | - | `isGasValve()`: a gas phase carrying more than half the volume. It selects the default, production-choke and IEC branches; the five choke standards read their own labelled phases, and the flag is reported unchanged. |
 | `calculated_molar_flow` | mol/s | `calculateMolarFlow()`: the mole flow the adjusted `Kv` and the drop give - the inverse of the sizing, and the class's own consistency check. |
 | `outlet_n` | mol/s | the outlet molar flow, which is the inlet's: a valve adds no moles. |
 | `outlet_z` | dimensionless | the outlet composition, which is the inlet's. |
@@ -58,35 +60,21 @@ A **direct** model: a computation over vectors, with no iteration and therefore 
 | `inlet_t > 0` | raises | an absolute temperature |
 | `valve_opening > 0 and valve_opening <= 100` | raises | the characteristic's opening factor is zero at a closed valve, and the sizing divides by it |
 
-## Not carried
-
-Values this model's inputs declare and the port does not carry. Each is refused
-by **both** implementations from the same row, and `tools/check_unported.py`
-holds the declaration and the two languages to each other.
-
-| Value | NeqSim | Measured by |
-|---|---|---|
-| `sizing_standard` = `iec_60534` | `ControlValveSizing_IEC_60534` | `validation/neqsim/captures/process_valve_sizing.tsv` |
-| `sizing_standard` = `iec_60534_full` | `ControlValveSizing_IEC_60534_full` | `validation/neqsim/captures/process_valve_sizing.tsv` |
-| `sizing_standard` = `prod_choke` | `ControlValveSizing_simple` | `validation/neqsim/captures/process_valve_sizing.tsv` |
-| `sizing_standard` = `sachdeva` | `ControlValveSizing_MultiphaseChoke` | `validation/neqsim/captures/process_valve_sizing.tsv` |
-| `sizing_standard` = `gilbert` | `ControlValveSizing_MultiphaseChoke` | `validation/neqsim/captures/process_valve_sizing.tsv` |
-| `sizing_standard` = `baxendell` | `ControlValveSizing_MultiphaseChoke` | `validation/neqsim/captures/process_valve_sizing.tsv` |
-| `sizing_standard` = `ros` | `ControlValveSizing_MultiphaseChoke` | `validation/neqsim/captures/process_valve_sizing.tsv` |
-| `sizing_standard` = `achong` | `ControlValveSizing_MultiphaseChoke` | `validation/neqsim/captures/process_valve_sizing.tsv` |
-
-
 ## Assumptions
 
 - **the drop is isenthalpic.** `ThrottlingValve.run` flashes a `PHflash` at the inlet's total enthalpy and `Stream::from_ph` is the same operation, so the outlet's temperature is the one the mixture reaches at the outlet pressure.
 - **`outlet_pressure` is taken at face value even above the inlet.** NeqSim's `acceptNegativeDP` defaults to `true`, so the capture's third row takes 30 bara to 40 at the same enthalpy. A port that clamped would disagree with the class it names.
 - **nothing bounds the drop and no pressure is refused.** A valve asked for a pressure it cannot reach raises it, which is what the measured class does; whether that is a sensible thing to ask for is the caller's business and not a check this can make on a single inlet.
-- **the valve sizes itself, and the sizing is `ControlValveSizing`, the default.** `calcKv` reads the inlet's flow, density, `Z` and `gamma` and the branch `isGasValve` selects; it is the rated `Kv` at 100%, which `valve_opening` and fouling scale. **The other eight standards are refused by name.**
+- **the valve sizes itself; `ControlValveSizing` is the default and `sizing_standard` selects another.** `calcKv` reads the inlet's flow, density, `Z` and `gamma`, and the rated `Kv` is scaled by `valve_opening` and fouling. **All eight alternatives are carried.**
 - **the gas branch's `gamma` is the libraries' heat capacity, and the two differ.** The choked `Kv` scales as `1/sqrt(Fgamma)`, so the plug-flow reactor's measured capacity divergence reaches this coefficient at about `3e-5` relative; the liquid branch reads only the density and agrees to rounding.
 - **the fluid is PR with the classic mixing rule**, because `Stream::mixture()` resolves `databank::mixture_of(names, Cubic::Pr, None)` and has no other route.
-- **the choked branch, fouling and the isothermal mode are in; the laminar branch and the controller are not.** The laminar branch belongs to `ControlValveSizing_IEC_60534_full`, refused by name; the controller is a transient surface. **A two-phase inlet is refused.**
+- **the choked branch, fouling and the isothermal mode are in; the controller is not.** `ControlValveSizing_IEC_60534_full`'s Reynolds, laminar and piping branches are unreachable: `D1` and `D` are `0`, and no design setter reaches them. **A two-phase inlet is refused by the single-phase standards.**
 - **the sizing reads the phase's own root, not a negative flash's trial phases.** NeqSim reads the gas phase's density and flow off the feed's composition; at 30 bara the trial root is `0.873` against the feed's `0.920`, which moved `Kv` by 5 %.
 - **a delta-stated outlet reports a finite `Kv` where the class reports `Infinity`.** `run` sizes before it resolves `setDeltaPressure` into a pressure, so `calcKv` sees a zero drop; the port sizes the resolved drop, and the outlet state is unaffected.
+- **the five choke standards read the flash's labelled phases and the other four read one root.** The choke family reads the gas and liquid densities, the gas mass fraction and the GLR; the four single-phase standards refuse a two-phase inlet rather than read one phase's root.
+- **Sachdeva's critical ratio is clamped to `[0.3, 0.9]` and Gilbert's is not.** Sachdeva also returns `0.90` below a gas quality of `0.001` and the isentropic ratio above `0.999`; the four Gilbert-type correlations use `0.85` below `0.01` and their own empirical form between.
+- **the choke `Kv` is an equivalent derived from mass flow, and the inverses are not inverses.** `calculateFlowRateFromValveOpening` ignores the sized `Kv` and answers `massFlow/density`; `findOutletPressureForFixedKv` answers `P1 * y_c`. Both are reproduced as the class answers them.
+- **`calcValveSize` mutates the choke diameter** to `d * sqrt(opening)`, so a second call at a partial opening compounds the shrink. **The capture's rows are at 100% opening**, where the mutation is inert.
 
 ## Cases
 
@@ -101,11 +89,26 @@ holds the declaration and the two languages to each other.
 | `the_pressure_mode_solves_the_drop` | components = ['methane', 'ethane', 'propane', 'n-butane'], inlet_n = 97.21961972278174, inlet_z = [0.1, 0.2, 0.4, 0.3], inlet_p = 182925.0, inlet_t = 296.25, outlet_pressure = 141325.0, is_calc_pressure = True | outlet_n = 97.21961972278174, outlet_z = [0.1, 0.2, 0.4, 0.3], outlet_p = 141324.95384216306, outlet_t = 295.6350458294925, kv = 607.9540338130714, cv = 702.7948630879105, cg = 955801.0137995583, choked = True, gas_valve = True, calculated_molar_flow = 97.21961972278176 |
 | `the_default_sizing_of_an_unchoked_gas` | components = ['methane'], inlet_n = 82.22866324530604, inlet_z = [1.0], inlet_p = 1000000.0, inlet_t = 293.15, outlet_pressure = 900000.0 | outlet_n = 82.22866324530604, outlet_z = [1.0], outlet_p = 900000.0, outlet_t = 292.63596698321015, kv = 78.64616342682979, cv = 90.91496492141523, cg = 123644.35229312471, choked = False, gas_valve = True, calculated_molar_flow = 82.22866324530605 |
 | `the_default_sizing_of_a_liquid` | components = ['water'], inlet_n = 26100.471829031365, inlet_z = [1.0], inlet_p = 1480000.0, inlet_t = 289.15, outlet_pressure = 446000.0 | outlet_n = 26100.471829031365, outlet_z = [1.0], outlet_p = 446000.0, outlet_t = 289.3699126718532, kv = 528.4961597255068, cv = 610.9415606426858, cg = 830880.5224740526, choked = False, gas_valve = False, calculated_molar_flow = 26100.47182903137 |
+| `iec_sizes_a_choked_gas` | components = ['methane', 'ethane', 'propane', 'n-butane'], inlet_n = 97.21961972278174, inlet_z = [0.1, 0.2, 0.4, 0.3], inlet_p = 182925.0, inlet_t = 296.25, outlet_pressure = 141325.0, sizing_standard = iec_60534 | outlet_n = 97.21961972278174, outlet_z = [0.1, 0.2, 0.4, 0.3], outlet_p = 141325.0, outlet_t = 295.6350248270999, outlet_h = 1441.3830449865272, kv = 873.109295270072, cv = 1009.3143453322032, cg = 1372667.5096517964, choked = True, gas_valve = True, calculated_molar_flow = 97.21961972278176 |
+| `iec_sizes_a_water_liquid` | components = ['water'], inlet_n = 26100.471829031365, inlet_z = [1.0], inlet_p = 1480000.0, inlet_t = 289.15, outlet_pressure = 446000.0, sizing_standard = iec_60534 | outlet_n = 26100.471829031365, outlet_z = [1.0], outlet_p = 446000.0, outlet_t = 289.36991929359766, outlet_h = -45590.9685376084, kv = 528.7333498347227, cv = 611.2157524089395, cg = 831253.4232761577, choked = False, gas_valve = False, calculated_molar_flow = 9425.264109024572 |
+| `iec_full_is_the_simplified_gas_branch` | components = ['methane', 'ethane', 'propane', 'n-butane'], inlet_n = 97.21961972278174, inlet_z = [0.1, 0.2, 0.4, 0.3], inlet_p = 182925.0, inlet_t = 296.25, outlet_pressure = 141325.0, sizing_standard = iec_60534_full | outlet_n = 97.21961972278174, outlet_z = [0.1, 0.2, 0.4, 0.3], outlet_p = 141325.0, outlet_t = 295.6350248270999, outlet_h = 1441.3830449865272, kv = 873.109295270072, cv = 1009.3143453322032, cg = 1372667.5096517964, choked = True, gas_valve = True, calculated_molar_flow = 97.21940510229186 |
+| `iec_full_is_the_simplified_liquid_branch` | components = ['water'], inlet_n = 26100.471829031365, inlet_z = [1.0], inlet_p = 1480000.0, inlet_t = 289.15, outlet_pressure = 446000.0, sizing_standard = iec_60534_full | outlet_n = 26100.471829031365, outlet_z = [1.0], outlet_p = 446000.0, outlet_t = 289.36991929359766, outlet_h = -45590.9685376084, kv = 528.7333498347227, cv = 611.2157524089395, cg = 831253.4232761577, choked = False, gas_valve = False, calculated_molar_flow = 9425.30866798149 |
+| `prod_choke_divides_the_gas_kv_by_cd` | components = ['methane', 'ethane', 'propane', 'n-butane'], inlet_n = 97.21961972278174, inlet_z = [0.1, 0.2, 0.4, 0.3], inlet_p = 182925.0, inlet_t = 296.25, outlet_pressure = 141325.0, sizing_standard = prod_choke | outlet_n = 97.21961972278174, outlet_z = [0.1, 0.2, 0.4, 0.3], outlet_p = 141325.0, outlet_t = 295.6350248270999, outlet_h = 1441.3830449865272, kv = 1027.1874062000845, cv = 1187.4286415672975, cg = 1614902.9525315247, choked = True, gas_valve = True, calculated_molar_flow = 97.21961972278173 |
+| `prod_choke_leaves_the_liquid_kv_alone` | components = ['water'], inlet_n = 26100.471829031365, inlet_z = [1.0], inlet_p = 1480000.0, inlet_t = 289.15, outlet_pressure = 446000.0, sizing_standard = prod_choke | outlet_n = 26100.471829031365, outlet_z = [1.0], outlet_p = 446000.0, outlet_t = 289.36991929359766, outlet_h = -45590.9685376084, kv = 528.4961597255068, cv = 610.9415606426858, cg = 830880.5224740526, choked = False, gas_valve = False, calculated_molar_flow = 26100.47182903137 |
+| `iec_honours_a_stated_allow_choked` | components = ['methane', 'ethane', 'propane', 'n-butane'], inlet_n = 97.21961972278174, inlet_z = [0.1, 0.2, 0.4, 0.3], inlet_p = 182925.0, inlet_t = 296.25, outlet_pressure = 141325.0, allow_choked = False, sizing_standard = iec_60534 | outlet_n = 97.21961972278174, outlet_z = [0.1, 0.2, 0.4, 0.3], outlet_p = 141325.0, outlet_t = 295.6350248270999, outlet_h = 1441.3830449865272, kv = 607.9540338130714, cv = 702.7948630879105, cg = 955801.0137995583, choked = True, gas_valve = True, calculated_molar_flow = 97.21961972278176 |
+| `sachdeva_sizes_a_two_phase_stream` | components = ['methane', 'n-butane'], inlet_n = 1.0, inlet_z = [0.7, 0.3], inlet_p = 2000000.0, inlet_t = 300.0, outlet_pressure = 1500000.0, choke_diameter = 0.0127, sizing_standard = sachdeva | outlet_n = 0.9999883722282301, outlet_z = [0.7, 0.3], outlet_p = 1500000.0, outlet_t = 294.3928609747115, outlet_h = -2705.411694202344, kv = 76.17629752584467, cv = 88.05979993987644, cg = 119761.32791823197, choked = False, gas_valve = True, calculated_molar_flow = 286.26279510589484 |
+| `sachdeva_chokes_and_reads_cd` | components = ['methane', 'n-butane'], inlet_n = 1.0, inlet_z = [0.7, 0.3], inlet_p = 2000000.0, inlet_t = 300.0, outlet_pressure = 500000.0, choke_diameter = 0.0127, discharge_coefficient = 0.9, sizing_standard = sachdeva | outlet_n = 0.9999883722282301, outlet_z = [0.7, 0.3], outlet_p = 500000.0, outlet_t = 272.3098516703981, outlet_h = -2705.4116942171036, kv = 34.14812719081707, cv = 39.47523503258453, cg = 53686.31964431496, choked = True, gas_valve = True, calculated_molar_flow = 222.26575997069986 |
+| `sachdeva_pressure_mode_answers_the_critical_pressure` | components = ['methane', 'n-butane'], inlet_n = 1.0, inlet_z = [0.7, 0.3], inlet_p = 2000000.0, inlet_t = 300.0, outlet_pressure = 500000.0, choke_diameter = 0.0127, is_calc_pressure = True, sizing_standard = sachdeva | outlet_n = 0.9999883722282301, outlet_z = [0.7, 0.3], outlet_p = 1188445.6598849501, outlet_t = 289.77358837469615, outlet_h = -2705.4116942171036, kv = 31.871585378095933, cv = 36.8435526970789, cg = 50107.2316680273, choked = True, gas_valve = True, calculated_molar_flow = 207.44804263931985 |
+| `gilbert_sizes_the_critical_flow` | components = ['methane', 'n-butane'], inlet_n = 1.0, inlet_z = [0.7, 0.3], inlet_p = 2000000.0, inlet_t = 300.0, outlet_pressure = 500000.0, choke_diameter = 0.0127, sizing_standard = gilbert | outlet_n = 0.9999883722282301, outlet_z = [0.7, 0.3], outlet_p = 500000.0, outlet_t = 272.3098516703981, outlet_h = -2705.4116942171036, kv = 24.575359998706734, cv = 28.409116158504983, cg = 38636.397975566775, choked = True, gas_valve = True, calculated_molar_flow = 159.95785174816183 |
+| `baxendell_sizes_the_critical_flow` | components = ['methane', 'n-butane'], inlet_n = 1.0, inlet_z = [0.7, 0.3], inlet_p = 2000000.0, inlet_t = 300.0, outlet_pressure = 500000.0, choke_diameter = 0.0127, sizing_standard = baxendell | outlet_n = 0.9999883722282301, outlet_z = [0.7, 0.3], outlet_p = 500000.0, outlet_t = 272.3098516703981, outlet_h = -2705.4116942171036, kv = 29.52894937654223, cv = 34.135465479282814, cg = 46424.23305182463, choked = True, gas_valve = True, calculated_molar_flow = 192.20012674892587 |
+| `ros_sizes_the_critical_flow` | components = ['methane', 'n-butane'], inlet_n = 1.0, inlet_z = [0.7, 0.3], inlet_p = 2000000.0, inlet_t = 300.0, outlet_pressure = 500000.0, choke_diameter = 0.0127, sizing_standard = ros | outlet_n = 0.9999883722282301, outlet_z = [0.7, 0.3], outlet_p = 500000.0, outlet_t = 272.3098516703981, outlet_h = -2705.4116942171036, kv = 23.342792324132382, cv = 26.984267926697033, cg = 36698.60438030797, choked = True, gas_valve = True, calculated_molar_flow = 151.93522756810844 |
+| `achong_sizes_the_critical_flow` | components = ['methane', 'n-butane'], inlet_n = 1.0, inlet_z = [0.7, 0.3], inlet_p = 2000000.0, inlet_t = 300.0, outlet_pressure = 500000.0, choke_diameter = 0.0127, sizing_standard = achong | outlet_n = 0.9999883722282301, outlet_z = [0.7, 0.3], outlet_p = 500000.0, outlet_t = 272.3098516703981, outlet_h = -2705.4116942171036, kv = 47.247914623691294, cv = 54.61858930498713, cg = 74281.2814547825, choked = True, gas_valve = True, calculated_molar_flow = 307.5305884912342 |
+| `gilbert_uses_the_default_one_inch` | components = ['methane', 'n-butane'], inlet_n = 1.0, inlet_z = [0.7, 0.3], inlet_p = 2000000.0, inlet_t = 300.0, outlet_pressure = 500000.0, sizing_standard = gilbert | outlet_n = 0.9999883722282301, outlet_z = [0.7, 0.3], outlet_p = 500000.0, outlet_t = 272.3098516703981, outlet_h = -2705.4116942171036, kv = 91.08494076583929, cv = 105.29419152531021, cg = 143200.1004744219, choked = True, gas_valve = True, calculated_molar_flow = 592.8601433419061 |
 
 ## How far this is checked
 **`partially_verified`** — exercised against expectations pinned in its own spec, with no independent oracle recorded for it - **the normal case rather than a defect**.
 
-- Tests: 9 declared, every one run
+- Tests: 24 declared, every one run
 - External check: no external validation case names it
 
 The same account travels with every result this returns: `result.provenance`
@@ -114,4 +117,10 @@ declared checks *that call* could not evaluate.
 
 ## References
 
-- NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/equipment/valve/ThrottlingValve.java` is the port source, through its `run`.
+- NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/equipment/valve/ThrottlingValve.java` is the port source, through its `run`; `process/mechanicaldesign/valve/` carries the sizing classes.
+- IEC 60534-2-1:1998, "Industrial-process control valves - Part 2-1: Flow capacity - Sizing equations for fluid flow under installed conditions."
+- Sachdeva, R.; Schmidt, Z.; Brill, J. P.; Blais, R. M. (1986). "Two-Phase Flow Through Chokes." SPE 15657.
+- Gilbert, W. E. (1954). "Flowing and Gas-Lift Well Performance." API Drilling and Production Practice.
+- Baxendell, P. B. (1958). "Bean Performance - Lake Wells." API Division of Production, Paper 926-15-B.
+- Ros, N. C. J. (1960). "An Analysis of Critical Simultaneous Gas/Liquid Flow Through a Restriction and Its Application to Flowmetering." Applied Scientific Research 9, 374-388.
+- Achong, I. (1961). "Revised Bean Performance Formula for Lake Maracaibo Wells." Shell Internal Report.
