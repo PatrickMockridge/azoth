@@ -1,0 +1,225 @@
+model = "pvt.fetkovich_aquifer"
+[[cases]]
+id = "constant_pressure"
+tolerance = 1.0e-12
+source = "The class's constant-pressure identity: 1e6 m3, 1e-4 1/bar, 0.02 m3/(s bar) and 12000 s at 250 bara, from `validation/neqsim/captures/pvt_fetkovich_aquifer.tsv`."
+[cases.inputs]
+initial_water_volume = 1000000.0
+total_compressibility = 1.0e-9
+productivity = 2.0e-7
+initial_pressure = 30000000.0
+intervals = [{ duration = 12000.0, reservoir_pressure_start = 25000000.0, reservoir_pressure_end = 25000000.0 }]
+[cases.expected]
+capacity = 0.001
+states = [
+  { time = 0.0, cumulative_influx = 0.0, pressure = 30000000.0, interval_influx = 0.0, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 0.0 },
+  { time = 12000.0, cumulative_influx = 4546.410233552938, pressure = 25453589.766447064, interval_influx = 4546.410233552938, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 4546.410233552938 },
+]
+[[cases]]
+id = "linear_ramp"
+tolerance = 1.0e-12
+source = "The class's 20000 s linear ramp from 300 to 180 bara."
+[cases.inputs]
+initial_water_volume = 1000000.0
+total_compressibility = 1.0e-9
+productivity = 2.0e-7
+initial_pressure = 30000000.0
+intervals = [{ duration = 20000.0, reservoir_pressure_start = 30000000.0, reservoir_pressure_end = 18000000.0 }]
+[cases.expected]
+capacity = 0.001
+states = [
+  { time = 0.0, cumulative_influx = 0.0, pressure = 30000000.0, interval_influx = 0.0, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 0.0 },
+  { time = 20000.0, cumulative_influx = 9054.946916666202, pressure = 20945053.083333794, interval_influx = 9054.946916666202, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 9054.946916666202 },
+]
+[[cases]]
+id = "tiny_exposure"
+tolerance = 1.0e-12
+source = "The class's 1e-5 s interval on a 1e12 m3 aquifer, below the small-exposure series boundary."
+[cases.inputs]
+initial_water_volume = 1000000000000.0
+total_compressibility = 1.0e-9
+productivity = 2.0e-7
+initial_pressure = 30000000.0
+intervals = [{ duration = 1.0e-5, reservoir_pressure_start = 30000000.0, reservoir_pressure_end = 25000000.0 }]
+[cases.expected]
+capacity = 1000.0
+states = [
+  { time = 0.0, cumulative_influx = 0.0, pressure = 30000000.0, interval_influx = 0.0, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 0.0 },
+  { time = 1.0e-5, cumulative_influx = 4.999999999999997e-6, pressure = 29999999.999999996, interval_influx = 4.999999999999997e-6, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 4.999999999999997e-6 },
+]
+[[cases]]
+id = "tiny_extrema"
+tolerance = 1.0e-12
+source = "The same aquifer on a rising ramp: both interior extrema are retained."
+[cases.inputs]
+initial_water_volume = 1000000000000.0
+total_compressibility = 1.0e-9
+productivity = 2.0e-7
+initial_pressure = 30000000.0
+intervals = [{ duration = 1.0e-5, reservoir_pressure_start = 25000000.0, reservoir_pressure_end = 40000000.0 }]
+[cases.expected]
+capacity = 1000.0
+states = [
+  { time = 0.0, cumulative_influx = 0.0, pressure = 30000000.0, interval_influx = 0.0, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 0.0 },
+  { time = 1.0e-5, cumulative_influx = -4.999999999999999e-6, pressure = 30000000.0, interval_influx = -4.999999999999999e-6, interval_minimum_cumulative_influx = -4.999999999999999e-6, interval_maximum_cumulative_influx = 1.6666666666666662e-6 },
+]
+[[cases]]
+id = "large_step"
+tolerance = 1.0e-12
+source = "The class's asymptotic large-exposure step: 1e20 s from 300 to 200 bara."
+[cases.inputs]
+initial_water_volume = 1000000000000.0
+total_compressibility = 1.0e-9
+productivity = 2.0e-7
+initial_pressure = 30000000.0
+intervals = [{ duration = 1.0e20, reservoir_pressure_start = 30000000.0, reservoir_pressure_end = 20000000.0 }]
+[cases.expected]
+capacity = 1000.0
+states = [
+  { time = 0.0, cumulative_influx = 0.0, pressure = 30000000.0, interval_influx = 0.0, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 0.0 },
+  { time = 1.0e20, cumulative_influx = 9999999999.5, pressure = 20000000.0005, interval_influx = 9999999999.5, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 9999999999.5 },
+]
+[[cases]]
+id = "ramp_up_extrema"
+tolerance = 1.0e-12
+source = "A rising ramp from 250 to 400 bara exposes both interior cumulative-influx extrema."
+[cases.inputs]
+initial_water_volume = 1000000.0
+total_compressibility = 1.0e-9
+productivity = 2.0e-7
+initial_pressure = 30000000.0
+intervals = [{ duration = 10000.0, reservoir_pressure_start = 25000000.0, reservoir_pressure_end = 40000000.0 }]
+[cases.expected]
+capacity = 0.001
+states = [
+  { time = 0.0, cumulative_influx = 0.0, pressure = 30000000.0, interval_influx = 0.0, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 0.0 },
+  { time = 10000.0, cumulative_influx = -4191.69104045766, pressure = 34191691.04045766, interval_influx = -4191.69104045766, interval_minimum_cumulative_influx = -4191.69104045766, interval_maximum_cumulative_influx = 1168.8078217550703 },
+]
+[[cases]]
+id = "ramp_down_extrema"
+tolerance = 1.0e-12
+source = "The falling ramp from 350 to 200 bara, with the extrema in the other order."
+[cases.inputs]
+initial_water_volume = 1000000.0
+total_compressibility = 1.0e-9
+productivity = 2.0e-7
+initial_pressure = 30000000.0
+intervals = [{ duration = 10000.0, reservoir_pressure_start = 35000000.0, reservoir_pressure_end = 20000000.0 }]
+[cases.expected]
+capacity = 0.001
+states = [
+  { time = 0.0, cumulative_influx = 0.0, pressure = 30000000.0, interval_influx = 0.0, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 0.0 },
+  { time = 10000.0, cumulative_influx = 4191.69104045766, pressure = 25808308.95954234, interval_influx = 4191.69104045766, interval_minimum_cumulative_influx = -1168.8078217550703, interval_maximum_cumulative_influx = 4191.69104045766 },
+]
+[[cases]]
+id = "infinite_up"
+tolerance = 1.0e-12
+source = "Infinite storage: absent initial volume, a linear rate and an unchanging aquifer pressure."
+[cases.inputs]
+total_compressibility = 1.0e-9
+productivity = 2.0e-7
+initial_pressure = 30000000.0
+intervals = [{ duration = 1000.0, reservoir_pressure_start = 25000000.0, reservoir_pressure_end = 40000000.0 }]
+[cases.expected]
+states = [
+  { time = 0.0, cumulative_influx = 0.0, pressure = 30000000.0, interval_influx = 0.0, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 0.0 },
+  { time = 1000.0, cumulative_influx = -500.0, pressure = 30000000.0, interval_influx = -500.0, interval_minimum_cumulative_influx = -500.0, interval_maximum_cumulative_influx = 166.66666666666663 },
+]
+[[cases]]
+id = "infinite_drawdown"
+tolerance = 1.0e-12
+source = "Infinite storage on a drawdown from 300 to 100 bara."
+[cases.inputs]
+total_compressibility = 1.0e-9
+productivity = 2.0e-7
+initial_pressure = 30000000.0
+intervals = [{ duration = 1000.0, reservoir_pressure_start = 30000000.0, reservoir_pressure_end = 10000000.0 }]
+[cases.expected]
+states = [
+  { time = 0.0, cumulative_influx = 0.0, pressure = 30000000.0, interval_influx = 0.0, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 0.0 },
+  { time = 1000.0, cumulative_influx = 2000.0, pressure = 30000000.0, interval_influx = 2000.0, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 2000.0 },
+]
+[[cases]]
+id = "zero_productivity"
+tolerance = 1.0e-12
+source = "A closed aquifer: zero productivity leaves the pressure and the influx unchanged."
+[cases.inputs]
+initial_water_volume = 1000000.0
+total_compressibility = 1.0e-9
+productivity = 0.0
+initial_pressure = 30000000.0
+intervals = [{ duration = 1000.0, reservoir_pressure_start = 30000000.0, reservoir_pressure_end = 10000000.0 }]
+[cases.expected]
+capacity = 0.001
+states = [
+  { time = 0.0, cumulative_influx = 0.0, pressure = 30000000.0, interval_influx = 0.0, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 0.0 },
+  { time = 1000.0, cumulative_influx = 0.0, pressure = 30000000.0, interval_influx = 0.0, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 0.0 },
+]
+[[cases]]
+id = "zero_storage"
+tolerance = 1.0e-12
+source = "Zero storage: the aquifer pressure follows the reservoir end pressure at once."
+[cases.inputs]
+initial_water_volume = 1000000.0
+total_compressibility = 0.0
+productivity = 2.0e-7
+initial_pressure = 30000000.0
+intervals = [{ duration = 1000.0, reservoir_pressure_start = 30000000.0, reservoir_pressure_end = 10000000.0 }]
+[cases.expected]
+capacity = 0.0
+states = [
+  { time = 0.0, cumulative_influx = 0.0, pressure = 30000000.0, interval_influx = 0.0, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 0.0 },
+  { time = 1000.0, cumulative_influx = 0.0, pressure = 10000000.0, interval_influx = 0.0, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 0.0 },
+]
+[[cases]]
+id = "recharge"
+tolerance = 1.0e-6
+source = "A recharge then a return: the signed cumulative influx is not clipped."
+[cases.inputs]
+initial_water_volume = 1000000.0
+total_compressibility = 1.0e-9
+productivity = 2.0e-7
+initial_pressure = 30000000.0
+intervals = [
+  { duration = 100000.0, reservoir_pressure_start = 35000000.0, reservoir_pressure_end = 35000000.0 },
+  { duration = 100000.0, reservoir_pressure_start = 30000000.0, reservoir_pressure_end = 30000000.0 },
+]
+[cases.expected]
+capacity = 0.001
+states = [
+  { time = 0.0, cumulative_influx = 0.0, pressure = 30000000.0, interval_influx = 0.0, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 0.0 },
+  { time = 100000.0, cumulative_influx = -4999.999989694232, pressure = 34999999.98969423, interval_influx = -4999.999989694232, interval_minimum_cumulative_influx = -4999.999989694232, interval_maximum_cumulative_influx = 0.0 },
+  { time = 200000.0, cumulative_influx = -1.0305768228136003e-5, pressure = 30000000.010305777, interval_influx = 4999.9999793884635, interval_minimum_cumulative_influx = -4999.999989694232, interval_maximum_cumulative_influx = -1.0305768228136003e-5 },
+]
+[[cases]]
+id = "small_exposure_boundary"
+tolerance = 1.0e-12
+source = "The 1e-3 series boundary from below: 0.00999999 s on the class's 1000 m3, 1e-6 1/bar, 1e-5 m3/(s bar) aquifer."
+[cases.inputs]
+initial_water_volume = 1000.0
+total_compressibility = 1.0e-11
+productivity = 1.0e-10
+initial_pressure = 30000000.0
+intervals = [{ duration = 0.00999999, reservoir_pressure_start = 30000000.0, reservoir_pressure_end = 15000000.0 }]
+[cases.expected]
+capacity = 1.0e-8
+states = [
+  { time = 0.0, cumulative_influx = 0.0, pressure = 30000000.0, interval_influx = 0.0, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 0.0 },
+  { time = 0.00999999, cumulative_influx = 7.4997425067498564e-6, pressure = 29999250.025749326, interval_influx = 7.4997425067498564e-6, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 7.4997425067498564e-6 },
+]
+[[cases]]
+id = "small_exposure_boundary_above"
+tolerance = 1.0e-12
+source = "The same boundary from above: 0.01000001 s."
+[cases.inputs]
+initial_water_volume = 1000.0
+total_compressibility = 1.0e-11
+productivity = 1.0e-10
+initial_pressure = 30000000.0
+intervals = [{ duration = 0.01000001, reservoir_pressure_start = 30000000.0, reservoir_pressure_end = 15000000.0 }]
+[cases.expected]
+capacity = 1.0e-8
+states = [
+  { time = 0.0, cumulative_influx = 0.0, pressure = 30000000.0, interval_influx = 0.0, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 0.0 },
+  { time = 0.01000001, cumulative_influx = 7.499757505749892e-6, pressure = 29999250.024249425, interval_influx = 7.499757505749892e-6, interval_minimum_cumulative_influx = 0.0, interval_maximum_cumulative_influx = 7.499757505749892e-6 },
+]

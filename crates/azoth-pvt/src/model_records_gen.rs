@@ -16,6 +16,7 @@ use crate::constant_mass_expansion::ConstantMassExpansionResult;
 use crate::constant_volume_depletion::ConstantVolumeDepletionResult;
 use crate::decline_curve::DeclineCurveResult;
 use crate::differential_liberation::DifferentialLiberationResult;
+use crate::fetkovich_aquifer::FetkovichAquiferResult;
 use crate::gas_correlations::GasCorrelationsResult;
 use crate::gas_material_balance::GasMaterialBalanceResult;
 use crate::mmp::MmpResult;
@@ -122,6 +123,15 @@ impl CalcResult for DifferentialLiberationResult {
         "points",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for FetkovichAquiferResult {
+    const CALC_ID: &'static str = "pvt.fetkovich_aquifer";
+    const FIELDS: &'static [&'static str] = &["capacity", "states", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

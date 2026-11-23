@@ -851,6 +851,29 @@ class EventTreeOutcome:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class FetkovichState:
+    """the initial state followed by one state per interval, in caller order."""
+
+    #: the elapsed time at the end of the interval.
+    time: Q
+
+    #: the cumulative water influx.
+    cumulative_influx: Q
+
+    #: the average aquifer pressure.
+    pressure: Q
+
+    #: the water influx over this interval.
+    interval_influx: Q
+
+    #: the smallest cumulative influx reached inside the interval.
+    interval_minimum_cumulative_influx: Q
+
+    #: the largest cumulative influx reached inside the interval.
+    interval_maximum_cumulative_influx: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class FiniteRateReleaseStation:
     """the base stations, with the opening's relaxed phase velocities solved. Empty on failure."""
 

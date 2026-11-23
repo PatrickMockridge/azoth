@@ -446,6 +446,7 @@ NON_UNIT_MODELS = {
     "pvt.van_everdingen_hurst_aquifer": (
         "the aquifer influence functions over scalars and histories, not a unit"
     ),
+    "pvt.fetkovich_aquifer": "the finite aquifer march over an interval schedule, not a unit",
     "process.bleve": "the fireball radiation over scalars, not a unit",
     "process.consequence_analysis": "the QRA composition over scalars and records, not a unit",
     "process.event_tree": "the event-tree enumeration over scalars, not a unit",

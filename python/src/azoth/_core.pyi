@@ -1192,6 +1192,13 @@ class BlackOilQuery(TypedDict):
     molar_mass: float | None
     z: float | None
 
+class FetkovichInterval(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    duration: float
+    reservoir_pressure_start: float
+    reservoir_pressure_end: float
+
 class GasQuery(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -2558,6 +2565,17 @@ class DlePoint:
     bo: float | None
     bg: float | None
     rs: float | None
+
+@final
+class FetkovichState:
+    """the initial state followed by one state per interval, in caller order."""
+
+    time: Qty
+    cumulative_influx: Qty
+    pressure: Qty
+    interval_influx: Qty
+    interval_minimum_cumulative_influx: Qty
+    interval_maximum_cumulative_influx: Qty
 
 @final
 class GasResultRow:
@@ -6982,6 +7000,12 @@ class DifferentialLiberationResult:
     warnings: list[Warning]
 
 @final
+class FetkovichAquiferResult:
+    capacity: float | None
+    states: list[FetkovichState]
+    warnings: list[Warning]
+
+@final
 class GasCorrelationsResult:
     queries: list[GasResultRow]
     warnings: list[Warning]
@@ -11262,6 +11286,13 @@ def differential_liberation(
     mixing_rule: str | None = None,
     volume_correction: bool | None = None,
 ) -> DifferentialLiberationResult: ...
+def fetkovich_aquifer(
+    total_compressibility: float,
+    productivity: float,
+    initial_pressure: float,
+    intervals: list[FetkovichInterval],
+    initial_water_volume: float | None = None,
+) -> FetkovichAquiferResult: ...
 def gas_correlations(queries: list[GasQuery]) -> GasCorrelationsResult: ...
 def gas_material_balance(
     calculation: str,

@@ -10278,6 +10278,41 @@ pub fn differential_liberation(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Fetkovich aquifer.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (initial_water_volume, total_compressibility, productivity, initial_pressure, intervals))]
+#[pyo3(
+    text_signature = "(initial_water_volume, total_compressibility, productivity, initial_pressure, intervals)"
+)]
+pub fn fetkovich_aquifer(
+    py: Python<'_>,
+    initial_water_volume: Option<f64>,
+    total_compressibility: f64,
+    productivity: f64,
+    initial_pressure: f64,
+    intervals: Vec<crate::records_gen::FetkovichInterval>,
+) -> PyResult<crate::transport_gen::PyFetkovichAquiferResult> {
+    let intervals_records: Vec<azoth_pvt::fetkovich_aquifer::FetkovichInterval> = intervals
+        .into_iter()
+        .map(|row| azoth_pvt::fetkovich_aquifer::FetkovichInterval {
+            duration: row.duration,
+            reservoir_pressure_start: row.reservoir_pressure_start,
+            reservoir_pressure_end: row.reservoir_pressure_end,
+        })
+        .collect();
+    azoth_pvt::fetkovich_aquifer::fetkovich_aquifer(
+        initial_water_volume.map(cubic_meters),
+        total_compressibility,
+        productivity,
+        pascals(initial_pressure),
+        &intervals_records,
+    )
+    .map(|r| crate::transport_gen::PyFetkovichAquiferResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Gas correlation table.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

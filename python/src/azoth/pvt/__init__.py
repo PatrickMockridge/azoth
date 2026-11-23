@@ -26,6 +26,7 @@ from azoth.core.result import (
     ConstantVolumeDepletionResult,
     DeclineCurveResult,
     DifferentialLiberationResult,
+    FetkovichAquiferResult,
     GasCorrelationsResult,
     GasMaterialBalanceResult,
     MmpResult,
@@ -46,6 +47,7 @@ _CONSTANT_MASS_EXPANSION = "pvt.constant_mass_expansion"
 _CONSTANT_VOLUME_DEPLETION = "pvt.constant_volume_depletion"
 _DECLINE_CURVE = "pvt.decline_curve"
 _DIFFERENTIAL_LIBERATION = "pvt.differential_liberation"
+_FETKOVICH_AQUIFER = "pvt.fetkovich_aquifer"
 _GAS_CORRELATIONS = "pvt.gas_correlations"
 _GAS_MATERIAL_BALANCE = "pvt.gas_material_balance"
 _MMP = "pvt.mmp"
@@ -65,6 +67,7 @@ __all__ = [
     "constant_volume_depletion",
     "decline_curve",
     "differential_liberation",
+    "fetkovich_aquifer",
     "gas_correlations",
     "gas_material_balance",
     "layers",
@@ -828,4 +831,39 @@ def van_everdingen_hurst_aquifer(
         encroachment_angle=encroachment_angle,
         aquifer_constant_value=aquifer_constant_value,
         pressure_drop=pressure_drop,
+    )
+
+
+def fetkovich_aquifer(
+    total_compressibility: float,
+    productivity: float,
+    initial_pressure: Any,
+    intervals: Sequence[Mapping[str, Any]],
+    *,
+    initial_water_volume: Any = None,
+) -> FetkovichAquiferResult:
+    """The finite, constant-property water aquifer over a prescribed interval schedule.
+
+    ``intervals`` is one row per prescribed linear reservoir-pressure interval, with
+    ``duration``, ``reservoir_pressure_start`` and ``reservoir_pressure_end``. Each interval
+    is integrated exactly; the cumulative-influx minimum and maximum are sampled at any
+    within-interval flow reversal. ``initial_water_volume`` absent is infinite storage; a
+    present zero is zero capacity. The capacitance is absent exactly when storage is infinite.
+
+    Returns:
+        The capacitance and the initial state followed by one state per interval.
+
+    Raises:
+        InvalidInputError: for a negative or NaN coefficient, a non-positive pressure or
+            duration, an unrepresentable finite capacity, or an interval that exhausts the
+            finite water inventory.
+
+    See :func:`azoth.pvt.reference.fetkovich_aquifer.fetkovich_aquifer`.
+    """
+    return resolve(_FETKOVICH_AQUIFER)(  # type: ignore[no-any-return]
+        initial_water_volume=initial_water_volume,
+        total_compressibility=total_compressibility,
+        productivity=productivity,
+        initial_pressure=initial_pressure,
+        intervals=intervals,
     )

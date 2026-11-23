@@ -360,6 +360,7 @@
 //!   - specs/models/pvt/constant_volume_depletion.toml
 //!   - specs/models/pvt/decline_curve.toml
 //!   - specs/models/pvt/differential_liberation.toml
+//!   - specs/models/pvt/fetkovich_aquifer.toml
 //!   - specs/models/pvt/gas_correlations.toml
 //!   - specs/models/pvt/gas_material_balance.toml
 //!   - specs/models/pvt/mmp.toml
@@ -6883,6 +6884,14 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "thermodynamic_temperature",
     ),
     ("pvt.differential_liberation", "pressures", "pressure"),
+    ("pvt.fetkovich_aquifer", "initial_water_volume", "volume"),
+    (
+        "pvt.fetkovich_aquifer",
+        "total_compressibility",
+        "dimensionless",
+    ),
+    ("pvt.fetkovich_aquifer", "productivity", "dimensionless"),
+    ("pvt.fetkovich_aquifer", "initial_pressure", "pressure"),
     ("pvt.gas_material_balance", "pressure", "pressure"),
     ("pvt.gas_material_balance", "z", "dimensionless"),
     ("pvt.gas_material_balance", "gp", "dimensionless"),

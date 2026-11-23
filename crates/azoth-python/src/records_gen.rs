@@ -745,6 +745,17 @@ pub struct FaultTreeNodeSpec {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct FetkovichInterval {
+    #[pyo3(item)]
+    pub duration: f64,
+    #[pyo3(item)]
+    pub reservoir_pressure_start: f64,
+    #[pyo3(item)]
+    pub reservoir_pressure_end: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct FilterBetaPoint {
     #[pyo3(item)]
     pub particle_size: f64,

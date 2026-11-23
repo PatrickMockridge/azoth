@@ -404,6 +404,10 @@ NO_INTERIOR: dict[str, str] = {
         "each calculation is one quadrature, conversion or recurrence answer; the nodes are "
         "the method, not a state a capture names"
     ),
+    "pvt.fetkovich_aquifer": (
+        "the answer is the interval schedule's states; the march's intermediate branches are "
+        "the method, not a state a capture names"
+    ),
 }
 
 #: Capture blocks that are evidence rather than a case - a refusal, a fallback or a fluid the

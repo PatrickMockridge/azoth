@@ -3964,6 +3964,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 2,
         "tests_skipped": 0,
     },
+    'pvt.fetkovich_aquifer': {
+        "calc_id": 'pvt.fetkovich_aquifer',
+        "name": 'Fetkovich aquifer',
+        "spec": {'path': 'specs/models/pvt/fetkovich_aquifer.toml', 'sha256': '7d5c0806a5ec9a9859dcc0be868972d1bb3af801d3a78f5d635a7a02876b5c5d'},
+        "code": [{'path': 'python/src/azoth/pvt/reference/fetkovich_aquifer.py', 'sha256': '3c7cc55409c16780a6f74f71426aa9c79f5691690f3c37fa44d310685ae10473'}, {'path': 'crates/azoth-pvt/src/fetkovich_aquifer.rs', 'sha256': 'bc014511df517f557ce6645d288bff130c2d130e453699a29aad4f0714097212'}],
+        "source": 'NeqSim pvtsimulation/reservoirproperties/materialbalance/FetkovichAquifer.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 14,
+        "tests_skipped": 0,
+    },
     'pvt.gas_correlations': {
         "calc_id": 'pvt.gas_correlations',
         "name": 'Gas correlation table',
@@ -4077,8 +4088,8 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'pvt.van_everdingen_hurst_aquifer': {
         "calc_id": 'pvt.van_everdingen_hurst_aquifer',
         "name": 'Van Everdingen-Hurst aquifer',
-        "spec": {'path': 'specs/models/pvt/van_everdingen_hurst_aquifer.toml', 'sha256': 'd9d30e271de9d099aa669e91a40ef26a5f02cf17995d783a4374a0e7e66fa8e2'},
-        "code": [{'path': 'python/src/azoth/pvt/reference/van_everdingen_hurst_aquifer.py', 'sha256': '4e66e7527ec5c427a7c0c8f7d52a139711d473da34035e2790a3a9f62c68db08'}, {'path': 'crates/azoth-pvt/src/van_everdingen_hurst_aquifer.rs', 'sha256': '65f909afd62d82e1e2332e821bfbe25a3382162f04353b25e8c1b15adbacc55f'}],
+        "spec": {'path': 'specs/models/pvt/van_everdingen_hurst_aquifer.toml', 'sha256': '797ad41cc93f5a2462f69f03b7153ab4f367d1d323f678b72f7927c6a33f8fb6'},
+        "code": [{'path': 'python/src/azoth/pvt/reference/van_everdingen_hurst_aquifer.py', 'sha256': '2f531069c1bf1513b77dbf84ea48dbc5141928f13b13e77b7141b24e0a86c2dc'}, {'path': 'crates/azoth-pvt/src/van_everdingen_hurst_aquifer.rs', 'sha256': '776f683894e0c72dbdf5239d15d3adbea67098aec81be66904141f48e65cb64d'}],
         "source": 'NeqSim pvtsimulation/reservoirproperties/materialbalance/VanEverdingenHurstAquifer.java and RadialInfiniteInfluence.java',
         "verification": 'partially_verified',
         "validation_cases": 0,

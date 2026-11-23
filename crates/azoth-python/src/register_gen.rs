@@ -378,6 +378,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyConstantVolumeDepletionResult>()?;
     m.add_class::<crate::transport_gen::PyDeclineCurveResult>()?;
     m.add_class::<crate::transport_gen::PyDifferentialLiberationResult>()?;
+    m.add_class::<crate::transport_gen::PyFetkovichAquiferResult>()?;
     m.add_class::<crate::transport_gen::PyGasCorrelationsResult>()?;
     m.add_class::<crate::transport_gen::PyGasMaterialBalanceResult>()?;
     m.add_class::<crate::transport_gen::PyMmpResult>()?;
@@ -443,6 +444,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyEscalationItemResult>()?;
     m.add_class::<crate::record_outputs_gen::PyEsdContribution>()?;
     m.add_class::<crate::record_outputs_gen::PyEventTreeOutcome>()?;
+    m.add_class::<crate::record_outputs_gen::PyFetkovichState>()?;
     m.add_class::<crate::record_outputs_gen::PyFiniteRateReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyFittedParameterRow>()?;
     m.add_class::<crate::record_outputs_gen::PyFlowlineScaleSegment>()?;
@@ -1394,6 +1396,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         crate::wrappers_gen::differential_liberation,
         m
     )?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::fetkovich_aquifer, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_correlations, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::gas_material_balance,

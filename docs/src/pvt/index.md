@@ -18,6 +18,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`pvt.constant_volume_depletion`](./constant_volume_depletion.md) | `direct composition` | NeqSim pvtsimulation/simulation/ConstantVolumeDepletion.java |
 | [`pvt.decline_curve`](./decline_curve.md) | `direct composition` | NeqSim pvtsimulation/util/DeclineCurveAnalysis.java |
 | [`pvt.differential_liberation`](./differential_liberation.md) | `direct composition` | NeqSim pvtsimulation/simulation/DifferentialLiberation.java |
+| [`pvt.fetkovich_aquifer`](./fetkovich_aquifer.md) | `fetkovich_exact_ramp_march` | NeqSim pvtsimulation/reservoirproperties/materialbalance/FetkovichAquifer.java |
 | [`pvt.gas_correlations`](./gas_correlations.md) | `gas_correlation_dispatch` | NeqSim pvtsimulation/util/ZFactorCorrelations.java, GasPseudoCriticalProperties.java, GasPseudoPressure.java and reservoirproperties/CompositionEstimation.java |
 | [`pvt.gas_material_balance`](./gas_material_balance.md) | `direct composition` | NeqSim reservoirproperties/materialbalance/GasMaterialBalance.java |
 | [`pvt.mmp`](./mmp.md) | `direct composition` | NeqSim pvtsimulation/simulation/MMPCalculator.java |

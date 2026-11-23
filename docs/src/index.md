@@ -471,6 +471,7 @@ Five sections, and the difference between them is the point:
 - [`pvt.constant_volume_depletion`](./pvt/constant_volume_depletion.md) — Constant volume depletion
 - [`pvt.decline_curve`](./pvt/decline_curve.md) — Decline-curve analysis
 - [`pvt.differential_liberation`](./pvt/differential_liberation.md) — Differential liberation
+- [`pvt.fetkovich_aquifer`](./pvt/fetkovich_aquifer.md) — Fetkovich aquifer
 - [`pvt.gas_correlations`](./pvt/gas_correlations.md) — Gas correlation table
 - [`pvt.gas_material_balance`](./pvt/gas_material_balance.md) — Gas material balance
 - [`pvt.mmp`](./pvt/mmp.md) — Minimum miscibility pressure

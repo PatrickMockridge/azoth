@@ -51,6 +51,7 @@ from azoth.core.record_outputs_gen import (
     EscalationItemResult,
     EsdContribution,
     EventTreeOutcome,
+    FetkovichState,
     FiniteRateReleaseStation,
     FittedParameterRow,
     FlowlineScaleSegment,
@@ -12444,6 +12445,22 @@ class DifferentialLiberationResult(_HasWarnings):
 
     #: one row per pressure.
     points: tuple[DlePoint, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class FetkovichAquiferResult(_HasWarnings):
+    """Result of ``pvt.fetkovich_aquifer``."""
+
+    CALC_ID: ClassVar[str] = "pvt.fetkovich_aquifer"
+
+    #: the volume-pressure capacitance in reservoir m3 per Pa; absent exactly when storage is infinite.
+    capacity: float | None
+
+    #: the initial state followed by one state per interval, in caller order.
+    states: tuple[FetkovichState, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

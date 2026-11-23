@@ -14,6 +14,7 @@ pub mod constant_mass_expansion;
 pub mod constant_volume_depletion;
 pub mod decline_curve;
 pub mod differential_liberation;
+pub mod fetkovich_aquifer;
 pub mod flash;
 pub mod fluid;
 pub mod gas_correlations;
@@ -49,6 +50,9 @@ pub use constant_volume_depletion::{
 pub use decline_curve::{DeclineCurveResult, decline_curve};
 pub use differential_liberation::{
     DifferentialLiberationResult, DlePoint, differential_liberation, differential_liberation_of,
+};
+pub use fetkovich_aquifer::{
+    FetkovichAquiferResult, FetkovichInterval, FetkovichState, fetkovich_aquifer,
 };
 pub use flash::{Flash, FlashMode, Phase};
 pub use fluid::{Fluid, GasTemplate};

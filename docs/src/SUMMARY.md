@@ -374,6 +374,7 @@
   - [Constant volume depletion](./pvt/constant_volume_depletion.md)
   - [Decline-curve analysis](./pvt/decline_curve.md)
   - [Differential liberation](./pvt/differential_liberation.md)
+  - [Fetkovich aquifer](./pvt/fetkovich_aquifer.md)
   - [Gas correlation table](./pvt/gas_correlations.md)
   - [Gas material balance](./pvt/gas_material_balance.md)
   - [Minimum miscibility pressure](./pvt/mmp.md)

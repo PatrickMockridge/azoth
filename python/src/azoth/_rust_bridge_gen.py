@@ -142,6 +142,8 @@ from azoth.core.result import (
     ExpanderResult,
     FaultTreeResult,
     FeSMorphology,
+    FetkovichAquiferResult,
+    FetkovichState,
     FilippovConductivityResult,
     FilterResult,
     FiniteRateReleaseResult,
@@ -679,6 +681,7 @@ __all__ = [
     "event_tree",
     "expander",
     "fault_tree",
+    "fetkovich_aquifer",
     "filippov_conductivity",
     "filter",
     "finite_rate_release",
@@ -10616,6 +10619,23 @@ def differential_liberation(components: Sequence[Mapping[str, Any]], *, pressure
         saturation_volume=None if result.saturation_volume is None else from_si(result.saturation_volume.magnitude_si, result.saturation_volume.unit),
         voil_std=None if result.voil_std is None else from_si(result.voil_std.magnitude_si, result.voil_std.unit),
         points=tuple(DlePoint(pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), total_volume=from_si(c.total_volume.magnitude_si, c.total_volume.unit), relative_volume=c.relative_volume, liquid_volume=from_si(c.liquid_volume.magnitude_si, c.liquid_volume.unit), liquid_volume_relative_to_vsat=c.liquid_volume_relative_to_vsat, oil_density=from_si(c.oil_density.magnitude_si, c.oil_density.unit), gas_volume=None if c.gas_volume is None else from_si(c.gas_volume.magnitude_si, c.gas_volume.unit), gas_standard_volume=None if c.gas_standard_volume is None else from_si(c.gas_standard_volume.magnitude_si, c.gas_standard_volume.unit), z_gas=c.z_gas, relative_gas_gravity=c.relative_gas_gravity, bo=c.bo, bg=c.bg, rs=c.rs) for c in result.points),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def fetkovich_aquifer(total_compressibility: float, productivity: float, initial_pressure: Any, intervals: Sequence[Mapping[str, Any]], *, initial_water_volume: Any=None) -> FetkovichAquiferResult:
+    """``pvt.fetkovich_aquifer``, computed in Rust."""
+    spec = _models_gen.model("pvt.fetkovich_aquifer")
+    result = _core.fetkovich_aquifer(
+        None if initial_water_volume is None else _si(spec, "initial_water_volume", initial_water_volume),
+        total_compressibility,
+        productivity,
+        _si(spec, "initial_pressure", initial_pressure),
+        input_records_to_si(spec, "intervals", intervals),
+    )
+    return FetkovichAquiferResult(
+        capacity=result.capacity,
+        states=tuple(FetkovichState(time=from_si(c.time.magnitude_si, c.time.unit), cumulative_influx=from_si(c.cumulative_influx.magnitude_si, c.cumulative_influx.unit), pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), interval_influx=from_si(c.interval_influx.magnitude_si, c.interval_influx.unit), interval_minimum_cumulative_influx=from_si(c.interval_minimum_cumulative_influx.magnitude_si, c.interval_minimum_cumulative_influx.unit), interval_maximum_cumulative_influx=from_si(c.interval_maximum_cumulative_influx.magnitude_si, c.interval_maximum_cumulative_influx.unit)) for c in result.states),
         warnings=_warnings(result.warnings),
     )
 

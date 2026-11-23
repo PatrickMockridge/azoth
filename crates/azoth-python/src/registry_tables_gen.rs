@@ -379,6 +379,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "pvt.constant_volume_depletion" => azoth_pvt::constant_volume_depletion::ConstantVolumeDepletionResult::FIELDS.to_vec(),
         "pvt.decline_curve" => azoth_pvt::decline_curve::DeclineCurveResult::FIELDS.to_vec(),
         "pvt.differential_liberation" => azoth_pvt::differential_liberation::DifferentialLiberationResult::FIELDS.to_vec(),
+        "pvt.fetkovich_aquifer" => azoth_pvt::fetkovich_aquifer::FetkovichAquiferResult::FIELDS.to_vec(),
         "pvt.gas_correlations" => azoth_pvt::gas_correlations::GasCorrelationsResult::FIELDS.to_vec(),
         "pvt.gas_material_balance" => azoth_pvt::gas_material_balance::GasMaterialBalanceResult::FIELDS.to_vec(),
         "pvt.mmp" => azoth_pvt::mmp::MmpResult::FIELDS.to_vec(),

@@ -22,13 +22,13 @@ use crate::record_outputs_gen::{
     PyDriftFluxReleaseStation, PyEnvelopePoint, PyEnvelopeQuery, PyEnvelopeSummary,
     PyEquilibriumSoundSpeedSample, PyEquipmentCostResultRow, PyEquipmentMtoRow,
     PyEquipmentQualityFlag, PyEscalationItemResult, PyEsdContribution, PyEventTreeOutcome,
-    PyFiniteRateReleaseStation, PyFittedParameterRow, PyFlowlineScaleSegment, PyFmeaRankedEntry,
-    PyGasResultRow, PyHazopPopulationRow, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
-    PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
-    PyHydrateRiskPoint, PyIdealGasFannoReleaseStation, PyIdealGasReleaseStation,
-    PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
-    PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier, PyMahConsequence,
-    PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet, PyMmpPoint,
+    PyFetkovichState, PyFiniteRateReleaseStation, PyFittedParameterRow, PyFlowlineScaleSegment,
+    PyFmeaRankedEntry, PyGasResultRow, PyHazopPopulationRow, PyHazopTemplateDeviation,
+    PyHeatExchangerMechanicalType, PyHeaterInstrument, PyHeaterMechanicalType,
+    PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIdealGasFannoReleaseStation,
+    PyIdealGasReleaseStation, PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic,
+    PyLeakBlowdownPoint, PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier,
+    PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet, PyMmpPoint,
     PyMultiVesselContributionRow, PyMultiVesselProfileRow, PyNaceIssueRow,
     PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment, PyOpenDrainResult, PyOperatingCostLine,
     PyP002FindingResult, PyPerformanceAssessment, PyPerformanceFinding, PyPerformanceInstrument,
@@ -30731,6 +30731,47 @@ impl From<&azoth_pvt::differential_liberation::DifferentialLiberationResult>
                 unit: "m**3".to_string(),
             }),
             points: r.points.iter().map(PyDlePoint::from).collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.fetkovich_aquifer`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FetkovichAquiferResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFetkovichAquiferResult {
+    /// the volume-pressure capacitance in reservoir m3 per Pa; absent exactly when storage is infinite.
+    #[pyo3(get)]
+    pub capacity: Option<f64>,
+    /// the initial state followed by one state per interval, in caller order.
+    #[pyo3(get)]
+    pub states: Vec<PyFetkovichState>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyFetkovichAquiferResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "FetkovichAquiferResult(capacity={:?}, states={:?}, {} warning(s))",
+            self.capacity,
+            self.states,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::fetkovich_aquifer::FetkovichAquiferResult> for PyFetkovichAquiferResult {
+    fn from(r: &azoth_pvt::fetkovich_aquifer::FetkovichAquiferResult) -> Self {
+        Self {
+            capacity: r.capacity,
+            states: r.states.iter().map(PyFetkovichState::from).collect(),
             warnings: transport(&r.warnings),
         }
     }

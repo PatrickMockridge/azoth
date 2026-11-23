@@ -1,0 +1,82 @@
+id = "pvt.fetkovich_aquifer"
+name = "Fetkovich aquifer"
+kind = "procedure"
+assumptions = [
+    "**each prescribed linear-pressure interval is integrated exactly**, with the class's small-exposure series below `1e-3` and its infinite-capacity branch; the march is a schedule of intervals, not a transient.\n",
+    "**the within-interval cumulative-influx minimum and maximum are sampled at a flow reversal**, so a ramp that turns the influx around inside one step reports both.\n",
+    "**a finite aquifer is refused when an interval's maximum cumulative influx reaches its water volume**, including an interior maximum: the class's `InventoryExhaustedException`.\n",
+    "**infinite storage is absent `initial_water_volume`**, not a non-finite number; a present zero is zero capacity.\n",
+    "**the capacity is absent exactly when storage is infinite**; a zero capacity is published as zero.\n",
+    "**the class's `State` serialization and resume surface is session state**: the id is one march over the stated schedule and publishes the states.\n",
+    "**a negative or NaN volume, compressibility or productivity, a non-positive pressure or duration, and an unrepresentable finite capacity are refused.**\n",
+]
+references = [
+    "Fetkovich, M. J. (1971). \"A Simplified Approach to Water Influx Calculations - Finite Aquifer Systems.\" Journal of Petroleum Technology 23(7), 814-828. DOI 10.2118/2603-PA.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/reservoirproperties/materialbalance/FetkovichAquifer.java` at commit 118d9af is the port source.",
+    "`validation/neqsim/captures/pvt_fetkovich_aquifer.tsv` - the constant-pressure identity, the linear ramps, the small-exposure boundary, the infinite-capacity and zero-productivity limits, the recharge replay and the inventory refusals.",
+]
+[source]
+standard = "NeqSim pvtsimulation/reservoirproperties/materialbalance/FetkovichAquifer.java"
+edition = "The exact prescribed-pressure march, the within-interval extrema, the infinite-capacity and zero-capacity branches and the finite-inventory refusal."
+[algorithm]
+scheme = "fetkovich_exact_ramp_march"
+initialisation = "stated_initial_pressure_and_zero_influx"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.initial_water_volume]
+unit = "m**3"
+optional = true
+description = "the initial aquifer water volume. **Absent is the class's explicit infinite storage**; a present zero is zero capacity rather than infinity.\n"
+[inputs.total_compressibility]
+unit = "dimensionless"
+description = "the total water/rock compressibility, in 1/Pa.\n"
+[inputs.productivity]
+unit = "dimensionless"
+description = "the water productivity, in reservoir m3 per second per Pa.\n"
+[inputs.initial_pressure]
+unit = "Pa"
+description = "the initial average aquifer pressure.\n"
+[inputs.intervals]
+type = "record_list"
+row_type = "FetkovichInterval"
+description = "the prescribed linear-pressure intervals, in caller order; an empty schedule answers the initial state alone.\n"
+[inputs.intervals.fields.duration]
+unit = "s"
+description = "the interval duration.\n"
+[inputs.intervals.fields.reservoir_pressure_start]
+unit = "Pa"
+description = "the reservoir pressure at the interval start.\n"
+[inputs.intervals.fields.reservoir_pressure_end]
+unit = "Pa"
+description = "the reservoir pressure at the interval end.\n"
+[outputs]
+[outputs.capacity]
+unit = "dimensionless"
+optional = true
+description = "the volume-pressure capacitance in reservoir m3 per Pa; absent exactly when storage is infinite.\n"
+[outputs.states]
+type = "record_list"
+description = "the initial state followed by one state per interval, in caller order.\n"
+[outputs.states.fields.time]
+unit = "s"
+description = "the elapsed time at the end of the interval.\n"
+[outputs.states.fields.cumulative_influx]
+unit = "m**3"
+description = "the cumulative water influx.\n"
+[outputs.states.fields.pressure]
+unit = "Pa"
+description = "the average aquifer pressure.\n"
+[outputs.states.fields.interval_influx]
+unit = "m**3"
+description = "the water influx over this interval.\n"
+[outputs.states.fields.interval_minimum_cumulative_influx]
+unit = "m**3"
+description = "the smallest cumulative influx reached inside the interval.\n"
+[outputs.states.fields.interval_maximum_cumulative_influx]
+unit = "m**3"
+description = "the largest cumulative influx reached inside the interval.\n"
+[implementations]
+python = "azoth.pvt.fetkovich_aquifer"
+rust = "azoth_pvt::fetkovich_aquifer"
