@@ -35,6 +35,34 @@ def phase_viscosity(mixture: Any, t: float, p: float, x: list[float], kind: str)
         )
     else:
         raise InvalidInputError("phase", f"{kind!r} is not a phase kind")
+    return _floor(value)
+
+
+def phase_viscosity_with_csp(
+    mixture: Any, t: float, p: float, x: list[float], correction: tuple[float, ...]
+) -> float:
+    """The same with the PVT regression's four PFCT correction factors.
+
+    Every phase takes the PFCT form once a factor is set, aqueous included: the class
+    forces ``PFCT`` on each stored phase slot before it writes the factor.
+    """
+    from azoth.eos.reference.viscosity import _viscosity_with_csp
+
+    value = (
+        _viscosity_with_csp(
+            mixture,
+            quantity(t, "K"),
+            quantity(p, "Pa"),
+            x,
+            (correction[0], correction[1], correction[2], correction[3]),
+        )
+        .mu.to("Pa*s")
+        .magnitude
+    )
+    return _floor(value)
+
+
+def _floor(value: float) -> float:
     if math.isnan(value):
         raise InvalidInputError("viscosity", "the correlation answered a NaN at this state")
     return VISCOSITY_FLOOR_PA_S if value < 0.0 else value

@@ -329,3 +329,573 @@ fn bip_overrides(
     }
     pairs
 }
+
+/// One experiment the regression fits.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum ExperimentType {
+    /// A constant-composition expansion.
+    Cce,
+    /// A constant-volume depletion.
+    Cvd,
+    /// A differential liberation.
+    Dle,
+    /// One phase's viscosity at one state.
+    Viscosity,
+}
+
+/// One CCE's schedule and its measured relative volumes.
+#[derive(Debug, Clone, PartialEq)]
+pub struct CceExperiment {
+    /// The experiment's temperature, in K.
+    pub temperature: f64,
+    /// The schedule, in Pa.
+    pub pressures: Vec<f64>,
+    /// The measured relative volumes, aligned with `pressures`.
+    pub relative_volumes: Vec<f64>,
+}
+
+/// One CVD's schedule and its measured dropout and gas Z.
+#[derive(Debug, Clone, PartialEq)]
+pub struct CvdExperiment {
+    /// The experiment's temperature, in K.
+    pub temperature: f64,
+    /// The schedule, in Pa.
+    pub pressures: Vec<f64>,
+    /// The measured liquid volume over the saturation volume, aligned with `pressures`.
+    pub liquid_dropout: Vec<f64>,
+    /// The measured gas compressibility, aligned with `pressures`.
+    pub z_factor: Vec<f64>,
+}
+
+/// One DLE's schedule and its measured Rs, Bo and oil density.
+#[derive(Debug, Clone, PartialEq)]
+pub struct DleExperiment {
+    /// The experiment's temperature, in K.
+    pub temperature: f64,
+    /// The schedule, in Pa.
+    pub pressures: Vec<f64>,
+    /// The measured solution gas-oil ratio.
+    pub rs: Vec<f64>,
+    /// The measured formation volume factor.
+    pub bo: Vec<f64>,
+    /// The measured oil density, in kg/m3.
+    pub oil_density: Vec<f64>,
+}
+
+/// Which phase a viscosity observation names.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ViscosityPhase {
+    /// The gas phase.
+    Gas,
+    /// The oil, or liquid, phase.
+    Oil,
+    /// The aqueous, or water, phase.
+    Aqueous,
+}
+
+impl ViscosityPhase {
+    /// The spec's enum spelling.
+    #[must_use]
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Gas => "gas",
+            Self::Oil => "oil",
+            Self::Aqueous => "aqueous",
+        }
+    }
+
+    /// The constant the spec's enum spelling names.
+    #[must_use]
+    pub fn from_name(name: &str) -> Option<Self> {
+        Some(match name {
+            "gas" | "vapor" | "vapour" => Self::Gas,
+            "oil" | "liquid" => Self::Oil,
+            "aqueous" | "water" => Self::Aqueous,
+            _ => return None,
+        })
+    }
+}
+
+/// One measured viscosity at one state.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ViscosityPoint {
+    /// The state's temperature, in K.
+    pub temperature: f64,
+    /// The state's pressure, in Pa.
+    pub pressure: f64,
+    /// The measured dynamic viscosity, in Pa*s.
+    pub viscosity: f64,
+    /// Which phase the measurement names.
+    pub phase: ViscosityPhase,
+}
+
+/// The class's per-experiment weights, which divide the sample standard deviations.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct ExperimentWeights {
+    /// The CCE weight; the class's default is 1.
+    pub cce: f64,
+    /// The CVD weight; the class's default is 1.
+    pub cvd: f64,
+    /// The DLE weight; the class's default is 1.
+    pub dle: f64,
+    /// The viscosity weight; the class's default is 0.5.
+    pub viscosity: f64,
+}
+
+impl Default for ExperimentWeights {
+    fn default() -> Self {
+        Self {
+            cce: 1.0,
+            cvd: 1.0,
+            dle: 1.0,
+            viscosity: 0.5,
+        }
+    }
+}
+
+/// Everything the fit is held to.
+#[derive(Debug, Clone, PartialEq)]
+pub struct RegressionData {
+    /// The CCE experiments, in registration order.
+    pub cce: Vec<CceExperiment>,
+    /// The CVD experiments, in registration order.
+    pub cvd: Vec<CvdExperiment>,
+    /// The DLE experiments, in registration order.
+    pub dle: Vec<DleExperiment>,
+    /// The viscosity points, in registration order.
+    pub viscosity: Vec<ViscosityPoint>,
+    /// The per-experiment weights.
+    pub weights: ExperimentWeights,
+}
+
+/// Which CVD value a sample fits.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CvdProperty {
+    /// The liquid volume over the saturation volume.
+    LiquidDropout,
+    /// The gas compressibility.
+    GasZ,
+}
+
+/// Which DLE value a sample fits.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DleProperty {
+    /// The solution gas-oil ratio.
+    Rs,
+    /// The formation volume factor.
+    Bo,
+    /// The oil density.
+    OilDensity,
+}
+
+/// One sample of the fit: an observed value, its standard deviation and where it is read.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Sample {
+    /// The measured value.
+    pub observed: f64,
+    /// The class's standard deviation, after the experiment's weight divides it.
+    pub sigma: f64,
+    /// The model value's address.
+    pub kind: SampleKind,
+}
+
+/// Where a sample's model value comes from.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SampleKind {
+    /// One CCE point.
+    Cce {
+        /// Which experiment.
+        experiment: usize,
+        /// Which point.
+        point: usize,
+    },
+    /// One CVD row's dropout or gas Z.
+    Cvd {
+        /// Which experiment.
+        experiment: usize,
+        /// Which row.
+        row: usize,
+        /// Which value.
+        property: CvdProperty,
+    },
+    /// One DLE row's Rs, Bo or density.
+    Dle {
+        /// Which experiment.
+        experiment: usize,
+        /// Which row.
+        row: usize,
+        /// Which value.
+        property: DleProperty,
+    },
+    /// One viscosity point.
+    Viscosity {
+        /// Which point.
+        point: usize,
+    },
+}
+
+fn finite_positive(name: &str, value: f64) -> Result<()> {
+    if value.is_finite() && value > 0.0 {
+        return Ok(());
+    }
+    Err(AzothError::invalid_input(
+        name,
+        format!("a positive finite value is needed; got {value}"),
+    ))
+}
+
+fn weight(name: &str, value: f64) -> Result<()> {
+    if value.is_finite() && value > 0.0 {
+        return Ok(());
+    }
+    Err(AzothError::invalid_input(
+        name,
+        format!("a weight must be finite and above zero; got {value}"),
+    ))
+}
+
+impl RegressionData {
+    /// The samples in the class's registration order, with its standard deviations.
+    ///
+    /// # Errors
+    /// * [`AzothError::InvalidInput`] for a weight at or below zero, an observation vector
+    ///   whose length is not the schedule's, a non-positive temperature or pressure, or a
+    ///   non-positive CCE relative volume - which the objective divides by.
+    pub fn samples(&self) -> Result<Vec<Sample>> {
+        weight("cce_weight", self.weights.cce)?;
+        weight("cvd_weight", self.weights.cvd)?;
+        weight("dle_weight", self.weights.dle)?;
+        weight("viscosity_weight", self.weights.viscosity)?;
+        let mut samples = Vec::new();
+        for (experiment, data) in self.cce.iter().enumerate() {
+            finite_positive("cce.temperature", data.temperature)?;
+            if data.pressures.len() != data.relative_volumes.len() {
+                return Err(AzothError::invalid_input(
+                    "cce",
+                    "the schedule and its relative volumes differ in length",
+                ));
+            }
+            for (point, (&pressure, &relative_volume)) in data
+                .pressures
+                .iter()
+                .zip(&data.relative_volumes)
+                .enumerate()
+            {
+                finite_positive(&format!("cce.pressures[{point}]"), pressure)?;
+                finite_positive(&format!("cce.relative_volumes[{point}]"), relative_volume)?;
+                samples.push(Sample {
+                    observed: relative_volume,
+                    sigma: 0.01 / self.weights.cce,
+                    kind: SampleKind::Cce { experiment, point },
+                });
+            }
+        }
+        for (experiment, data) in self.cvd.iter().enumerate() {
+            finite_positive("cvd.temperature", data.temperature)?;
+            if data.pressures.len() != data.liquid_dropout.len()
+                || data.pressures.len() != data.z_factor.len()
+            {
+                return Err(AzothError::invalid_input(
+                    "cvd",
+                    "the schedule, its dropout and its Z differ in length",
+                ));
+            }
+            for row in 0..data.pressures.len() {
+                finite_positive(&format!("cvd.pressures[{row}]"), data.pressures[row])?;
+                for (property, observed) in [
+                    (CvdProperty::LiquidDropout, data.liquid_dropout[row]),
+                    (CvdProperty::GasZ, data.z_factor[row]),
+                ] {
+                    samples.push(Sample {
+                        observed,
+                        sigma: 0.01 / self.weights.cvd,
+                        kind: SampleKind::Cvd {
+                            experiment,
+                            row,
+                            property,
+                        },
+                    });
+                }
+            }
+        }
+        for (experiment, data) in self.dle.iter().enumerate() {
+            finite_positive("dle.temperature", data.temperature)?;
+            if data.pressures.len() != data.rs.len()
+                || data.pressures.len() != data.bo.len()
+                || data.pressures.len() != data.oil_density.len()
+            {
+                return Err(AzothError::invalid_input(
+                    "dle",
+                    "the schedule and its three observations differ in length",
+                ));
+            }
+            for row in 0..data.pressures.len() {
+                finite_positive(&format!("dle.pressures[{row}]"), data.pressures[row])?;
+                for (property, observed) in [
+                    (DleProperty::Rs, data.rs[row]),
+                    (DleProperty::Bo, data.bo[row]),
+                    (DleProperty::OilDensity, data.oil_density[row]),
+                ] {
+                    samples.push(Sample {
+                        observed,
+                        sigma: (observed.abs() * 0.01).max(1e-3) / self.weights.dle,
+                        kind: SampleKind::Dle {
+                            experiment,
+                            row,
+                            property,
+                        },
+                    });
+                }
+            }
+        }
+        for (point, data) in self.viscosity.iter().enumerate() {
+            finite_positive(&format!("viscosity[{point}].temperature"), data.temperature)?;
+            finite_positive(&format!("viscosity[{point}].pressure"), data.pressure)?;
+            samples.push(Sample {
+                observed: data.viscosity,
+                sigma: (data.viscosity.abs() * 0.02).max(1e-10) / self.weights.viscosity,
+                kind: SampleKind::Viscosity { point },
+            });
+        }
+        Ok(samples)
+    }
+}
+
+/// The model value one sample reads.
+///
+/// # Errors
+/// Propagates the kernels' refusals.
+pub fn sample_value(
+    fluid: &Fluid,
+    csp: [f64; 4],
+    sample: &Sample,
+    data: &RegressionData,
+) -> Result<f64> {
+    match sample.kind {
+        SampleKind::Cce { experiment, point } => {
+            let data = &data.cce[experiment];
+            let result = crate::constant_mass_expansion_of(
+                fluid,
+                azoth_core::units::kelvins(data.temperature),
+                &[data.pressures[point]],
+            )?;
+            Ok(result.points[0].relative_volume)
+        }
+        SampleKind::Cvd {
+            experiment,
+            row,
+            property,
+        } => {
+            let data = &data.cvd[experiment];
+            let result = crate::constant_volume_depletion_of(
+                fluid,
+                azoth_core::units::kelvins(data.temperature),
+                &data.pressures,
+            )?;
+            let point = &result.points[row];
+            Ok(match property {
+                CvdProperty::LiquidDropout => point.liquid_volume_relative_to_vsat.unwrap_or(0.0),
+                CvdProperty::GasZ => point.z_gas.unwrap_or(0.0),
+            })
+        }
+        SampleKind::Dle {
+            experiment,
+            row,
+            property,
+        } => {
+            let data = &data.dle[experiment];
+            let result = crate::differential_liberation_of(
+                fluid,
+                azoth_core::units::kelvins(data.temperature),
+                &data.pressures,
+            )?;
+            let point = &result.points[row];
+            Ok(match property {
+                DleProperty::Rs => point.rs.unwrap_or(0.0),
+                DleProperty::Bo => point.bo.unwrap_or(1.0),
+                DleProperty::OilDensity => point.oil_density,
+            })
+        }
+        SampleKind::Viscosity { point } => {
+            let data = &data.viscosity[point];
+            let flash = fluid.flash(data.temperature, data.pressure, crate::FlashMode::TwoPhase)?;
+            let phase = match data.phase {
+                ViscosityPhase::Gas => flash.gas(),
+                ViscosityPhase::Oil => flash.oil(),
+                ViscosityPhase::Aqueous => flash.aqueous(),
+            };
+            match phase {
+                None => Ok(0.0),
+                Some(phase) => crate::transport::phase_viscosity_with_csp(
+                    &fluid.mixture,
+                    data.temperature,
+                    data.pressure,
+                    &phase.x,
+                    csp,
+                ),
+            }
+        }
+    }
+}
+
+/// The weighted chi-square the optimizer minimises.
+///
+/// # Errors
+/// Propagates [`RegressionData::samples`] and [`sample_value`].
+pub fn chi_square(
+    fluid: &Fluid,
+    csp: [f64; 4],
+    samples: &[Sample],
+    data: &RegressionData,
+) -> Result<f64> {
+    let mut sum = 0.0;
+    for sample in samples {
+        let value = sample_value(fluid, csp, sample, data)?;
+        let residual = (value - sample.observed) / sample.sigma;
+        sum += residual * residual;
+    }
+    Ok(sum)
+}
+
+/// The class's second ledger: unweighted squared relative residuals, each divided by its
+/// experiment's point count.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct Objectives {
+    /// The CCE objective.
+    pub cce: Option<f64>,
+    /// The CVD objective.
+    pub cvd: Option<f64>,
+    /// The DLE objective.
+    pub dle: Option<f64>,
+    /// The viscosity objective.
+    pub viscosity: Option<f64>,
+}
+
+impl Objectives {
+    /// The sum in the class's declaration order.
+    #[must_use]
+    pub fn total(&self) -> f64 {
+        self.cce.unwrap_or(0.0)
+            + self.cvd.unwrap_or(0.0)
+            + self.dle.unwrap_or(0.0)
+            + self.viscosity.unwrap_or(0.0)
+    }
+}
+
+/// The second ledger, computed from the tuned fluid.
+///
+/// # Errors
+/// Propagates the kernels' refusals.
+pub fn objectives(fluid: &Fluid, csp: [f64; 4], data: &RegressionData) -> Result<Objectives> {
+    let mut values = Objectives::default();
+    if !data.cce.is_empty() {
+        // The class flattens every CCE experiment onto the first point's temperature.
+        let temperature = data.cce[0].temperature;
+        let mut pressures = Vec::new();
+        for experiment in &data.cce {
+            pressures.extend(&experiment.pressures);
+        }
+        let result = crate::constant_mass_expansion_of(
+            fluid,
+            azoth_core::units::kelvins(temperature),
+            &pressures,
+        )?;
+        let mut total = 0.0;
+        let mut index = 0;
+        for experiment in &data.cce {
+            for observed in &experiment.relative_volumes {
+                let calculated = result.points[index].relative_volume;
+                total += ((calculated - observed) / observed).powi(2);
+                index += 1;
+            }
+        }
+        if index > 0 {
+            values.cce = Some(total / index as f64);
+        }
+    }
+    if !data.cvd.is_empty() {
+        let mut total = 0.0;
+        let mut points = 0;
+        for experiment in &data.cvd {
+            let result = crate::constant_volume_depletion_of(
+                fluid,
+                azoth_core::units::kelvins(experiment.temperature),
+                &experiment.pressures,
+            )?;
+            for (row, point) in result.points.iter().enumerate() {
+                let dropout = point.liquid_volume_relative_to_vsat.unwrap_or(0.0);
+                let observed = experiment.liquid_dropout[row];
+                total += ((dropout - observed) / observed.max(0.01)).powi(2);
+                let z = point.z_gas.unwrap_or(0.0);
+                let observed_z = experiment.z_factor[row];
+                total += ((z - observed_z) / observed_z.abs().max(1e-12)).powi(2);
+            }
+            points += experiment.pressures.len();
+        }
+        if points > 0 {
+            values.cvd = Some(total / (2 * points) as f64);
+        }
+    }
+    if !data.dle.is_empty() {
+        let mut total = 0.0;
+        let mut points = 0;
+        for experiment in &data.dle {
+            let result = crate::differential_liberation_of(
+                fluid,
+                azoth_core::units::kelvins(experiment.temperature),
+                &experiment.pressures,
+            )?;
+            for (row, point) in result.points.iter().enumerate() {
+                let calculated = [
+                    point.rs.unwrap_or(0.0),
+                    point.bo.unwrap_or(1.0),
+                    point.oil_density,
+                ];
+                let observed = [
+                    experiment.rs[row],
+                    experiment.bo[row],
+                    experiment.oil_density[row],
+                ];
+                for (calculated, observed) in calculated.into_iter().zip(observed) {
+                    if observed > 0.0 {
+                        total += ((calculated - observed) / observed).powi(2);
+                    }
+                }
+            }
+            points += experiment.pressures.len();
+        }
+        if points > 0 {
+            values.dle = Some(total / (3 * points) as f64);
+        }
+    }
+    if !data.viscosity.is_empty() {
+        let mut total = 0.0;
+        for point in &data.viscosity {
+            let flash = fluid.flash(
+                point.temperature,
+                point.pressure,
+                crate::FlashMode::TwoPhase,
+            )?;
+            let phase = match point.phase {
+                ViscosityPhase::Gas => flash.gas(),
+                ViscosityPhase::Oil => flash.oil(),
+                ViscosityPhase::Aqueous => flash.aqueous(),
+            };
+            let calculated = match phase {
+                None => 0.0,
+                Some(phase) => crate::transport::phase_viscosity_with_csp(
+                    &fluid.mixture,
+                    point.temperature,
+                    point.pressure,
+                    &phase.x,
+                    csp,
+                )?,
+            };
+            if point.viscosity > 0.0 {
+                total += ((calculated - point.viscosity) / point.viscosity).powi(2);
+            }
+        }
+        values.viscosity = Some(total / data.viscosity.len() as f64);
+    }
+    Ok(values)
+}

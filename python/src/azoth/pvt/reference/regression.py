@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass, field, replace
 from typing import Any
 
 from azoth.core.errors import InvalidInputError
@@ -171,3 +172,332 @@ def build_fluid(
         rows, eos=eos, kij=kij, kij_overrides=overrides, corrected=corrected
     )
     return fluid, (csp[0], csp[1], csp[2], csp[3])
+
+
+#: The experiments the fit carries. SEPARATOR stays owed.
+EXPERIMENTS: tuple[str, ...] = ("cce", "cvd", "dle", "viscosity")
+
+#: The phase names a viscosity observation accepts, in the class's mapping.
+PHASES: dict[str, str] = {
+    "gas": "gas",
+    "vapor": "gas",
+    "vapour": "gas",
+    "oil": "oil",
+    "liquid": "oil",
+    "aqueous": "aqueous",
+    "water": "aqueous",
+}
+
+
+@dataclass(frozen=True)
+class CceExperiment:
+    """One CCE's schedule and its measured relative volumes."""
+
+    temperature: float
+    pressures: tuple[float, ...]
+    relative_volumes: tuple[float, ...]
+
+
+@dataclass(frozen=True)
+class CvdExperiment:
+    """One CVD's schedule and its measured dropout and gas Z."""
+
+    temperature: float
+    pressures: tuple[float, ...]
+    liquid_dropout: tuple[float, ...]
+    z_factor: tuple[float, ...]
+
+
+@dataclass(frozen=True)
+class DleExperiment:
+    """One DLE's schedule and its measured Rs, Bo and oil density."""
+
+    temperature: float
+    pressures: tuple[float, ...]
+    rs: tuple[float, ...]
+    bo: tuple[float, ...]
+    oil_density: tuple[float, ...]
+
+
+@dataclass(frozen=True)
+class ViscosityPoint:
+    """One measured viscosity at one state."""
+
+    temperature: float
+    pressure: float
+    viscosity: float
+    phase: str
+
+
+@dataclass(frozen=True)
+class ExperimentWeights:
+    """The class's per-experiment weights."""
+
+    cce: float = 1.0
+    cvd: float = 1.0
+    dle: float = 1.0
+    viscosity: float = 0.5
+
+
+@dataclass(frozen=True)
+class RegressionData:
+    """Everything the fit is held to."""
+
+    cce: tuple[CceExperiment, ...] = ()
+    cvd: tuple[CvdExperiment, ...] = ()
+    dle: tuple[DleExperiment, ...] = ()
+    viscosity: tuple[ViscosityPoint, ...] = ()
+    weights: ExperimentWeights = field(default_factory=ExperimentWeights)
+
+
+@dataclass(frozen=True)
+class Sample:
+    """One observed value, its standard deviation and the model address."""
+
+    observed: float
+    sigma: float
+    kind: tuple[Any, ...]
+
+
+@dataclass(frozen=True)
+class Objectives:
+    """The class's second ledger, by experiment."""
+
+    cce: float | None = None
+    cvd: float | None = None
+    dle: float | None = None
+    viscosity: float | None = None
+
+    def total(self) -> float:
+        """The sum in the class's declaration order."""
+        return (self.cce or 0.0) + (self.cvd or 0.0) + (self.dle or 0.0) + (self.viscosity or 0.0)
+
+
+def _positive(name: str, value: float) -> float:
+    if math.isfinite(value) and value > 0.0:
+        return value
+    raise InvalidInputError(name, f"a positive finite value is needed; got {value}")
+
+
+def _weight(name: str, value: float) -> float:
+    if math.isfinite(value) and value > 0.0:
+        return value
+    raise InvalidInputError(name, f"a weight must be finite and above zero; got {value}")
+
+
+def samples(data: RegressionData) -> list[Sample]:
+    """The samples in the class's registration order, with its standard deviations."""
+    _weight("cce_weight", data.weights.cce)
+    _weight("cvd_weight", data.weights.cvd)
+    _weight("dle_weight", data.weights.dle)
+    _weight("viscosity_weight", data.weights.viscosity)
+    out: list[Sample] = []
+    for experiment, cce in enumerate(data.cce):
+        _positive("cce.temperature", cce.temperature)
+        if len(cce.pressures) != len(cce.relative_volumes):
+            raise InvalidInputError("cce", "the schedule and its relative volumes differ in length")
+        for point, (pressure, relative) in enumerate(
+            zip(cce.pressures, cce.relative_volumes, strict=True)
+        ):
+            _positive(f"cce.pressures[{point}]", pressure)
+            _positive(f"cce.relative_volumes[{point}]", relative)
+            out.append(Sample(relative, 0.01 / data.weights.cce, ("cce", experiment, point)))
+    for experiment, cvd in enumerate(data.cvd):
+        _positive("cvd.temperature", cvd.temperature)
+        if not (len(cvd.pressures) == len(cvd.liquid_dropout) == len(cvd.z_factor)):
+            raise InvalidInputError("cvd", "the schedule, its dropout and its Z differ in length")
+        for row, pressure in enumerate(cvd.pressures):
+            _positive(f"cvd.pressures[{row}]", pressure)
+            out.append(
+                Sample(
+                    cvd.liquid_dropout[row],
+                    0.01 / data.weights.cvd,
+                    ("cvd", experiment, row, "liquid_dropout"),
+                )
+            )
+            out.append(
+                Sample(
+                    cvd.z_factor[row],
+                    0.01 / data.weights.cvd,
+                    ("cvd", experiment, row, "gas_z"),
+                )
+            )
+    for experiment, dle in enumerate(data.dle):
+        _positive("dle.temperature", dle.temperature)
+        if not (len(dle.pressures) == len(dle.rs) == len(dle.bo) == len(dle.oil_density)):
+            raise InvalidInputError(
+                "dle", "the schedule and its three observations differ in length"
+            )
+        for row, pressure in enumerate(dle.pressures):
+            _positive(f"dle.pressures[{row}]", pressure)
+            for property_name, observed in (
+                ("rs", dle.rs[row]),
+                ("bo", dle.bo[row]),
+                ("oil_density", dle.oil_density[row]),
+            ):
+                out.append(
+                    Sample(
+                        observed,
+                        max(abs(observed) * 0.01, 1e-3) / data.weights.dle,
+                        ("dle", experiment, row, property_name),
+                    )
+                )
+    for point, viscosity in enumerate(data.viscosity):
+        _positive(f"viscosity[{point}].temperature", viscosity.temperature)
+        _positive(f"viscosity[{point}].pressure", viscosity.pressure)
+        if viscosity.phase not in ("gas", "oil", "aqueous"):
+            raise InvalidInputError(
+                f"viscosity[{point}].phase", f"{viscosity.phase!r} is not a phase"
+            )
+        out.append(
+            Sample(
+                viscosity.viscosity,
+                max(abs(viscosity.viscosity) * 0.02, 1e-10) / data.weights.viscosity,
+                ("viscosity", point),
+            )
+        )
+    return out
+
+
+def _viscosity_value(fluid: Fluid, csp: tuple[float, ...], point: ViscosityPoint) -> float:
+    from . import _flash
+    from ._transport import phase_viscosity_with_csp
+
+    flash = fluid.flash(point.temperature, point.pressure, _flash.TWO_PHASE)
+    phase = {
+        "gas": flash.gas(),
+        "oil": flash.oil(),
+        "aqueous": flash.aqueous(),
+    }[point.phase]
+    if phase is None:
+        return 0.0
+    return phase_viscosity_with_csp(
+        fluid.mixture, point.temperature, point.pressure, list(phase.x), csp
+    )
+
+
+def sample_value(
+    fluid: Fluid, csp: tuple[float, ...], sample: Sample, data: RegressionData
+) -> float:
+    """The model value one sample reads."""
+    kind = sample.kind
+    if kind[0] == "cce":
+        from .constant_mass_expansion import _constant_mass_expansion_of
+
+        experiment = data.cce[kind[1]]
+        result = _constant_mass_expansion_of(
+            fluid, experiment.temperature, [experiment.pressures[kind[2]]]
+        )
+        return float(result.points[0].relative_volume)
+    if kind[0] == "cvd":
+        from .constant_volume_depletion import _constant_volume_depletion_of
+
+        experiment = data.cvd[kind[1]]
+        result = _constant_volume_depletion_of(
+            fluid, experiment.temperature, list(experiment.pressures)
+        )
+        point = result.points[kind[2]]
+        if kind[3] == "liquid_dropout":
+            return float(point.liquid_volume_relative_to_vsat or 0.0)
+        return float(point.z_gas or 0.0)
+    if kind[0] == "dle":
+        from .differential_liberation import _differential_liberation_of
+
+        experiment = data.dle[kind[1]]
+        result = _differential_liberation_of(
+            fluid, experiment.temperature, list(experiment.pressures)
+        )
+        point = result.points[kind[2]]
+        if kind[3] == "rs":
+            return float(point.rs or 0.0)
+        if kind[3] == "bo":
+            return float(point.bo or 1.0)
+        return float(point.oil_density.to("kg/m**3").magnitude)
+    if kind[0] == "viscosity":
+        return _viscosity_value(fluid, csp, data.viscosity[kind[1]])
+    raise InvalidInputError("samples", f"unknown sample kind {kind!r}")
+
+
+def chi_square(
+    fluid: Fluid, csp: tuple[float, ...], rows: Sequence[Sample], data: RegressionData
+) -> float:
+    """The weighted chi-square the optimizer minimises."""
+    total = 0.0
+    for sample in rows:
+        value = sample_value(fluid, csp, sample, data)
+        residual = (value - sample.observed) / sample.sigma
+        total += residual * residual
+    return total
+
+
+def objectives(fluid: Fluid, csp: tuple[float, ...], data: RegressionData) -> Objectives:
+    """The class's second ledger, computed from the tuned fluid."""
+    values = Objectives()
+    if data.cce:
+        from .constant_mass_expansion import _constant_mass_expansion_of
+
+        temperature = data.cce[0].temperature
+        pressures = [pressure for experiment in data.cce for pressure in experiment.pressures]
+        result = _constant_mass_expansion_of(fluid, temperature, pressures)
+        total = 0.0
+        index = 0
+        for experiment in data.cce:
+            for observed in experiment.relative_volumes:
+                calculated = float(result.points[index].relative_volume)
+                total += ((calculated - observed) / observed) ** 2
+                index += 1
+        if index:
+            values = replace(values, cce=total / index)
+    if data.cvd:
+        from .constant_volume_depletion import _constant_volume_depletion_of
+
+        total = 0.0
+        points = 0
+        for experiment in data.cvd:
+            result = _constant_volume_depletion_of(
+                fluid, experiment.temperature, list(experiment.pressures)
+            )
+            for row, point in enumerate(result.points):
+                dropout = float(point.liquid_volume_relative_to_vsat or 0.0)
+                observed = experiment.liquid_dropout[row]
+                total += ((dropout - observed) / max(observed, 0.01)) ** 2
+                z = float(point.z_gas or 0.0)
+                observed_z = experiment.z_factor[row]
+                total += ((z - observed_z) / max(abs(observed_z), 1e-12)) ** 2
+            points += len(experiment.pressures)
+        if points:
+            values = replace(values, cvd=total / (2 * points))
+    if data.dle:
+        from .differential_liberation import _differential_liberation_of
+
+        total = 0.0
+        points = 0
+        for experiment in data.dle:
+            result = _differential_liberation_of(
+                fluid, experiment.temperature, list(experiment.pressures)
+            )
+            for row, point in enumerate(result.points):
+                calculated = (
+                    float(point.rs or 0.0),
+                    float(point.bo or 1.0),
+                    float(point.oil_density.to("kg/m**3").magnitude),
+                )
+                observed = (
+                    experiment.rs[row],
+                    experiment.bo[row],
+                    experiment.oil_density[row],
+                )
+                for value, target in zip(calculated, observed, strict=True):
+                    if target > 0.0:
+                        total += ((value - target) / target) ** 2
+            points += len(experiment.pressures)
+        if points:
+            values = replace(values, dle=total / (3 * points))
+    if data.viscosity:
+        total = 0.0
+        for point in data.viscosity:
+            calculated = _viscosity_value(fluid, csp, point)
+            if point.viscosity > 0.0:
+                total += ((calculated - point.viscosity) / point.viscosity) ** 2
+        values = replace(values, viscosity=total / len(data.viscosity))
+    return values

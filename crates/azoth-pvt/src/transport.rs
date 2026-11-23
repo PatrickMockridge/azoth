@@ -47,6 +47,31 @@ pub fn phase_viscosity(
                 .value
         }
     };
+    floor(value)
+}
+
+/// The same with the PVT regression's four PFCT correction factors.
+///
+/// **Every phase takes the PFCT form once a factor is set**, aqueous included: the class's
+/// `applyCspViscosityCorrectionFactor` forces `PFCT` on each stored phase slot before it
+/// writes the factor, so the water correlation is not the one that answers there.
+///
+/// # Errors
+/// The same as [`phase_viscosity`], plus a non-finite correction factor.
+pub fn phase_viscosity_with_csp(
+    mixture: &Mixture,
+    t: f64,
+    p: f64,
+    x: &[f64],
+    correction: [f64; 4],
+) -> Result<f64> {
+    let value = azoth_eos::viscosity_with_csp(mixture, kelvins(t), pascals(p), x, correction)?
+        .mu
+        .value;
+    floor(value)
+}
+
+fn floor(value: f64) -> Result<f64> {
     if value.is_nan() {
         return Err(AzothError::invalid_input(
             "viscosity",
