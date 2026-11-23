@@ -24,6 +24,7 @@ from dataclasses import dataclass
 
 from azoth.core.units import quantity
 from azoth.eos import components as _components
+from azoth.eos.reference.hydrate_inhibitor_wt import GAS
 from azoth.eos.reference.molar_enthalpy_entropy import molar_enthalpy_entropy
 from azoth.eos.reference.pr_molar_volume import pr_molar_volume
 from azoth.eos.reference.pt_flash import pt_flash
@@ -944,7 +945,7 @@ def _choke_reads(
     liquid: tuple[list[float], float, float] | None = None
     for (label, composition, root), _share in zip(labelled, shares, strict=True):
         density = capacity._mass_density(mixture, t, p, composition, root)
-        if label == capacity.GAS:
+        if label == GAS:
             gas = (composition, root, density)
         else:
             liquid = (composition, root, density)
@@ -1016,7 +1017,7 @@ def _homogeneous_density(gas_quality: float, rho_gas: float, rho_liquid: float) 
 
 
 def _isentropic_critical_ratio(gamma: float) -> float:
-    return (2.0 / (gamma + 1.0)) ** (gamma / (gamma - 1.0))
+    return float((2.0 / (gamma + 1.0)) ** (gamma / (gamma - 1.0)))
 
 
 def _sachdeva_critical_ratio(gas_quality: float, gamma: float) -> float:
@@ -1041,7 +1042,7 @@ def _sachdeva_gas_only(read: _ChokeReads, p2_pa: float, cd: float, area: float) 
     critical = _isentropic_critical_ratio(gamma)
     ratio = p2_pa / read.p1_pa
     if ratio <= critical:
-        factor = (2.0 / (gamma + 1.0)) ** ((gamma + 1.0) / (2.0 * (gamma - 1.0)))
+        factor = float((2.0 / (gamma + 1.0)) ** ((gamma + 1.0) / (2.0 * (gamma - 1.0))))
         return cd * area * math.sqrt(gamma * read.p1_pa * read.rho_gas) * factor
     term1 = 2.0 * gamma / (gamma - 1.0)
     term2 = ratio ** (2.0 / gamma) - ratio ** ((gamma + 1.0) / gamma)
@@ -1091,7 +1092,9 @@ def _gilbert_mass_flow(read: _ChokeReads, p2_pa: float, standard: str, diameter:
         return 0.85 * area * math.sqrt(2.0 * read.rho_liquid * delta_p)
     if p_psig <= 0.0 or d_64ths <= 0.0:
         return 0.0
-    q_stb_day = p_psig * d_64ths**diameter_exponent / (constant * glr_scf_stb**glr_exponent)
+    q_stb_day = (
+        p_psig * float(d_64ths**diameter_exponent) / (constant * float(glr_scf_stb**glr_exponent))
+    )
     q_m3_s = q_stb_day * 0.158987 / 86400.0
     glr_sm3 = glr_scf_stb * 0.02832 / 0.158987
     return q_m3_s * read.rho_liquid + q_m3_s * glr_sm3 * 1.2

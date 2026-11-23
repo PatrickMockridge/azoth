@@ -52,7 +52,7 @@ def test_the_public_wrapper_takes_every_declared_input() -> None:
 
 @pytest.mark.parametrize("backend", sorted(available()))
 @pytest.mark.parametrize("standard", ["default", "iec_60534", "iec_60534_full", "prod_choke"])
-def test_the_single_phase_standards_refuse_a_two_phase_inlet(backend: str, standard: str) -> None:
+def test_the_single_phase_standards_refuse_a_two_phase_inlet(backend: Any, standard: str) -> None:
     inputs = {**WELL, "sizing_standard": standard}
     with pytest.raises(InvalidInputError, match="single phase"):
         _run(inputs, backend)
@@ -60,7 +60,7 @@ def test_the_single_phase_standards_refuse_a_two_phase_inlet(backend: str, stand
 
 @pytest.mark.parametrize("backend", sorted(available()))
 @pytest.mark.parametrize("standard", ["sachdeva", "gilbert", "baxendell", "ros", "achong"])
-def test_the_choke_standards_accept_a_two_phase_inlet(backend: str, standard: str) -> None:
+def test_the_choke_standards_accept_a_two_phase_inlet(backend: Any, standard: str) -> None:
     inputs = {**WELL, "sizing_standard": standard, "choke_diameter": 0.0127}
     result = _run(inputs, backend)
     assert result.kv > 0.0
@@ -68,7 +68,7 @@ def test_the_choke_standards_accept_a_two_phase_inlet(backend: str, standard: st
 
 
 @pytest.mark.parametrize("backend", sorted(available()))
-def test_allow_choked_absent_follows_the_selected_standard(backend: str) -> None:
+def test_allow_choked_absent_follows_the_selected_standard(backend: Any) -> None:
     default = _run({**RICH, "sizing_standard": "default"}, backend)
     iec = _run({**RICH, "sizing_standard": "iec_60534"}, backend)
     assert default.kv < iec.kv
