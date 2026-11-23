@@ -163,10 +163,6 @@ pub fn build_fluid(
                 format!("{} is not finite", config.parameter.name()),
             ));
         }
-        if let Some(index) = config.parameter.csp_index() {
-            csp[index] = value;
-            continue;
-        }
         match config.parameter {
             RegressionParameter::BipMethaneC7Plus
             | RegressionParameter::BipC2C6C7Plus
@@ -244,7 +240,15 @@ pub fn build_fluid(
             RegressionParameter::ViscosityCsp1
             | RegressionParameter::ViscosityCsp2
             | RegressionParameter::ViscosityCsp3
-            | RegressionParameter::ViscosityCsp4 => unreachable!("handled by csp_index"),
+            | RegressionParameter::ViscosityCsp4 => {
+                let index = config.parameter.csp_index().ok_or_else(|| {
+                    AzothError::invalid_input(
+                        "parameters",
+                        format!("{} has no CSP index", config.parameter.name()),
+                    )
+                })?;
+                csp[index] = value;
+            }
         }
     }
     let fluid = Fluid::from_rows_with_kij(&rows, cubic, kij, &overrides, corrected)?;
@@ -1141,6 +1145,7 @@ where
 }
 
 /// Solve `matrix * x = rhs` by Gaussian elimination with partial pivoting.
+#[allow(clippy::needless_range_loop)] // Row elimination reads two rows at one column index.
 fn solve_system(matrix: &[Vec<f64>], rhs: &[f64]) -> Option<Vec<f64>> {
     let n = rhs.len();
     let mut a = matrix.to_vec();
@@ -1209,10 +1214,9 @@ where
         let chi = weighted_chi(&values, observed, sigma);
         let count = parameters.len();
         let mut derivatives = vec![vec![0.0f64; count]; observed.len()];
-        for sample in 0..observed.len() {
-            for index in 0..count {
-                derivatives[sample][index] =
-                    ridders(&mut evaluate, bounds, &parameters, sample, index)?;
+        for (sample, row) in derivatives.iter_mut().enumerate() {
+            for (index, slot) in row.iter_mut().enumerate() {
+                *slot = ridders(&mut evaluate, bounds, &parameters, sample, index)?;
             }
         }
         let mut alpha = vec![vec![0.0f64; count]; count];
@@ -1262,7 +1266,7 @@ where
             .map(|((value, step), bound)| clamp(value + step, *bound))
             .collect();
         let new_chi = weighted_chi(&evaluate(&next)?, observed, sigma);
-        if !(new_chi < chi) || !new_chi.is_finite() {
+        if !new_chi.is_finite() || new_chi >= chi {
             next = old_parameters;
             damping *= 10.0;
         } else {
@@ -1276,11 +1280,10 @@ where
     let chi = weighted_chi(&values, observed, sigma);
     let count = parameters.len();
     let mut gradient = vec![0.0; count];
-    for sample in 0..observed.len() {
-        for index in 0..count {
+    for (sample, &observation) in observed.iter().enumerate() {
+        for (index, slot) in gradient.iter_mut().enumerate() {
             let derivative = ridders(&mut evaluate, bounds, &parameters, sample, index)?;
-            gradient[index] +=
-                (observed[sample] - values[sample]) / sigma[sample].powi(2) * derivative;
+            *slot += (observation - values[sample]) / sigma[sample].powi(2) * derivative;
         }
     }
     let gradient_norm = gradient

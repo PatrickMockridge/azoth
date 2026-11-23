@@ -190,7 +190,7 @@ fn the_model_surface_matches_the_fit() {
     assert_eq!(result.objectives[0].experiment, "cce");
     assert!((result.total_objective - result.objectives[0].value).abs() < 1e-18);
     assert_eq!(result.degrees_of_freedom, 2.0);
-    assert!(!result.convergence_reason.is_empty());
+    assert!(!result.convergence_reason.name().is_empty());
 }
 
 #[test]

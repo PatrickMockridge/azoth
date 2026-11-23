@@ -61,6 +61,7 @@ fn first_carbon_number(name: &str) -> Result<usize> {
 }
 
 /// The fluid re-characterised at one plus molar mass.
+#[allow(clippy::too_many_arguments)] // One call per loop iteration, each argument a stated input.
 fn rebuild(
     base: &[FluidComponent],
     plus: &FluidComponent,
