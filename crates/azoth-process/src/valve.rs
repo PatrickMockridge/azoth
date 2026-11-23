@@ -4,8 +4,8 @@
 //! `valveSizingMethod` is `ControlValveSizing` (`setValveSizingStandard` selects the IEC
 //! variants), and this module is that class: `calcKv`, its inverse flow and its outlet-pressure
 //! solve, on the liquid and gas branches, with the opening characteristic and the fouling
-//! fraction. **The IEC pair and the production choke are carried beside it**; the five
-//! multiphase chokes are the remaining `[[unported]]` rows.
+//! fraction. **All nine `setValveSizingStandard` values are carried**; the five multiphase
+//! chokes read the flash's labelled phases rather than one root.
 //!
 //! **The gas formula is the class's, unit mixing included.** It reads `Q` at standard conditions
 //! (273.15 K, 101.325 kPa) from the *actual* volumetric flow through `P1`, `T` and `Z`, then
@@ -19,10 +19,12 @@
 
 use azoth_core::units::{Pressure, pascals};
 use azoth_core::{AzothError, Result};
-use azoth_eos::{Phase, pt_flash};
+use azoth_eos::hydrate_inhibitor_wt::PhaseLabel;
+use azoth_eos::{Phase, molar_enthalpy_entropy, pr_molar_volume, pt_flash};
 
 use crate::segment::phase::{
-    liquid_view, system_mass_density_from_feed, system_volumetric_flow_from_feed, vapour_view,
+    labelled_phases_at_from_feed, liquid_view, mass_density, molar_mass_of,
+    system_mass_density_from_feed, system_volumetric_flow_from_feed, vapour_view,
 };
 use crate::stream::Stream;
 
@@ -1078,6 +1080,317 @@ fn simple_gas_pressure(read: &Reads, adjusted: f64, geometry: &ValveSizingGeomet
     Ok(mid)
 }
 
+/// The class's `getPhaseIndex("gas")` / `("oil")` / `("aqueous")` reads, at the inlet.
+struct ChokeReads {
+    p1_pa: f64,
+    /// `fluid.getDensity("kg/m3")`, the whole stream's.
+    system_density: f64,
+    /// `fluid.getMolarMass("kg/mol")`.
+    molar_mass_kg: f64,
+    /// `calculateGasQuality`: the gas mass fraction.
+    gas_quality: f64,
+    /// `fluid.getGamma2()`: the phase-weighted `Cp/(Cp - R)`.
+    gamma: f64,
+    /// The gas phase's density, or the class's ideal-gas estimate when there is no gas.
+    rho_gas: f64,
+    /// `getLiquidDensity`: the oil's, the aqueous's, or the model's own default.
+    rho_liquid: f64,
+    /// `calculateGLR`, Sm3/Sm3; `+infinity` with no liquid.
+    glr: f64,
+}
+
+fn choke_reads(inlet: &Stream, standard: SizingStandard) -> Result<ChokeReads> {
+    let (mixture, ideal_gas) = inlet.mixture()?;
+    let flash = pt_flash(&mixture, inlet.t, inlet.p, &inlet.z)?;
+    let labelled = labelled_phases_at_from_feed(&mixture, inlet.t, inlet.p, &inlet.z, &flash)?;
+    let total_n = inlet.n;
+    let vapour_fraction = flash.vapour_fraction.unwrap_or(0.0);
+    let share = |label: PhaseLabel| -> f64 {
+        match flash.phase {
+            Phase::AllVapour => {
+                if label == PhaseLabel::Gas {
+                    1.0
+                } else {
+                    0.0
+                }
+            }
+            Phase::AllLiquid | Phase::Trivial => {
+                if label == PhaseLabel::Gas {
+                    0.0
+                } else {
+                    1.0
+                }
+            }
+            Phase::TwoPhase => {
+                if label == PhaseLabel::Gas {
+                    vapour_fraction
+                } else {
+                    1.0 - vapour_fraction
+                }
+            }
+        }
+    };
+
+    let mut gas: Option<(Vec<f64>, f64, f64)> = None;
+    let mut liquid: Option<(Vec<f64>, f64, f64, PhaseLabel)> = None;
+    for (label, composition, root) in &labelled {
+        let molar_mass = molar_mass_of(&mixture, composition)?;
+        let density = mass_density(&mixture, inlet.t, inlet.p, composition, *root, molar_mass)?;
+        match label {
+            PhaseLabel::Gas => gas = Some((composition.clone(), *root, density)),
+            _ => liquid = Some((composition.clone(), *root, density, *label)),
+        }
+    }
+
+    let gas_mass = gas
+        .as_ref()
+        .map(|(composition, _, _)| {
+            Ok::<_, AzothError>(
+                share(PhaseLabel::Gas) * total_n * molar_mass_of(&mixture, composition)?,
+            )
+        })
+        .transpose()?
+        .unwrap_or(0.0);
+    let liquid_mass = liquid
+        .as_ref()
+        .map(|(composition, _, _, _)| {
+            Ok::<_, AzothError>(
+                (1.0 - share(PhaseLabel::Gas)) * total_n * molar_mass_of(&mixture, composition)?,
+            )
+        })
+        .transpose()?
+        .unwrap_or(0.0);
+    let gas_quality = if gas.is_none() {
+        0.0
+    } else if liquid.is_none() {
+        1.0
+    } else {
+        gas_mass / (gas_mass + liquid_mass)
+    };
+
+    let system_z = {
+        let volume = system_volumetric_flow_from_feed(inlet)? / inlet.n;
+        inlet.p.value * volume / (R_J_PER_MOL_K * inlet.t.value)
+    };
+    let rho_gas = match gas.as_ref() {
+        Some((_, _, density)) => *density,
+        None => {
+            inlet.p.value * inlet.molar_mass()?.value / (system_z * R_J_PER_MOL_K * inlet.t.value)
+        }
+    };
+    let liquid_default = if standard == SizingStandard::Sachdeva {
+        1000.0
+    } else {
+        800.0
+    };
+    let rho_liquid = liquid
+        .as_ref()
+        .map(|(_, _, density, _)| *density)
+        .unwrap_or(liquid_default);
+
+    let cp = {
+        let mut total = 0.0;
+        for (label, composition, root) in &labelled {
+            let state =
+                molar_enthalpy_entropy(&mixture, &ideal_gas, inlet.t, inlet.p, composition, *root)?;
+            total += share(*label) * state.cp.value;
+        }
+        total
+    };
+    let gamma = cp / (cp - R_J_PER_MOL_K);
+
+    let gas_z = gas
+        .as_ref()
+        .map(|(_, root, _)| {
+            let volume = pr_molar_volume(*root, inlet.t, inlet.p)?.v.value;
+            Ok::<_, AzothError>(inlet.p.value * volume / (R_J_PER_MOL_K * inlet.t.value))
+        })
+        .transpose()?
+        .unwrap_or(system_z);
+    let gas_volume = gas.as_ref().map(|(composition, _, density)| {
+        let moles = share(PhaseLabel::Gas) * total_n;
+        Ok::<_, AzothError>(moles * molar_mass_of(&mixture, composition)? / density)
+    });
+    let liquid_volume = liquid.as_ref().map(|(composition, _, density, _)| {
+        let moles = (1.0 - share(PhaseLabel::Gas)) * total_n;
+        Ok::<_, AzothError>(moles * molar_mass_of(&mixture, composition)? / density)
+    });
+    let gas_std_volume = match gas_volume.transpose()? {
+        Some(volume) => volume * gas_z * inlet.t.value / 288.15 * 101325.0 / inlet.p.value,
+        None => 0.0,
+    };
+    let liquid_volume = liquid_volume.transpose()?.unwrap_or(0.0);
+    let glr = if liquid_volume > 0.0 {
+        gas_std_volume / liquid_volume
+    } else {
+        f64::INFINITY
+    };
+
+    Ok(ChokeReads {
+        p1_pa: inlet.p.value,
+        system_density: system_mass_density_from_feed(inlet)?,
+        molar_mass_kg: inlet.molar_mass()?.value,
+        gas_quality,
+        gamma,
+        rho_gas,
+        rho_liquid,
+        glr,
+    })
+}
+
+fn homogeneous_density(gas_quality: f64, rho_gas: f64, rho_liquid: f64) -> f64 {
+    if gas_quality >= 1.0 {
+        return rho_gas;
+    }
+    if gas_quality <= 0.0 {
+        return rho_liquid;
+    }
+    1.0 / (gas_quality / rho_gas + (1.0 - gas_quality) / rho_liquid)
+}
+
+fn isentropic_critical_ratio(gamma: f64) -> f64 {
+    (2.0 / (gamma + 1.0)).powf(gamma / (gamma - 1.0))
+}
+
+fn sachdeva_critical_ratio(gas_quality: f64, gamma: f64) -> f64 {
+    if gas_quality <= 0.001 {
+        return 0.90;
+    }
+    if gas_quality >= 0.999 {
+        return isentropic_critical_ratio(gamma);
+    }
+    let xg = gas_quality.clamp(0.02, 0.98);
+    (0.5847 - 0.0227 * xg.ln()).clamp(0.3, 0.9)
+}
+
+fn gilbert_critical_ratio(gas_quality: f64, gamma: f64) -> f64 {
+    if gas_quality <= 0.01 {
+        return 0.85;
+    }
+    if gas_quality >= 0.99 {
+        return isentropic_critical_ratio(gamma);
+    }
+    0.5847 - 0.0227 * gas_quality.max(0.02).ln()
+}
+
+fn sachdeva_gas_only(read: &ChokeReads, p2_pa: f64, cd: f64, area: f64) -> f64 {
+    let gamma = read.gamma;
+    let critical = isentropic_critical_ratio(gamma);
+    let ratio = p2_pa / read.p1_pa;
+    if ratio <= critical {
+        let factor = (2.0 / (gamma + 1.0)).powf((gamma + 1.0) / (2.0 * (gamma - 1.0)));
+        cd * area * (gamma * read.p1_pa * read.rho_gas).sqrt() * factor
+    } else {
+        let term1 = 2.0 * gamma / (gamma - 1.0);
+        let term2 = ratio.powf(2.0 / gamma) - ratio.powf((gamma + 1.0) / gamma);
+        cd * area * (term1 * read.p1_pa * read.rho_gas * term2).sqrt()
+    }
+}
+
+fn sachdeva_mass_flow(
+    read: &ChokeReads,
+    p2_pa: f64,
+    geometry: &ValveSizingGeometry,
+    diameter: f64,
+) -> f64 {
+    let cd = geometry.discharge_coefficient.unwrap_or(0.84);
+    let area = std::f64::consts::PI * diameter * diameter / 4.0;
+    let xg = read.gas_quality;
+    if xg <= 0.001 {
+        let delta_p = (read.p1_pa - p2_pa).max(0.0);
+        return cd * area * (2.0 * read.rho_liquid * delta_p).sqrt();
+    }
+    if xg >= 0.999 {
+        return sachdeva_gas_only(read, p2_pa, cd, area);
+    }
+    let y = (p2_pa / read.p1_pa).max(sachdeva_critical_ratio(xg, read.gamma));
+    let n = 1.2_f64;
+    let rho_gas2 = read.rho_gas * y.powf(1.0 / n);
+    let area_ratio_sq = (diameter / 0.1016).powi(4);
+    let xl = 1.0 - xg;
+    let kinetic = (1.0 / (y * y) - area_ratio_sq)
+        * (xg / (rho_gas2 * rho_gas2) + xl / (read.rho_liquid * read.rho_liquid));
+    let liquid_work = 2.0 * xl / read.rho_liquid * (1.0 - y);
+    let gas_work = 2.0 * xg / ((n - 1.0) * read.rho_gas) * (1.0 - y.powf((n - 1.0) / n));
+    let denominator = kinetic + liquid_work + gas_work;
+    if denominator <= 0.0 {
+        return 0.0;
+    }
+    let rho_mix = homogeneous_density(xg, read.rho_gas, read.rho_liquid);
+    cd * area * (2.0 * read.p1_pa * rho_mix / denominator).sqrt()
+}
+
+fn gilbert_mass_flow(
+    read: &ChokeReads,
+    p2_pa: f64,
+    standard: SizingStandard,
+    diameter: f64,
+) -> f64 {
+    let (constant, diameter_exponent, glr_exponent) = match standard {
+        SizingStandard::Baxendell => (9.56, 1.93, 0.546),
+        SizingStandard::Ros => (17.4, 2.0, 0.5),
+        SizingStandard::Achong => (3.82, 1.88, 0.65),
+        _ => (10.0, 1.89, 0.546),
+    };
+    let area = std::f64::consts::PI * diameter * diameter / 4.0;
+    let p_psig = read.p1_pa / 6894.76 - 14.696;
+    let d_64ths = diameter / 0.0254 * 64.0;
+    let glr_scf_stb = read.glr * 35.3147 / 6.28981;
+    if glr_scf_stb <= 0.0 {
+        let delta_p = (read.p1_pa - p2_pa).max(0.0);
+        return 0.85 * area * (2.0 * read.rho_liquid * delta_p).sqrt();
+    }
+    if p_psig <= 0.0 || d_64ths <= 0.0 {
+        return 0.0;
+    }
+    let q_stb_day =
+        p_psig * d_64ths.powf(diameter_exponent) / (constant * glr_scf_stb.powf(glr_exponent));
+    let q_m3_s = q_stb_day * 0.158987 / 86400.0;
+    let glr_sm3 = glr_scf_stb * 0.02832 / 0.158987;
+    q_m3_s * read.rho_liquid + q_m3_s * glr_sm3 * 1.2
+}
+
+/// `ControlValveSizing_MultiphaseChoke`: the five two-phase choke correlations.
+fn choke_report(
+    inlet: &Stream,
+    outlet_bara: f64,
+    geometry: &ValveSizingGeometry,
+    standard: SizingStandard,
+) -> Result<ValveSizingReport> {
+    let read = choke_reads(inlet, standard)?;
+    let opening = opening_factor(geometry);
+    let diameter = geometry.choke_diameter_m * opening.sqrt();
+    let p2_pa = outlet_bara * 1.0e5;
+    let (mass_flow, critical_ratio) = match standard {
+        SizingStandard::Sachdeva => (
+            sachdeva_mass_flow(&read, p2_pa, geometry, diameter),
+            sachdeva_critical_ratio(read.gas_quality, read.gamma),
+        ),
+        _ => (
+            gilbert_mass_flow(&read, p2_pa, standard, diameter),
+            gilbert_critical_ratio(read.gas_quality, read.gamma),
+        ),
+    };
+    let pressure_ratio = p2_pa / read.p1_pa;
+    let choked = pressure_ratio <= critical_ratio;
+    let delta_p_bar = (read.p1_pa - p2_pa) / 1.0e5;
+    let kv = if delta_p_bar > 0.0 && read.system_density > 0.0 {
+        let q_m3h = mass_flow / read.system_density * 3600.0;
+        q_m3h * ((read.system_density / 1000.0) / delta_p_bar).sqrt()
+    } else {
+        0.0
+    };
+    Ok(ValveSizingReport {
+        kv,
+        cv: kv * KV_TO_CV_FACTOR,
+        cg: kv * KV_TO_CV_FACTOR * CG_PER_CV,
+        choked,
+        gas_valve: gas_valve(inlet)?,
+        calculated_molar_flow: mass_flow / read.molar_mass_kg,
+        calculated_outlet_pressure: read.p1_pa * critical_ratio / 1.0e5,
+    })
+}
+
 /// The report for a selected standard.
 ///
 /// # Errors
@@ -1100,10 +1413,7 @@ pub fn sizing_report_for(
         | SizingStandard::Gilbert
         | SizingStandard::Baxendell
         | SizingStandard::Ros
-        | SizingStandard::Achong => Err(AzothError::invalid_input(
-            "sizing_standard",
-            "no sizing report is built for this route",
-        )),
+        | SizingStandard::Achong => choke_report(inlet, outlet_bara, geometry, standard),
     }
 }
 

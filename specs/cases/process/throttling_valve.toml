@@ -434,3 +434,247 @@ cg = 955801.0137995583
 choked = true
 gas_valve = true
 calculated_molar_flow = 97.21961972278176
+
+[[cases]]
+id = "sachdeva_sizes_a_two_phase_stream"
+tolerance = 0.0001
+source = """\
+    NeqSim pin, `ControlValveSizing_MultiphaseChoke` with `SachdevaChokeFlow`, from
+    `validation/neqsim/captures/process_valve_standards.tsv`, row
+    `standard_subcritical_sachdeva`. **The feed is the separator capture's methane/n-butane
+    `0.7/0.3` at 20 bara and 300 K**, which the probe proves is gas and oil; the downstream
+    ratio `0.75` is above Sachdeva's `0.594` critical ratio.
+    """
+[cases.inputs]
+components = ["methane", "n-butane"]
+inlet_n = 1.0
+inlet_z = [0.7, 0.3]
+inlet_p = 2000000.0
+inlet_t = 300.0
+outlet_pressure = 1500000.0
+choke_diameter = 0.0127
+sizing_standard = "sachdeva"
+[cases.expected]
+outlet_n = 0.9999883722282301
+outlet_z = [0.7, 0.3]
+outlet_p = 1500000.0
+outlet_t = 294.3928609747115
+outlet_h = -2705.411694202344
+kv = 76.17629752584467
+cv = 88.05979993987644
+cg = 119761.32791823197
+choked = false
+gas_valve = true
+calculated_molar_flow = 286.26279510589484
+
+[[cases]]
+id = "sachdeva_chokes_and_reads_cd"
+tolerance = 0.0001
+source = """\
+    NeqSim pin, `ControlValveSizing_MultiphaseChoke`, from
+    `validation/neqsim/captures/process_valve_standards.tsv`, row `standard_sachdeva_cd`.
+    A stated `Cd = 0.9` scales the mass flow from `5.947` to `6.372` kg/s; the downstream ratio
+    `0.25` is below the critical `0.594`.
+    """
+[cases.inputs]
+components = ["methane", "n-butane"]
+inlet_n = 1.0
+inlet_z = [0.7, 0.3]
+inlet_p = 2000000.0
+inlet_t = 300.0
+outlet_pressure = 500000.0
+choke_diameter = 0.0127
+discharge_coefficient = 0.9
+sizing_standard = "sachdeva"
+[cases.expected]
+outlet_n = 0.9999883722282301
+outlet_z = [0.7, 0.3]
+outlet_p = 500000.0
+outlet_t = 272.3098516703981
+outlet_h = -2705.4116942171036
+kv = 34.14812719081707
+cv = 39.47523503258453
+cg = 53686.31964431496
+choked = true
+gas_valve = true
+calculated_molar_flow = 222.26575997069986
+
+[[cases]]
+id = "sachdeva_pressure_mode_answers_the_critical_pressure"
+tolerance = 0.0001
+source = """\
+    NeqSim pin, `ControlValveSizing_MultiphaseChoke`, from
+    `validation/neqsim/captures/process_valve_standards.tsv`, row
+    `standard_sachdeva_pressure_mode`. **`findOutletPressureForFixedKv` answers `P1 * y_c`**
+    rather than inverting the sizing: `20 * 0.594 = 11.884` bara, and the outlet flashes there.
+    """
+[cases.inputs]
+components = ["methane", "n-butane"]
+inlet_n = 1.0
+inlet_z = [0.7, 0.3]
+inlet_p = 2000000.0
+inlet_t = 300.0
+outlet_pressure = 500000.0
+choke_diameter = 0.0127
+is_calc_pressure = true
+sizing_standard = "sachdeva"
+[cases.expected]
+outlet_n = 0.9999883722282301
+outlet_z = [0.7, 0.3]
+outlet_p = 1188445.6598849502
+outlet_t = 289.77358837469615
+outlet_h = -2705.4116942171036
+kv = 31.871585378095933
+cv = 36.8435526970789
+cg = 50107.2316680273
+choked = true
+gas_valve = true
+calculated_molar_flow = 207.44804263931985
+
+[[cases]]
+id = "gilbert_sizes_the_critical_flow"
+tolerance = 0.0001
+source = """\
+    NeqSim pin, `GilbertChokeFlow`'s Gilbert constants, from
+    `validation/neqsim/captures/process_valve_standards.tsv`, row `standard_critical_gilbert`.
+    The empirical GLR correlation ignores the downstream pressure; only the regime and the
+    equivalent `Kv` it derives from the mass flow read it.
+    """
+[cases.inputs]
+components = ["methane", "n-butane"]
+inlet_n = 1.0
+inlet_z = [0.7, 0.3]
+inlet_p = 2000000.0
+inlet_t = 300.0
+outlet_pressure = 500000.0
+choke_diameter = 0.0127
+sizing_standard = "gilbert"
+[cases.expected]
+outlet_n = 0.9999883722282301
+outlet_z = [0.7, 0.3]
+outlet_p = 500000.0
+outlet_t = 272.3098516703981
+outlet_h = -2705.4116942171036
+kv = 24.575359998706734
+cv = 28.409116158504983
+cg = 38636.397975566775
+choked = true
+gas_valve = true
+calculated_molar_flow = 159.95785174816183
+
+[[cases]]
+id = "baxendell_sizes_the_critical_flow"
+tolerance = 0.0001
+source = """\
+    NeqSim pin, `GilbertChokeFlow`'s Baxendell constants, from
+    `validation/neqsim/captures/process_valve_standards.tsv`, row `standard_critical_baxendell`.
+    """
+[cases.inputs]
+components = ["methane", "n-butane"]
+inlet_n = 1.0
+inlet_z = [0.7, 0.3]
+inlet_p = 2000000.0
+inlet_t = 300.0
+outlet_pressure = 500000.0
+choke_diameter = 0.0127
+sizing_standard = "baxendell"
+[cases.expected]
+outlet_n = 0.9999883722282301
+outlet_z = [0.7, 0.3]
+outlet_p = 500000.0
+outlet_t = 272.3098516703981
+outlet_h = -2705.4116942171036
+kv = 29.52894937654223
+cv = 34.135465479282814
+cg = 46424.23305182463
+choked = true
+gas_valve = true
+calculated_molar_flow = 192.20012674892587
+
+[[cases]]
+id = "ros_sizes_the_critical_flow"
+tolerance = 0.0001
+source = """\
+    NeqSim pin, `GilbertChokeFlow`'s Ros constants, from
+    `validation/neqsim/captures/process_valve_standards.tsv`, row `standard_critical_ros`.
+    """
+[cases.inputs]
+components = ["methane", "n-butane"]
+inlet_n = 1.0
+inlet_z = [0.7, 0.3]
+inlet_p = 2000000.0
+inlet_t = 300.0
+outlet_pressure = 500000.0
+choke_diameter = 0.0127
+sizing_standard = "ros"
+[cases.expected]
+outlet_n = 0.9999883722282301
+outlet_z = [0.7, 0.3]
+outlet_p = 500000.0
+outlet_t = 272.3098516703981
+outlet_h = -2705.4116942171036
+kv = 23.342792324132382
+cv = 26.984267926697033
+cg = 36698.60438030797
+choked = true
+gas_valve = true
+calculated_molar_flow = 151.93522756810844
+
+[[cases]]
+id = "achong_sizes_the_critical_flow"
+tolerance = 0.0001
+source = """\
+    NeqSim pin, `GilbertChokeFlow`'s Achong constants, from
+    `validation/neqsim/captures/process_valve_standards.tsv`, row `standard_critical_achong`.
+    """
+[cases.inputs]
+components = ["methane", "n-butane"]
+inlet_n = 1.0
+inlet_z = [0.7, 0.3]
+inlet_p = 2000000.0
+inlet_t = 300.0
+outlet_pressure = 500000.0
+choke_diameter = 0.0127
+sizing_standard = "achong"
+[cases.expected]
+outlet_n = 0.9999883722282301
+outlet_z = [0.7, 0.3]
+outlet_p = 500000.0
+outlet_t = 272.3098516703981
+outlet_h = -2705.4116942171036
+kv = 47.247914623691294
+cv = 54.61858930498713
+cg = 74281.2814547825
+choked = true
+gas_valve = true
+calculated_molar_flow = 307.5305884912342
+
+[[cases]]
+id = "gilbert_uses_the_default_one_inch"
+tolerance = 0.0001
+source = """\
+    NeqSim pin, `GilbertChokeFlow`, from
+    `validation/neqsim/captures/process_valve_standards.tsv`, row
+    `standard_gilbert_default_diameter`. With no diameter stated the class's own `0.0254` m
+    stands, and the empirical diameter exponent turns it into `16.996` kg/s.
+    """
+[cases.inputs]
+components = ["methane", "n-butane"]
+inlet_n = 1.0
+inlet_z = [0.7, 0.3]
+inlet_p = 2000000.0
+inlet_t = 300.0
+outlet_pressure = 500000.0
+sizing_standard = "gilbert"
+[cases.expected]
+outlet_n = 0.9999883722282301
+outlet_z = [0.7, 0.3]
+outlet_p = 500000.0
+outlet_t = 272.3098516703981
+outlet_h = -2705.4116942171036
+kv = 91.08494076583929
+cv = 105.29419152531021
+cg = 143200.1004744219
+choked = true
+gas_valve = true
+calculated_molar_flow = 592.8601433419061

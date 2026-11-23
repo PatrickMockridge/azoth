@@ -1,13 +1,14 @@
-"""``ControlValveSizing``, the ``ValveMechanicalDesign`` default: the IEC 60534 simplified sizing.
+"""``ControlValveSizing`` and the eight standards ``setValveSizingStandard`` selects.
 
 The Python twin of ``crates/azoth-process/src/valve.rs``. Every step mirrors the Rust module, and
-**the two halves are held to the same capture**: the Rust module's own tests and
-``python/tests/test_cross_impl.py`` compare the rows of
-``validation/neqsim/captures/process_valve_sizing.tsv``.
+**the two halves are held to the same captures**: the Rust module's own tests and
+``python/tests/test_cross_impl.py`` compare the rows of ``process_valve_sizing.tsv`` and
+``process_valve_standards.tsv``.
 
-**The default sizing standard and not the IEC class.** ``setValveSizingStandard`` selects the
-others and this module is the default: ``calcKv``, its inverse flow and its outlet-pressure solve,
-on the liquid and gas branches, with the opening characteristic and the fouling fraction.
+**All nine standards are carried.** ``ControlValveSizing`` is the default; the IEC pair, the
+production choke and the five multiphase choke correlations follow. The four single-phase
+standards read one root and refuse a two-phase inlet; the five chokes read the flash's labelled
+phases, the gas quality and the GLR.
 
 **The gas formula is the class's, unit mixing included.** ``Q`` at standard conditions (273.15 K,
 101.325 kPa) comes from the actual volumetric flow through ``P1``, ``T`` and ``Z``, then
@@ -913,6 +914,222 @@ def sizing_report_for(
         return iec_report(components, t, p, z, n, outlet_bara, standard, geometry, full=True)
     if standard == "prod_choke":
         return simple_report(components, t, p, z, n, outlet_bara, standard, geometry)
-    from azoth.core.errors import InvalidInputError
+    return choke_report(components, t, p, z, n, outlet_bara, standard, geometry)
 
-    raise InvalidInputError("sizing_standard", "no sizing report is built for this route")
+
+def _sqrt(value: float) -> float:
+    """Java's ``Math.sqrt``: a negative radicand is a NaN, not a ``ValueError``."""
+    return math.sqrt(value) if value >= 0.0 else math.nan
+
+
+@dataclass(frozen=True, slots=True)
+class _ChokeReads:
+    p1_pa: float
+    system_density: float
+    molar_mass_kg: float
+    gas_quality: float
+    gamma: float
+    rho_gas: float
+    rho_liquid: float
+    glr: float
+
+
+def _choke_reads(
+    components: list[str], t: float, p: float, z: list[float], n: float, standard: str
+) -> _ChokeReads:
+    mixture, labelled, shares = capacity._labelled_phases(components, t, p, z, from_feed=True)
+    _, ideal_gas = _components.mixture_of(components, eos="pr")
+
+    gas: tuple[list[float], float, float] | None = None
+    liquid: tuple[list[float], float, float] | None = None
+    for (label, composition, root), _share in zip(labelled, shares, strict=True):
+        density = capacity._mass_density(mixture, t, p, composition, root)
+        if label == capacity.GAS:
+            gas = (composition, root, density)
+        else:
+            liquid = (composition, root, density)
+
+    gas_mass = 0.0 if gas is None else shares[0] * n * capacity._molar_mass(mixture, gas[0])
+    liquid_mass = (
+        0.0 if liquid is None else (1.0 - shares[0]) * n * capacity._molar_mass(mixture, liquid[0])
+    )
+    if gas is None:
+        gas_quality = 0.0
+    elif liquid is None:
+        gas_quality = 1.0
+    else:
+        gas_quality = gas_mass / (gas_mass + liquid_mass)
+
+    _mass_per_mole, volume_per_mole = capacity._system_per_mole(components, t, p, z, from_feed=True)
+    system_z = p * volume_per_mole / (R_J_PER_MOL_K * t)
+    molar_mass_kg = capacity._molar_mass(mixture, list(z))
+    if gas is not None:
+        rho_gas = gas[2]
+        gas_z = p * pr_molar_volume_root(gas[1], t, p) / (R_J_PER_MOL_K * t)
+    else:
+        rho_gas = p * molar_mass_kg / (system_z * R_J_PER_MOL_K * t)
+        gas_z = system_z
+    rho_liquid = liquid[2] if liquid is not None else (1000.0 if standard == "sachdeva" else 800.0)
+
+    cp = 0.0
+    for (_label, composition, root), share in zip(labelled, shares, strict=True):
+        state = molar_enthalpy_entropy(
+            mixture, ideal_gas, quantity(t, "K"), quantity(p, "Pa"), composition, root
+        )
+        cp += share * float(state.cp.to_base_units().magnitude)
+    gamma = cp / (cp - R_J_PER_MOL_K)
+
+    gas_volume = (
+        0.0 if gas is None else shares[0] * n * capacity._molar_mass(mixture, gas[0]) / rho_gas
+    )
+    liquid_volume = (
+        0.0
+        if liquid is None
+        else (1.0 - shares[0]) * n * capacity._molar_mass(mixture, liquid[0]) / rho_liquid
+    )
+    gas_std_volume = gas_volume * gas_z * t / 288.15 * 101325.0 / p
+    glr = gas_std_volume / liquid_volume if liquid_volume > 0.0 else math.inf
+
+    return _ChokeReads(
+        p1_pa=p,
+        system_density=capacity.system_mass_density(components, t, p, z, from_feed=True),
+        molar_mass_kg=molar_mass_kg,
+        gas_quality=gas_quality,
+        gamma=gamma,
+        rho_gas=rho_gas,
+        rho_liquid=rho_liquid,
+        glr=glr,
+    )
+
+
+def pr_molar_volume_root(root: float, t: float, p: float) -> float:
+    """``pr_molar_volume``'s magnitude, m3/mol, at a stated root."""
+    return pr_molar_volume(root, quantity(t, "K"), quantity(p, "Pa")).v.to("m**3/mol").magnitude
+
+
+def _homogeneous_density(gas_quality: float, rho_gas: float, rho_liquid: float) -> float:
+    if gas_quality >= 1.0:
+        return rho_gas
+    if gas_quality <= 0.0:
+        return rho_liquid
+    return 1.0 / (gas_quality / rho_gas + (1.0 - gas_quality) / rho_liquid)
+
+
+def _isentropic_critical_ratio(gamma: float) -> float:
+    return (2.0 / (gamma + 1.0)) ** (gamma / (gamma - 1.0))
+
+
+def _sachdeva_critical_ratio(gas_quality: float, gamma: float) -> float:
+    if gas_quality <= 0.001:
+        return 0.90
+    if gas_quality >= 0.999:
+        return _isentropic_critical_ratio(gamma)
+    xg = min(0.98, max(0.02, gas_quality))
+    return min(0.9, max(0.3, 0.5847 - 0.0227 * math.log(xg)))
+
+
+def _gilbert_critical_ratio(gas_quality: float, gamma: float) -> float:
+    if gas_quality <= 0.01:
+        return 0.85
+    if gas_quality >= 0.99:
+        return _isentropic_critical_ratio(gamma)
+    return 0.5847 - 0.0227 * math.log(max(0.02, gas_quality))
+
+
+def _sachdeva_gas_only(read: _ChokeReads, p2_pa: float, cd: float, area: float) -> float:
+    gamma = read.gamma
+    critical = _isentropic_critical_ratio(gamma)
+    ratio = p2_pa / read.p1_pa
+    if ratio <= critical:
+        factor = (2.0 / (gamma + 1.0)) ** ((gamma + 1.0) / (2.0 * (gamma - 1.0)))
+        return cd * area * math.sqrt(gamma * read.p1_pa * read.rho_gas) * factor
+    term1 = 2.0 * gamma / (gamma - 1.0)
+    term2 = ratio ** (2.0 / gamma) - ratio ** ((gamma + 1.0) / gamma)
+    return cd * area * _sqrt(term1 * read.p1_pa * read.rho_gas * term2)
+
+
+def _sachdeva_mass_flow(
+    read: _ChokeReads, p2_pa: float, geometry: ValveSizingGeometry, diameter: float
+) -> float:
+    cd = geometry.discharge_coefficient if geometry.discharge_coefficient is not None else 0.84
+    area = math.pi * diameter * diameter / 4.0
+    xg = read.gas_quality
+    if xg <= 0.001:
+        delta_p = max(0.0, read.p1_pa - p2_pa)
+        return cd * area * math.sqrt(2.0 * read.rho_liquid * delta_p)
+    if xg >= 0.999:
+        return _sachdeva_gas_only(read, p2_pa, cd, area)
+    y = max(p2_pa / read.p1_pa, _sachdeva_critical_ratio(xg, read.gamma))
+    n = 1.2
+    rho_gas2 = read.rho_gas * y ** (1.0 / n)
+    area_ratio_sq = (diameter / 0.1016) ** 4
+    xl = 1.0 - xg
+    kinetic = (1.0 / (y * y) - area_ratio_sq) * (
+        xg / (rho_gas2 * rho_gas2) + xl / (read.rho_liquid * read.rho_liquid)
+    )
+    liquid_work = 2.0 * xl / read.rho_liquid * (1.0 - y)
+    gas_work = 2.0 * xg / ((n - 1.0) * read.rho_gas) * (1.0 - y ** ((n - 1.0) / n))
+    denominator = kinetic + liquid_work + gas_work
+    if denominator <= 0.0:
+        return 0.0
+    rho_mix = _homogeneous_density(xg, read.rho_gas, read.rho_liquid)
+    return cd * area * math.sqrt(2.0 * read.p1_pa * rho_mix / denominator)
+
+
+def _gilbert_mass_flow(read: _ChokeReads, p2_pa: float, standard: str, diameter: float) -> float:
+    constant, diameter_exponent, glr_exponent = {
+        "baxendell": (9.56, 1.93, 0.546),
+        "ros": (17.4, 2.0, 0.5),
+        "achong": (3.82, 1.88, 0.65),
+    }.get(standard, (10.0, 1.89, 0.546))
+    area = math.pi * diameter * diameter / 4.0
+    p_psig = read.p1_pa / 6894.76 - 14.696
+    d_64ths = diameter / 0.0254 * 64.0
+    glr_scf_stb = read.glr * 35.3147 / 6.28981
+    if glr_scf_stb <= 0.0:
+        delta_p = max(0.0, read.p1_pa - p2_pa)
+        return 0.85 * area * math.sqrt(2.0 * read.rho_liquid * delta_p)
+    if p_psig <= 0.0 or d_64ths <= 0.0:
+        return 0.0
+    q_stb_day = p_psig * d_64ths**diameter_exponent / (constant * glr_scf_stb**glr_exponent)
+    q_m3_s = q_stb_day * 0.158987 / 86400.0
+    glr_sm3 = glr_scf_stb * 0.02832 / 0.158987
+    return q_m3_s * read.rho_liquid + q_m3_s * glr_sm3 * 1.2
+
+
+def choke_report(
+    components: list[str],
+    t: float,
+    p: float,
+    z: list[float],
+    n: float,
+    outlet_bara: float,
+    standard: str,
+    geometry: ValveSizingGeometry,
+) -> ValveSizingReport:
+    read = _choke_reads(components, t, p, z, n, standard)
+    opening = opening_factor(geometry.characteristic, geometry.opening_percent)
+    diameter = geometry.choke_diameter_m * math.sqrt(opening)
+    p2_pa = outlet_bara * 1.0e5
+    if standard == "sachdeva":
+        mass_flow = _sachdeva_mass_flow(read, p2_pa, geometry, diameter)
+        critical_ratio = _sachdeva_critical_ratio(read.gas_quality, read.gamma)
+    else:
+        mass_flow = _gilbert_mass_flow(read, p2_pa, standard, diameter)
+        critical_ratio = _gilbert_critical_ratio(read.gas_quality, read.gamma)
+    choked = p2_pa / read.p1_pa <= critical_ratio
+    delta_p_bar = (read.p1_pa - p2_pa) / 1.0e5
+    if delta_p_bar > 0.0 and read.system_density > 0.0:
+        q_m3h = mass_flow / read.system_density * 3600.0
+        kv = q_m3h * math.sqrt(read.system_density / 1000.0 / delta_p_bar)
+    else:
+        kv = 0.0
+    return ValveSizingReport(
+        kv=kv,
+        cv=kv * KV_TO_CV_FACTOR,
+        cg=kv * KV_TO_CV_FACTOR * CG_PER_CV,
+        choked=choked,
+        gas_valve=gas_valve(components, t, p, z),
+        calculated_molar_flow=mass_flow / read.molar_mass_kg,
+        calculated_outlet_pressure=read.p1_pa * critical_ratio / 1.0e5,
+    )

@@ -25,7 +25,7 @@ from azoth.core.warnings import Warning
 from azoth.eos import components as _components
 from azoth.eos.reference.ph_flash import enthalpy_at
 from azoth.eos.reference.ph_flash import ph_flash as ph_flash_solve
-from azoth.process.reference import _unported, valve_sizing
+from azoth.process.reference import valve_sizing
 
 
 def throttling_valve(
@@ -101,20 +101,8 @@ def throttling_valve(
         warnings,
     )
 
-    # **The choke standards are the remaining second machines**, refused by name from the
-    # declaration.
     standard = "default" if sizing_standard is None else sizing_standard
-    if standard == "sachdeva":
-        _unported.refuse("sizing_standard=sachdeva")
-    elif standard == "gilbert":
-        _unported.refuse("sizing_standard=gilbert")
-    elif standard == "baxendell":
-        _unported.refuse("sizing_standard=baxendell")
-    elif standard == "ros":
-        _unported.refuse("sizing_standard=ros")
-    elif standard == "achong":
-        _unported.refuse("sizing_standard=achong")
-    elif standard not in valve_sizing.SIZING_STANDARDS:
+    if standard not in valve_sizing.SIZING_STANDARDS:
         raise InvalidInputError(
             "sizing_standard", f"'{standard}' is not one of the nine declared standards"
         )

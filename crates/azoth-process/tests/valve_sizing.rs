@@ -4,7 +4,7 @@
 //! The gas `Kv` carries the measured `3e-5` heat-capacity divergence the default route's own
 //! tests already bound; the liquid branch reads only the density and agrees to rounding.
 
-use azoth_core::units::{kelvins, pascals};
+use azoth_core::units::{kelvins, meters, pascals};
 use azoth_process::models::throttling_valve::{ThrottlingValveResult, throttling_valve};
 
 const RICH: [&str; 4] = ["methane", "ethane", "propane", "n-butane"];
@@ -236,4 +236,140 @@ fn the_single_phase_standards_refuse_a_two_phase_inlet() {
         let message = format!("{error}");
         assert!(message.contains("single phase"), "{standard}: {message}");
     }
+}
+
+/// The separator capture's two-phase feed: methane/n-butane 0.7/0.3 at 20 bara and 300 K.
+#[allow(clippy::too_many_arguments)]
+fn well(
+    standard: &str,
+    outlet_bara: f64,
+    diameter: Option<f64>,
+    discharge: Option<f64>,
+    calc_pressure: bool,
+) -> ThrottlingValveResult {
+    throttling_valve(
+        &["methane".to_string(), "n-butane".to_string()],
+        1.0,
+        &[0.7, 0.3],
+        pascals(2_000_000.0),
+        kelvins(300.0),
+        pascals(outlet_bara * 1.0e5),
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        Some(calc_pressure),
+        None,
+        Some(standard),
+        diameter.map(meters),
+        discharge,
+    )
+    .expect("the captured two-phase state sizes")
+}
+
+/// Sachdeva's two regimes, on the capture's subcritical and critical rows.
+#[test]
+fn the_sachdeva_rows_match_the_capture() {
+    let subcritical = well("sachdeva", 15.0, Some(0.0127), None, false);
+    // `standard_subcritical_sachdeva`.
+    close(
+        subcritical.kv,
+        76.176_297_525_844_67,
+        1.0e-4,
+        "Sachdeva subcritical Kv",
+    );
+    close(
+        subcritical.calculated_molar_flow,
+        286.262_795_105_894_84,
+        1.0e-4,
+        "Sachdeva subcritical flow",
+    );
+    assert!(!subcritical.choked);
+    assert!(subcritical.gas_valve);
+
+    let critical = well("sachdeva", 5.0, Some(0.0127), None, false);
+    // `standard_critical_sachdeva`.
+    close(
+        critical.kv,
+        31.871_585_378_095_933,
+        1.0e-4,
+        "Sachdeva critical Kv",
+    );
+    close(
+        critical.calculated_molar_flow,
+        207.448_042_639_319_85,
+        1.0e-4,
+        "Sachdeva critical flow",
+    );
+    assert!(critical.choked);
+}
+
+/// A stated `Cd` scales the choke's mass flow.
+#[test]
+fn a_stated_discharge_coefficient_scales_the_sachdeva_flow() {
+    let result = well("sachdeva", 5.0, Some(0.0127), Some(0.9), false);
+    // `standard_sachdeva_cd`.
+    close(result.kv, 34.148_127_190_817_07, 1.0e-4, "Sachdeva Cd Kv");
+    close(
+        result.calculated_molar_flow,
+        222.265_759_970_699_86,
+        1.0e-4,
+        "Sachdeva Cd flow",
+    );
+}
+
+/// The five choke standards all accept a two-phase inlet and answer a mass flow.
+#[test]
+fn the_choke_standards_accept_a_two_phase_inlet() {
+    for standard in ["sachdeva", "gilbert", "baxendell", "ros", "achong"] {
+        let result = well(standard, 5.0, Some(0.0127), None, false);
+        assert!(result.kv > 0.0, "{standard}: no sizing");
+        assert!(
+            result.calculated_molar_flow.is_finite(),
+            "{standard}: no flow"
+        );
+    }
+}
+
+/// The four Gilbert-type correlations are one formula with four constant sets.
+#[test]
+fn the_gilbert_family_matches_the_capture() {
+    let rows = [
+        ("gilbert", 24.575_359_998_706_734, 159.957_851_748_161_83),
+        ("baxendell", 29.528_949_376_542_23, 192.200_126_748_925_87),
+        ("ros", 23.342_792_324_132_382, 151.935_227_568_108_44),
+        ("achong", 47.247_914_623_691_294, 307.530_588_491_234_2),
+    ];
+    for (standard, kv, flow) in rows {
+        let result = well(standard, 5.0, Some(0.0127), None, false);
+        close(result.kv, kv, 1.0e-4, &format!("{standard} Kv"));
+        close(
+            result.calculated_molar_flow,
+            flow,
+            1.0e-4,
+            &format!("{standard} flow"),
+        );
+        assert!(result.choked, "{standard}: the row is critical");
+    }
+}
+
+/// `findOutletPressureForFixedKv` answers `P1 * y_c`, not an inverse of the sizing.
+#[test]
+fn the_sachdeva_pressure_mode_is_the_critical_pressure() {
+    let result = well("sachdeva", 5.0, Some(0.0127), None, true);
+    // `standard_sachdeva_pressure_mode`'s `solved_outlet_p_bara=11.884456598849502`.
+    close(
+        result.outlet_p.value,
+        1_188_445.659_884_950_2,
+        1.0e-5,
+        "Sachdeva solved pressure",
+    );
+    close(
+        result.outlet_t.value,
+        289.773_588_374_696_15,
+        2.0e-4,
+        "Sachdeva solved outlet T",
+    );
 }

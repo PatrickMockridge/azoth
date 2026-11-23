@@ -16,7 +16,6 @@ use azoth_core::{AzothError, Result, Warning, apply_checks};
 use crate::kernels::throttling_valve as kernel;
 use crate::model_gen;
 use crate::stream::Stream;
-use crate::unported;
 use crate::valve::{
     DEFAULT_OPENING_PERCENT, DEFAULT_XT, SizingStandard, ValveCharacteristic, ValveSizingGeometry,
     sizing_report_for,
@@ -91,18 +90,16 @@ pub fn throttling_valve(
         &mut warnings,
     )?;
 
-    // **The choke standards are the remaining second machines**, each refused by name from
-    // the declaration's `[[unported]]` rows.
     let standard = match sizing_standard.unwrap_or("default") {
         "default" => SizingStandard::Default,
         "iec_60534" => SizingStandard::Iec60534,
         "iec_60534_full" => SizingStandard::Iec60534Full,
         "prod_choke" => SizingStandard::ProdChoke,
-        "sachdeva" => return Err(unported::refuse("sizing_standard=sachdeva")),
-        "gilbert" => return Err(unported::refuse("sizing_standard=gilbert")),
-        "baxendell" => return Err(unported::refuse("sizing_standard=baxendell")),
-        "ros" => return Err(unported::refuse("sizing_standard=ros")),
-        "achong" => return Err(unported::refuse("sizing_standard=achong")),
+        "sachdeva" => SizingStandard::Sachdeva,
+        "gilbert" => SizingStandard::Gilbert,
+        "baxendell" => SizingStandard::Baxendell,
+        "ros" => SizingStandard::Ros,
+        "achong" => SizingStandard::Achong,
         other => {
             return Err(AzothError::invalid_input(
                 "sizing_standard",
