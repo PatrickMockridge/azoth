@@ -894,7 +894,7 @@ def regression(
 ) -> RegressionResult:
     """``PVTRegression`` as the id exposes it: rows in, the fit and its two ledgers out."""
     from azoth import _models_gen
-    from azoth.core.units import input_records_to_si
+    from azoth.core.units import input_records_to_si, to_count
 
     spec = _models_gen.model("pvt.regression")
     component_rows: list[dict[str, Any]] = input_records_to_si(spec, "components", list(components))
@@ -959,7 +959,11 @@ def regression(
         corrected=True if volume_correction is None else volume_correction,
         parameters=parameter_rows,
         data=data,
-        max_iterations=LM_MAXIMUM_ITERATIONS if max_iterations is None else int(max_iterations),
+        max_iterations=(
+            LM_MAXIMUM_ITERATIONS
+            if max_iterations is None
+            else to_count(max_iterations, "max_iterations")
+        ),
     )
     objectives_rows = []
     for experiment, value in (

@@ -89,6 +89,12 @@ pub fn throttling_valve(
         },
         &mut warnings,
     )?;
+    if !(inlet_n.is_finite() && inlet_n > 0.0) {
+        return Err(AzothError::invalid_input(
+            "inlet_n",
+            "a valve needs a positive feed amount",
+        ));
+    }
 
     let standard = match sizing_standard.unwrap_or("default") {
         "default" => SizingStandard::Default,

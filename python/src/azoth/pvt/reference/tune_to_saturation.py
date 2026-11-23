@@ -137,7 +137,7 @@ def tune_to_saturation(
 ) -> TuneToSaturationResult:
     """``TuneToSaturation`` as the id exposes it."""
     from azoth import _models_gen
-    from azoth.core.units import input_records_to_si, input_to_si
+    from azoth.core.units import input_records_to_si, input_to_si, to_count
 
     spec = _models_gen.model("pvt.tune_to_saturation")
     rows: list[dict[str, Any]] = input_records_to_si(spec, "components", list(components))
@@ -183,13 +183,16 @@ def tune_to_saturation(
     if rule not in ("classic", "zero"):
         raise InvalidInputError("mixing_rule", f"{rule!r} is not one of classic and zero")
     kij = "database" if rule == "classic" else "zero"
-    cap = max(1, DEFAULT_MAX_ITERATIONS if max_iterations is None else int(max_iterations))
+    lumps = None if number_of_lumps is None else to_count(number_of_lumps, "number_of_lumps")
+    cap = (
+        DEFAULT_MAX_ITERATIONS
+        if max_iterations is None
+        else to_count(max_iterations, "max_iterations")
+    )
 
     corrected = True if volume_correction is None else volume_correction
     molar_mass = float(initial)
-    fluid = _rebuild(
-        base, plus, molar_mass, model, number_of_lumps, first_carbon, cubic, kij, corrected
-    )
+    fluid = _rebuild(base, plus, molar_mass, model, lumps, first_carbon, cubic, kij, corrected)
     pressure = _saturation_at(fluid, temperature)
     error = pressure - target
     if abs(error) < EARLY_RETURN_PA:
@@ -206,9 +209,7 @@ def tune_to_saturation(
     while abs(error) > LOOP_TOLERANCE_PA and iterations < cap:
         iterations += 1
         molar_mass -= sign * (error / 1.0e5) / 1000.0
-        fluid = _rebuild(
-            base, plus, molar_mass, model, number_of_lumps, first_carbon, cubic, kij, corrected
-        )
+        fluid = _rebuild(base, plus, molar_mass, model, lumps, first_carbon, cubic, kij, corrected)
         pressure = _saturation_at(fluid, temperature)
         if abs(previous) < abs(error):
             sign = -sign

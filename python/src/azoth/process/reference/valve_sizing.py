@@ -959,7 +959,7 @@ def _choke_reads(
     elif liquid is None:
         gas_quality = 1.0
     else:
-        gas_quality = gas_mass / (gas_mass + liquid_mass)
+        gas_quality = _ieee_div(gas_mass, gas_mass + liquid_mass)
 
     _mass_per_mole, volume_per_mole = capacity._system_per_mole(components, t, p, z, from_feed=True)
     system_z = p * volume_per_mole / (R_J_PER_MOL_K * t)
