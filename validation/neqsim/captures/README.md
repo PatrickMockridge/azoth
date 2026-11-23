@@ -3398,7 +3398,7 @@ own strings, and a Class 4 or coarser basis adds its not-detailed flag after the
 
 ### The PVT laboratory captures
 
-`PvtProbe` against the pin: eight subcommands, one capture each, in the id's SI units and
+`PvtProbe` against the pin: sixteen subcommands, one capture each, in the id's SI units and
 with absent fields omitted. Compile once, then run each:
 
 ```bash
@@ -3411,6 +3411,8 @@ with absent fields omitted. Compile once, then run each:
 ../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe swelling > captures/pvt_swelling.tsv
 ../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe mmp > captures/pvt_mmp.tsv
 ../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe property_sweep > captures/pvt_property_sweep.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe regression > captures/pvt_regression.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe tuning > captures/pvt_tune_to_saturation.tsv
 ```
 
 The probe reads a few private arrays by reflection, walking the superclass chain: that is
@@ -3421,3 +3423,20 @@ volumes 2e5. The separator train's stage oil density is read before the carried 
 physical properties are re-initialised, so it is the previous stage's density. The property
 sweep has no wax block: the class's wax model refuses a databank n-alkane wax former, and
 the TBP fluid the upstream wax tests use cannot be built from characterization rows.
+
+The regression capture holds three one-parameter fits: the class's own CSP viscosity state
+(n-heptane, 320 K, 1/5/15 bara, target 1.35), a CCE on a methane/n-decane/C15 TBP fluid
+tuning the C7+ critical-temperature multiplier from a clone at 1.03, and a DLE tuning the
+CO2-hydrocarbon BIP from a clone at 0.15. Each block prints its component rows, the
+observations, the base-state values at the initial parameters, the fitted value, every
+objective by `getObjectiveValue`, the chi-square, the simplified uncertainty, and the
+optimizer's iterations and convergence reason from the same private sample builders the
+class's weighting tests reach by reflection. `getTotalObjective` sums a `HashMap`, so only
+the individual objectives are compared.
+
+The tuning capture holds the class's own plus-molar-mass search on a methane/n-decane/C11
+fluid at 350 K. Its early-return block targets 0.003 bar above the base saturation and
+exits before any update; its loop block targets 0.02 bar above and runs seventeen
+iterations. The loop's exit criterion is the *previous* run's error, so the last run can
+sit above 1e-3 bar from the target; the tuned molar mass is read from the class's own
+per-iteration line, which is the only place it is published.
