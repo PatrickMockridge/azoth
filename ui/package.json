@@ -1,7 +1,7 @@
 {
   "name": "azoth-ui",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.4",
   "type": "module",
   "description": "The azoth flowsheet editor: the middleware's first front-end.",
   "scripts": {
