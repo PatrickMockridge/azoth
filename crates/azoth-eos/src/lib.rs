@@ -489,7 +489,7 @@ pub use unifac_umrpru_activity_coefficients::unifac_umrpru_activity_coefficients
 pub use uniquac_activity_coefficients::uniquac_activity_coefficients;
 pub use van_laar_acid_activity_coefficients::van_laar_acid_activity_coefficients;
 pub use vdw1f_mix_binary::vdw1f_mix_binary;
-pub use viscosity::viscosity;
+pub use viscosity::{viscosity, viscosity_with_csp};
 pub use vu_flash::vu_flash;
 pub use water_dew_point_line::water_dew_point_line;
 pub use water_dew_point_multiphase::water_dew_point_multiphase;

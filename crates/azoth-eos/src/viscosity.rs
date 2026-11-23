@@ -127,7 +127,8 @@ fn get_ref_viscosity(t0: f64, p0: f64) -> Result<f64> {
 }
 
 /// The corresponding-states scaling, `calculateCorrespondingStatesViscosity`, with the
-/// four correction factors at their default `1.0`.
+/// four correction factors multiplying the temperature, pressure and molar-mass exponents
+/// and the alpha exponent. The default set is `[1.0; 4]`.
 #[allow(clippy::too_many_arguments)]
 fn csp(
     reference_viscosity: f64,
@@ -136,12 +137,13 @@ fn csp(
     m_mix: f64,
     alfa_mix: f64,
     alfa0: f64,
+    correction: [f64; 4],
 ) -> f64 {
     reference_viscosity
-        * (tc_mix / METHANE_TC).powf(-1.0 / 6.0)
-        * (pc_mix / METHANE_PC).powf(2.0 / 3.0)
-        * (m_mix / (METHANE_M * 1e3)).powf(0.5)
-        * (alfa_mix / alfa0)
+        * (tc_mix / METHANE_TC).powf(-1.0 / 6.0 * correction[0])
+        * (pc_mix / METHANE_PC).powf(2.0 / 3.0 * correction[1])
+        * (m_mix / (METHANE_M * 1e3)).powf(0.5 * correction[2])
+        * (alfa_mix / alfa0).powf(correction[3])
 }
 
 /// The liquid viscosity of a mixture, from the Pedersen (PFCT) heavy-oil correlation.
@@ -161,6 +163,30 @@ pub fn viscosity(
     p: Pressure,
     z: &[f64],
 ) -> Result<ViscosityResult> {
+    viscosity_with_csp(mixture, t, p, z, [1.0; 4])
+}
+
+/// The same correlation with the four CSP correction factors the PVT regression tunes.
+///
+/// The factors multiply the temperature, pressure and molar-mass exponents and the alpha
+/// exponent, exactly as `PFCTViscosityMethodHeavyOil.calculateCorrespondingStatesViscosity`
+/// reads them. `[1.0; 4]` is the published correlation.
+///
+/// # Errors
+/// The same as [`viscosity`], plus a non-finite correction factor.
+pub fn viscosity_with_csp(
+    mixture: &Mixture,
+    t: ThermodynamicTemperature,
+    p: Pressure,
+    z: &[f64],
+    correction: [f64; 4],
+) -> Result<ViscosityResult> {
+    if correction.iter().any(|value| !value.is_finite()) {
+        return Err(AzothError::invalid_input(
+            "csp_correction",
+            "the four CSP viscosity correction factors must be finite",
+        ));
+    }
     let spec = &model_gen::VISCOSITY_SPEC;
     let mut warnings = Vec::new();
 
@@ -269,12 +295,28 @@ pub fn viscosity(
             ho_viscosity
         } else {
             let ref_viscosity = get_ref_viscosity(t0, p0)?;
-            let lo_viscosity = csp(ref_viscosity, tc_mix, pc_mix, m_mix, alfa_mix, alfa0);
+            let lo_viscosity = csp(
+                ref_viscosity,
+                tc_mix,
+                pc_mix,
+                m_mix,
+                alfa_mix,
+                alfa0,
+                correction,
+            );
             lo_viscosity * (1.0 - (75.0 - t0) / 10.0) + ho_viscosity * (75.0 - t0) / 10.0
         }
     } else {
         let ref_viscosity = get_ref_viscosity(t0, p0)?;
-        csp(ref_viscosity, tc_mix, pc_mix, m_mix, alfa_mix, alfa0)
+        csp(
+            ref_viscosity,
+            tc_mix,
+            pc_mix,
+            m_mix,
+            alfa_mix,
+            alfa0,
+            correction,
+        )
     };
 
     apply_checks(
