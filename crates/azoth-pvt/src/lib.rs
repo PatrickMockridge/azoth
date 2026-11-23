@@ -32,6 +32,7 @@ pub mod standard;
 pub mod swelling_test;
 pub mod transport;
 pub mod tune_to_saturation;
+pub mod van_everdingen_hurst_aquifer;
 pub mod volume;
 pub mod water_correlations;
 
@@ -71,6 +72,9 @@ pub use separator_test::{
 };
 pub use swelling_test::{SwellingPoint, SwellingTestResult, swelling_test};
 pub use tune_to_saturation::{TuneToSaturationResult, tune_to_saturation};
+pub use van_everdingen_hurst_aquifer::{
+    VanEverdingenHurstAquiferResult, van_everdingen_hurst_aquifer,
+};
 pub use water_correlations::{
     WaterCorrelationsResult, WaterQuery, WaterResultRow, water_correlations,
 };

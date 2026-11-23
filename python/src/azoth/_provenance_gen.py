@@ -4074,6 +4074,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 2,
         "tests_skipped": 0,
     },
+    'pvt.van_everdingen_hurst_aquifer': {
+        "calc_id": 'pvt.van_everdingen_hurst_aquifer',
+        "name": 'Van Everdingen-Hurst aquifer',
+        "spec": {'path': 'specs/models/pvt/van_everdingen_hurst_aquifer.toml', 'sha256': 'd9d30e271de9d099aa669e91a40ef26a5f02cf17995d783a4374a0e7e66fa8e2'},
+        "code": [{'path': 'python/src/azoth/pvt/reference/van_everdingen_hurst_aquifer.py', 'sha256': '4e66e7527ec5c427a7c0c8f7d52a139711d473da34035e2790a3a9f62c68db08'}, {'path': 'crates/azoth-pvt/src/van_everdingen_hurst_aquifer.rs', 'sha256': '65f909afd62d82e1e2332e821bfbe25a3382162f04353b25e8c1b15adbacc55f'}],
+        "source": 'NeqSim pvtsimulation/reservoirproperties/materialbalance/VanEverdingenHurstAquifer.java and RadialInfiniteInfluence.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 11,
+        "tests_skipped": 0,
+    },
     'pvt.water_correlations': {
         "calc_id": 'pvt.water_correlations',
         "name": 'Water and brine correlation table',

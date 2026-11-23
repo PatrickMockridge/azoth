@@ -10800,6 +10800,52 @@ pub fn tune_to_saturation(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Van Everdingen-Hurst aquifer.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (calculation, dimensionless_time_value, dimensionless_times, dimensionless_outer_radius, permeability, time, porosity, viscosity, total_compressibility, reservoir_radius, thickness, encroachment_angle, aquifer_constant_value, pressure_drop))]
+#[pyo3(
+    text_signature = "(calculation, dimensionless_time_value, dimensionless_times, dimensionless_outer_radius, permeability, time, porosity, viscosity, total_compressibility, reservoir_radius, thickness, encroachment_angle, aquifer_constant_value, pressure_drop)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn van_everdingen_hurst_aquifer(
+    py: Python<'_>,
+    calculation: &str,
+    dimensionless_time_value: Option<f64>,
+    dimensionless_times: Option<Vec<f64>>,
+    dimensionless_outer_radius: Option<f64>,
+    permeability: Option<f64>,
+    time: Option<f64>,
+    porosity: Option<f64>,
+    viscosity: Option<f64>,
+    total_compressibility: Option<f64>,
+    reservoir_radius: Option<f64>,
+    thickness: Option<f64>,
+    encroachment_angle: Option<f64>,
+    aquifer_constant_value: Option<f64>,
+    pressure_drop: Option<Vec<f64>>,
+) -> PyResult<crate::transport_gen::PyVanEverdingenHurstAquiferResult> {
+    azoth_pvt::van_everdingen_hurst_aquifer::van_everdingen_hurst_aquifer(
+        calculation,
+        dimensionless_time_value,
+        dimensionless_times.as_deref(),
+        dimensionless_outer_radius,
+        permeability.map(square_meters),
+        time.map(seconds),
+        porosity,
+        viscosity.map(pascal_seconds),
+        total_compressibility,
+        reservoir_radius.map(meters),
+        thickness.map(meters),
+        encroachment_angle,
+        aquifer_constant_value,
+        pressure_drop.as_deref(),
+    )
+    .map(|r| crate::transport_gen::PyVanEverdingenHurstAquiferResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Water and brine correlation table.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

@@ -370,6 +370,7 @@
 //!   - specs/models/pvt/separator_test.toml
 //!   - specs/models/pvt/swelling_test.toml
 //!   - specs/models/pvt/tune_to_saturation.toml
+//!   - specs/models/pvt/van_everdingen_hurst_aquifer.toml
 //!   - specs/models/pvt/water_correlations.toml
 //!   - specs/models/reactions/chemical_equilibrium.toml
 //!   - specs/calcs/reactions/equilibrium_constant.toml
@@ -6999,6 +7000,59 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("pvt.tune_to_saturation", "saturation_pressure", "pressure"),
     ("pvt.tune_to_saturation", "number_of_lumps", "dimensionless"),
     ("pvt.tune_to_saturation", "max_iterations", "dimensionless"),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "dimensionless_time_value",
+        "dimensionless",
+    ),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "dimensionless_times",
+        "dimensionless",
+    ),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "dimensionless_outer_radius",
+        "dimensionless",
+    ),
+    ("pvt.van_everdingen_hurst_aquifer", "permeability", "area"),
+    ("pvt.van_everdingen_hurst_aquifer", "time", "time"),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "porosity",
+        "dimensionless",
+    ),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "viscosity",
+        "dynamic_viscosity",
+    ),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "total_compressibility",
+        "dimensionless",
+    ),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "reservoir_radius",
+        "length",
+    ),
+    ("pvt.van_everdingen_hurst_aquifer", "thickness", "length"),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "encroachment_angle",
+        "dimensionless",
+    ),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "aquifer_constant_value",
+        "dimensionless",
+    ),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "pressure_drop",
+        "pressure",
+    ),
     (
         "reactions.chemical_equilibrium",
         "a_matrix",

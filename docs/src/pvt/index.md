@@ -28,4 +28,5 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`pvt.separator_test`](./separator_test.md) | `direct composition` | NeqSim pvtsimulation/simulation/{GOR,SeparatorTest,MultiStageSeparatorTest}.java |
 | [`pvt.swelling_test`](./swelling_test.md) | `direct composition` | NeqSim pvtsimulation/simulation/SwellingTest.java |
 | [`pvt.tune_to_saturation`](./tune_to_saturation.md) | `plus_molar_mass_search` | NeqSim pvtsimulation/modeltuning/TuneToSaturation.java |
+| [`pvt.van_everdingen_hurst_aquifer`](./van_everdingen_hurst_aquifer.md) | `direct composition` | NeqSim pvtsimulation/reservoirproperties/materialbalance/VanEverdingenHurstAquifer.java and RadialInfiniteInfluence.java |
 | [`pvt.water_correlations`](./water_correlations.md) | `water_correlation_dispatch` | NeqSim pvtsimulation/util/WaterPropertyCorrelations.java and SolutionGasWaterRatio.java |

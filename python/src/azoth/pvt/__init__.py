@@ -36,6 +36,7 @@ from azoth.core.result import (
     SeparatorTestResult,
     SwellingTestResult,
     TuneToSaturationResult,
+    VanEverdingenHurstAquiferResult,
     WaterCorrelationsResult,
 )
 from azoth.pvt import layers as layers
@@ -55,6 +56,7 @@ _SATURATION_TEST = "pvt.saturation_test"
 _SEPARATOR_TEST = "pvt.separator_test"
 _SWELLING_TEST = "pvt.swelling_test"
 _TUNE_TO_SATURATION = "pvt.tune_to_saturation"
+_VAN_EVERDINGEN_HURST_AQUIFER = "pvt.van_everdingen_hurst_aquifer"
 _WATER_CORRELATIONS = "pvt.water_correlations"
 
 __all__ = [
@@ -74,6 +76,7 @@ __all__ = [
     "separator_test",
     "swelling_test",
     "tune_to_saturation",
+    "van_everdingen_hurst_aquifer",
     "water_correlations",
 ]
 
@@ -766,4 +769,63 @@ def oil_material_balance(
         eo_history=eo_history,
         eg_history=eg_history,
         we_history=we_history,
+    )
+
+
+def van_everdingen_hurst_aquifer(
+    calculation: str,
+    *,
+    dimensionless_time_value: float | None = None,
+    dimensionless_times: Sequence[float] | None = None,
+    dimensionless_outer_radius: float | None = None,
+    permeability: Any = None,
+    time: Any = None,
+    porosity: float | None = None,
+    viscosity: Any = None,
+    total_compressibility: float | None = None,
+    reservoir_radius: Any = None,
+    thickness: Any = None,
+    encroachment_angle: float | None = None,
+    aquifer_constant_value: float | None = None,
+    pressure_drop: Sequence[Any] | None = None,
+) -> VanEverdingenHurstAquiferResult:
+    """The radial aquifer influence functions, time and constant, and water influx.
+
+    ``calculation`` selects the answer: the dimensionless pressure or its derivative at a
+    time, the physical dimensionless time or aquifer constant from the aquifer's properties,
+    the Carter-Tracy cumulative influx over a history, or the influence table. ``permeability``
+    is an area, ``time`` a duration, ``viscosity`` a dynamic viscosity, the two radii and the
+    thickness lengths, and ``pressure_drop`` a pressure history. The aquifer constant is in
+    reservoir m3 per Pa, because ``total_compressibility`` is 1/Pa throughout.
+
+    ``dimensionless_outer_radius`` absent, non-positive or infinite is infinite-acting; a
+    finite radius selects the class's legacy bounded policy, the maximum of the infinite-acting
+    pressure and its pseudo-steady form. A negative total pressure drop sets a Carter-Tracy
+    increment to zero rather than creating a water credit.
+
+    Returns:
+        The dimensionless pressures, time and constant, or the cumulative influx history; the
+        fields a calculation does not answer are absent.
+
+    Raises:
+        InvalidInputError: for an unknown calculation, a missing input, a physical input outside
+            its domain, a non-increasing Carter-Tracy history or an unrepresentable answer.
+
+    See :func:`azoth.pvt.reference.van_everdingen_hurst_aquifer.van_everdingen_hurst_aquifer`.
+    """
+    return resolve(_VAN_EVERDINGEN_HURST_AQUIFER)(  # type: ignore[no-any-return]
+        calculation=calculation,
+        dimensionless_time_value=dimensionless_time_value,
+        dimensionless_times=dimensionless_times,
+        dimensionless_outer_radius=dimensionless_outer_radius,
+        permeability=permeability,
+        time=time,
+        porosity=porosity,
+        viscosity=viscosity,
+        total_compressibility=total_compressibility,
+        reservoir_radius=reservoir_radius,
+        thickness=thickness,
+        encroachment_angle=encroachment_angle,
+        aquifer_constant_value=aquifer_constant_value,
+        pressure_drop=pressure_drop,
     )

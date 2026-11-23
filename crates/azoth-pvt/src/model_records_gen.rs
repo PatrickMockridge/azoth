@@ -26,6 +26,7 @@ use crate::saturation_test::SaturationTestResult;
 use crate::separator_test::SeparatorTestResult;
 use crate::swelling_test::SwellingTestResult;
 use crate::tune_to_saturation::TuneToSaturationResult;
+use crate::van_everdingen_hurst_aquifer::VanEverdingenHurstAquiferResult;
 use crate::water_correlations::WaterCorrelationsResult;
 
 impl CalcResult for BlackOilCorrelationsResult {
@@ -270,6 +271,23 @@ impl CalcResult for TuneToSaturationResult {
         "final_saturation_pressure",
         "iterations",
         "converged",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for VanEverdingenHurstAquiferResult {
+    const CALC_ID: &'static str = "pvt.van_everdingen_hurst_aquifer";
+    const FIELDS: &'static [&'static str] = &[
+        "dimensionless_pressure",
+        "dimensionless_pressure_derivative",
+        "dimensionless_time",
+        "aquifer_constant",
+        "dimensionless_pressures",
+        "cumulative_influx",
         "warnings",
     ];
 

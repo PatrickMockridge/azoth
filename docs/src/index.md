@@ -481,6 +481,7 @@ Five sections, and the difference between them is the point:
 - [`pvt.separator_test`](./pvt/separator_test.md) — Separator test
 - [`pvt.swelling_test`](./pvt/swelling_test.md) — Swelling test
 - [`pvt.tune_to_saturation`](./pvt/tune_to_saturation.md) — Plus-molar-mass saturation tuning
+- [`pvt.van_everdingen_hurst_aquifer`](./pvt/van_everdingen_hurst_aquifer.md) — Van Everdingen-Hurst aquifer
 - [`pvt.water_correlations`](./pvt/water_correlations.md) — Water and brine correlation table
 
 **Reactions** - [`reactions/index.md`](./reactions/index.md):

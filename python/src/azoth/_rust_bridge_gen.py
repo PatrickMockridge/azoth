@@ -525,6 +525,7 @@ from azoth.core.result import (
     VacuumCollapseResult,
     VacuumVerdict,
     ValveScaleDriftResult,
+    VanEverdingenHurstAquiferResult,
     VanLaarAcidActivityCoefficientsResult,
     VceResult,
     Vdw1fMixBinaryResult,
@@ -959,6 +960,7 @@ __all__ = [
     "uniquac_activity_coefficients",
     "vacuum_collapse",
     "valve_scale_drift",
+    "van_everdingen_hurst_aquifer",
     "van_laar_acid_activity_coefficients",
     "vce",
     "vdw1f_mix_binary",
@@ -10877,6 +10879,36 @@ def tune_to_saturation(components: Sequence[Mapping[str, Any]], plus_component: 
         final_saturation_pressure=from_si(result.final_saturation_pressure.magnitude_si, result.final_saturation_pressure.unit),
         iterations=result.iterations,
         converged=result.converged,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def van_everdingen_hurst_aquifer(calculation: str, *, dimensionless_time_value: float | None=None, dimensionless_times: Sequence[float] | None=None, dimensionless_outer_radius: float | None=None, permeability: Any=None, time: Any=None, porosity: float | None=None, viscosity: Any=None, total_compressibility: float | None=None, reservoir_radius: Any=None, thickness: Any=None, encroachment_angle: float | None=None, aquifer_constant_value: float | None=None, pressure_drop: Sequence[Any] | None=None) -> VanEverdingenHurstAquiferResult:
+    """``pvt.van_everdingen_hurst_aquifer``, computed in Rust."""
+    spec = _models_gen.model("pvt.van_everdingen_hurst_aquifer")
+    result = _core.van_everdingen_hurst_aquifer(
+        calculation,
+        None if dimensionless_time_value is None else dimensionless_time_value,
+        None if dimensionless_times is None else list(dimensionless_times),
+        None if dimensionless_outer_radius is None else dimensionless_outer_radius,
+        None if permeability is None else _si(spec, "permeability", permeability),
+        None if time is None else _si(spec, "time", time),
+        None if porosity is None else porosity,
+        None if viscosity is None else _si(spec, "viscosity", viscosity),
+        None if total_compressibility is None else total_compressibility,
+        None if reservoir_radius is None else _si(spec, "reservoir_radius", reservoir_radius),
+        None if thickness is None else _si(spec, "thickness", thickness),
+        None if encroachment_angle is None else encroachment_angle,
+        None if aquifer_constant_value is None else aquifer_constant_value,
+        None if pressure_drop is None else [_si(spec, "pressure_drop", v) for v in pressure_drop],
+    )
+    return VanEverdingenHurstAquiferResult(
+        dimensionless_pressure=result.dimensionless_pressure,
+        dimensionless_pressure_derivative=result.dimensionless_pressure_derivative,
+        dimensionless_time=result.dimensionless_time,
+        aquifer_constant=result.aquifer_constant,
+        dimensionless_pressures=None if result.dimensionless_pressures is None else tuple(result.dimensionless_pressures),
+        cumulative_influx=None if result.cumulative_influx is None else tuple(from_si(q.magnitude_si, q.unit) for q in result.cumulative_influx),
         warnings=_warnings(result.warnings),
     )
 

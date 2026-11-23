@@ -389,6 +389,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "pvt.separator_test" => azoth_pvt::separator_test::SeparatorTestResult::FIELDS.to_vec(),
         "pvt.swelling_test" => azoth_pvt::swelling_test::SwellingTestResult::FIELDS.to_vec(),
         "pvt.tune_to_saturation" => azoth_pvt::tune_to_saturation::TuneToSaturationResult::FIELDS.to_vec(),
+        "pvt.van_everdingen_hurst_aquifer" => azoth_pvt::van_everdingen_hurst_aquifer::VanEverdingenHurstAquiferResult::FIELDS.to_vec(),
         "pvt.water_correlations" => azoth_pvt::water_correlations::WaterCorrelationsResult::FIELDS.to_vec(),
         "reactions.chemical_equilibrium" => azoth_reactions::chemical_equilibrium::ChemicalEquilibriumResult::FIELDS.to_vec(),
         "reactions.equilibrium_constant" => azoth_reactions::equilibrium_constant::EquilibriumConstantResult::FIELDS.to_vec(),

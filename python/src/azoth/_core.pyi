@@ -7077,6 +7077,16 @@ class TuneToSaturationResult:
     warnings: list[Warning]
 
 @final
+class VanEverdingenHurstAquiferResult:
+    dimensionless_pressure: float | None
+    dimensionless_pressure_derivative: float | None
+    dimensionless_time: float | None
+    aquifer_constant: float | None
+    dimensionless_pressures: list[float] | None
+    cumulative_influx: list[Qty] | None
+    warnings: list[Warning]
+
+@final
 class WaterCorrelationsResult:
     queries: list[WaterResultRow]
     warnings: list[Warning]
@@ -11379,6 +11389,22 @@ def tune_to_saturation(
     volume_correction: bool | None = None,
     max_iterations: float | None = None,
 ) -> TuneToSaturationResult: ...
+def van_everdingen_hurst_aquifer(
+    calculation: str,
+    dimensionless_time_value: float | None = None,
+    dimensionless_times: list[float] | None = None,
+    dimensionless_outer_radius: float | None = None,
+    permeability: float | None = None,
+    time: float | None = None,
+    porosity: float | None = None,
+    viscosity: float | None = None,
+    total_compressibility: float | None = None,
+    reservoir_radius: float | None = None,
+    thickness: float | None = None,
+    encroachment_angle: float | None = None,
+    aquifer_constant_value: float | None = None,
+    pressure_drop: list[float] | None = None,
+) -> VanEverdingenHurstAquiferResult: ...
 def water_correlations(queries: list[WaterQuery]) -> WaterCorrelationsResult: ...
 def chemical_equilibrium(
     a_matrix: list[list[float]],

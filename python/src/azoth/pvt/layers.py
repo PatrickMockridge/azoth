@@ -400,6 +400,10 @@ NO_INTERIOR: dict[str, str] = {
         "the answer is the tuned molar mass and the last saturation pressure; the iteration "
         "path is the loop's own and no intermediate state is published"
     ),
+    "pvt.van_everdingen_hurst_aquifer": (
+        "each calculation is one quadrature, conversion or recurrence answer; the nodes are "
+        "the method, not a state a capture names"
+    ),
 }
 
 #: Capture blocks that are evidence rather than a case - a refusal, a fallback or a fluid the

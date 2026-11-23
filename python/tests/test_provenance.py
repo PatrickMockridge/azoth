@@ -192,8 +192,8 @@ def test_the_block_exists_for_every_registered_id() -> None:
     # test; 386: the constant mass expansion; 387: the differential liberation; 388: the
     # constant volume depletion; 389: the separator test; 390: the swelling test; 391: the
     # minimum miscibility pressure; 392: the property sweep; 393: the PVT regression;
-    # 394: the plus-molar-mass saturation tuning.
-    assert len(registered) == 394
+    # 394: the plus-molar-mass saturation tuning; 395: the Van Everdingen-Hurst aquifer.
+    assert len(registered) == 395
 
 
 def test_the_rust_table_carries_exactly_the_same_ids() -> None:

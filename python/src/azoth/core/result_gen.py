@@ -12715,6 +12715,34 @@ class TuneToSaturationResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class VanEverdingenHurstAquiferResult(_HasWarnings):
+    """Result of ``pvt.van_everdingen_hurst_aquifer``."""
+
+    CALC_ID: ClassVar[str] = "pvt.van_everdingen_hurst_aquifer"
+
+    #: the dimensionless pressure at the stated time and radius.
+    dimensionless_pressure: float | None
+
+    #: the derivative of the selected pressure branch with respect to dimensionless time.
+    dimensionless_pressure_derivative: float | None
+
+    #: the dimensionless time from the physical inputs.
+    dimensionless_time: float | None
+
+    #: the aquifer constant in reservoir m3 per Pa.
+    aquifer_constant: float | None
+
+    #: the influence table's pressures, one per time.
+    dimensionless_pressures: tuple[float, ...] | None
+
+    #: the Carter-Tracy cumulative water influx, one per time.
+    cumulative_influx: tuple[Q, ...] | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class WaterCorrelationsResult(_HasWarnings):
     """Result of ``pvt.water_correlations``."""
 

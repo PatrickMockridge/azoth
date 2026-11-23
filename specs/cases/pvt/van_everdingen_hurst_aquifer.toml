@@ -1,0 +1,117 @@
+model = "pvt.van_everdingen_hurst_aquifer"
+[[cases]]
+id = "infinite_acting_pressure"
+tolerance = 1.0e-12
+source = "The class's infinite-acting pressure at tD 0.005, from `validation/neqsim/captures/pvt_van_everdingen_hurst.tsv`."
+[cases.inputs]
+calculation = "dimensionless_pressure"
+dimensionless_time_value = 0.005
+[cases.expected]
+dimensionless_pressure = 0.0773837496680494
+[[cases]]
+id = "infinite_acting_derivative"
+tolerance = 1.0e-12
+source = "The analytic derivative at the same state."
+[cases.inputs]
+calculation = "dimensionless_pressure_derivative"
+dimensionless_time_value = 0.005
+[cases.expected]
+dimensionless_pressure_derivative = 7.507012527254403
+[[cases]]
+id = "late_time"
+tolerance = 1.0e-12
+source = "The late-time semilog branch at tD 1e5."
+[cases.inputs]
+calculation = "dimensionless_pressure"
+dimensionless_time_value = 100000.0
+[cases.expected]
+dimensionless_pressure = 6.161035384162979
+[[cases]]
+id = "bounded_policy"
+tolerance = 1.0e-12
+source = "The legacy bounded policy at tD 100 and reD 5."
+[cases.inputs]
+calculation = "dimensionless_pressure"
+dimensionless_time_value = 100.0
+dimensionless_outer_radius = 5.0
+[cases.expected]
+dimensionless_pressure = 9.192771245767434
+[[cases]]
+id = "bounded_derivative"
+tolerance = 1.0e-12
+source = "The bounded branch's derivative at tD 1e-4 and reD 10."
+[cases.inputs]
+calculation = "dimensionless_pressure_derivative"
+dimensionless_time_value = 1.0e-4
+dimensionless_outer_radius = 10.0
+[cases.expected]
+dimensionless_pressure_derivative = 0.020202020202020204
+[[cases]]
+id = "dimensionless_time"
+tolerance = 1.0e-12
+source = "The class test's physical state: 1e-13 m2, 8.64e7 s, 0.2, 5e-4 Pa s, 1e-9 1/Pa and 3000 m."
+[cases.inputs]
+calculation = "dimensionless_time"
+permeability = 1.0e-13
+time = 86400000.0
+porosity = 0.2
+viscosity = 0.0005
+total_compressibility = 1.0e-9
+reservoir_radius = 3000.0
+[cases.expected]
+dimensionless_time = 9.599999999999998
+[[cases]]
+id = "aquifer_constant"
+tolerance = 1.0e-12
+source = "The class test's constant: 0.2, 1e-4 1/bar, 30 m, 3000 m and 180 degrees, in m3 per Pa."
+[cases.inputs]
+calculation = "aquifer_constant"
+porosity = 0.2
+total_compressibility = 1.0e-9
+thickness = 30.0
+reservoir_radius = 3000.0
+encroachment_angle = 180.0
+[cases.expected]
+aquifer_constant = 0.16964600329384885
+[[cases]]
+id = "carter_tracy"
+tolerance = 1.0e-12
+source = "The class test's Carter-Tracy history: tD 0 to 160, drops 0 to 50 bar, at the constant above."
+[cases.inputs]
+calculation = "carter_tracy"
+dimensionless_times = [0.0, 10.0, 20.0, 40.0, 80.0, 160.0]
+pressure_drop = [0.0, 500000.0, 1200000.0, 2200000.0, 3500000.0, 5000000.0]
+aquifer_constant_value = 0.16964600329384885
+[cases.expected]
+cumulative_influx = [0.0, 513800.1920958346, 1622029.7705783644, 5083532.268602057, 14575989.592201814, 38319577.38347466]
+[[cases]]
+id = "carter_tracy_zero_support"
+tolerance = 1.0e-15
+source = "A zero aquifer constant gives a zero history."
+[cases.inputs]
+calculation = "carter_tracy"
+dimensionless_times = [0.0, 10.0, 20.0]
+pressure_drop = [0.0, 500000.0, 1200000.0]
+aquifer_constant_value = 0.0
+[cases.expected]
+cumulative_influx = [0.0, 0.0, 0.0]
+[[cases]]
+id = "carter_tracy_recovery"
+tolerance = 1.0e-12
+source = "A negative total drop is projected to a zero increment, not a water credit."
+[cases.inputs]
+calculation = "carter_tracy"
+dimensionless_times = [0.0, 0.1, 0.2]
+pressure_drop = [0.0, 1.0, -10.0]
+aquifer_constant_value = 1.0
+[cases.expected]
+cumulative_influx = [0.0, 0.31823407285179967, 0.0]
+[[cases]]
+id = "influence_table"
+tolerance = 1.0e-12
+source = "The influence table at the AQUTAB export's four times; the text itself is not published."
+[cases.inputs]
+calculation = "influence_table"
+dimensionless_times = [1.0, 10.0, 100.0, 1000.0]
+[cases.expected]
+dimensionless_pressures = [0.8021451666033006, 1.6508947048253173, 2.722894443143703, 3.860590595578624]

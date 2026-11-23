@@ -31365,6 +31365,80 @@ impl From<&azoth_pvt::tune_to_saturation::TuneToSaturationResult> for PyTuneToSa
         }
     }
 }
+/// Result of `pvt.van_everdingen_hurst_aquifer`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "VanEverdingenHurstAquiferResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyVanEverdingenHurstAquiferResult {
+    /// the dimensionless pressure at the stated time and radius.
+    #[pyo3(get)]
+    pub dimensionless_pressure: Option<f64>,
+    /// the derivative of the selected pressure branch with respect to dimensionless time.
+    #[pyo3(get)]
+    pub dimensionless_pressure_derivative: Option<f64>,
+    /// the dimensionless time from the physical inputs.
+    #[pyo3(get)]
+    pub dimensionless_time: Option<f64>,
+    /// the aquifer constant in reservoir m3 per Pa.
+    #[pyo3(get)]
+    pub aquifer_constant: Option<f64>,
+    /// the influence table's pressures, one per time.
+    #[pyo3(get)]
+    pub dimensionless_pressures: Option<Vec<f64>>,
+    /// the Carter-Tracy cumulative water influx, one per time.
+    #[pyo3(get)]
+    pub cumulative_influx: Option<Vec<PyQty>>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyVanEverdingenHurstAquiferResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "VanEverdingenHurstAquiferResult(dimensionless_pressure={:?}, dimensionless_pressure_derivative={:?}, dimensionless_time={:?}, aquifer_constant={:?}, dimensionless_pressures={:?}, cumulative_influx={:?}, {} warning(s))",
+            self.dimensionless_pressure,
+            self.dimensionless_pressure_derivative,
+            self.dimensionless_time,
+            self.aquifer_constant,
+            self.dimensionless_pressures,
+            self.cumulative_influx,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::van_everdingen_hurst_aquifer::VanEverdingenHurstAquiferResult>
+    for PyVanEverdingenHurstAquiferResult
+{
+    fn from(r: &azoth_pvt::van_everdingen_hurst_aquifer::VanEverdingenHurstAquiferResult) -> Self {
+        Self {
+            dimensionless_pressure: r.dimensionless_pressure,
+            dimensionless_pressure_derivative: r.dimensionless_pressure_derivative,
+            dimensionless_time: r.dimensionless_time,
+            aquifer_constant: r.aquifer_constant,
+            dimensionless_pressures: r
+                .dimensionless_pressures
+                .as_ref()
+                .map(|values| values.to_vec()),
+            cumulative_influx: r.cumulative_influx.as_ref().map(|values| {
+                values
+                    .iter()
+                    .map(|v| PyQty {
+                        magnitude_si: *v,
+                        unit: "m**3".to_string(),
+                    })
+                    .collect()
+            }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `pvt.water_correlations`, transported.
 #[pyclass(
     frozen,
