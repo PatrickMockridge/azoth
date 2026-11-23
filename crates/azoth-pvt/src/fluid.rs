@@ -11,7 +11,9 @@
 //! because NeqSim's `addFluid` merges by component name.
 
 use azoth_characterization::component_row::FluidComponent;
-use azoth_characterization::{KijSource, mixture_from_characterization_with};
+use azoth_characterization::{
+    KijSource, mixture_from_characterization_with, mixture_from_characterization_with_kij,
+};
 use azoth_core::units::kelvins;
 use azoth_core::units::pascals;
 use azoth_core::{AzothError, Result};
@@ -63,6 +65,34 @@ impl Fluid {
         check_rows(rows)?;
         let moles = rows.iter().map(|row| row.moles).collect::<Vec<_>>();
         let (mixture, ideal_gas) = mixture_from_characterization_with(rows, cubic, kij)?;
+        Ok(Self {
+            mixture,
+            ideal_gas,
+            cubic,
+            moles,
+            corrected,
+        })
+    }
+
+    /// A fluid whose named pairs' interaction coefficients are replaced after assembly.
+    ///
+    /// The PVT regression's BIP parameters build this fluid: the rows carry the composition
+    /// and properties, and `overrides` carries `(first, second, value)` row indices applied
+    /// symmetrically, a later entry winning.
+    ///
+    /// # Errors
+    /// The same as [`Self::from_rows`], plus a pair index outside the mixture.
+    pub fn from_rows_with_kij(
+        rows: &[FluidComponent],
+        cubic: Cubic,
+        kij: KijSource,
+        overrides: &[(usize, usize, f64)],
+        corrected: bool,
+    ) -> Result<Self> {
+        check_rows(rows)?;
+        let moles = rows.iter().map(|row| row.moles).collect::<Vec<_>>();
+        let (mixture, ideal_gas) =
+            mixture_from_characterization_with_kij(rows, cubic, kij, overrides)?;
         Ok(Self {
             mixture,
             ideal_gas,

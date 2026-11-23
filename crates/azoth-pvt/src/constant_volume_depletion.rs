@@ -90,6 +90,18 @@ pub fn constant_volume_depletion(
         kij_named(mixing_rule)?,
         volume_correction.unwrap_or(true),
     )?;
+    constant_volume_depletion_of(&feed, temperature, pressures)
+}
+
+/// The same CVD over a fluid the caller has already built.
+///
+/// # Errors
+/// The same as [`constant_volume_depletion`], less the `eos`/`mixing_rule` refusals.
+pub fn constant_volume_depletion_of(
+    feed: &Fluid,
+    temperature: ThermodynamicTemperature,
+    pressures: &[f64],
+) -> Result<ConstantVolumeDepletionResult> {
     let t = positive("temperature", temperature.value)?;
     if pressures.is_empty() {
         return Err(AzothError::invalid_input(
@@ -102,12 +114,12 @@ pub fn constant_volume_depletion(
     }
 
     let mut warnings = Vec::new();
-    let (saturation_pressure, saturation) = cvd_saturation(&feed, t, &mut warnings)?;
+    let (saturation_pressure, saturation) = cvd_saturation(feed, t, &mut warnings)?;
     let saturation_volume = saturation.volume();
     let z_saturation = saturation.zvolcorr();
     let initial_moles = feed.total_moles();
 
-    let mut fluid = feed;
+    let mut fluid = feed.clone();
     let mut cumulative_removed = 0.0;
     let mut sampled_hydrocarbon_split = false;
     let mut points = Vec::with_capacity(pressures.len());

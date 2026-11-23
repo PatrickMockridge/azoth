@@ -16,6 +16,7 @@ derives it - it is a function of ``racket_z`` and not a field.
 
 from __future__ import annotations
 
+import math
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import replace
 from typing import Any, cast
@@ -159,7 +160,11 @@ def _pseudo_cp(row: Any, index: int) -> tuple[float, float, float, float, float]
 
 
 def mixture_from_characterization(
-    components: Iterable[Any], *, eos: str = "srk", kij: str = "database"
+    components: Iterable[Any],
+    *,
+    eos: str = "srk",
+    kij: str = "database",
+    kij_overrides: Iterable[tuple[int, int, float]] = (),
 ) -> tuple[Any, IdealGasModel]:
     """A mixture and its ideal-gas model, from a characterization table.
 
@@ -171,7 +176,9 @@ def mixture_from_characterization(
     ``eos`` is ``"srk"``, the class's own fluid, or ``"pr"``; Peng-Robinson has no fitted ``m``
     and ignores a row's ``attractive_m``. ``kij`` is ``"database"`` - NeqSim's
     ``setMixingRule(2)`` - or ``"zero"``, its ``setMixingRule(1)``; the swelling experiment's
-    pinned state is the second.
+    pinned state is the second. ``kij_overrides`` replaces named pairs after the source fills
+    the matrix: ``(first, second, value)`` row indices, applied symmetrically, a later entry
+    for the same pair winning, as repeated ``setBinaryInteractionParameter`` calls do.
 
     Raises:
         PropertyUnavailableError: if a base row's name is not in the databank, or its substance
@@ -237,6 +244,15 @@ def mixture_from_characterization(
         if kij == "database"
         else {}
     )
+    for first, second, value in kij_overrides:
+        if first >= len(built) or second >= len(built) or not math.isfinite(value):
+            raise InvalidInputError(
+                "kij_override",
+                f"a binary interaction override names ({first}, {second}) = {value} in a "
+                f"mixture of {len(built)} components",
+            )
+        pairs[(first, second)] = value
+        pairs[(second, first)] = value
     fluid = mixture(
         built,
         kij=pairs,

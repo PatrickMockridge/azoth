@@ -90,6 +90,18 @@ pub fn differential_liberation(
         kij_named(mixing_rule)?,
         volume_correction.unwrap_or(true),
     )?;
+    differential_liberation_of(&feed, temperature, pressures)
+}
+
+/// The same DLE over a fluid the caller has already built.
+///
+/// # Errors
+/// The same as [`differential_liberation`], less the `eos`/`mixing_rule` refusals.
+pub fn differential_liberation_of(
+    feed: &Fluid,
+    temperature: ThermodynamicTemperature,
+    pressures: &[f64],
+) -> Result<DifferentialLiberationResult> {
     let t = positive("temperature", temperature.value)?;
     if pressures.is_empty() {
         return Err(AzothError::invalid_input(
@@ -102,7 +114,7 @@ pub fn differential_liberation(
     }
 
     let mut warnings = Vec::new();
-    let mut fluid = feed;
+    let mut fluid = feed.clone();
     let mut saturation: Option<(f64, f64)> = None;
     let mut total_gas_standard = 0.0;
     let mut rows: Vec<Row> = Vec::with_capacity(pressures.len());

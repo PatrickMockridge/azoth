@@ -177,13 +177,21 @@ def constant_volume_depletion(
         kij=_kij(mixing_rule),
         corrected=True if volume_correction is None else volume_correction,
     )
-    t = _positive("temperature", _scalar("temperature", temperature))
-    if pressures is None or len(pressures) == 0:
+    t = _scalar("temperature", temperature)
+    if pressures is None:
         raise InvalidInputError("pressures", "a CVD needs at least one pressure")
-    schedule = [
-        _positive(f"pressures[{index}]", float(input_to_si(_spec(), "pressures", value)))
-        for index, value in enumerate(pressures)
-    ]
+    schedule = [float(input_to_si(_spec(), "pressures", value)) for value in pressures]
+    return _constant_volume_depletion_of(feed, t, schedule)
+
+
+def _constant_volume_depletion_of(
+    feed: _fluid.Fluid, t: float, schedule: Sequence[float]
+) -> ConstantVolumeDepletionResult:
+    """The same CVD over a fluid the caller has already built, in SI."""
+    t = _positive("temperature", t)
+    if len(schedule) == 0:
+        raise InvalidInputError("pressures", "a CVD needs at least one pressure")
+    schedule = [_positive(f"pressures[{index}]", value) for index, value in enumerate(schedule)]
 
     warnings: list[Warning] = []
     saturation_pressure, saturation = _cvd_saturation(feed, t, warnings)

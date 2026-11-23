@@ -119,13 +119,21 @@ def differential_liberation(
         kij=_kij(mixing_rule),
         corrected=True if volume_correction is None else volume_correction,
     )
-    t = _positive("temperature", _scalar("temperature", temperature))
-    if pressures is None or len(pressures) == 0:
+    t = _scalar("temperature", temperature)
+    if pressures is None:
         raise InvalidInputError("pressures", "a DLE needs at least one pressure")
-    schedule = [
-        _positive(f"pressures[{index}]", float(input_to_si(_spec(), "pressures", value)))
-        for index, value in enumerate(pressures)
-    ]
+    schedule = [float(input_to_si(_spec(), "pressures", value)) for value in pressures]
+    return _differential_liberation_of(fluid, t, schedule)
+
+
+def _differential_liberation_of(
+    fluid: _fluid.Fluid, t: float, schedule: Sequence[float]
+) -> DifferentialLiberationResult:
+    """The same DLE over a fluid the caller has already built, in SI."""
+    t = _positive("temperature", t)
+    if len(schedule) == 0:
+        raise InvalidInputError("pressures", "a DLE needs at least one pressure")
+    schedule = [_positive(f"pressures[{index}]", value) for index, value in enumerate(schedule)]
 
     warnings: list[Warning] = []
     saturation: tuple[float, float] | None = None

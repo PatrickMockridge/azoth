@@ -96,6 +96,21 @@ pub fn constant_mass_expansion(
         kij_named(mixing_rule)?,
         volume_correction.unwrap_or(true),
     )?;
+    constant_mass_expansion_of(&fluid, temperature, pressures)
+}
+
+/// The same CCE over a fluid the caller has already built.
+///
+/// The PVT regression builds one fluid per parameter vector and asks this kernel for the
+/// schedule, rather than rebuilding the rows for every point.
+///
+/// # Errors
+/// The same as [`constant_mass_expansion`], less the `eos`/`mixing_rule` refusals.
+pub fn constant_mass_expansion_of(
+    fluid: &Fluid,
+    temperature: ThermodynamicTemperature,
+    pressures: &[f64],
+) -> Result<ConstantMassExpansionResult> {
     let t = positive("temperature", temperature.value)?;
     if pressures.is_empty() {
         return Err(AzothError::invalid_input(
@@ -107,7 +122,7 @@ pub fn constant_mass_expansion(
         positive(&format!("pressures[{index}]"), *pressure)?;
     }
 
-    let (saturation_pressure, saturation, warnings) = saturation_state(&fluid, t)?;
+    let (saturation_pressure, saturation, warnings) = saturation_state(fluid, t)?;
     let saturation_volume = saturation.volume_uncorrected();
     let z_saturation = saturation.z_mix();
     // **The saturation state's phase 0 is the phase carrying the material.** NeqSim's flash
