@@ -21,6 +21,8 @@ import sys
 from pathlib import Path
 from types import ModuleType
 
+import pytest
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RUST_OUT = REPO_ROOT / "crates" / "azoth-python" / "src" / "record_outputs_gen.rs"
 PYTHON_OUT = REPO_ROOT / "python" / "src" / "azoth" / "core" / "record_outputs_gen.py"
@@ -34,6 +36,7 @@ def gen_outputs() -> ModuleType:
         sys.path.pop(0)
 
 
+@pytest.mark.slow_sweep
 def test_the_committed_rows_are_current() -> None:
     """The drift gate `docs-drift` runs, run here so it fails in the suite too."""
     result = subprocess.run(
