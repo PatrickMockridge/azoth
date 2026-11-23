@@ -1216,6 +1216,21 @@ class GasQuery(TypedDict):
     ppr: float | None
     molar_mass: float | None
 
+class MaterialBalanceObservation(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    pressure: float
+    rs: float
+    bo: float
+    bg: float
+    bw: float
+    rv: float
+    net_oil_produced: float
+    net_gas_produced: float
+    net_water_produced: float
+    water_influx: float
+    expansion_fraction: float
+
 class RegressionParameterRow(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -7022,6 +7037,18 @@ class GasMaterialBalanceResult:
     warnings: list[Warning]
 
 @final
+class GeneralizedMaterialBalanceResult:
+    free_oil: Qty
+    free_gas: Qty
+    ooip: Qty
+    ogip: Qty
+    gas_cap_ratio: float | None
+    residuals: list[Qty]
+    rms_residual: Qty
+    condition_number: float
+    warnings: list[Warning]
+
+@final
 class MmpResult:
     mmp: Qty | None
     mechanism: str
@@ -11305,6 +11332,17 @@ def gas_material_balance(
     temperature: float | None = None,
     gas_gravity: float | None = None,
 ) -> GasMaterialBalanceResult: ...
+def generalized_material_balance(
+    fit: str,
+    initial_pressure: float,
+    initial_rs: float,
+    initial_bo: float,
+    initial_bg: float,
+    initial_bw: float,
+    initial_rv: float,
+    observations: list[MaterialBalanceObservation],
+    gas_cap_ratio: float | None = None,
+) -> GeneralizedMaterialBalanceResult: ...
 def mmp(
     oil_components: list[FluidComponent],
     gas_components: list[FluidComponent],

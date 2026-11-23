@@ -9,6 +9,7 @@
 //!   - specs/models/pvt/fetkovich_aquifer.toml
 //!   - specs/models/pvt/gas_correlations.toml
 //!   - specs/models/pvt/gas_material_balance.toml
+//!   - specs/models/pvt/generalized_material_balance.toml
 //!   - specs/models/pvt/mmp.toml
 //!   - specs/models/pvt/oil_material_balance.toml
 //!   - specs/models/pvt/property_sweep.toml
@@ -7064,6 +7065,1358 @@ pub static GAS_MATERIAL_BALANCE_SPEC: ModelSpec = ModelSpec {
     cases: GAS_MATERIAL_BALANCE_CASES,
 };
 
+static GENERALIZED_MATERIAL_BALANCE_CHECKS: &[SpecCheck] = &[];
+
+static GENERALIZED_MATERIAL_BALANCE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "oil_and_gas",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("initial_pressure", 30000000.0),
+            ("initial_rs", 100.0),
+            ("initial_bo", 1.6),
+            ("initial_bg", 0.004),
+            ("initial_bw", 1.02),
+            ("initial_rv", 0.0002),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("fit", "oil_and_gas")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("free_oil", 9999999.999999976),
+            ("free_gas", 2000000000.0000012),
+            ("ooip", 10399999.999999976),
+            ("ogip", 2999999999.999999),
+            ("gas_cap_ratio", 0.5000000000000014),
+            ("condition_number", 10.34514772279802),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "observations",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(26000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(80.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.5),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.005),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(0.00016),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(797440.0000000019),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(241600000.0),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(21000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.4),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.008),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(0.00012),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(1648571.428571429),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(985714285.7142854),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(16000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(40.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.3),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.012),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(8e-05),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(2553353.846153848),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(1529846153.8461537),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(11000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.2),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.02),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(4e-05),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(3568320.000000001),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(2072000000.0),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "oil_and_gas_supported",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("initial_pressure", 30000000.0),
+            ("initial_rs", 100.0),
+            ("initial_bo", 1.6),
+            ("initial_bg", 0.004),
+            ("initial_bw", 1.02),
+            ("initial_rv", 0.0002),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("fit", "oil_and_gas")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("free_oil", 10000000.00000001),
+            ("free_gas", 1999999999.9999998),
+            ("ooip", 10400000.00000001),
+            ("ogip", 3000000000.000001),
+            ("gas_cap_ratio", 0.4999999999999995),
+            ("condition_number", 10.49078135775767),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "observations",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(26000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(80.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.5),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.005),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(0.00016),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(836042.2911999989),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(252688768.0),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(-24000.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(48000.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.001),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(21000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.4),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.008),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(0.00012),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(1718932.9142857138),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(1001909142.8571427),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(-48000.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(96000.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.002),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(16000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(40.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.3),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.012),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(8e-05),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(2647984.3987692324),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(1547576209.2307692),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(-72000.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(144000.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.003),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(11000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.2),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.02),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(4e-05),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(3678173.4144),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(2086922240.0),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(-96000.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(192000.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.004),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "initially_gas",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("initial_pressure", 30000000.0),
+            ("initial_rs", 100.0),
+            ("initial_bo", 1.6),
+            ("initial_bg", 0.004),
+            ("initial_bw", 1.02),
+            ("initial_rv", 0.0002),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("fit", "initially_gas")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("free_oil", 0.0),
+            ("free_gas", 1999999999.9999993),
+            ("ooip", 399999.9999999999),
+            ("ogip", 1999999999.9999993),
+            ("condition_number", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "observations",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(26000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(80.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.5),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.005),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(0.00016),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(93226.66666666663),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(411733333.33333325),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(21000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.4),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.008),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(0.00012),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(168114.2857142857),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(1013142857.1428572),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(16000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(40.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.3),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.012),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(8e-05),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(163651.28205128206),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(1345948717.948718),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(11000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.2),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.02),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(4e-05),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(117973.33333333331),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(1610666666.6666667),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "initially_oil",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("initial_pressure", 30000000.0),
+            ("initial_rs", 100.0),
+            ("initial_bo", 1.6),
+            ("initial_bg", 0.004),
+            ("initial_bw", 1.02),
+            ("initial_rv", 0.0002),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("fit", "initially_oil")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("free_oil", 9999999.999999998),
+            ("free_gas", 0.0),
+            ("ooip", 9999999.999999998),
+            ("ogip", 999999999.9999998),
+            ("gas_cap_ratio", 0.0),
+            ("condition_number", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "observations",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(26000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(80.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.5),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.005),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(0.00016),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(3598293.333333333),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(-838933333.3333335),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(21000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.4),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.008),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(0.00012),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(4165714.2857142864),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(-342857142.8571429),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(16000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(40.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.3),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.012),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(8e-05),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(4768902.564102565),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(19897435.897435904),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(11000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.2),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.02),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(4e-05),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(5445546.666666667),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(381333333.3333334),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "known_gas_cap",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("gas_cap_ratio", 0.5),
+            ("initial_pressure", 30000000.0),
+            ("initial_rs", 100.0),
+            ("initial_bo", 1.6),
+            ("initial_bg", 0.004),
+            ("initial_bw", 1.02),
+            ("initial_rv", 0.0002),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("fit", "known_gas_cap")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("free_oil", 10000000.0),
+            ("free_gas", 2000000000.0),
+            ("ooip", 10400000.0),
+            ("ogip", 3000000000.0),
+            ("gas_cap_ratio", 0.5),
+            ("condition_number", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "observations",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(26000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(80.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.5),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.005),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(0.00016),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(836042.2911999989),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(252688768.0),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(-24000.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(48000.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.001),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(21000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.4),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.008),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(0.00012),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(1718932.9142857138),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(1001909142.8571427),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(-48000.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(96000.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.002),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(16000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(40.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.3),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.012),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(8e-05),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(2647984.3987692324),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(1547576209.2307692),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(-72000.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(144000.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.003),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(11000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.2),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.02),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(4e-05),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(3678173.4144),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(2086922240.0),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(-96000.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(192000.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.004),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "conventional_rv_zero",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("initial_pressure", 30000000.0),
+            ("initial_rs", 100.0),
+            ("initial_bo", 1.5),
+            ("initial_bg", 0.004),
+            ("initial_bw", 1.02),
+            ("initial_rv", 0.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("fit", "initially_oil")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("free_oil", 10000000.0),
+            ("free_gas", 0.0),
+            ("ooip", 10000000.0),
+            ("ogip", 1000000000.0),
+            ("gas_cap_ratio", 0.0),
+            ("condition_number", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "observations",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(26000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(85.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.46),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.006),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(100000.0),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(67499999.99999994),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(22000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(70.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.42),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.008),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(200000.0),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(178499999.9999999),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(18000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(55.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.38),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.01),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(300000.0),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(305099999.9999999),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(14000000.0),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(40.0),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.34),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.012),
+                    },
+                    RecordField {
+                        name: "bw",
+                        value: FieldValue::Number(1.02),
+                    },
+                    RecordField {
+                        name: "rv",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "net_oil_produced",
+                        value: FieldValue::Number(400000.0),
+                    },
+                    RecordField {
+                        name: "net_gas_produced",
+                        value: FieldValue::Number(438000000.00000006),
+                    },
+                    RecordField {
+                        name: "net_water_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "water_influx",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "expansion_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+];
+
+static GENERALIZED_MATERIAL_BALANCE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "scaled_least_squares_condition_gate",
+    convergence: "absolute",
+    tolerance: 1e-06,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: Some("stated_initial_pvt"),
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `pvt.generalized_material_balance`.
+pub static GENERALIZED_MATERIAL_BALANCE_SPEC: ModelSpec = ModelSpec {
+    id: "pvt.generalized_material_balance",
+    kind: "procedure",
+    algorithm: Some(&GENERALIZED_MATERIAL_BALANCE_ALGORITHM),
+    checks: GENERALIZED_MATERIAL_BALANCE_CHECKS,
+    cases: GENERALIZED_MATERIAL_BALANCE_CASES,
+};
+
 static MMP_CHECKS: &[SpecCheck] = &[];
 
 static MMP_CASES: &[TestCase] = &[
@@ -11874,6 +13227,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &FETKOVICH_AQUIFER_SPEC,
     &GAS_CORRELATIONS_SPEC,
     &GAS_MATERIAL_BALANCE_SPEC,
+    &GENERALIZED_MATERIAL_BALANCE_SPEC,
     &MMP_SPEC,
     &OIL_MATERIAL_BALANCE_SPEC,
     &PROPERTY_SWEEP_SPEC,

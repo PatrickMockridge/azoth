@@ -30883,6 +30883,101 @@ impl From<&azoth_pvt::gas_material_balance::GasMaterialBalanceResult>
         }
     }
 }
+/// Result of `pvt.generalized_material_balance`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "GeneralizedMaterialBalanceResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyGeneralizedMaterialBalanceResult {
+    /// the initial free-oil surface component, excluding oil in the gas phase.
+    #[pyo3(get)]
+    pub free_oil: PyQty,
+    /// the initial free-gas surface component, excluding dissolved gas.
+    #[pyo3(get)]
+    pub free_gas: PyQty,
+    /// the total original oil in place, including vaporized oil.
+    #[pyo3(get)]
+    pub ooip: PyQty,
+    /// the total original gas in place, including dissolved gas.
+    #[pyo3(get)]
+    pub ogip: PyQty,
+    /// the initial free-gas over free-oil reservoir-volume ratio; absent when the fit has no free oil.
+    #[pyo3(get)]
+    pub gas_cap_ratio: Option<f64>,
+    /// the observed-minus-fitted volume residual, one per observation.
+    #[pyo3(get)]
+    pub residuals: Vec<PyQty>,
+    /// the root-mean-square volume residual.
+    #[pyo3(get)]
+    pub rms_residual: PyQty,
+    /// the 2-norm condition number of the column-scaled predictor matrix.
+    #[pyo3(get)]
+    pub condition_number: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyGeneralizedMaterialBalanceResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "GeneralizedMaterialBalanceResult(free_oil={:?}, free_gas={:?}, ooip={:?}, ogip={:?}, gas_cap_ratio={:?}, residuals={:?}, rms_residual={:?}, condition_number={:?}, {} warning(s))",
+            self.free_oil,
+            self.free_gas,
+            self.ooip,
+            self.ogip,
+            self.gas_cap_ratio,
+            self.residuals,
+            self.rms_residual,
+            self.condition_number,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::generalized_material_balance::GeneralizedMaterialBalanceResult>
+    for PyGeneralizedMaterialBalanceResult
+{
+    fn from(r: &azoth_pvt::generalized_material_balance::GeneralizedMaterialBalanceResult) -> Self {
+        Self {
+            free_oil: PyQty {
+                magnitude_si: r.free_oil,
+                unit: "m**3".to_string(),
+            },
+            free_gas: PyQty {
+                magnitude_si: r.free_gas,
+                unit: "m**3".to_string(),
+            },
+            ooip: PyQty {
+                magnitude_si: r.ooip,
+                unit: "m**3".to_string(),
+            },
+            ogip: PyQty {
+                magnitude_si: r.ogip,
+                unit: "m**3".to_string(),
+            },
+            gas_cap_ratio: r.gas_cap_ratio,
+            residuals: r
+                .residuals
+                .iter()
+                .map(|v| PyQty {
+                    magnitude_si: *v,
+                    unit: "m**3".to_string(),
+                })
+                .collect(),
+            rms_residual: PyQty {
+                magnitude_si: r.rms_residual,
+                unit: "m**3".to_string(),
+            },
+            condition_number: r.condition_number,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `pvt.mmp`, transported.
 #[pyclass(
     frozen,

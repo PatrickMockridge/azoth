@@ -19,6 +19,7 @@ pub mod flash;
 pub mod fluid;
 pub mod gas_correlations;
 pub mod gas_material_balance;
+pub mod generalized_material_balance;
 pub mod ledger;
 pub mod mmp;
 pub mod model_gen;
@@ -58,6 +59,9 @@ pub use flash::{Flash, FlashMode, Phase};
 pub use fluid::{Fluid, GasTemplate};
 pub use gas_correlations::{GasCorrelationsResult, GasQuery, GasResultRow, gas_correlations};
 pub use gas_material_balance::{GasMaterialBalanceResult, gas_material_balance};
+pub use generalized_material_balance::{
+    GeneralizedMaterialBalanceResult, MaterialBalanceObservation, generalized_material_balance,
+};
 pub use mmp::{MmpPoint, MmpResult, mmp};
 pub use oil_material_balance::{OilMaterialBalanceResult, oil_material_balance};
 pub use property_sweep::{PropertyPoint, PropertySweepResult, property_sweep};

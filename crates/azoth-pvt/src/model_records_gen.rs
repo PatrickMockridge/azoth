@@ -19,6 +19,7 @@ use crate::differential_liberation::DifferentialLiberationResult;
 use crate::fetkovich_aquifer::FetkovichAquiferResult;
 use crate::gas_correlations::GasCorrelationsResult;
 use crate::gas_material_balance::GasMaterialBalanceResult;
+use crate::generalized_material_balance::GeneralizedMaterialBalanceResult;
 use crate::mmp::MmpResult;
 use crate::oil_material_balance::OilMaterialBalanceResult;
 use crate::property_sweep::PropertySweepResult;
@@ -157,6 +158,25 @@ impl CalcResult for GasMaterialBalanceResult {
         "r_squared",
         "cole_gp",
         "cole_f_over_eg",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for GeneralizedMaterialBalanceResult {
+    const CALC_ID: &'static str = "pvt.generalized_material_balance";
+    const FIELDS: &'static [&'static str] = &[
+        "free_oil",
+        "free_gas",
+        "ooip",
+        "ogip",
+        "gas_cap_ratio",
+        "residuals",
+        "rms_residual",
+        "condition_number",
         "warnings",
     ];
 

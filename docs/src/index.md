@@ -474,6 +474,7 @@ Five sections, and the difference between them is the point:
 - [`pvt.fetkovich_aquifer`](./pvt/fetkovich_aquifer.md) — Fetkovich aquifer
 - [`pvt.gas_correlations`](./pvt/gas_correlations.md) — Gas correlation table
 - [`pvt.gas_material_balance`](./pvt/gas_material_balance.md) — Gas material balance
+- [`pvt.generalized_material_balance`](./pvt/generalized_material_balance.md) — Generalized material balance
 - [`pvt.mmp`](./pvt/mmp.md) — Minimum miscibility pressure
 - [`pvt.oil_material_balance`](./pvt/oil_material_balance.md) — Oil material balance
 - [`pvt.property_sweep`](./pvt/property_sweep.md) — Property sweep

@@ -10382,6 +10382,62 @@ pub fn gas_material_balance(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Generalized material balance.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (fit, gas_cap_ratio, initial_pressure, initial_rs, initial_bo, initial_bg, initial_bw, initial_rv, observations))]
+#[pyo3(
+    text_signature = "(fit, gas_cap_ratio, initial_pressure, initial_rs, initial_bo, initial_bg, initial_bw, initial_rv, observations)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn generalized_material_balance(
+    py: Python<'_>,
+    fit: &str,
+    gas_cap_ratio: Option<f64>,
+    initial_pressure: f64,
+    initial_rs: f64,
+    initial_bo: f64,
+    initial_bg: f64,
+    initial_bw: f64,
+    initial_rv: f64,
+    observations: Vec<crate::records_gen::MaterialBalanceObservation>,
+) -> PyResult<crate::transport_gen::PyGeneralizedMaterialBalanceResult> {
+    let observations_records: Vec<
+        azoth_pvt::generalized_material_balance::MaterialBalanceObservation,
+    > = observations
+        .into_iter()
+        .map(
+            |row| azoth_pvt::generalized_material_balance::MaterialBalanceObservation {
+                pressure: row.pressure,
+                rs: row.rs,
+                bo: row.bo,
+                bg: row.bg,
+                bw: row.bw,
+                rv: row.rv,
+                net_oil_produced: row.net_oil_produced,
+                net_gas_produced: row.net_gas_produced,
+                net_water_produced: row.net_water_produced,
+                water_influx: row.water_influx,
+                expansion_fraction: row.expansion_fraction,
+            },
+        )
+        .collect();
+    azoth_pvt::generalized_material_balance::generalized_material_balance(
+        fit,
+        gas_cap_ratio,
+        pascals(initial_pressure),
+        initial_rs,
+        initial_bo,
+        initial_bg,
+        initial_bw,
+        initial_rv,
+        &observations_records,
+    )
+    .map(|r| crate::transport_gen::PyGeneralizedMaterialBalanceResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Minimum miscibility pressure.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

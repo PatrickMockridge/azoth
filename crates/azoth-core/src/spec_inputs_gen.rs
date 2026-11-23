@@ -363,6 +363,7 @@
 //!   - specs/models/pvt/fetkovich_aquifer.toml
 //!   - specs/models/pvt/gas_correlations.toml
 //!   - specs/models/pvt/gas_material_balance.toml
+//!   - specs/models/pvt/generalized_material_balance.toml
 //!   - specs/models/pvt/mmp.toml
 //!   - specs/models/pvt/oil_material_balance.toml
 //!   - specs/models/pvt/property_sweep.toml
@@ -6904,6 +6905,41 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "thermodynamic_temperature",
     ),
     ("pvt.gas_material_balance", "gas_gravity", "dimensionless"),
+    (
+        "pvt.generalized_material_balance",
+        "gas_cap_ratio",
+        "dimensionless",
+    ),
+    (
+        "pvt.generalized_material_balance",
+        "initial_pressure",
+        "pressure",
+    ),
+    (
+        "pvt.generalized_material_balance",
+        "initial_rs",
+        "dimensionless",
+    ),
+    (
+        "pvt.generalized_material_balance",
+        "initial_bo",
+        "dimensionless",
+    ),
+    (
+        "pvt.generalized_material_balance",
+        "initial_bg",
+        "dimensionless",
+    ),
+    (
+        "pvt.generalized_material_balance",
+        "initial_bw",
+        "dimensionless",
+    ),
+    (
+        "pvt.generalized_material_balance",
+        "initial_rv",
+        "dimensionless",
+    ),
     ("pvt.mmp", "temperature", "thermodynamic_temperature"),
     ("pvt.mmp", "recovery_threshold", "dimensionless"),
     ("pvt.mmp", "number_of_pressure_points", "dimensionless"),

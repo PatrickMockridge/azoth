@@ -12511,6 +12511,40 @@ class GasMaterialBalanceResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class GeneralizedMaterialBalanceResult(_HasWarnings):
+    """Result of ``pvt.generalized_material_balance``."""
+
+    CALC_ID: ClassVar[str] = "pvt.generalized_material_balance"
+
+    #: the initial free-oil surface component, excluding oil in the gas phase.
+    free_oil: Q
+
+    #: the initial free-gas surface component, excluding dissolved gas.
+    free_gas: Q
+
+    #: the total original oil in place, including vaporized oil.
+    ooip: Q
+
+    #: the total original gas in place, including dissolved gas.
+    ogip: Q
+
+    #: the initial free-gas over free-oil reservoir-volume ratio; absent when the fit has no free oil.
+    gas_cap_ratio: float | None
+
+    #: the observed-minus-fitted volume residual, one per observation.
+    residuals: tuple[Q, ...]
+
+    #: the root-mean-square volume residual.
+    rms_residual: Q
+
+    #: the 2-norm condition number of the column-scaled predictor matrix.
+    condition_number: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class MmpResult(_HasWarnings):
     """Result of ``pvt.mmp``."""
 

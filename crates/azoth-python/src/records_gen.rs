@@ -1021,6 +1021,33 @@ pub struct MapCurvePoint {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct MaterialBalanceObservation {
+    #[pyo3(item)]
+    pub pressure: f64,
+    #[pyo3(item)]
+    pub rs: f64,
+    #[pyo3(item)]
+    pub bo: f64,
+    #[pyo3(item)]
+    pub bg: f64,
+    #[pyo3(item)]
+    pub bw: f64,
+    #[pyo3(item)]
+    pub rv: f64,
+    #[pyo3(item)]
+    pub net_oil_produced: f64,
+    #[pyo3(item)]
+    pub net_gas_produced: f64,
+    #[pyo3(item)]
+    pub net_water_produced: f64,
+    #[pyo3(item)]
+    pub water_influx: f64,
+    #[pyo3(item)]
+    pub expansion_fraction: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct MeasurementDeviceRow {
     #[pyo3(item)]
     pub name: String,

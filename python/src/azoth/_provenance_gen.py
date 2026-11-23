@@ -3997,6 +3997,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 5,
         "tests_skipped": 0,
     },
+    'pvt.generalized_material_balance': {
+        "calc_id": 'pvt.generalized_material_balance',
+        "name": 'Generalized material balance',
+        "spec": {'path': 'specs/models/pvt/generalized_material_balance.toml', 'sha256': 'f083acfb6d0878e17248f556792af80d11a48b9346ca3c250528678f094b2de1'},
+        "code": [{'path': 'python/src/azoth/pvt/reference/generalized_material_balance.py', 'sha256': '65fd0087962940d12e5d5a23c699ab9082b38404a49c1eb7fb5a795c58926434'}, {'path': 'crates/azoth-pvt/src/generalized_material_balance.rs', 'sha256': '8cc7463ff18dc23253c309635b9fdf1b310edbfdb1cab042fe76d6a9b09e1f5e'}],
+        "source": 'NeqSim pvtsimulation/reservoirproperties/materialbalance/GeneralizedMaterialBalance.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 6,
+        "tests_skipped": 0,
+    },
     'pvt.mmp': {
         "calc_id": 'pvt.mmp',
         "name": 'Minimum miscibility pressure',

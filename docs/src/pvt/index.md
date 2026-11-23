@@ -21,6 +21,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`pvt.fetkovich_aquifer`](./fetkovich_aquifer.md) | `fetkovich_exact_ramp_march` | NeqSim pvtsimulation/reservoirproperties/materialbalance/FetkovichAquifer.java |
 | [`pvt.gas_correlations`](./gas_correlations.md) | `gas_correlation_dispatch` | NeqSim pvtsimulation/util/ZFactorCorrelations.java, GasPseudoCriticalProperties.java, GasPseudoPressure.java and reservoirproperties/CompositionEstimation.java |
 | [`pvt.gas_material_balance`](./gas_material_balance.md) | `direct composition` | NeqSim reservoirproperties/materialbalance/GasMaterialBalance.java |
+| [`pvt.generalized_material_balance`](./generalized_material_balance.md) | `scaled_least_squares_condition_gate` | NeqSim pvtsimulation/reservoirproperties/materialbalance/GeneralizedMaterialBalance.java |
 | [`pvt.mmp`](./mmp.md) | `direct composition` | NeqSim pvtsimulation/simulation/MMPCalculator.java |
 | [`pvt.oil_material_balance`](./oil_material_balance.md) | `direct composition` | NeqSim reservoirproperties/materialbalance/OilMaterialBalance.java |
 | [`pvt.property_sweep`](./property_sweep.md) | `direct composition` | NeqSim pvtsimulation/simulation/DensitySim.java and ViscositySim.java |

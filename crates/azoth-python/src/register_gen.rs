@@ -381,6 +381,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyFetkovichAquiferResult>()?;
     m.add_class::<crate::transport_gen::PyGasCorrelationsResult>()?;
     m.add_class::<crate::transport_gen::PyGasMaterialBalanceResult>()?;
+    m.add_class::<crate::transport_gen::PyGeneralizedMaterialBalanceResult>()?;
     m.add_class::<crate::transport_gen::PyMmpResult>()?;
     m.add_class::<crate::transport_gen::PyOilMaterialBalanceResult>()?;
     m.add_class::<crate::transport_gen::PyPropertySweepResult>()?;
@@ -1400,6 +1401,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_correlations, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::gas_material_balance,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::generalized_material_balance,
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::mmp, m)?)?;

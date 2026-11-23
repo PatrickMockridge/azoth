@@ -382,6 +382,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "pvt.fetkovich_aquifer" => azoth_pvt::fetkovich_aquifer::FetkovichAquiferResult::FIELDS.to_vec(),
         "pvt.gas_correlations" => azoth_pvt::gas_correlations::GasCorrelationsResult::FIELDS.to_vec(),
         "pvt.gas_material_balance" => azoth_pvt::gas_material_balance::GasMaterialBalanceResult::FIELDS.to_vec(),
+        "pvt.generalized_material_balance" => azoth_pvt::generalized_material_balance::GeneralizedMaterialBalanceResult::FIELDS.to_vec(),
         "pvt.mmp" => azoth_pvt::mmp::MmpResult::FIELDS.to_vec(),
         "pvt.oil_material_balance" => azoth_pvt::oil_material_balance::OilMaterialBalanceResult::FIELDS.to_vec(),
         "pvt.property_sweep" => azoth_pvt::property_sweep::PropertySweepResult::FIELDS.to_vec(),

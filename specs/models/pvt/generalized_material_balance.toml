@@ -1,0 +1,121 @@
+id = "pvt.generalized_material_balance"
+name = "Generalized material balance"
+kind = "procedure"
+assumptions = [
+    "**the reported volumes are surface components on one common standard basis**, the formation volume factors reservoir m3 per standard m3. The pressure is read only by the record's positivity guard, not by the coefficients.\n",
+    "**the fit column-scales the predictors and the response**, gates on the 2-norm condition number of the scaled matrix at `1e8`, then solves the scaled least squares; the condition number is published.\n",
+    "**the four fits are the class's**: one unknown with no free gas, one with no free oil, two for the oil and gas together, and the known-gas-cap route's single predictor `eo + ratio*eg` with the ratio folded into the gas volume.\n",
+    "**a fit with no free oil publishes the gas-cap ratio absent with a warning**, where the class answers `+Infinity`.\n",
+    "**the histories are signed**: produced minus injected volumes, signed water influx and expansion fraction; the residuals are observed minus fitted.\n",
+    "**the declared tolerance is the residual's cancellation floor**, `1e-6` m3: the fitted terms are of order `1e7` m3, so the residual is rounding at `1e-9` m3 and a relative comparison there divides by the vanishing quantity.\n",
+    "**a positive finite pressure and FVF, nonnegative Rs and Rv, a split below one by more than `1e-10`, and at least two observations are required.**\n",
+    "**a zero withdrawal or expansion signal, a scaled condition number above `1e8`, negative fitted volumes, and production above the fitted inventory at an observation are refused.**\n",
+]
+references = [
+    "Havlena, D. & Odeh, A. S. (1963). \"The Material Balance as an Equation of a Straight Line.\" Journal of Petroleum Technology 15(8), 896-900. DOI 10.2118/559-PA.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/reservoirproperties/materialbalance/GeneralizedMaterialBalance.java` at commit 118d9af is the port source.",
+    "`validation/neqsim/captures/pvt_generalized_material_balance.tsv` - the class's four-observation synthetic history for all four fits, the inventory scaling, the conventional Rv = 0 limit and the refusal rows.",
+]
+[source]
+standard = "NeqSim pvtsimulation/reservoirproperties/materialbalance/GeneralizedMaterialBalance.java"
+edition = "The initial-PVT coefficients, the four fits, the column-scaled least squares and condition gate, the inventory checks and the result's volumes and residuals."
+[algorithm]
+scheme = "scaled_least_squares_condition_gate"
+initialisation = "stated_initial_pvt"
+convergence = "absolute"
+tolerance = 1.0e-6
+max_iterations = 1
+[inputs]
+[inputs.fit]
+type = "enum"
+values = ["initially_oil", "initially_gas", "known_gas_cap", "oil_and_gas"]
+description = "the reservoir state the fit constrains.\n"
+[inputs.gas_cap_ratio]
+unit = "dimensionless"
+optional = true
+description = "the initial gas-cap volume ratio for `known_gas_cap`; required there and ignored by the other fits.\n"
+[inputs.initial_pressure]
+unit = "Pa"
+description = "the initial average reservoir pressure; read only by the positivity guard.\n"
+[inputs.initial_rs]
+unit = "dimensionless"
+description = "the initial solution gas-oil ratio, Sm3/Sm3.\n"
+[inputs.initial_bo]
+unit = "dimensionless"
+description = "the initial oil formation volume factor, reservoir m3/Sm3.\n"
+[inputs.initial_bg]
+unit = "dimensionless"
+description = "the initial gas formation volume factor, reservoir m3/Sm3.\n"
+[inputs.initial_bw]
+unit = "dimensionless"
+description = "the initial water formation volume factor, reservoir m3/Sm3.\n"
+[inputs.initial_rv]
+unit = "dimensionless"
+description = "the initial vaporized oil ratio, Sm3/Sm3.\n"
+[inputs.observations]
+type = "record_list"
+row_type = "MaterialBalanceObservation"
+description = "the aligned pressure, PVT and cumulative-production history, in caller order.\n"
+[inputs.observations.fields.pressure]
+unit = "Pa"
+description = "the average reservoir pressure; read only by the positivity guard.\n"
+[inputs.observations.fields.rs]
+unit = "dimensionless"
+description = "the solution gas-oil ratio.\n"
+[inputs.observations.fields.bo]
+unit = "dimensionless"
+description = "the oil formation volume factor.\n"
+[inputs.observations.fields.bg]
+unit = "dimensionless"
+description = "the gas formation volume factor.\n"
+[inputs.observations.fields.bw]
+unit = "dimensionless"
+description = "the water formation volume factor.\n"
+[inputs.observations.fields.rv]
+unit = "dimensionless"
+description = "the vaporized oil ratio.\n"
+[inputs.observations.fields.net_oil_produced]
+unit = "m**3"
+description = "cumulative stock-tank oil produced minus injected, at the common standard basis.\n"
+[inputs.observations.fields.net_gas_produced]
+unit = "m**3"
+description = "cumulative standard gas produced minus injected, at the common standard basis.\n"
+[inputs.observations.fields.net_water_produced]
+unit = "m**3"
+description = "cumulative standard water produced minus injected, at the common standard basis.\n"
+[inputs.observations.fields.water_influx]
+unit = "m**3"
+description = "cumulative aquifer influx, reservoir m3, excluding injected water.\n"
+[inputs.observations.fields.expansion_fraction]
+unit = "dimensionless"
+description = "rock and connate-water expansion per initial hydrocarbon reservoir volume.\n"
+[outputs]
+[outputs.free_oil]
+unit = "m**3"
+description = "the initial free-oil surface component, excluding oil in the gas phase.\n"
+[outputs.free_gas]
+unit = "m**3"
+description = "the initial free-gas surface component, excluding dissolved gas.\n"
+[outputs.ooip]
+unit = "m**3"
+description = "the total original oil in place, including vaporized oil.\n"
+[outputs.ogip]
+unit = "m**3"
+description = "the total original gas in place, including dissolved gas.\n"
+[outputs.gas_cap_ratio]
+unit = "dimensionless"
+optional = true
+description = "the initial free-gas over free-oil reservoir-volume ratio; absent when the fit has no free oil.\n"
+[outputs.residuals]
+type = "vector"
+unit = "m**3"
+description = "the observed-minus-fitted volume residual, one per observation.\n"
+[outputs.rms_residual]
+unit = "m**3"
+description = "the root-mean-square volume residual.\n"
+[outputs.condition_number]
+unit = "dimensionless"
+description = "the 2-norm condition number of the column-scaled predictor matrix.\n"
+[implementations]
+python = "azoth.pvt.generalized_material_balance"
+rust = "azoth_pvt::generalized_material_balance"

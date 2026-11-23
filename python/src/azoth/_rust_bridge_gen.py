@@ -178,6 +178,7 @@ from azoth.core.result import (
     GasScrubberResult,
     GaussianPlumeResult,
     GeFlashResult,
+    GeneralizedMaterialBalanceResult,
     GeNrtlFlashResult,
     GeNrtlPhaseResult,
     Gerg2008PhaseResult,
@@ -717,6 +718,7 @@ __all__ = [
     "ge_uniquac_phase",
     "ge_van_laar_acid_phase",
     "ge_wilson_phase",
+    "generalized_material_balance",
     "gerg2008_phase",
     "gibbs_reactor",
     "gt_surface_tension",
@@ -10674,6 +10676,33 @@ def gas_material_balance(calculation: str, *, pressure: Sequence[Any] | None=Non
         r_squared=result.r_squared,
         cole_gp=None if result.cole_gp is None else tuple(result.cole_gp),
         cole_f_over_eg=None if result.cole_f_over_eg is None else tuple(result.cole_f_over_eg),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def generalized_material_balance(fit: str, initial_pressure: Any, initial_rs: float, initial_bo: float, initial_bg: float, initial_bw: float, initial_rv: float, observations: Sequence[Mapping[str, Any]], *, gas_cap_ratio: float | None=None) -> GeneralizedMaterialBalanceResult:
+    """``pvt.generalized_material_balance``, computed in Rust."""
+    spec = _models_gen.model("pvt.generalized_material_balance")
+    result = _core.generalized_material_balance(
+        fit,
+        None if gas_cap_ratio is None else gas_cap_ratio,
+        _si(spec, "initial_pressure", initial_pressure),
+        initial_rs,
+        initial_bo,
+        initial_bg,
+        initial_bw,
+        initial_rv,
+        input_records_to_si(spec, "observations", observations),
+    )
+    return GeneralizedMaterialBalanceResult(
+        free_oil=from_si(result.free_oil.magnitude_si, result.free_oil.unit),
+        free_gas=from_si(result.free_gas.magnitude_si, result.free_gas.unit),
+        ooip=from_si(result.ooip.magnitude_si, result.ooip.unit),
+        ogip=from_si(result.ogip.magnitude_si, result.ogip.unit),
+        gas_cap_ratio=result.gas_cap_ratio,
+        residuals=tuple(from_si(q.magnitude_si, q.unit) for q in result.residuals),
+        rms_residual=from_si(result.rms_residual.magnitude_si, result.rms_residual.unit),
+        condition_number=result.condition_number,
         warnings=_warnings(result.warnings),
     )
 

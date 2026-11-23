@@ -377,6 +377,7 @@
   - [Fetkovich aquifer](./pvt/fetkovich_aquifer.md)
   - [Gas correlation table](./pvt/gas_correlations.md)
   - [Gas material balance](./pvt/gas_material_balance.md)
+  - [Generalized material balance](./pvt/generalized_material_balance.md)
   - [Minimum miscibility pressure](./pvt/mmp.md)
   - [Oil material balance](./pvt/oil_material_balance.md)
   - [Property sweep](./pvt/property_sweep.md)

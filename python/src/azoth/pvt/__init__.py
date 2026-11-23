@@ -29,6 +29,7 @@ from azoth.core.result import (
     FetkovichAquiferResult,
     GasCorrelationsResult,
     GasMaterialBalanceResult,
+    GeneralizedMaterialBalanceResult,
     MmpResult,
     OilMaterialBalanceResult,
     PropertySweepResult,
@@ -50,6 +51,7 @@ _DIFFERENTIAL_LIBERATION = "pvt.differential_liberation"
 _FETKOVICH_AQUIFER = "pvt.fetkovich_aquifer"
 _GAS_CORRELATIONS = "pvt.gas_correlations"
 _GAS_MATERIAL_BALANCE = "pvt.gas_material_balance"
+_GENERALIZED_MATERIAL_BALANCE = "pvt.generalized_material_balance"
 _MMP = "pvt.mmp"
 _OIL_MATERIAL_BALANCE = "pvt.oil_material_balance"
 _PROPERTY_SWEEP = "pvt.property_sweep"
@@ -70,6 +72,7 @@ __all__ = [
     "fetkovich_aquifer",
     "gas_correlations",
     "gas_material_balance",
+    "generalized_material_balance",
     "layers",
     "mmp",
     "oil_material_balance",
@@ -866,4 +869,52 @@ def fetkovich_aquifer(
         productivity=productivity,
         initial_pressure=initial_pressure,
         intervals=intervals,
+    )
+
+
+def generalized_material_balance(
+    fit: str,
+    initial_pressure: Any,
+    initial_rs: float,
+    initial_bo: float,
+    initial_bg: float,
+    initial_bw: float,
+    initial_rv: float,
+    observations: Sequence[Mapping[str, Any]],
+    *,
+    gas_cap_ratio: float | None = None,
+) -> GeneralizedMaterialBalanceResult:
+    """The generalized oil and gas material balance over a stated history.
+
+    ``fit`` is ``"initially_oil"``, ``"initially_gas"``, ``"known_gas_cap"`` (which needs
+    ``gas_cap_ratio``) or ``"oil_and_gas"``. ``observations`` is one row per aligned
+    pressure/PVT/production state: the formation volume factors are reservoir m3 per
+    standard m3, the production volumes are signed standard volumes, and ``water_influx``
+    is a reservoir volume. The model column-scales its predictors, refuses a scaled
+    condition number above ``1e8`` and publishes that number beside the residuals.
+
+    A fit with no free oil publishes the gas-cap ratio absent with a warning, where the
+    class answers an infinity.
+
+    Returns:
+        The free-phase and total in-place volumes, the optional gas-cap ratio, the
+        observed-minus-fitted residuals, their RMS and the condition number.
+
+    Raises:
+        InvalidInputError: for an unknown fit, a missing input, a history that is too short,
+            a zero withdrawal or expansion signal, an ill-conditioned or singular solve,
+            unphysical volumes, or production above the fitted inventory.
+
+    See :func:`azoth.pvt.reference.generalized_material_balance.generalized_material_balance`.
+    """
+    return resolve(_GENERALIZED_MATERIAL_BALANCE)(  # type: ignore[no-any-return]
+        fit=fit,
+        gas_cap_ratio=gas_cap_ratio,
+        initial_pressure=initial_pressure,
+        initial_rs=initial_rs,
+        initial_bo=initial_bo,
+        initial_bg=initial_bg,
+        initial_bw=initial_bw,
+        initial_rv=initial_rv,
+        observations=observations,
     )
