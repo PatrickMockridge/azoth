@@ -728,7 +728,9 @@ fn the_generated_input_table_is_the_models_own() {
     // minimum NPSH margin and the four operating-region fractions - 739 + 13 = 752.
     // **And the compressor's two** - `mechanical_design` and `max_stages_per_casing` -
     // 752 + 2 = 754. **And the turbine-expander's `mechanical_design`** - 754 + 1 = 755.
-    assert_eq!(walked, 755, "the inputs this test walked");
+    // **And the throttling valve's two choke geometry inputs** - `choke_diameter` and
+    // `discharge_coefficient` - 755 + 2 = 757.
+    assert_eq!(walked, 757, "the inputs this test walked");
 }
 
 /// **The generated output table is the spec files' own, read a second time.**
