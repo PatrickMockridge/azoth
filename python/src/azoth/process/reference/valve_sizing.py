@@ -40,6 +40,47 @@ STANDARD_PRESSURE_KPA = 101.325
 DEFAULT_XT = 0.137
 
 DEFAULT_CHOKE_DIAMETER_M = 0.0254
+#: ``ControlValveSizing_IEC_60534.N1``.
+IEC_N1 = 0.1
+#: ``ControlValveSizing_IEC_60534.rho0``.
+IEC_RHO0 = 999.103
+#: ``ControlValveSizing_IEC_60534.FL``, the liquid pressure recovery factor.
+IEC_FL = 0.9
+#: ``ControlValveSizing_simple.Cd``, the production choke's discharge coefficient.
+SIMPLE_CD = 0.85
+#: The nine ``setValveSizingStandard`` values.
+SIZING_STANDARDS = (
+    "default",
+    "iec_60534",
+    "iec_60534_full",
+    "prod_choke",
+    "sachdeva",
+    "gilbert",
+    "baxendell",
+    "ros",
+    "achong",
+)
+#: The five standards that read the flash's labelled phases.
+CHOKE_STANDARDS = ("sachdeva", "gilbert", "baxendell", "ros", "achong")
+#: The class each standard selects.
+STANDARD_CLASSES = {
+    "default": "ControlValveSizing",
+    "iec_60534": "ControlValveSizing_IEC_60534",
+    "iec_60534_full": "ControlValveSizing_IEC_60534_full",
+    "prod_choke": "ControlValveSizing_simple",
+    "sachdeva": "ControlValveSizing_MultiphaseChoke",
+    "gilbert": "ControlValveSizing_MultiphaseChoke",
+    "baxendell": "ControlValveSizing_MultiphaseChoke",
+    "ros": "ControlValveSizing_MultiphaseChoke",
+    "achong": "ControlValveSizing_MultiphaseChoke",
+}
+
+
+def default_allow_choked(standard: str) -> bool:
+    """``setValveSizingStandard``'s constructor state: only the default starts ``false``."""
+    return standard != "default"
+
+
 #: ``Cg = Cv * 1360``.
 CG_PER_CV = 1360.0
 #: The bisection's ``Kv`` tolerance and cap, the class's own.
@@ -380,3 +421,498 @@ def sizing_report(
             components, t, p, z, n, adjusted, geometry
         ),
     )
+
+
+def _ieee_div(numerator: float, denominator: float) -> float:
+    """Java's double division: a zero denominator gives an infinity, not a ``ZeroDivisionError``."""
+    if denominator == 0.0:
+        if numerator == 0.0:
+            return math.nan
+        return math.copysign(math.inf, numerator)
+    return numerator / denominator
+
+
+@dataclass(frozen=True, slots=True)
+class _IecReads:
+    reads: _Reads
+    gas: bool
+    pseudo_critical_pa: float
+
+
+def _require_single_phase(
+    components: list[str], t: float, p: float, z: list[float], standard: str
+) -> None:
+    mixture, _ = _components.mixture_of(components, eos="pr")
+    flash = pt_flash(mixture, quantity(t, "K"), quantity(p, "Pa"), list(z))
+    if flash.phase == "two_phase":
+        from azoth.core.errors import InvalidInputError
+
+        raise InvalidInputError(
+            "inlet_z",
+            f"the {STANDARD_CLASSES[standard]} standard reads a single phase's root, "
+            f"and this inlet is two phases at {t} K and {p} Pa",
+        )
+
+
+def _iec_reads(components: list[str], t: float, p: float, z: list[float], n: float) -> _IecReads:
+    read = _reads(components, t, p, z, n)
+    mixture, _ = _components.mixture_of(components, eos="pr")
+    flash = pt_flash(mixture, quantity(t, "K"), quantity(p, "Pa"), list(z))
+    pseudo_critical_pa = sum(
+        fraction * _components.entry(name).Pc.to("Pa").magnitude
+        for name, fraction in zip(components, z, strict=True)
+    )
+    return _IecReads(
+        reads=read,
+        gas=flash.phase in ("all_vapour", "two_phase"),
+        pseudo_critical_pa=pseudo_critical_pa,
+    )
+
+
+def _iec_reads_with_flow(read: _IecReads, flow_m3s: float) -> _IecReads:
+    original = read.reads
+    return _IecReads(
+        reads=_Reads(
+            p1_bara=original.p1_bara,
+            t_k=original.t_k,
+            flow_m3hr=flow_m3s * 3600.0,
+            density_kg_m3=original.density_kg_m3,
+            z=original.z,
+            gamma=original.gamma,
+            molar_mass_gr_mol=original.molar_mass_gr_mol,
+        ),
+        gas=read.gas,
+        pseudo_critical_pa=read.pseudo_critical_pa,
+    )
+
+
+def _iec_gas_kv(
+    read: _IecReads, p1_pa: float, p2_pa: float, xt: float, allow_choked: bool
+) -> tuple[float, bool]:
+    r = read.reads
+    loc_p1 = p1_pa / 1000.0
+    loc_p2 = p2_pa / 1000.0
+    d_p = loc_p1 - loc_p2
+    x = _ieee_div(d_p, loc_p1)
+    f_gamma = r.gamma / 1.40
+    y = max(1.0 - _ieee_div(x, 3.0 * f_gamma * xt), 2.0 / 3.0)
+    choked = x >= f_gamma * xt
+    q_std = r.flow_m3hr * (loc_p1 / STANDARD_PRESSURE_KPA) * (STANDARD_TEMPERATURE_K / r.t_k) / r.z
+    if choked and allow_choked:
+        kv = (
+            q_std
+            / (N9 * loc_p1 * y)
+            * math.sqrt(r.molar_mass_gr_mol * r.t_k * r.z / (xt * f_gamma))
+        )
+    else:
+        kv = q_std / (N9 * loc_p1 * y) * math.sqrt(r.molar_mass_gr_mol * r.t_k * r.z / x)
+    return kv, choked
+
+
+def _iec_liquid_kv(
+    read: _IecReads,
+    psat_pa: float,
+    pc_pa: float,
+    p1_pa: float,
+    p2_pa: float,
+    allow_choked: bool,
+) -> tuple[float, bool]:
+    r = read.reads
+    loc_p1 = p1_pa / 1000.0
+    loc_p2 = p2_pa / 1000.0
+    loc_psat = psat_pa / 1000.0
+    loc_pc = pc_pa / 1000.0
+    d_p = loc_p1 - loc_p2
+    ff = 0.96 - 0.28 * math.sqrt(_ieee_div(loc_psat, loc_pc))
+    choked = d_p >= IEC_FL * IEC_FL * (loc_p1 - ff * loc_psat)
+    q_loc = r.flow_m3hr
+    if choked and allow_choked:
+        kv = q_loc / (
+            IEC_N1
+            * IEC_FL
+            * math.sqrt(_ieee_div((loc_p1 - ff * loc_psat) * IEC_RHO0, r.density_kg_m3))
+        )
+    else:
+        kv = q_loc / (IEC_N1 * math.sqrt(_ieee_div(d_p * IEC_RHO0, r.density_kg_m3)))
+    return kv, choked
+
+
+def _iec_gas_flow_m3s(
+    read: _IecReads,
+    adjusted: float,
+    p1_pa: float,
+    p2_pa: float,
+    xt: float,
+    allow_choked: bool,
+) -> float:
+    r = read.reads
+    loc_p1 = p1_pa / 1000.0
+    loc_p2 = p2_pa / 1000.0
+    d_p = loc_p1 - loc_p2
+    x = _ieee_div(d_p, loc_p1)
+    f_gamma = r.gamma / 1.40
+    y = max(1.0 - _ieee_div(x, 3.0 * f_gamma * xt), 2.0 / 3.0)
+    choked = x >= f_gamma * xt
+    if choked and allow_choked:
+        q_std = (
+            adjusted
+            * N9
+            * loc_p1
+            * y
+            / math.sqrt(r.molar_mass_gr_mol * r.t_k * r.z / (xt * f_gamma))
+        )
+    else:
+        q_std = adjusted * N9 * loc_p1 * y / math.sqrt(r.molar_mass_gr_mol * r.t_k * r.z / x)
+    q = q_std * (STANDARD_PRESSURE_KPA / loc_p1) * (r.t_k / STANDARD_TEMPERATURE_K) * r.z
+    return q / 3600.0
+
+
+def _iec_liquid_flow_m3s(
+    read: _IecReads,
+    adjusted: float,
+    psat_pa: float,
+    pc_pa: float,
+    p1_pa: float,
+    p2_pa: float,
+    allow_choked: bool,
+) -> float:
+    r = read.reads
+    loc_p1 = p1_pa / 1000.0
+    loc_p2 = p2_pa / 1000.0
+    loc_psat = psat_pa / 1000.0
+    d_p = loc_p1 - loc_p2
+    ff = 0.96 - 0.28 * math.sqrt(_ieee_div(loc_psat, pc_pa / 1000.0))
+    choked = d_p >= IEC_FL * IEC_FL * (loc_p1 - ff * loc_psat)
+    if choked and allow_choked:
+        q_loc = (
+            IEC_N1
+            * adjusted
+            * IEC_FL
+            * math.sqrt(_ieee_div((loc_p1 - ff * loc_psat) * IEC_RHO0, r.density_kg_m3))
+        )
+    else:
+        q_loc = IEC_N1 * adjusted * math.sqrt(_ieee_div(d_p * IEC_RHO0, r.density_kg_m3))
+    return q_loc / 3600.0
+
+
+def _iec_gas_pressure(
+    read: _IecReads, adjusted: float, p1_pa: float, xt: float, allow: bool
+) -> float:
+    low = 1.0
+    high = p1_pa - 1.0e-4
+    mid = 0.5 * (low + high)
+    for _ in range(50):
+        required, _ = _iec_gas_kv(read, p1_pa, mid, xt, allow)
+        if required < adjusted:
+            low = mid
+        else:
+            high = mid
+        old = mid
+        mid = 0.5 * (low + high)
+        if mid > 1.0e-9 and abs(mid - old) / mid < 1.0e-6:
+            break
+    return mid
+
+
+def _iec_liquid_pressure(
+    read: _IecReads,
+    adjusted: float,
+    opening: float,
+    allow: bool,
+    divide_by_opening: bool,
+) -> float:
+    p1_pa = read.reads.p1_bara * 1.0e5
+    psat_pa = p1_pa
+    pc_pa = read.pseudo_critical_pa
+    low = 0.1
+    high = p1_pa / 1000.0 - 1.0e-4
+    mid = 0.5 * (low + high)
+    for _ in range(50):
+        required, _ = _iec_liquid_kv(read, psat_pa, pc_pa, p1_pa, mid * 1000.0, allow)
+        if divide_by_opening:
+            required = required / opening
+        if required < adjusted:
+            low = mid
+        else:
+            high = mid
+        old = mid
+        mid = 0.5 * (low + high)
+        if abs(mid - old) < 1.0e-6:
+            break
+    return mid * 1000.0
+
+
+def _full_gas_flow_m3s_at(
+    read: _IecReads, adjusted: float, outlet_bara: float, xt: float, allow: bool
+) -> float:
+    r = read.reads
+    p1_pa = r.p1_bara * 1.0e5
+    p2_pa = outlet_bara * 1.0e5
+    x = (p1_pa - p2_pa) / p1_pa if p1_pa > p2_pa else 1.0e-3
+    y = 0.8
+    q_high_m3h = (
+        N9 * adjusted * (p1_pa / 1000.0) * y / math.sqrt(r.molar_mass_gr_mol * r.t_k * r.z / x)
+    )
+    q_low = 0.0
+    q_high = q_high_m3h / 3600.0 * 2.0
+    q_mid = 0.0
+    for _ in range(20):
+        q_mid = 0.5 * (q_low + q_high)
+        if q_mid < 1.0e-9:
+            break
+        required, _ = _iec_gas_kv(_iec_reads_with_flow(read, q_mid), p1_pa, p2_pa, xt, allow)
+        if required < adjusted:
+            q_low = q_mid
+        else:
+            q_high = q_mid
+        if abs(q_high - q_low) < 1.0e-6:
+            break
+    return q_mid
+
+
+def _full_liquid_flow_m3s_at(
+    read: _IecReads, adjusted: float, outlet_bara: float, allow: bool
+) -> float:
+    r = read.reads
+    p1_pa = r.p1_bara * 1.0e5
+    p2_pa = outlet_bara * 1.0e5
+    d_p_kpa = (p1_pa - p2_pa) / 1000.0 if p1_pa > p2_pa else 1.0e-3
+    q_high_m3h = IEC_N1 * adjusted * math.sqrt(_ieee_div(d_p_kpa * IEC_RHO0, r.density_kg_m3))
+    q_low = 0.0
+    q_high = q_high_m3h / 3600.0 * 2.0
+    q_mid = 0.0
+    for _ in range(20):
+        q_mid = 0.5 * (q_low + q_high)
+        if q_mid < 1.0e-9:
+            break
+        required, _ = _iec_liquid_kv(
+            _iec_reads_with_flow(read, q_mid),
+            p1_pa,
+            read.pseudo_critical_pa,
+            p1_pa,
+            p2_pa,
+            allow,
+        )
+        if required < adjusted:
+            q_low = q_mid
+        else:
+            q_high = q_mid
+        if abs(q_high - q_low) < 1.0e-6:
+            break
+    return q_mid
+
+
+def _nan_report(gas: bool) -> ValveSizingReport:
+    return ValveSizingReport(
+        kv=math.nan,
+        cv=math.nan,
+        cg=math.nan,
+        choked=False,
+        gas_valve=gas,
+        calculated_molar_flow=0.0,
+        calculated_outlet_pressure=math.nan,
+    )
+
+
+def iec_report(
+    components: list[str],
+    t: float,
+    p: float,
+    z: list[float],
+    n: float,
+    outlet_bara: float,
+    standard: str,
+    geometry: ValveSizingGeometry,
+    *,
+    full: bool,
+) -> ValveSizingReport:
+    _require_single_phase(components, t, p, z, standard)
+    read = _iec_reads(components, t, p, z, n)
+    opening = opening_factor(geometry.characteristic, geometry.opening_percent)
+    p1_pa = read.reads.p1_bara * 1.0e5
+    p2_pa = outlet_bara * 1.0e5
+    if read.gas:
+        raw_kv, choked = _iec_gas_kv(read, p1_pa, p2_pa, geometry.xt, geometry.allow_choked)
+    else:
+        # The forward passes the system Z into the Psat slot and the unset getPC() as Pc.
+        raw_kv, choked = _iec_liquid_kv(
+            read, read.reads.z, 0.0, p1_pa, p2_pa, geometry.allow_choked
+        )
+    if geometry.kv is not None:
+        kv = geometry.kv
+    elif full:
+        kv = raw_kv
+    else:
+        kv = raw_kv / opening
+    if not math.isfinite(kv):
+        return _nan_report(gas_valve(components, t, p, z))
+    adjusted = adjusted_kv(kv, geometry)
+    if full:
+        if read.gas:
+            flow_m3s = _full_gas_flow_m3s_at(
+                read, adjusted, outlet_bara, geometry.xt, geometry.allow_choked
+            )
+        else:
+            flow_m3s = _full_liquid_flow_m3s_at(read, adjusted, outlet_bara, geometry.allow_choked)
+    elif read.gas:
+        flow_m3s = _iec_gas_flow_m3s(
+            read, adjusted, p1_pa, p2_pa, geometry.xt, geometry.allow_choked
+        )
+    else:
+        flow_m3s = _iec_liquid_flow_m3s(
+            read,
+            adjusted,
+            p1_pa,
+            read.pseudo_critical_pa,
+            p1_pa,
+            p2_pa,
+            geometry.allow_choked,
+        )
+    molar_mass_kg = read.reads.molar_mass_gr_mol / 1000.0
+    if read.gas:
+        pressure_pa = _iec_gas_pressure(read, adjusted, p1_pa, geometry.xt, geometry.allow_choked)
+    else:
+        pressure_pa = _iec_liquid_pressure(read, adjusted, opening, geometry.allow_choked, not full)
+    return ValveSizingReport(
+        kv=kv,
+        cv=kv * KV_TO_CV_FACTOR,
+        cg=kv * KV_TO_CV_FACTOR * CG_PER_CV,
+        choked=choked,
+        gas_valve=gas_valve(components, t, p, z),
+        calculated_molar_flow=flow_m3s * read.reads.density_kg_m3 / molar_mass_kg,
+        calculated_outlet_pressure=pressure_pa / 1.0e5,
+    )
+
+
+def _simple_gas_pressure(read: _Reads, adjusted: float, geometry: ValveSizingGeometry) -> float:
+    if adjusted <= 0.0:
+        from azoth.core.errors import InvalidInputError
+
+        raise InvalidInputError("kv", f"an adjusted Kv of {adjusted} gives no outlet pressure")
+    p1_kpa = read.p1_bara * 100.0
+    standard_flow = (
+        read.flow_m3hr
+        * (p1_kpa / STANDARD_PRESSURE_KPA)
+        * (STANDARD_TEMPERATURE_K / read.t_k)
+        / read.z
+    )
+    f_gamma = read.gamma / 1.40
+    low = 0.1
+    high = read.p1_bara - 0.001
+    mid = 0.5 * (low + high)
+    for _ in range(100):
+        mid = 0.5 * (low + high)
+        d_p_kpa = (read.p1_bara - mid) * 100.0
+        x = d_p_kpa / p1_kpa
+        choked = x >= f_gamma * geometry.xt
+        x_effective = f_gamma * geometry.xt if choked and geometry.allow_choked else x
+        y = max(1.0 - x_effective / (3.0 * f_gamma * geometry.xt), 2.0 / 3.0)
+        if choked and geometry.allow_choked:
+            calc_kv = (
+                standard_flow
+                / (N9 * p1_kpa * y)
+                * math.sqrt(read.molar_mass_gr_mol * read.t_k * read.z / (geometry.xt * f_gamma))
+                / SIMPLE_CD
+            )
+        else:
+            calc_kv = (
+                standard_flow
+                / (N9 * p1_kpa * y)
+                * math.sqrt(read.molar_mass_gr_mol * read.t_k * read.z / x)
+                / SIMPLE_CD
+            )
+        if abs(calc_kv - adjusted) / adjusted < BISECTION_TOLERANCE:
+            break
+        if calc_kv > adjusted:
+            high = mid
+        else:
+            low = mid
+    return mid
+
+
+def simple_report(
+    components: list[str],
+    t: float,
+    p: float,
+    z: list[float],
+    n: float,
+    outlet_bara: float,
+    standard: str,
+    geometry: ValveSizingGeometry,
+) -> ValveSizingReport:
+    _require_single_phase(components, t, p, z, standard)
+    read = _reads(components, t, p, z, n)
+    gas = gas_valve(components, t, p, z)
+    delta_p = read.p1_bara - outlet_bara
+    if geometry.kv is not None:
+        kv = geometry.kv
+    elif delta_p > 0.0:
+        base = calc_kv(components, t, p, z, n, outlet_bara, geometry)
+        kv = base / SIMPLE_CD if gas else base
+    else:
+        kv = math.nan
+    if not math.isfinite(kv):
+        return _nan_report(gas)
+    adjusted = adjusted_kv(kv, geometry)
+    choked = gas and (delta_p / read.p1_bara) >= (read.gamma / 1.40) * geometry.xt
+    if gas:
+        effective = adjusted * SIMPLE_CD
+        p1_kpa = read.p1_bara * 100.0
+        x = delta_p / read.p1_bara
+        f_gamma = read.gamma / 1.40
+        is_choked = x >= f_gamma * geometry.xt
+        x_effective = f_gamma * geometry.xt if is_choked and geometry.allow_choked else x
+        y = max(1.0 - x_effective / (3.0 * f_gamma * geometry.xt), 2.0 / 3.0)
+        x_for_scale = geometry.xt * f_gamma if is_choked and geometry.allow_choked else x
+        standard_flow = (
+            effective
+            * N9
+            * p1_kpa
+            * y
+            / math.sqrt(read.molar_mass_gr_mol * read.t_k * read.z / x_for_scale)
+        )
+        actual = (
+            standard_flow
+            * (STANDARD_PRESSURE_KPA / p1_kpa)
+            * (read.t_k / STANDARD_TEMPERATURE_K)
+            * read.z
+        )
+        flow_m3s = actual / 3600.0
+        pressure_bara = _simple_gas_pressure(read, adjusted, geometry)
+    else:
+        flow_m3s = adjusted * math.sqrt(delta_p / (read.density_kg_m3 / 1000.0)) / 3600.0
+        pressure_bara = calculated_outlet_pressure(components, t, p, z, n, adjusted, geometry)
+    return ValveSizingReport(
+        kv=kv,
+        cv=kv * KV_TO_CV_FACTOR,
+        cg=kv * KV_TO_CV_FACTOR * CG_PER_CV,
+        choked=choked,
+        gas_valve=gas,
+        calculated_molar_flow=flow_m3s * read.density_kg_m3 / (read.molar_mass_gr_mol / 1000.0),
+        calculated_outlet_pressure=pressure_bara,
+    )
+
+
+def sizing_report_for(
+    components: list[str],
+    t: float,
+    p: float,
+    z: list[float],
+    n: float,
+    outlet_bara: float,
+    standard: str,
+    geometry: ValveSizingGeometry,
+) -> ValveSizingReport:
+    """The report for a selected ``setValveSizingStandard`` value."""
+    if standard == "default":
+        _require_single_phase(components, t, p, z, standard)
+        return sizing_report(components, t, p, z, n, outlet_bara, geometry)
+    if standard == "iec_60534":
+        return iec_report(components, t, p, z, n, outlet_bara, standard, geometry, full=False)
+    if standard == "iec_60534_full":
+        return iec_report(components, t, p, z, n, outlet_bara, standard, geometry, full=True)
+    if standard == "prod_choke":
+        return simple_report(components, t, p, z, n, outlet_bara, standard, geometry)
+    from azoth.core.errors import InvalidInputError
+
+    raise InvalidInputError("sizing_standard", "no sizing report is built for this route")

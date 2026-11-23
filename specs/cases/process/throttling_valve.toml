@@ -220,3 +220,217 @@ cg = 830880.5224740526
 choked = false
 gas_valve = false
 calculated_molar_flow = 26100.47182903137
+
+[[cases]]
+id = "iec_sizes_a_choked_gas"
+tolerance = 0.0002
+source = """\
+    NeqSim pin, `ControlValveSizing_IEC_60534` through
+    `ValveMechanicalDesign.setValveSizingStandard`, from
+    `validation/neqsim/captures/process_valve_standards.tsv`, row `standard_gas_iec_60534`.
+    The constructor starts `allowChoked = true`, so the rich gas is capped as the default's own
+    `allow_choked` row was; the gas `Kv` carries the measured heat-capacity divergence.
+    """
+[cases.inputs]
+components = ["methane", "ethane", "propane", "n-butane"]
+inlet_n = 97.21961972278174
+inlet_z = [0.1, 0.2, 0.4, 0.3]
+inlet_p = 182925.0
+inlet_t = 296.25
+outlet_pressure = 141325.0
+sizing_standard = "iec_60534"
+[cases.expected]
+outlet_n = 97.21961972278174
+outlet_z = [0.1, 0.2, 0.4, 0.3]
+outlet_p = 141325.0
+outlet_t = 295.6350248270999
+outlet_h = 1441.3830449865272
+kv = 873.109295270072
+cv = 1009.3143453322032
+cg = 1372667.5096517964
+choked = true
+gas_valve = true
+calculated_molar_flow = 97.21961972278176
+
+[[cases]]
+id = "iec_sizes_a_water_liquid"
+tolerance = 0.0002
+source = """\
+    NeqSim pin, `ControlValveSizing_IEC_60534`, from
+    `validation/neqsim/captures/process_valve_standards.tsv`, row `standard_water_iec_60534`.
+    **The forward passes the system `Z` into the `Psat` slot and the unset `getPC()` as `Pc`**,
+    so `FF = -Infinity` and the row never chokes; the inverse passes `Psat = P1` and does choke,
+    returning `9425` mol/s against the `26100` inlet.
+    """
+[cases.inputs]
+components = ["water"]
+inlet_n = 26100.471829031365
+inlet_z = [1.0]
+inlet_p = 1480000.0
+inlet_t = 289.15
+outlet_pressure = 446000.0
+sizing_standard = "iec_60534"
+[cases.expected]
+outlet_n = 26100.471829031365
+outlet_z = [1.0]
+outlet_p = 446000.0
+outlet_t = 289.36991929359766
+outlet_h = -45590.9685376084
+kv = 528.7333498347227
+cv = 611.2157524089395
+cg = 831253.4232761577
+choked = false
+gas_valve = false
+calculated_molar_flow = 9425.264109024572
+
+[[cases]]
+id = "iec_full_is_the_simplified_gas_branch"
+tolerance = 0.0002
+source = """\
+    NeqSim pin, `ControlValveSizing_IEC_60534_full`, from
+    `validation/neqsim/captures/process_valve_standards.tsv`, row `standard_gas_iec_60534_full`.
+    **`D1 = D = 0` returns before the Reynolds and piping iteration**, so the reachable route is
+    the simplified IEC sizing with `Rev = Infinity` and `laminar = false`; the flow inverse is the
+    full class's own Q bisection.
+    """
+[cases.inputs]
+components = ["methane", "ethane", "propane", "n-butane"]
+inlet_n = 97.21961972278174
+inlet_z = [0.1, 0.2, 0.4, 0.3]
+inlet_p = 182925.0
+inlet_t = 296.25
+outlet_pressure = 141325.0
+sizing_standard = "iec_60534_full"
+[cases.expected]
+outlet_n = 97.21961972278174
+outlet_z = [0.1, 0.2, 0.4, 0.3]
+outlet_p = 141325.0
+outlet_t = 295.6350248270999
+outlet_h = 1441.3830449865272
+kv = 873.109295270072
+cv = 1009.3143453322032
+cg = 1372667.5096517964
+choked = true
+gas_valve = true
+calculated_molar_flow = 97.21940510229186
+
+[[cases]]
+id = "iec_full_is_the_simplified_liquid_branch"
+tolerance = 0.0002
+source = """\
+    NeqSim pin, `ControlValveSizing_IEC_60534_full`, from
+    `validation/neqsim/captures/process_valve_standards.tsv`, row `standard_water_iec_60534_full`.
+    The early return is the simplified liquid sizing; the flow is the full class's liquid Q
+    bisection.
+    """
+[cases.inputs]
+components = ["water"]
+inlet_n = 26100.471829031365
+inlet_z = [1.0]
+inlet_p = 1480000.0
+inlet_t = 289.15
+outlet_pressure = 446000.0
+sizing_standard = "iec_60534_full"
+[cases.expected]
+outlet_n = 26100.471829031365
+outlet_z = [1.0]
+outlet_p = 446000.0
+outlet_t = 289.36991929359766
+outlet_h = -45590.9685376084
+kv = 528.7333498347227
+cv = 611.2157524089395
+cg = 831253.4232761577
+choked = false
+gas_valve = false
+calculated_molar_flow = 9425.30866798149
+
+[[cases]]
+id = "prod_choke_divides_the_gas_kv_by_cd"
+tolerance = 0.0002
+source = """\
+    NeqSim pin, `ControlValveSizing_simple`, from
+    `validation/neqsim/captures/process_valve_standards.tsv`, row `standard_gas_prod_choke`.
+    The inherited map's `Kv` is the capped gas form divided by `Cd = 0.85`, and the flow inverse
+    multiplies the adjusted `Kv` by `Cd` again.
+    """
+[cases.inputs]
+components = ["methane", "ethane", "propane", "n-butane"]
+inlet_n = 97.21961972278174
+inlet_z = [0.1, 0.2, 0.4, 0.3]
+inlet_p = 182925.0
+inlet_t = 296.25
+outlet_pressure = 141325.0
+sizing_standard = "prod_choke"
+[cases.expected]
+outlet_n = 97.21961972278174
+outlet_z = [0.1, 0.2, 0.4, 0.3]
+outlet_p = 141325.0
+outlet_t = 295.6350248270999
+outlet_h = 1441.3830449865272
+kv = 1027.1874062000845
+cv = 1187.4286415672975
+cg = 1614902.9525315247
+choked = true
+gas_valve = true
+calculated_molar_flow = 97.21961972278173
+
+[[cases]]
+id = "prod_choke_leaves_the_liquid_kv_alone"
+tolerance = 0.0002
+source = """\
+    NeqSim pin, `ControlValveSizing_simple`, from
+    `validation/neqsim/captures/process_valve_standards.tsv`, row `standard_water_prod_choke`.
+    The liquid branch is the default's own; only the gas branch reads `Cd`.
+    """
+[cases.inputs]
+components = ["water"]
+inlet_n = 26100.471829031365
+inlet_z = [1.0]
+inlet_p = 1480000.0
+inlet_t = 289.15
+outlet_pressure = 446000.0
+sizing_standard = "prod_choke"
+[cases.expected]
+outlet_n = 26100.471829031365
+outlet_z = [1.0]
+outlet_p = 446000.0
+outlet_t = 289.36991929359766
+outlet_h = -45590.9685376084
+kv = 528.4961597255068
+cv = 610.9415606426858
+cg = 830880.5224740526
+choked = false
+gas_valve = false
+calculated_molar_flow = 26100.47182903137
+
+[[cases]]
+id = "iec_honours_a_stated_allow_choked"
+tolerance = 0.0002
+source = """\
+    NeqSim pin, `ControlValveSizing_IEC_60534`, from
+    `validation/neqsim/captures/process_valve_standards.tsv`, row
+    `standard_gas_iec_60534_allow_false`. **The factory's constructor state is `true`**, so a
+    stated `false` must be applied after the standard is selected; the uncapped `Kv` is
+    `607.954`.
+    """
+[cases.inputs]
+components = ["methane", "ethane", "propane", "n-butane"]
+inlet_n = 97.21961972278174
+inlet_z = [0.1, 0.2, 0.4, 0.3]
+inlet_p = 182925.0
+inlet_t = 296.25
+outlet_pressure = 141325.0
+allow_choked = false
+sizing_standard = "iec_60534"
+[cases.expected]
+outlet_n = 97.21961972278174
+outlet_z = [0.1, 0.2, 0.4, 0.3]
+outlet_p = 141325.0
+outlet_t = 295.6350248270999
+outlet_h = 1441.3830449865272
+kv = 607.9540338130714
+cv = 702.7948630879105
+cg = 955801.0137995583
+choked = true
+gas_valve = true
+calculated_molar_flow = 97.21961972278176

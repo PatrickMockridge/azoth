@@ -101,15 +101,10 @@ def throttling_valve(
         warnings,
     )
 
-    # **The eight other standards are second machines**, refused by name from the declaration.
+    # **The choke standards are the remaining second machines**, refused by name from the
+    # declaration.
     standard = "default" if sizing_standard is None else sizing_standard
-    if standard == "iec_60534":
-        _unported.refuse("sizing_standard=iec_60534")
-    elif standard == "iec_60534_full":
-        _unported.refuse("sizing_standard=iec_60534_full")
-    elif standard == "prod_choke":
-        _unported.refuse("sizing_standard=prod_choke")
-    elif standard == "sachdeva":
+    if standard == "sachdeva":
         _unported.refuse("sizing_standard=sachdeva")
     elif standard == "gilbert":
         _unported.refuse("sizing_standard=gilbert")
@@ -119,7 +114,7 @@ def throttling_valve(
         _unported.refuse("sizing_standard=ros")
     elif standard == "achong":
         _unported.refuse("sizing_standard=achong")
-    elif standard != "default":
+    elif standard not in valve_sizing.SIZING_STANDARDS:
         raise InvalidInputError(
             "sizing_standard", f"'{standard}' is not one of the nine declared standards"
         )
@@ -130,7 +125,11 @@ def throttling_valve(
         fouling_fraction=0.0 if fouling_fraction is None else float(fouling_fraction),
         characteristic="linear" if valve_characterization is None else valve_characterization,
         xt=valve_sizing.DEFAULT_XT if xt is None else float(xt),
-        allow_choked=bool(allow_choked),
+        allow_choked=(
+            valve_sizing.default_allow_choked(standard)
+            if allow_choked is None
+            else bool(allow_choked)
+        ),
         choke_diameter_m=(
             valve_sizing.DEFAULT_CHOKE_DIAMETER_M
             if choke_diameter is None
@@ -140,8 +139,8 @@ def throttling_valve(
             None if discharge_coefficient is None else float(discharge_coefficient)
         ),
     )
-    report = valve_sizing.sizing_report(
-        components, t, p, list(inlet_z), n, stated / 1.0e5, geometry
+    report = valve_sizing.sizing_report_for(
+        components, t, p, list(inlet_z), n, stated / 1.0e5, standard, geometry
     )
     out_p = report.calculated_outlet_pressure * 1.0e5 if is_calc_pressure else stated
 

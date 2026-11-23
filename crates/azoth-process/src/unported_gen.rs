@@ -203,24 +203,6 @@ pub static UNPORTED: &[Unported] = &[
         capture: "validation/neqsim/captures/process_column_mechanical_design.tsv",
     },
     Unported {
-        key: "sizing_standard=iec_60534",
-        model: "process.throttling_valve",
-        class: "ControlValveSizing_IEC_60534",
-        capture: "validation/neqsim/captures/process_valve_sizing.tsv",
-    },
-    Unported {
-        key: "sizing_standard=iec_60534_full",
-        model: "process.throttling_valve",
-        class: "ControlValveSizing_IEC_60534_full",
-        capture: "validation/neqsim/captures/process_valve_sizing.tsv",
-    },
-    Unported {
-        key: "sizing_standard=prod_choke",
-        model: "process.throttling_valve",
-        class: "ControlValveSizing_simple",
-        capture: "validation/neqsim/captures/process_valve_sizing.tsv",
-    },
-    Unported {
         key: "sizing_standard=sachdeva",
         model: "process.throttling_valve",
         class: "ControlValveSizing_MultiphaseChoke",
