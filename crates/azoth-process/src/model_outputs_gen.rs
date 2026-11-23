@@ -7936,7 +7936,7 @@ static ALL: &[ModelOutputs] = &[
                 unit: None,
                 dimension: None,
                 values: &[],
-                description: "`calcValveSize`'s `choked`: on a gas valve, `x >= Fgamma * xT`. Reported whether or not `allow_choked` caps it.\n",
+                description: "`calcValveSize`'s `choked`: on the gas routes, `x >= Fgamma * xT`; on the five choke standards, the model's `flowRegime == CRITICAL`. Reported whether or not `allow_choked` caps it.\n",
                 optional: false,
             },
             ModelOutput {
@@ -7945,7 +7945,7 @@ static ALL: &[ModelOutputs] = &[
                 unit: None,
                 dimension: None,
                 values: &[],
-                description: "`isGasValve()`: a gas phase carrying more than half the volume. It selects the branch the whole sizing runs.\n",
+                description: "`isGasValve()`: a gas phase carrying more than half the volume. It selects the default, production-choke and IEC branches; the five choke standards read their own labelled phases, and the flag is reported unchanged.\n",
                 optional: false,
             },
             ModelOutput {
