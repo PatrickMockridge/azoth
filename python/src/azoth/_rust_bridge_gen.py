@@ -84,6 +84,7 @@ from azoth.core.result import (
     ConstantVolumeDepletionResult,
     ControlValveCvResult,
     ControlValveFailureReliefResult,
+    ConvergenceReason,
     CooldownVerdict,
     CoolerResult,
     CorrosionSeverity,
@@ -150,6 +151,7 @@ from azoth.core.result import (
     FireWaterCoverageAssessmentResult,
     FireWaterDemandResult,
     FirozabadiRamleyInterfaceTensionResult,
+    FittedParameterRow,
     FivLikelihood,
     FlareResult,
     FlowInducedPulsationResult,
@@ -376,6 +378,8 @@ from azoth.core.result import (
     RealGasFannoReleaseStation,
     ReferencePotentialsResult,
     RegisterFinding,
+    RegressionObjectiveRow,
+    RegressionResult,
     ReliefDisposalNetworkResult,
     ReliefDisposalRow,
     ReliefPhase,
@@ -501,6 +505,7 @@ from azoth.core.result import (
     TubeInsertModelResult,
     TubeRuptureReliefResult,
     TuFlashResult,
+    TuneToSaturationResult,
     TurboExpanderResult,
     TvFlashResult,
     TvFractionFlashResult,
@@ -851,6 +856,7 @@ __all__ = [
     "reactive_tp_flash",
     "real_gas_fanno_release",
     "reference_potentials",
+    "regression",
     "relief_disposal_network",
     "reynolds_number",
     "risk_matrix",
@@ -935,6 +941,7 @@ __all__ = [
     "tu_flash",
     "tube_insert_model",
     "tube_rupture_relief",
+    "tune_to_saturation",
     "turbo_expander_compressor",
     "tv_flash",
     "tv_fraction_flash",
@@ -10738,6 +10745,41 @@ def property_sweep(components: Sequence[Mapping[str, Any]], mode: str, *, temper
     )
 
 
+def regression(components: Sequence[Mapping[str, Any]], parameters: Sequence[Mapping[str, Any]], *, cce: Sequence[Mapping[str, Any]] | None=None, cvd: Sequence[Mapping[str, Any]] | None=None, dle: Sequence[Mapping[str, Any]] | None=None, viscosity: Sequence[Mapping[str, Any]] | None=None, cce_weight: float | None=None, cvd_weight: float | None=None, dle_weight: float | None=None, viscosity_weight: float | None=None, eos: str | None=None, mixing_rule: str | None=None, volume_correction: bool | None=None, max_iterations: int | None=None) -> RegressionResult:
+    """``pvt.regression``, computed in Rust."""
+    spec = _models_gen.model("pvt.regression")
+    result = _core.regression(
+        input_records_to_si(spec, "components", components),
+        input_records_to_si(spec, "parameters", parameters),
+        None if cce is None else input_records_to_si(spec, "cce", cce),
+        None if cvd is None else input_records_to_si(spec, "cvd", cvd),
+        None if dle is None else input_records_to_si(spec, "dle", dle),
+        None if viscosity is None else input_records_to_si(spec, "viscosity", viscosity),
+        None if cce_weight is None else cce_weight,
+        None if cvd_weight is None else cvd_weight,
+        None if dle_weight is None else dle_weight,
+        None if viscosity_weight is None else viscosity_weight,
+        eos,
+        mixing_rule,
+        volume_correction,
+        None if max_iterations is None else _count("max_iterations", max_iterations),
+    )
+    return RegressionResult(
+        fitted_parameters=tuple(FittedParameterRow(parameter=c.parameter, value=c.value, lower=c.lower, upper=c.upper) for c in result.fitted_parameters),
+        standard_errors=tuple(result.standard_errors),
+        half_widths_95=tuple(result.half_widths_95),
+        objectives=tuple(RegressionObjectiveRow(experiment=c.experiment, value=c.value) for c in result.objectives),
+        final_chi_square=result.final_chi_square,
+        total_objective=result.total_objective,
+        degrees_of_freedom=result.degrees_of_freedom,
+        residual_variance=result.residual_variance,
+        average_absolute_deviation_percent=result.average_absolute_deviation_percent,
+        iterations=result.iterations,
+        convergence_reason=ConvergenceReason(result.convergence_reason),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def saturation_test(components: Sequence[Mapping[str, Any]], mode: str, *, eos: str | None=None, mixing_rule: str | None=None, temperature: Any=None, pressure: Any=None, temperature_search_min: Any=None, temperature_search_max: Any=None) -> SaturationTestResult:
     """``pvt.saturation_test``, computed in Rust."""
     spec = _models_gen.model("pvt.saturation_test")
@@ -10811,6 +10853,30 @@ def swelling_test(components: Sequence[Mapping[str, Any]], *, cumulative_gas_inj
         original_oil_moles=from_si(result.original_oil_moles.magnitude_si, result.original_oil_moles.unit),
         original_oil_volume=from_si(result.original_oil_volume.magnitude_si, result.original_oil_volume.unit),
         points=tuple(SwellingPoint(cumulative_gas_injected=c.cumulative_gas_injected, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), relative_oil_volume=c.relative_oil_volume) for c in result.points),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def tune_to_saturation(components: Sequence[Mapping[str, Any]], plus_component: str, *, saturation_temperature: Any, saturation_pressure: Any, plus_model: str | None=None, number_of_lumps: int | None=None, eos: str | None=None, mixing_rule: str | None=None, volume_correction: bool | None=None, max_iterations: int | None=None) -> TuneToSaturationResult:
+    """``pvt.tune_to_saturation``, computed in Rust."""
+    spec = _models_gen.model("pvt.tune_to_saturation")
+    result = _core.tune_to_saturation(
+        input_records_to_si(spec, "components", components),
+        plus_component,
+        _si(spec, "saturation_temperature", saturation_temperature),
+        _si(spec, "saturation_pressure", saturation_pressure),
+        plus_model,
+        None if number_of_lumps is None else _count("number_of_lumps", number_of_lumps),
+        eos,
+        mixing_rule,
+        volume_correction,
+        None if max_iterations is None else _count("max_iterations", max_iterations),
+    )
+    return TuneToSaturationResult(
+        tuned_molar_mass=from_si(result.tuned_molar_mass.magnitude_si, result.tuned_molar_mass.unit),
+        final_saturation_pressure=from_si(result.final_saturation_pressure.magnitude_si, result.final_saturation_pressure.unit),
+        iterations=result.iterations,
+        converged=result.converged,
         warnings=_warnings(result.warnings),
     )
 

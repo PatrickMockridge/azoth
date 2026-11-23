@@ -81,6 +81,25 @@ pub fn mixture_from_characterization_with(
     cubic: Cubic,
     kij_source: KijSource,
 ) -> Result<(Mixture, IdealGasModel)> {
+    mixture_from_characterization_with_kij(components, cubic, kij_source, &[])
+}
+
+/// The same, with named pairs' interaction coefficients replaced after the source fills
+/// the matrix.
+///
+/// The overrides are `(first, second, value)` row indices, applied symmetrically in order;
+/// a later entry for the same pair replaces an earlier one, as repeated
+/// `setBinaryInteractionParameter` calls do. The PVT regression's BIP parameters are the
+/// caller.
+///
+/// # Errors
+/// The same as [`mixture_from_characterization`], plus a pair index outside the matrix.
+pub fn mixture_from_characterization_with_kij(
+    components: &[FluidComponent],
+    cubic: Cubic,
+    kij_source: KijSource,
+    overrides: &[(usize, usize, f64)],
+) -> Result<(Mixture, IdealGasModel)> {
     if !matches!(cubic, Cubic::Pr | Cubic::Srk) {
         return Err(AzothError::invalid_input(
             "cubic",
@@ -151,6 +170,20 @@ pub fn mixture_from_characterization_with(
                 kij[second * n + first] = value;
             }
         }
+    }
+
+    for &(first, second, value) in overrides {
+        if first >= n || second >= n || !value.is_finite() {
+            return Err(AzothError::invalid_input(
+                "kij_override",
+                format!(
+                    "a binary interaction override names ({first}, {second}) = {value} in a \
+                     mixture of {n} components"
+                ),
+            ));
+        }
+        kij[first * n + second] = value;
+        kij[second * n + first] = value;
     }
 
     let coefficient = |position: usize| cp.iter().map(|row| row[position]).collect();

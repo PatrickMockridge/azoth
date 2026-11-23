@@ -595,10 +595,9 @@ tags = ["pvt"]
 [[skill]]
 name = "azoth-pvt-regression-characterization-factor"
 version = "0.1.0"
-description = "Public weighted multi-target regression of a split/characterization factor against measured PVT and separator data (saturation pressure, GOR, stock-tank-oil density, formation volume factor). USE WHEN: a task must calibrate one heavy-end characterization factor so a fluid model reproduces several measured PVT/separator quantities at once, with per-target weights and residual reporting, before rigorous NeqSim EOS regression."
-calculation_basis = "screening"
+description = "Weighted multi-target regression of a characterized fluid: a heavy-end critical-constant, acentric or volume-shift multiplier, or one of four binary interaction parameters, fitted to measured CCE relative volumes, CVD liquid dropout and gas Z, DLE Rs/Bo/oil density, or a phase viscosity at once, with per-target weights, an unweighted residual ledger and the class's simplified standard errors. USE WHEN: a task must calibrate a characterization factor or a BIP so a fluid model reproduces several measured PVT quantities at once, with a convergence reason and residual reporting, before rigorous NeqSim EOS regression."
+calculation_basis = "azoth"
 path = "skills/pvt/pvt-regression-characterization-factor/SKILL.md"
-tranche = "P4"
 tags = ["pvt"]
 
 [[skill]]

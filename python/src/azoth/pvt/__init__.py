@@ -31,9 +31,11 @@ from azoth.core.result import (
     MmpResult,
     OilMaterialBalanceResult,
     PropertySweepResult,
+    RegressionResult,
     SaturationTestResult,
     SeparatorTestResult,
     SwellingTestResult,
+    TuneToSaturationResult,
     WaterCorrelationsResult,
 )
 from azoth.pvt import layers as layers
@@ -48,9 +50,11 @@ _GAS_MATERIAL_BALANCE = "pvt.gas_material_balance"
 _MMP = "pvt.mmp"
 _OIL_MATERIAL_BALANCE = "pvt.oil_material_balance"
 _PROPERTY_SWEEP = "pvt.property_sweep"
+_REGRESSION = "pvt.regression"
 _SATURATION_TEST = "pvt.saturation_test"
 _SEPARATOR_TEST = "pvt.separator_test"
 _SWELLING_TEST = "pvt.swelling_test"
+_TUNE_TO_SATURATION = "pvt.tune_to_saturation"
 _WATER_CORRELATIONS = "pvt.water_correlations"
 
 __all__ = [
@@ -65,9 +69,11 @@ __all__ = [
     "mmp",
     "oil_material_balance",
     "property_sweep",
+    "regression",
     "saturation_test",
     "separator_test",
     "swelling_test",
+    "tune_to_saturation",
     "water_correlations",
 ]
 
@@ -227,6 +233,59 @@ def separator_test(
     )
 
 
+def regression(
+    components: Sequence[Mapping[str, Any]],
+    parameters: Sequence[Mapping[str, Any]],
+    *,
+    cce: Sequence[Mapping[str, Any]] | None = None,
+    cvd: Sequence[Mapping[str, Any]] | None = None,
+    dle: Sequence[Mapping[str, Any]] | None = None,
+    viscosity: Sequence[Mapping[str, Any]] | None = None,
+    cce_weight: float | None = None,
+    cvd_weight: float | None = None,
+    dle_weight: float | None = None,
+    viscosity_weight: float | None = None,
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+    max_iterations: int | None = None,
+) -> RegressionResult:
+    """The PVT multi-target regression over a characterised fluid.
+
+    ``components`` is the fluid's row list, ``parameters`` the fitting constants with their
+    bounds and guesses, and the four experiment lists the measured points grouped by an
+    ``experiment`` index. The fit minimises a weighted chi-square and publishes the class's
+    second, unweighted objective ledger beside it.
+
+    Returns:
+        One row per fitted parameter, the standard errors and 95 % half-widths, one
+        objective row per experiment, and the optimizer's chi-square, dof, AAD, iterations
+        and exit reason.
+
+    Raises:
+        InvalidInputError: for an unknown parameter or phase name, a malformed experiment
+            index, or an experiment whose rows disagree on their temperature.
+
+    See :func:`azoth.pvt.reference.regression.fit`.
+    """
+    return resolve(_REGRESSION)(  # type: ignore[no-any-return]
+        components=components,
+        parameters=parameters,
+        cce=cce,
+        cvd=cvd,
+        dle=dle,
+        viscosity=viscosity,
+        cce_weight=cce_weight,
+        cvd_weight=cvd_weight,
+        dle_weight=dle_weight,
+        viscosity_weight=viscosity_weight,
+        eos=eos,
+        mixing_rule=mixing_rule,
+        volume_correction=volume_correction,
+        max_iterations=max_iterations,
+    )
+
+
 def swelling_test(
     components: Sequence[Mapping[str, Any]],
     *,
@@ -260,6 +319,49 @@ def swelling_test(
         temperature=temperature,
         cumulative_gas_injected=cumulative_gas_injected,
         volume_correction=volume_correction,
+    )
+
+
+def tune_to_saturation(
+    components: Sequence[Mapping[str, Any]],
+    plus_component: str,
+    *,
+    saturation_temperature: Any,
+    saturation_pressure: Any,
+    plus_model: str | None = None,
+    number_of_lumps: int | None = None,
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+    max_iterations: int | None = None,
+) -> TuneToSaturationResult:
+    """Tune a plus fraction's molar mass until its saturation pressure meets a target.
+
+    Each iteration re-characterises the plus end through the split and its lumps, rebuilds
+    the fluid and runs the saturation scan. The class steps the mass by ``dp/1000`` (bar) and
+    flips the sign when the error grows.
+
+    Returns:
+        The tuned molar mass, the last saturation pressure, the steps taken, and whether the
+        loop exited on its own tolerance rather than the cap.
+
+    Raises:
+        InvalidInputError: for a plus name the rows do not carry, a plus row that is not a
+            pseudo row, another pseudo row present, or a name without a carbon number.
+
+    See :func:`azoth.pvt.reference.tune_to_saturation.tune_to_saturation`.
+    """
+    return resolve(_TUNE_TO_SATURATION)(  # type: ignore[no-any-return]
+        components=components,
+        plus_component=plus_component,
+        saturation_temperature=saturation_temperature,
+        saturation_pressure=saturation_pressure,
+        plus_model=plus_model,
+        number_of_lumps=number_of_lumps,
+        eos=eos,
+        mixing_rule=mixing_rule,
+        volume_correction=volume_correction,
+        max_iterations=max_iterations,
     )
 
 

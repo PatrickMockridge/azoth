@@ -22,8 +22,8 @@ use crate::record_outputs_gen::{
     PyDriftFluxReleaseStation, PyEnvelopePoint, PyEnvelopeQuery, PyEnvelopeSummary,
     PyEquilibriumSoundSpeedSample, PyEquipmentCostResultRow, PyEquipmentMtoRow,
     PyEquipmentQualityFlag, PyEscalationItemResult, PyEsdContribution, PyEventTreeOutcome,
-    PyFiniteRateReleaseStation, PyFlowlineScaleSegment, PyFmeaRankedEntry, PyGasResultRow,
-    PyHazopPopulationRow, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
+    PyFiniteRateReleaseStation, PyFittedParameterRow, PyFlowlineScaleSegment, PyFmeaRankedEntry,
+    PyGasResultRow, PyHazopPopulationRow, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
     PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
     PyHydrateRiskPoint, PyIdealGasFannoReleaseStation, PyIdealGasReleaseStation,
     PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
@@ -35,16 +35,17 @@ use crate::record_outputs_gen::{
     PyPerformanceSif, PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation,
     PyProcessCostEquipmentResult, PyProcessCostFlag, PyProcessCostMtoRow, PyProjectCostLine,
     PyPropertyPoint, PyPulsationModeResult, PyRanzMarshallReleaseStation,
-    PyRealGasFannoReleaseStation, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
-    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint,
-    PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow,
-    PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySeparatorStageResult,
-    PySettleOutCompartmentResult, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
-    PySts0131FindingResult, PySubFraction, PySwellingPoint, PyTopsidesBreakdownLine,
-    PyTopsidesCapitalLine, PyTopsidesFlag, PyTopsidesMtoRow, PyTopsidesProjectLine,
-    PyTopsidesProjectSummaryLine, PyTopsidesSummaryLine, PyTopsidesWeightLine, PyTr3001Finding,
-    PyTrappedInventorySegmentResult, PyTypeCostLine, PyVesselFillingPoint, PyVesselRuptureStep,
-    PyWaterMixingResult, PyWaterResultRow, PyZoneRatingRow,
+    PyRealGasFannoReleaseStation, PyRegisterFinding, PyRegressionObjectiveRow, PyReliefDisposalRow,
+    PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage, PyReviewVerdict,
+    PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem, PySafeChartMissingDevice,
+    PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow,
+    PySelfHeatingTimePoint, PySeparatorStageResult, PySettleOutCompartmentResult, PySilIssue,
+    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
+    PySwellingPoint, PyTopsidesBreakdownLine, PyTopsidesCapitalLine, PyTopsidesFlag,
+    PyTopsidesMtoRow, PyTopsidesProjectLine, PyTopsidesProjectSummaryLine, PyTopsidesSummaryLine,
+    PyTopsidesWeightLine, PyTr3001Finding, PyTrappedInventorySegmentResult, PyTypeCostLine,
+    PyVesselFillingPoint, PyVesselRuptureStep, PyWaterMixingResult, PyWaterResultRow,
+    PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -31014,6 +31015,100 @@ impl From<&azoth_pvt::property_sweep::PropertySweepResult> for PyPropertySweepRe
         }
     }
 }
+/// Result of `pvt.regression`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "RegressionResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyRegressionResult {
+    /// One row per fitting parameter, in the caller's order.
+    #[pyo3(get)]
+    pub fitted_parameters: Vec<PyFittedParameterRow>,
+    /// The simplified standard error, `sqrt(chi-square/dof) * (upper - lower) * 0.1`.
+    #[pyo3(get)]
+    pub standard_errors: Vec<f64>,
+    /// `1.96` times the standard error.
+    #[pyo3(get)]
+    pub half_widths_95: Vec<f64>,
+    /// One row per experiment that had observations, in the class's declaration order.
+    #[pyo3(get)]
+    pub objectives: Vec<PyRegressionObjectiveRow>,
+    /// The weighted chi-square the optimizer minimised.
+    #[pyo3(get)]
+    pub final_chi_square: f64,
+    /// The objectives' sum, in declaration order.
+    #[pyo3(get)]
+    pub total_objective: f64,
+    /// The observation count less the parameter count, floored at one.
+    #[pyo3(get)]
+    pub degrees_of_freedom: f64,
+    /// The class's residual variance, which is the final chi-square itself.
+    #[pyo3(get)]
+    pub residual_variance: f64,
+    /// `sqrt(chi-square) * 100`.
+    #[pyo3(get)]
+    pub average_absolute_deviation_percent: f64,
+    /// The steps the optimizer took.
+    #[pyo3(get)]
+    pub iterations: f64,
+    /// Why the optimizer stopped.
+    #[pyo3(get)]
+    pub convergence_reason: String,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyRegressionResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "RegressionResult(fitted_parameters={:?}, standard_errors={:?}, half_widths_95={:?}, objectives={:?}, final_chi_square={:?}, total_objective={:?}, degrees_of_freedom={:?}, residual_variance={:?}, average_absolute_deviation_percent={:?}, iterations={:?}, convergence_reason={:?}, {} warning(s))",
+            self.fitted_parameters,
+            self.standard_errors,
+            self.half_widths_95,
+            self.objectives,
+            self.final_chi_square,
+            self.total_objective,
+            self.degrees_of_freedom,
+            self.residual_variance,
+            self.average_absolute_deviation_percent,
+            self.iterations,
+            self.convergence_reason,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::regression::RegressionResult> for PyRegressionResult {
+    fn from(r: &azoth_pvt::regression::RegressionResult) -> Self {
+        Self {
+            fitted_parameters: r
+                .fitted_parameters
+                .iter()
+                .map(PyFittedParameterRow::from)
+                .collect(),
+            standard_errors: r.standard_errors.clone(),
+            half_widths_95: r.half_widths_95.clone(),
+            objectives: r
+                .objectives
+                .iter()
+                .map(PyRegressionObjectiveRow::from)
+                .collect(),
+            final_chi_square: r.final_chi_square,
+            total_objective: r.total_objective,
+            degrees_of_freedom: r.degrees_of_freedom,
+            residual_variance: r.residual_variance,
+            average_absolute_deviation_percent: r.average_absolute_deviation_percent,
+            iterations: r.iterations,
+            convergence_reason: r.convergence_reason.name().to_string(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `pvt.saturation_test`, transported.
 #[pyclass(
     frozen,
@@ -31209,6 +31304,63 @@ impl From<&azoth_pvt::swelling_test::SwellingTestResult> for PySwellingTestResul
                 unit: "m**3".to_string(),
             },
             points: r.points.iter().map(PySwellingPoint::from).collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.tune_to_saturation`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "TuneToSaturationResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTuneToSaturationResult {
+    /// The plus fraction's molar mass after the last update, which is the one the last run used.
+    #[pyo3(get)]
+    pub tuned_molar_mass: PyQty,
+    /// The saturation pressure of the last run.
+    #[pyo3(get)]
+    pub final_saturation_pressure: PyQty,
+    /// The steps taken; zero is the class's early return.
+    #[pyo3(get)]
+    pub iterations: f64,
+    /// Whether the loop exited on its own tolerance rather than the iteration cap.
+    #[pyo3(get)]
+    pub converged: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyTuneToSaturationResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "TuneToSaturationResult(tuned_molar_mass={:?}, final_saturation_pressure={:?}, iterations={:?}, converged={:?}, {} warning(s))",
+            self.tuned_molar_mass,
+            self.final_saturation_pressure,
+            self.iterations,
+            self.converged,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::tune_to_saturation::TuneToSaturationResult> for PyTuneToSaturationResult {
+    fn from(r: &azoth_pvt::tune_to_saturation::TuneToSaturationResult) -> Self {
+        Self {
+            tuned_molar_mass: PyQty {
+                magnitude_si: r.tuned_molar_mass,
+                unit: "kg/mol".to_string(),
+            },
+            final_saturation_pressure: PyQty {
+                magnitude_si: r.final_saturation_pressure,
+                unit: "Pa".to_string(),
+            },
+            iterations: r.iterations,
+            converged: r.converged,
             warnings: transport(&r.warnings),
         }
     }

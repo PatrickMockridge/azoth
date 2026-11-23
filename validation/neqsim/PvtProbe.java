@@ -7,7 +7,18 @@
 // class surface: the library never reflects, and a field rename at a later pin breaks this
 // file rather than an id.
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Map;
+import org.apache.commons.lang3.SerializationUtils;
+import neqsim.pvtsimulation.modeltuning.TuneToSaturation;
+import neqsim.pvtsimulation.regression.ExperimentType;
+import neqsim.pvtsimulation.regression.PVTRegression;
+import neqsim.pvtsimulation.regression.PVTRegressionFunction;
+import neqsim.pvtsimulation.regression.RegressionParameter;
+import neqsim.pvtsimulation.regression.RegressionParameterConfig;
+import neqsim.pvtsimulation.regression.RegressionResult;
+import neqsim.pvtsimulation.regression.UncertaintyAnalysis;
 import neqsim.pvtsimulation.reservoirproperties.CompositionEstimation;
 import neqsim.pvtsimulation.reservoirproperties.materialbalance.GasMaterialBalance;
 import neqsim.pvtsimulation.reservoirproperties.materialbalance.OilMaterialBalance;
@@ -33,8 +44,14 @@ import neqsim.pvtsimulation.util.GasPseudoPressure;
 import neqsim.pvtsimulation.util.SaturationPressureCorrelation;
 import neqsim.pvtsimulation.util.WaterPropertyCorrelations;
 import neqsim.pvtsimulation.util.ZFactorCorrelations;
+import neqsim.statistics.parameterfitting.SampleSet;
+import neqsim.statistics.parameterfitting.SampleValue;
+import neqsim.statistics.parameterfitting.nonlinearparameterfitting.LevenbergMarquardt;
+import neqsim.statistics.parameterfitting.nonlinearparameterfitting.LevenbergMarquardtResult;
+import neqsim.thermo.component.ComponentInterface;
 import neqsim.thermo.system.SystemInterface;
 import neqsim.thermo.system.SystemSrkEos;
+import neqsim.thermodynamicoperations.ThermodynamicOperations;
 
 public final class PvtProbe {
 
@@ -889,7 +906,308 @@ public final class PvtProbe {
     }
   }
 
-  public static void main(String[] args) {
+  // ---- regression and tuning ---------------------------------------------------------------
+
+  private static String number(double value) {
+    return Double.isFinite(value) ? String.format(java.util.Locale.ROOT, "%.17g", value) : "-";
+  }
+
+  // One component as a row, the CharacterizationFluidRebuildProbe shape. A pseudo row carries
+  // every property; a base row carries none.
+  private static void componentRows(String prefix, SystemInterface system) {
+    for (int i = 0; i < system.getNumberOfComponents(); i++) {
+      ComponentInterface component = system.getComponent(i);
+      if (!(component.getNumberOfmoles() > 0.0)) {
+        continue;
+      }
+      boolean isPseudo = component.isIsTBPfraction() || component.isIsPlusFraction();
+      StringBuilder row = new StringBuilder();
+      row.append(component.getComponentName()).append('|').append(isPseudo).append('|')
+          .append(number(component.getNumberOfmoles()));
+      if (!isPseudo) {
+        for (int k = 0; k < 19; k++) {
+          row.append("|-");
+        }
+      } else {
+        row.append('|').append(number(component.getMolarMass()));
+        row.append('|').append(number(component.getNormalLiquidDensity() * 1000.0));
+        row.append('|').append(number(component.getNormalBoilingPoint()));
+        row.append('|').append(number(component.getTC()));
+        row.append('|').append(number(component.getPC() * 1.0e5));
+        row.append('|').append(number(component.getAcentricFactor()));
+        row.append('|').append(number(component.getCriticalVolume() / 1.0e6));
+        row.append('|').append(number(component.getRacketZ()));
+        row.append('|').append(number(component.getRacketZCPA()));
+        row.append('|').append(number(component.getParachorParameter()));
+        row.append('|').append(number(component.getCriticalViscosity()));
+        row.append('|').append(number(component.getTriplePointTemperature()));
+        row.append('|').append(number(component.getHeatOfFusion()));
+        row.append('|').append(number(component.getIdealGasEnthalpyOfFormation()));
+        row.append('|').append(number(component.getCpA()));
+        row.append('|').append(number(component.getCpB()));
+        row.append('|').append(number(component.getCpC()));
+        row.append('|').append(number(component.getCpD()));
+        row.append('|').append(component.getAttractiveTerm() == null ? "-"
+            : number(component.getAttractiveTerm().getm()));
+      }
+      System.out.println(prefix + i + " = " + row);
+    }
+  }
+
+  // The class's own viscosity test fluid, rebuilt from PVTRegressionTest.createViscosityFluid.
+  private static SystemInterface viscosityFluid() {
+    SystemInterface fluid = new SystemSrkEos(320.0, 1.0);
+    fluid.addComponent("n-heptane", 1.0);
+    fluid.setMixingRule("classic");
+    ThermodynamicOperations ops = new ThermodynamicOperations(fluid);
+    ops.TPflash();
+    fluid.getPhase("oil").getPhysicalProperties().setViscosityModel("PFCT");
+    fluid.initProperties();
+    return fluid;
+  }
+
+  // PVTRegressionTest.calculateOilViscosity: the third CSP factor at one state.
+  private static double oilViscosity(SystemInterface fluid, double pressure, double temperature,
+      double cspFactor) {
+    fluid.setPressure(pressure);
+    fluid.setTemperature(temperature);
+    ThermodynamicOperations ops = new ThermodynamicOperations(fluid);
+    ops.TPflash();
+    fluid.getPhase("oil").getPhysicalProperties().setViscosityModel("PFCT");
+    fluid.getPhase("oil").getPhysicalProperties().setCspViscosityCorrectionFactor(2, cspFactor);
+    fluid.initProperties();
+    return fluid.getPhase("oil").getPhysicalProperties().getViscosity();
+  }
+
+  // A TBP fluid: methane, n-decane and one C15 pseudo row. The row printer above carries the
+  // pseudo component's twenty properties into the id's FluidComponent boundary.
+  private static SystemInterface tbpFluid() {
+    SystemInterface fluid = new SystemSrkEos(373.15, 250.0);
+    fluid.addComponent("methane", 0.60);
+    fluid.addComponent("nC10", 0.30);
+    fluid.addTBPfraction("C15", 0.10, 0.150, 0.820);
+    fluid.setMixingRule("classic");
+    fluid.init(0);
+    fluid.init(1);
+    return fluid;
+  }
+
+  private static void regressionResult(String at, RegressionResult result) {
+    for (RegressionParameterConfig config : result.getParameterConfigs()) {
+      String name = config.getParameter().name();
+      line(at + "value_" + name, config.getOptimizedValue());
+      line(at + "lower_" + name, config.getLowerBound());
+      line(at + "upper_" + name, config.getUpperBound());
+    }
+    for (Map.Entry<ExperimentType, Double> objective : result.getObjectiveValues().entrySet()) {
+      line(at + "objective_" + objective.getKey().name(), objective.getValue());
+    }
+    line(at + "final_chi_square", result.getFinalChiSquare());
+    line(at + "total_objective", result.getTotalObjective());
+    line(at + "average_absolute_deviation_percent", result.getAverageAbsoluteDeviation());
+    UncertaintyAnalysis uncertainty = result.getUncertainty();
+    line(at + "degrees_of_freedom", uncertainty.getDegreesOfFreedom());
+    line(at + "residual_variance", uncertainty.getResidualVariance());
+    for (int i = 0; i < uncertainty.getParameterValues().length; i++) {
+      line(at + "standard_error_" + i, uncertainty.getStandardError(i));
+      line(at + "half_width_95_" + i, uncertainty.getConfidenceInterval95(i));
+    }
+  }
+
+  // The regression's own optimizer result, from the private sample builders the class's
+  // weighting tests also reach by reflection.
+  private static void optimizerResult(PVTRegression regression, String builder, int maxIterations)
+      throws Exception {
+    Method create = PVTRegression.class.getDeclaredMethod("createRegressionFunction");
+    create.setAccessible(true);
+    PVTRegressionFunction function = (PVTRegressionFunction) create.invoke(regression);
+    Method add = PVTRegression.class.getDeclaredMethod(builder, ArrayList.class,
+        PVTRegressionFunction.class);
+    add.setAccessible(true);
+    ArrayList<SampleValue> samples = new ArrayList<>();
+    add.invoke(regression, samples, function);
+    LevenbergMarquardt optimizer = new LevenbergMarquardt();
+    optimizer.setMaxNumberOfIterations(maxIterations);
+    optimizer.setSampleSet(new SampleSet(samples));
+    optimizer.solve();
+    LevenbergMarquardtResult result = optimizer.getResult();
+    line("lm_iterations", result.getIterations());
+    line("lm_gradient_norm", result.getGradientNorm());
+    System.out.println("lm_convergence=" + result.getConvergenceReason().name());
+  }
+
+  private static void regression() throws Exception {
+    System.out.println("pvt_regression");
+
+    // 1. The class's own CSP viscosity fit: n-heptane, 320 K, 1/5/15 bara, target 1.35.
+    System.out.println("[csp_viscosity]");
+    double viscosityTemperature = 320.0;
+    double[] viscosityPressures = {1.0, 5.0, 15.0};
+    double targetFactor = 1.35;
+    double[] viscosities = new double[viscosityPressures.length];
+    for (int i = 0; i < viscosityPressures.length; i++) {
+      viscosities[i] = oilViscosity(viscosityFluid(), viscosityPressures[i], viscosityTemperature,
+          targetFactor);
+      line("observation_" + i, viscosities[i]);
+      line("base_" + i, oilViscosity(viscosityFluid(), viscosityPressures[i], viscosityTemperature,
+          1.0));
+    }
+    PVTRegression viscosity = new PVTRegression(viscosityFluid());
+    viscosity.addRegressionParameter(RegressionParameter.VISCOSITY_CSP_3, 0.5, 2.0, 1.0);
+    viscosity.addViscosityData(viscosityPressures, viscosities, viscosityTemperature, "oil");
+    viscosity.setMaxIterations(8);
+    viscosity.setVerbose(false);
+    regressionResult("csp_", viscosity.runRegression());
+    optimizerResult(viscosity, "addViscositySamples", 8);
+
+    // 2. CCE on a TBP fluid, tuning the C7+ critical-temperature multiplier from a clone at 1.03.
+    System.out.println("[cce_tc_multiplier]");
+    double[] ccePressures = {250.0, 200.0, 150.0};
+    double cceTemperature = 373.15;
+    SystemInterface cceBase = tbpFluid();
+    componentRows("component_", cceBase);
+    SystemInterface cceObserved = SerializationUtils.clone(cceBase);
+    cceObserved.init(0);
+    cceObserved.init(1);
+    RegressionParameter.TC_MULTIPLIER_C7PLUS.applyToFluid(cceObserved, 1.03);
+    ConstantMassExpansion cce = new ConstantMassExpansion(cceObserved);
+    cce.setTemperature(cceTemperature);
+    cce.setPressures(ccePressures);
+    cce.runCalc();
+    double[] relativeVolumes = cce.getRelativeVolume();
+    for (int i = 0; i < ccePressures.length; i++) {
+      line("observation_" + i, relativeVolumes[i]);
+    }
+    ConstantMassExpansion cceBaseState = new ConstantMassExpansion(cceBase.clone());
+    cceBaseState.setTemperature(cceTemperature);
+    cceBaseState.setPressures(ccePressures);
+    cceBaseState.runCalc();
+    double[] baseVolumes = cceBaseState.getRelativeVolume();
+    for (int i = 0; i < ccePressures.length; i++) {
+      line("base_" + i, baseVolumes[i]);
+    }
+    PVTRegression cceRegression = new PVTRegression(cceBase);
+    cceRegression.addCCEData(ccePressures, relativeVolumes, cceTemperature);
+    cceRegression.addRegressionParameter(RegressionParameter.TC_MULTIPLIER_C7PLUS, 0.95, 1.05, 1.0);
+    cceRegression.setMaxIterations(6);
+    cceRegression.setVerbose(false);
+    regressionResult("cce_", cceRegression.runRegression());
+    optimizerResult(cceRegression, "addCCESamples", 6);
+
+    // 3. DLE tuning the CO2-hydrocarbon BIP from a clone at 0.15.
+    System.out.println("[dle_bip_co2]");
+    double[] dlePressures = {250.0, 150.0, 80.0};
+    double dleTemperature = 323.15;
+    SystemInterface dleBase = new SystemSrkEos(dleTemperature, 250.0);
+    dleBase.addComponent("methane", 0.45);
+    dleBase.addComponent("CO2", 0.05);
+    dleBase.addComponent("nC10", 0.50);
+    dleBase.setMixingRule("classic");
+    dleBase.init(0);
+    dleBase.init(1);
+    componentRows("component_", dleBase);
+    SystemInterface dleObserved = SerializationUtils.clone(dleBase);
+    RegressionParameter.BIP_CO2_HC.applyToFluid(dleObserved, 0.15);
+    dleObserved.init(0);
+    dleObserved.init(1);
+    DifferentialLiberation dle = new DifferentialLiberation(dleObserved);
+    dle.setTemperature(dleTemperature);
+    dle.setPressures(dlePressures);
+    dle.runCalc();
+    double[] rs = dle.getRs();
+    double[] bo = dle.getBo();
+    double[] oilDensity = dle.getOilDensity();
+    for (int i = 0; i < dlePressures.length; i++) {
+      line("observation_rs_" + i, rs[i]);
+      line("observation_bo_" + i, bo[i]);
+      line("observation_oil_density_" + i, oilDensity[i]);
+    }
+    DifferentialLiberation dleBaseState = new DifferentialLiberation(dleBase.clone());
+    dleBaseState.setTemperature(dleTemperature);
+    dleBaseState.setPressures(dlePressures);
+    dleBaseState.runCalc();
+    double[] baseRs = dleBaseState.getRs();
+    double[] baseBo = dleBaseState.getBo();
+    for (int i = 0; i < dlePressures.length; i++) {
+      line("base_rs_" + i, baseRs[i]);
+      line("base_bo_" + i, baseBo[i]);
+    }
+    PVTRegression dleRegression = new PVTRegression(dleBase);
+    dleRegression.addDLEData(dlePressures, rs, bo, oilDensity, dleTemperature);
+    dleRegression.addRegressionParameter(RegressionParameter.BIP_CO2_HC, 0.08, 0.18, 0.12);
+    dleRegression.setMaxIterations(6);
+    dleRegression.setVerbose(false);
+    regressionResult("dle_", dleRegression.runRegression());
+    optimizerResult(dleRegression, "addDLESamples", 6);
+  }
+
+  private static SystemInterface tuningFluid(double temperature) {
+    SystemInterface fluid = new SystemSrkEos(temperature, 100.0);
+    fluid.addComponent("methane", 0.80);
+    fluid.addComponent("nC10", 0.10);
+    fluid.addPlusFraction("C11", 0.10, 0.2562, 0.8398);
+    fluid.setMixingRule("classic");
+    fluid.init(0);
+    fluid.init(1);
+    return fluid;
+  }
+
+  private static void tuningBlock(String block, double temperature, double offset) {
+    System.out.println("[" + block + "]");
+    SystemInterface base = tuningFluid(temperature);
+    componentRows("component_", base);
+    SystemInterface characterised = SerializationUtils.clone(base);
+    characterised.getCharacterization().characterisePlusFraction();
+    characterised.createDatabase(true);
+    characterised.setMixingRule("classic");
+    characterised.init(0);
+    characterised.init(1);
+    SaturationPressure baseScan = new SaturationPressure(characterised);
+    baseScan.setTemperature(temperature);
+    double baseSaturation = baseScan.calcSaturationPressure();
+    line("base_saturation_pressure_pa", baseSaturation * 1.0e5);
+    double targetBar = baseSaturation + offset;
+    line("target_saturation_pressure_pa", targetBar * 1.0e5);
+
+    SaturationPressure simulation = new SaturationPressure(base);
+    TuneToSaturation tuner = new TuneToSaturation(simulation);
+    tuner.setSaturationConditions(temperature, targetBar);
+    java.io.ByteArrayOutputStream captured = new java.io.ByteArrayOutputStream();
+    java.io.PrintStream previous = System.out;
+    try {
+      System.setOut(new java.io.PrintStream(captured, true));
+      tuner.run();
+    } finally {
+      System.setOut(previous);
+    }
+    int iterations = 0;
+    double tunedMolarMass = 0.2562;
+    for (String row : captured.toString().split("\\R")) {
+      int at = row.indexOf("molarmass");
+      if (at >= 0) {
+        iterations++;
+        try {
+          tunedMolarMass = Double.parseDouble(row.substring(at + "molarmass".length()).trim());
+        } catch (NumberFormatException ignored) {
+          // A line whose number did not parse leaves the previous value.
+        }
+      }
+    }
+    line("initial_molar_mass", 0.2562);
+    line("tuned_molar_mass", tunedMolarMass);
+    line("iterations", iterations);
+    line("final_saturation_pressure_pa", simulation.getSaturationPressure() * 1.0e5);
+  }
+
+  private static void tuning() {
+    System.out.println("pvt_tune_to_saturation");
+    // The first run's error is under the class's 0.01-bar early return: no update, no loop.
+    tuningBlock("early_return", 350.0, 0.003);
+    // A 0.02-bar target: the sign-flipping loop runs and exits on its lagged criterion.
+    tuningBlock("loop", 350.0, 0.02);
+  }
+
+  public static void main(String[] args) throws Exception {
     String which = args.length > 0 ? args[0] : "black_oil";
     switch (which) {
       case "black_oil":
@@ -933,6 +1251,12 @@ public final class PvtProbe {
         break;
       case "property_sweep":
         propertySweep();
+        break;
+      case "regression":
+        regression();
+        break;
+      case "tuning":
+        tuning();
         break;
       default:
         System.err.println("unknown subcommand: " + which);

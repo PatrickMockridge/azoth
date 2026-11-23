@@ -24,6 +24,7 @@ from azoth.core.result_base import TURBULENT_MIN as TURBULENT_MIN
 from azoth.core.result_base import AlarpVerdict as AlarpVerdict
 from azoth.core.result_base import BeggsBrillRegime as BeggsBrillRegime
 from azoth.core.result_base import BlowbyVerdict as BlowbyVerdict
+from azoth.core.result_base import ConvergenceReason as ConvergenceReason
 from azoth.core.result_base import CooldownVerdict as CooldownVerdict
 from azoth.core.result_base import CorrosionSeverity as CorrosionSeverity
 from azoth.core.result_base import DeadheadVerdict as DeadheadVerdict

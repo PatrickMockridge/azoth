@@ -2362,6 +2362,50 @@ impl From<&azoth_process::models::finite_rate_release::FiniteRateReleaseStation>
     }
 }
 
+/// One row per fitting parameter, in the caller's order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FittedParameterRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFittedParameterRow {
+    /// Which constant.
+    #[pyo3(get)]
+    pub parameter: String,
+    /// The fitted value.
+    #[pyo3(get)]
+    pub value: f64,
+    /// The lower bound the fit used.
+    #[pyo3(get)]
+    pub lower: f64,
+    /// The upper bound the fit used.
+    #[pyo3(get)]
+    pub upper: f64,
+}
+
+#[pymethods]
+impl PyFittedParameterRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "FittedParameterRow(parameter={}, value={}, lower={}, upper={})",
+            self.parameter, self.value, self.lower, self.upper
+        )
+    }
+}
+
+impl From<&azoth_pvt::regression::FittedParameterRow> for PyFittedParameterRow {
+    fn from(row: &azoth_pvt::regression::FittedParameterRow) -> Self {
+        Self {
+            parameter: row.parameter.clone(),
+            value: row.value,
+            lower: row.lower,
+            upper: row.upper,
+        }
+    }
+}
+
 /// The `N + 1` points, inlet first; a point's index is absent where its ions are.
 #[pyclass(
     frozen,
@@ -6005,6 +6049,42 @@ impl From<&azoth_process::models::barrier_register_validation::RegisterFinding>
             scope: row.scope.as_str().to_string(),
             subject_id: row.subject_id.clone(),
             rule: row.rule.as_str().to_string(),
+        }
+    }
+}
+
+/// One row per experiment that had observations, in the class's declaration order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "RegressionObjectiveRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyRegressionObjectiveRow {
+    /// Which experiment.
+    #[pyo3(get)]
+    pub experiment: String,
+    /// The unweighted objective, divided by the experiment's point count.
+    #[pyo3(get)]
+    pub value: f64,
+}
+
+#[pymethods]
+impl PyRegressionObjectiveRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "RegressionObjectiveRow(experiment={}, value={})",
+            self.experiment, self.value
+        )
+    }
+}
+
+impl From<&azoth_pvt::regression::RegressionObjectiveRow> for PyRegressionObjectiveRow {
+    fn from(row: &azoth_pvt::regression::RegressionObjectiveRow) -> Self {
+        Self {
+            experiment: row.experiment.clone(),
+            value: row.value,
         }
     }
 }

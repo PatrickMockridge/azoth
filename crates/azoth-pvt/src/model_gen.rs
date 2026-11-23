@@ -11,9 +11,11 @@
 //!   - specs/models/pvt/mmp.toml
 //!   - specs/models/pvt/oil_material_balance.toml
 //!   - specs/models/pvt/property_sweep.toml
+//!   - specs/models/pvt/regression.toml
 //!   - specs/models/pvt/saturation_test.toml
 //!   - specs/models/pvt/separator_test.toml
 //!   - specs/models/pvt/swelling_test.toml
+//!   - specs/models/pvt/tune_to_saturation.toml
 //!   - specs/models/pvt/water_correlations.toml
 //!
 //! Regenerate with `python tools/gen_models.py`; CI runs `--check` and fails
@@ -24,7 +26,10 @@
 //! approximation of `1/pi`, and clippy cannot tell the two apart.
 #![allow(clippy::approx_constant)]
 
-use azoth_core::{FieldValue, ModelAlgorithm, ModelSpec, RecordField, SpecCheck, TestCase};
+use azoth_core::{
+    Band, FieldValue, ModelAlgorithm, ModelSpec, RangeCheck, RecordField, Severity, SpecCheck,
+    TestCase, WarningCode,
+};
 
 static BLACK_OIL_CORRELATIONS_CHECKS: &[SpecCheck] = &[];
 
@@ -7131,6 +7136,566 @@ pub static PROPERTY_SWEEP_SPEC: ModelSpec = ModelSpec {
     cases: PROPERTY_SWEEP_CASES,
 };
 
+static REGRESSION_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "cce_weight",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a weight divides a standard deviation, and zero makes it infinite",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "cvd_weight",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a weight divides a standard deviation, and zero makes it infinite",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "dle_weight",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a weight divides a standard deviation, and zero makes it infinite",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "viscosity_weight",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a weight divides a standard deviation, and zero makes it infinite",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "max_iterations",
+            min: Some(1.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the optimizer needs at least one step budget; the class's floor is five either way",
+        },
+    },
+];
+
+static REGRESSION_CASES: &[TestCase] = &[
+    TestCase {
+        id: "capture_cce_tc_multiplier",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 0.0001,
+        numbers: &[("max_iterations", 6.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("degrees_of_freedom", 2.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "components",
+                &[
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("methane"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.6),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("nC10"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.3),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("C15_PC"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(true),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.1),
+                        },
+                        RecordField {
+                            name: "molar_mass",
+                            value: FieldValue::Number(0.15),
+                        },
+                        RecordField {
+                            name: "density",
+                            value: FieldValue::Number(820.0),
+                        },
+                        RecordField {
+                            name: "normal_boiling_point",
+                            value: FieldValue::Number(459.785),
+                        },
+                        RecordField {
+                            name: "critical_temperature",
+                            value: FieldValue::Number(617.630088327571),
+                        },
+                        RecordField {
+                            name: "critical_pressure",
+                            value: FieldValue::Number(2317913.3235636964),
+                        },
+                        RecordField {
+                            name: "acentric_factor",
+                            value: FieldValue::Number(0.6207158082397568),
+                        },
+                        RecordField {
+                            name: "critical_volume",
+                            value: FieldValue::Number(0.0005031685170968987),
+                        },
+                        RecordField {
+                            name: "racket_z",
+                            value: FieldValue::Number(0.26187509006247484),
+                        },
+                        RecordField {
+                            name: "racket_z_cpa",
+                            value: FieldValue::Number(0.26187509006247484),
+                        },
+                        RecordField {
+                            name: "parachor",
+                            value: FieldValue::Number(410.3),
+                        },
+                        RecordField {
+                            name: "critical_viscosity",
+                            value: FieldValue::Number(2.7118350358337838e-05),
+                        },
+                        RecordField {
+                            name: "triple_point_temperature",
+                            value: FieldValue::Number(243.9455),
+                        },
+                        RecordField {
+                            name: "heat_of_fusion",
+                            value: FieldValue::Number(21846.780317779318),
+                        },
+                        RecordField {
+                            name: "ideal_gas_enthalpy_of_formation",
+                            value: FieldValue::Number(-266956.0),
+                        },
+                        RecordField {
+                            name: "cp_a",
+                            value: FieldValue::Number(-2.8331262101030834),
+                        },
+                        RecordField {
+                            name: "cp_b",
+                            value: FieldValue::Number(0.8287561079860862),
+                        },
+                        RecordField {
+                            name: "cp_c",
+                            value: FieldValue::Number(-0.00033668595820249037),
+                        },
+                        RecordField {
+                            name: "cp_d",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "attractive_m",
+                            value: FieldValue::Number(1.389195974),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "parameters",
+                &[&[
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("tc_multiplier_c7plus"),
+                    },
+                    RecordField {
+                        name: "initial",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "lower",
+                        value: FieldValue::Number(0.95),
+                    },
+                    RecordField {
+                        name: "upper",
+                        value: FieldValue::Number(1.05),
+                    },
+                ]],
+            ),
+            (
+                "cce",
+                &[
+                    &[
+                        RecordField {
+                            name: "experiment",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(373.15),
+                        },
+                        RecordField {
+                            name: "pressure",
+                            value: FieldValue::Number(25000000.0),
+                        },
+                        RecordField {
+                            name: "relative_volume",
+                            value: FieldValue::Number(0.9980317970636378),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "experiment",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(373.15),
+                        },
+                        RecordField {
+                            name: "pressure",
+                            value: FieldValue::Number(20000000.0),
+                        },
+                        RecordField {
+                            name: "relative_volume",
+                            value: FieldValue::Number(1.1028215960619943),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "experiment",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(373.15),
+                        },
+                        RecordField {
+                            name: "pressure",
+                            value: FieldValue::Number(15000000.0),
+                        },
+                        RecordField {
+                            name: "relative_volume",
+                            value: FieldValue::Number(1.3009108004036105),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[(
+            "fitted_parameters",
+            &[&[
+                RecordField {
+                    name: "parameter",
+                    value: FieldValue::Name("tc_multiplier_c7plus"),
+                },
+                RecordField {
+                    name: "value",
+                    value: FieldValue::Number(1.029994778729241),
+                },
+                RecordField {
+                    name: "lower",
+                    value: FieldValue::Number(0.95),
+                },
+                RecordField {
+                    name: "upper",
+                    value: FieldValue::Number(1.05),
+                },
+            ]],
+        )],
+    },
+    TestCase {
+        id: "capture_dle_co2_bip",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-05,
+        numbers: &[("max_iterations", 6.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("degrees_of_freedom", 8.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "components",
+                &[
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("methane"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.45),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("CO2"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.05),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("nC10"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.5),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "parameters",
+                &[&[
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("bip_co2_hc"),
+                    },
+                    RecordField {
+                        name: "initial",
+                        value: FieldValue::Number(0.12),
+                    },
+                    RecordField {
+                        name: "lower",
+                        value: FieldValue::Number(0.08),
+                    },
+                    RecordField {
+                        name: "upper",
+                        value: FieldValue::Number(0.18),
+                    },
+                ]],
+            ),
+            (
+                "dle",
+                &[
+                    &[
+                        RecordField {
+                            name: "experiment",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(323.15),
+                        },
+                        RecordField {
+                            name: "pressure",
+                            value: FieldValue::Number(25000000.0),
+                        },
+                        RecordField {
+                            name: "rs",
+                            value: FieldValue::Number(124.11323743589683),
+                        },
+                        RecordField {
+                            name: "bo",
+                            value: FieldValue::Number(1.297774285932201),
+                        },
+                        RecordField {
+                            name: "oil_density",
+                            value: FieldValue::Number(657.1251440903429),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "experiment",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(323.15),
+                        },
+                        RecordField {
+                            name: "pressure",
+                            value: FieldValue::Number(15000000.0),
+                        },
+                        RecordField {
+                            name: "rs",
+                            value: FieldValue::Number(117.87406453877271),
+                        },
+                        RecordField {
+                            name: "bo",
+                            value: FieldValue::Number(1.3196221126198664),
+                        },
+                        RecordField {
+                            name: "oil_density",
+                            value: FieldValue::Number(642.5894780343832),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "experiment",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(323.15),
+                        },
+                        RecordField {
+                            name: "pressure",
+                            value: FieldValue::Number(8000000.0),
+                        },
+                        RecordField {
+                            name: "rs",
+                            value: FieldValue::Number(54.85724347826862),
+                        },
+                        RecordField {
+                            name: "bo",
+                            value: FieldValue::Number(1.1668447141587335),
+                        },
+                        RecordField {
+                            name: "oil_density",
+                            value: FieldValue::Number(684.8946122783024),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[(
+            "fitted_parameters",
+            &[&[
+                RecordField {
+                    name: "parameter",
+                    value: FieldValue::Name("bip_co2_hc"),
+                },
+                RecordField {
+                    name: "value",
+                    value: FieldValue::Number(0.14999999104346481),
+                },
+                RecordField {
+                    name: "lower",
+                    value: FieldValue::Number(0.08),
+                },
+                RecordField {
+                    name: "upper",
+                    value: FieldValue::Number(0.18),
+                },
+            ]],
+        )],
+    },
+];
+
+static REGRESSION_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "levenberg_marquardt",
+    convergence: "absolute",
+    tolerance: 1e-06,
+    max_iterations: 100,
+    bracket: None,
+    initialisation: Some("caller_stated_parameter_guesses"),
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `pvt.regression`.
+pub static REGRESSION_SPEC: ModelSpec = ModelSpec {
+    id: "pvt.regression",
+    kind: "procedure",
+    algorithm: Some(&REGRESSION_ALGORITHM),
+    checks: REGRESSION_CHECKS,
+    cases: REGRESSION_CASES,
+};
+
 static SATURATION_TEST_CHECKS: &[SpecCheck] = &[];
 
 static SATURATION_TEST_CASES: &[TestCase] = &[
@@ -8900,6 +9465,379 @@ pub static SWELLING_TEST_SPEC: ModelSpec = ModelSpec {
     cases: SWELLING_TEST_CASES,
 };
 
+static TUNE_TO_SATURATION_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "number_of_lumps",
+            min: Some(1.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a characterisation needs at least one lump",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "max_iterations",
+            min: Some(1.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the loop needs at least one step budget",
+        },
+    },
+];
+
+static TUNE_TO_SATURATION_CASES: &[TestCase] = &[
+    TestCase {
+        id: "capture_early_return",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[
+            ("saturation_temperature", 350.0),
+            ("saturation_pressure", 46440426.99127197),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("plus_component", "C11_PC")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("tuned_molar_mass", 0.2562),
+            ("final_saturation_pressure", 46440126.99127197),
+            ("iterations", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "components",
+            &[
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("methane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.8),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("nC10"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("C11_PC"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "molar_mass",
+                        value: FieldValue::Number(0.2562),
+                    },
+                    RecordField {
+                        name: "density",
+                        value: FieldValue::Number(839.8),
+                    },
+                    RecordField {
+                        name: "normal_boiling_point",
+                        value: FieldValue::Number(590.5954566560001),
+                    },
+                    RecordField {
+                        name: "critical_temperature",
+                        value: FieldValue::Number(718.2840684775796),
+                    },
+                    RecordField {
+                        name: "critical_pressure",
+                        value: FieldValue::Number(1538175.2886642318),
+                    },
+                    RecordField {
+                        name: "acentric_factor",
+                        value: FieldValue::Number(0.8888791640238103),
+                    },
+                    RecordField {
+                        name: "critical_volume",
+                        value: FieldValue::Number(0.0006495508812617179),
+                    },
+                    RecordField {
+                        name: "racket_z",
+                        value: FieldValue::Number(0.26043758346060014),
+                    },
+                    RecordField {
+                        name: "racket_z_cpa",
+                        value: FieldValue::Number(0.26043758346060014),
+                    },
+                    RecordField {
+                        name: "parachor",
+                        value: FieldValue::Number(658.808),
+                    },
+                    RecordField {
+                        name: "critical_viscosity",
+                        value: FieldValue::Number(2.62936974322256e-05),
+                    },
+                    RecordField {
+                        name: "triple_point_temperature",
+                        value: FieldValue::Number(302.4693910023419),
+                    },
+                    RecordField {
+                        name: "heat_of_fusion",
+                        value: FieldValue::Number(46266.210417662005),
+                    },
+                    RecordField {
+                        name: "ideal_gas_enthalpy_of_formation",
+                        value: FieldValue::Number(-422284.12),
+                    },
+                    RecordField {
+                        name: "cp_a",
+                        value: FieldValue::Number(12.061362782895609),
+                    },
+                    RecordField {
+                        name: "cp_b",
+                        value: FieldValue::Number(1.4613967296168557),
+                    },
+                    RecordField {
+                        name: "cp_c",
+                        value: FieldValue::Number(-0.0005795425404581572),
+                    },
+                    RecordField {
+                        name: "cp_d",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "attractive_m",
+                        value: FieldValue::Number(1.7400371185639998),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "capture_loop",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 0.0001,
+        numbers: &[
+            ("saturation_temperature", 350.0),
+            ("saturation_pressure", 46443392.517089844),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("plus_component", "C11_PC")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("tuned_molar_mass", 0.2562238822937013)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "components",
+            &[
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("methane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.8),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("nC10"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("C11_PC"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "molar_mass",
+                        value: FieldValue::Number(0.2562),
+                    },
+                    RecordField {
+                        name: "density",
+                        value: FieldValue::Number(839.8),
+                    },
+                    RecordField {
+                        name: "normal_boiling_point",
+                        value: FieldValue::Number(590.5954566560001),
+                    },
+                    RecordField {
+                        name: "critical_temperature",
+                        value: FieldValue::Number(718.2840684775796),
+                    },
+                    RecordField {
+                        name: "critical_pressure",
+                        value: FieldValue::Number(1538175.2886642318),
+                    },
+                    RecordField {
+                        name: "acentric_factor",
+                        value: FieldValue::Number(0.8888791640238103),
+                    },
+                    RecordField {
+                        name: "critical_volume",
+                        value: FieldValue::Number(0.0006495508812617179),
+                    },
+                    RecordField {
+                        name: "racket_z",
+                        value: FieldValue::Number(0.26043758346060014),
+                    },
+                    RecordField {
+                        name: "racket_z_cpa",
+                        value: FieldValue::Number(0.26043758346060014),
+                    },
+                    RecordField {
+                        name: "parachor",
+                        value: FieldValue::Number(658.808),
+                    },
+                    RecordField {
+                        name: "critical_viscosity",
+                        value: FieldValue::Number(2.62936974322256e-05),
+                    },
+                    RecordField {
+                        name: "triple_point_temperature",
+                        value: FieldValue::Number(302.4693910023419),
+                    },
+                    RecordField {
+                        name: "heat_of_fusion",
+                        value: FieldValue::Number(46266.210417662005),
+                    },
+                    RecordField {
+                        name: "ideal_gas_enthalpy_of_formation",
+                        value: FieldValue::Number(-422284.12),
+                    },
+                    RecordField {
+                        name: "cp_a",
+                        value: FieldValue::Number(12.061362782895609),
+                    },
+                    RecordField {
+                        name: "cp_b",
+                        value: FieldValue::Number(1.4613967296168557),
+                    },
+                    RecordField {
+                        name: "cp_c",
+                        value: FieldValue::Number(-0.0005795425404581572),
+                    },
+                    RecordField {
+                        name: "cp_d",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "attractive_m",
+                        value: FieldValue::Number(1.7400371185639998),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+];
+
+static TUNE_TO_SATURATION_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "plus_molar_mass_search",
+    convergence: "absolute",
+    tolerance: 100.0,
+    max_iterations: 50,
+    bracket: None,
+    initialisation: Some("stated_plus_row_and_model"),
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `pvt.tune_to_saturation`.
+pub static TUNE_TO_SATURATION_SPEC: ModelSpec = ModelSpec {
+    id: "pvt.tune_to_saturation",
+    kind: "procedure",
+    algorithm: Some(&TUNE_TO_SATURATION_ALGORITHM),
+    checks: TUNE_TO_SATURATION_CHECKS,
+    cases: TUNE_TO_SATURATION_CASES,
+};
+
 static WATER_CORRELATIONS_CHECKS: &[SpecCheck] = &[];
 
 static WATER_CORRELATIONS_CASES: &[TestCase] = &[TestCase {
@@ -9254,9 +10192,11 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &MMP_SPEC,
     &OIL_MATERIAL_BALANCE_SPEC,
     &PROPERTY_SWEEP_SPEC,
+    &REGRESSION_SPEC,
     &SATURATION_TEST_SPEC,
     &SEPARATOR_TEST_SPEC,
     &SWELLING_TEST_SPEC,
+    &TUNE_TO_SATURATION_SPEC,
     &WATER_CORRELATIONS_SPEC,
 ];
 

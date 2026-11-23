@@ -8,16 +8,17 @@ the mapping, so an agent can tell "validated" from "placeholder" at a glance.
 
 ## What is `azoth`-basis, and what is still a placeholder
 
-A skill whose `calculation_basis` is `azoth` drives the validated library. Thirty
+A skill whose `calculation_basis` is `azoth` drives the validated library. Thirty-one
 are: the four `library/` skills, four under `eos/`, five under `flow-assurance/`,
-two under `hydraulics/`, five under `process/`, nine under `safety/` and one under
-`thermal/`, driving the 98 calculations and 294 models the library implements.
+two under `hydraulics/`, five under `process/`, nine under `safety/`, one under `pvt/`
+and one under `thermal/`, driving the 98 calculations and 296 models the library
+implements.
 
-The remaining 60 are placeholders — 32 `screening`, 18 `advisory` and 10
+The remaining 59 are placeholders — 31 `screening`, 18 `advisory` and 10
 `data-retrieval` — and each `screening` one names **what would back it**,
 which is a tranche where a tranche covers the physics and a named family where none does:
 
-- **What a tranche covers** — 7 skills under P4 (six under `pvt/`,
+- **What a tranche covers** — 6 skills under P4 (five under `pvt/`,
   `azoth-near-well-and-injectivity` under `subsurface/`); and
   `azoth-water-dewpoint-dehydration-screening` under P1, whose correlation P1's tree
   covers and did not port.

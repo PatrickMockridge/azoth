@@ -121,15 +121,21 @@ def _get_ref_viscosity(t0: float, p0: float) -> float:
 
 
 def _csp(
-    ref_visc: float, tc_mix: float, pc_mix: float, m_mix: float, alfa_mix: float, alfa0: float
+    ref_visc: float,
+    tc_mix: float,
+    pc_mix: float,
+    m_mix: float,
+    alfa_mix: float,
+    alfa0: float,
+    correction: tuple[float, float, float, float],
 ) -> float:
-    """The corresponding-states scaling, four correction factors at their default 1.0."""
+    """The corresponding-states scaling; the four factors scale the exponents."""
     return (
         ref_visc
-        * math.pow(tc_mix / _METHANE_TC, -1.0 / 6.0)
-        * math.pow(pc_mix / _METHANE_PC, 2.0 / 3.0)
-        * math.pow(m_mix / (_METHANE_M * 1e3), 0.5)
-        * (alfa_mix / alfa0)
+        * math.pow(tc_mix / _METHANE_TC, -1.0 / 6.0 * correction[0])
+        * math.pow(pc_mix / _METHANE_PC, 2.0 / 3.0 * correction[1])
+        * math.pow(m_mix / (_METHANE_M * 1e3), 0.5 * correction[2])
+        * math.pow(alfa_mix / alfa0, correction[3])
     )
 
 
@@ -151,6 +157,28 @@ def viscosity(mixture: Mixture, T: Q, P: Q, z: list[float]) -> ViscosityResult:
         PropertyUnavailableError: if a component carries no molar mass.
         OutOfRangeError: if ``T`` or ``P`` is not positive.
     """
+    return _viscosity_with_csp(mixture, T, P, z, (1.0, 1.0, 1.0, 1.0))
+
+
+def _viscosity_with_csp(
+    mixture: Mixture,
+    T: Q,
+    P: Q,
+    z: list[float],
+    correction: tuple[float, float, float, float],
+) -> ViscosityResult:
+    """The correlation with the PVT regression's four CSP correction factors.
+
+    The factors scale the temperature, pressure and molar-mass exponents and the alpha
+    exponent, exactly as ``PFCTViscosityMethodHeavyOil`` reads them.
+
+    Raises:
+        The same as :func:`viscosity`, plus a non-finite correction factor.
+    """
+    if not all(math.isfinite(value) for value in correction):
+        raise InvalidInputError(
+            "csp_correction", "the four CSP viscosity correction factors must be finite"
+        )
     from azoth import _models_gen
 
     spec = _models_gen.model(MODEL_ID)
@@ -223,9 +251,11 @@ def viscosity(mixture: Mixture, T: Q, P: Q, z: list[float]) -> ViscosityResult:
         if t0 < 65.0:
             mu = ho_viscosity
         else:
-            lo_viscosity = _csp(_get_ref_viscosity(t0, p0), tc_mix, pc_mix, m_mix, alfa_mix, alfa0)
+            lo_viscosity = _csp(
+                _get_ref_viscosity(t0, p0), tc_mix, pc_mix, m_mix, alfa_mix, alfa0, correction
+            )
             mu = lo_viscosity * (1.0 - (75.0 - t0) / 10.0) + ho_viscosity * (75.0 - t0) / 10.0
     else:
-        mu = _csp(_get_ref_viscosity(t0, p0), tc_mix, pc_mix, m_mix, alfa_mix, alfa0)
+        mu = _csp(_get_ref_viscosity(t0, p0), tc_mix, pc_mix, m_mix, alfa_mix, alfa0, correction)
 
     return ViscosityResult(mu=from_si(mu, "Pa*s"), warnings=tuple(warnings))

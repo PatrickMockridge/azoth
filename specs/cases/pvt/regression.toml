@@ -1,0 +1,51 @@
+model = "pvt.regression"
+
+[[cases]]
+id = "capture_cce_tc_multiplier"
+tolerance = 1.0e-4
+source = "The class's CCE fit on a methane/n-decane/C15 TBP fluid at 373.15 K, observations from a clone at a 1.03 critical-temperature multiplier: the fit recovers it. From `validation/neqsim/captures/pvt_regression.tsv` (`cce_tc_multiplier`). The TBP-fluid CCE is 1.4e-6 from the class, which is why the fitted value carries the 1e-4 case tolerance."
+[cases.inputs]
+components = [
+    { fluid = 0.0, name = "methane", pseudo_component = false, moles = 0.6 },
+    { fluid = 0.0, name = "nC10", pseudo_component = false, moles = 0.3 },
+    { fluid = 0.0, name = "C15_PC", pseudo_component = true, moles = 0.1, molar_mass = 0.15, density = 820.0, normal_boiling_point = 459.785, critical_temperature = 617.630088327571, critical_pressure = 2317913.3235636964, acentric_factor = 0.6207158082397568, critical_volume = 0.0005031685170968987, racket_z = 0.26187509006247484, racket_z_cpa = 0.26187509006247484, parachor = 410.3, critical_viscosity = 2.7118350358337838e-05, triple_point_temperature = 243.9455, heat_of_fusion = 21846.780317779318, ideal_gas_enthalpy_of_formation = -266956.0, cp_a = -2.8331262101030834, cp_b = 0.8287561079860862, cp_c = -0.00033668595820249037, cp_d = 0.0, attractive_m = 1.389195974 },
+]
+parameters = [
+    { parameter = "tc_multiplier_c7plus", initial = 1.0, lower = 0.95, upper = 1.05 },
+]
+cce = [
+    { experiment = 0.0, temperature = 373.15, pressure = 25000000.0, relative_volume = 0.9980317970636378 },
+    { experiment = 0.0, temperature = 373.15, pressure = 20000000.0, relative_volume = 1.1028215960619943 },
+    { experiment = 0.0, temperature = 373.15, pressure = 15000000.0, relative_volume = 1.3009108004036105 },
+]
+max_iterations = 6.0
+[cases.expected]
+fitted_parameters = [
+    { parameter = "tc_multiplier_c7plus", value = 1.029994778729241, lower = 0.95, upper = 1.05 },
+]
+degrees_of_freedom = 2.0
+
+[[cases]]
+id = "capture_dle_co2_bip"
+tolerance = 1.0e-5
+source = "The class's DLE fit on a methane/CO2/n-decane fluid at 323.15 K, observations from a clone at a 0.15 CO2-hydrocarbon BIP: the fit recovers it. From `validation/neqsim/captures/pvt_regression.tsv` (`dle_bip_co2`)."
+[cases.inputs]
+components = [
+    { fluid = 0.0, name = "methane", pseudo_component = false, moles = 0.45 },
+    { fluid = 0.0, name = "CO2", pseudo_component = false, moles = 0.05 },
+    { fluid = 0.0, name = "nC10", pseudo_component = false, moles = 0.5 },
+]
+parameters = [
+    { parameter = "bip_co2_hc", initial = 0.12, lower = 0.08, upper = 0.18 },
+]
+dle = [
+    { experiment = 0.0, temperature = 323.15, pressure = 25000000.0, rs = 124.11323743589683, bo = 1.297774285932201, oil_density = 657.1251440903429 },
+    { experiment = 0.0, temperature = 323.15, pressure = 15000000.0, rs = 117.87406453877271, bo = 1.3196221126198664, oil_density = 642.5894780343832 },
+    { experiment = 0.0, temperature = 323.15, pressure = 8000000.0, rs = 54.85724347826862, bo = 1.1668447141587335, oil_density = 684.8946122783024 },
+]
+max_iterations = 6.0
+[cases.expected]
+fitted_parameters = [
+    { parameter = "bip_co2_hc", value = 0.14999999104346481, lower = 0.08, upper = 0.18 },
+]
+degrees_of_freedom = 8.0

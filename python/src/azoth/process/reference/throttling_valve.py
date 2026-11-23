@@ -17,6 +17,8 @@ entry was wrong about its parameters, not about its arithmetic.
 
 from __future__ import annotations
 
+import math
+
 from azoth.core.errors import InvalidInputError
 from azoth.core.range import apply_checks, checks_for
 from azoth.core.result import ThrottlingValveResult
@@ -85,6 +87,8 @@ def throttling_valve(
     n = input_to_si(spec, "inlet_n", inlet_n)
     t = input_to_si(spec, "inlet_t", inlet_t)
     p = input_to_si(spec, "inlet_p", inlet_p)
+    if not (math.isfinite(n) and n > 0.0):
+        raise InvalidInputError("inlet_n", "a valve needs a positive feed amount")
 
     # Every declared bound's quantity is fed here: a closure that supplies one and not
     # the other produces a `RANGE_CHECK_SKIPPED` warning for a check that could have run,

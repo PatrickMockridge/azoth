@@ -111,6 +111,33 @@ class Fluid:
         )
 
     @classmethod
+    def from_rows_with_kij(
+        cls,
+        rows: Sequence[Any],
+        *,
+        eos: str = "srk",
+        kij: str = "database",
+        kij_overrides: Sequence[tuple[int, int, float]] = (),
+        corrected: bool = True,
+    ) -> Fluid:
+        """A fluid whose named pairs' interaction coefficients are replaced after assembly."""
+        converted = _rows_as_mappings(rows)
+        _check_rows(converted)
+        from azoth.characterization import mixture_from_characterization
+
+        mixture, ideal_gas = mixture_from_characterization(
+            converted, eos=eos, kij=kij, kij_overrides=tuple(kij_overrides)
+        )
+        return cls(
+            mixture=mixture,
+            ideal_gas=ideal_gas,
+            eos=eos,
+            moles=[_scalar(row["moles"]) for row in converted],
+            corrected=corrected,
+            rows=converted,
+        )
+
+    @classmethod
     def from_rows_pair(
         cls,
         oil: Sequence[Any],

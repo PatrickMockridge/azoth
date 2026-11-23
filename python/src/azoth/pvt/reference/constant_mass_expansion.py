@@ -125,13 +125,21 @@ def constant_mass_expansion(
         kij=_kij(mixing_rule),
         corrected=True if volume_correction is None else volume_correction,
     )
-    t = _positive("temperature", _scalar("temperature", temperature))
-    if pressures is None or len(pressures) == 0:
+    t = _scalar("temperature", temperature)
+    if pressures is None:
         raise InvalidInputError("pressures", "a CCE needs at least one pressure")
-    schedule = [
-        _positive(f"pressures[{index}]", float(input_to_si(_spec(), "pressures", value)))
-        for index, value in enumerate(pressures)
-    ]
+    schedule = [float(input_to_si(_spec(), "pressures", value)) for value in pressures]
+    return _constant_mass_expansion_of(fluid, t, schedule)
+
+
+def _constant_mass_expansion_of(
+    fluid: _fluid.Fluid, t: float, schedule: Sequence[float]
+) -> ConstantMassExpansionResult:
+    """The same CCE over a fluid the caller has already built, in SI."""
+    t = _positive("temperature", t)
+    if len(schedule) == 0:
+        raise InvalidInputError("pressures", "a CCE needs at least one pressure")
+    schedule = [_positive(f"pressures[{index}]", value) for index, value in enumerate(schedule)]
 
     saturation_pressure, saturation, warnings = _saturation_state(fluid, t)
     saturation_volume = saturation.volume_uncorrected()

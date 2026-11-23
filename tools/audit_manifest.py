@@ -146,9 +146,19 @@ def carried_as() -> dict[str, str]:
 
     rust = (ROOT / "crates" / "azoth-eos" / "src" / "databank.rs").read_text(encoding="utf-8")
     lines = rust.split("\n")
+    fields = set(re.findall(r"^\s*(\w+)\s*:", rust, re.M))
     for number, line in enumerate(lines):
         for alias in _ALIAS.findall(line):
-            field = _walk_up_to_field(lines, number)
+            # **An alias read through the record's index map is assigned to a local first**:
+            # `let cpa_kij_t_srk = optional_number(&record, index["cpakijt_srk"], ...)`. The
+            # local names the field, and the upward walk would otherwise stop on whatever
+            # field precedes the function.
+            assigned = re.search(r"\blet\s+(\w+)\s*=", line)
+            field = (
+                assigned.group(1)
+                if assigned and assigned.group(1) in fields
+                else _walk_up_to_field(lines, number)
+            )
             if field:
                 out.setdefault(alias, field)
 

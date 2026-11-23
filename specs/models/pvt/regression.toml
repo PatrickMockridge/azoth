@@ -1,0 +1,343 @@
+id = "pvt.regression"
+name = "PVT multi-target regression"
+kind = "procedure"
+assumptions = [
+    "**the fit minimises the weighted chi-square**, and the per-experiment objectives are a second ledger: unweighted squared relative residuals, each divided by its experiment's point count. A user reading both will see two different numbers.\n",
+    "**the weights divide the sample standard deviations**, not the objectives: CCE and CVD `0.01/weight`, DLE `max(|obs|*0.01, 1e-3)/weight`, viscosity `max(|obs|*0.02, 1e-10)/weight`.\n",
+    "**the optimizer is Levenberg-Marquardt with Ridders derivatives**, damping 10 (accepted step /10, rejected *10), a five-iteration floor, and the two 1e-6 stops. The initial guess is evaluated without clamping; steps and derivative probes are clamped onto the bounds.\n",
+    "**the uncertainty is the class's simplified form, not the LM covariance**: `dof = max(1, N - p)`, `residual variance = chi-square`, `standard error = sqrt(variance/dof) * (upper - lower) * 0.1`, and a 95% half-width of `1.96` times it. `N` counts CCE 1, CVD 2, DLE 3 and viscosity 1 per point.\n",
+    "**the second ledger carries the class's own denominators**: the CCE objective runs the whole schedule at the first point's temperature, CVD dropout divides by `max(observed, 0.01)` and gas Z by `max(|Z|, 1e-12)`, and DLE skips a non-positive observation there while the fit still reads it.\n",
+    "**twelve of the seventeen parameters are carried**: the four BIPs, the volume shift, the Tc/Pc/acentric multipliers and the four PFCT factors. The plus-molar-mass and gamma pair need mutable characterisation; the LBC and Pedersen viscosity pair need a model this route does not select.\n",
+    "**the separator experiment is owed**: its fit route flashes at a hardcoded 500 bara and reads phase 1, while the reported objective runs a one-stage `SeparatorTest` - different calculations. `SATURATION_PRESSURE` and `SWELLING` throw.\n",
+    "**a parameter acts on the pseudo rows or on named BIP pairs before assembly**. The volume-shift multiplier scales the Peneloux constant, which is linear in the Rackett compressibility: `z' = A - value*(A - z)` with `A = 0.29441` for SRK or `0.25969` for PR.\n",
+    "**an experiment index groups rows and must stay contiguous**: once a later index appears, an earlier one may not reopen. Every row of one experiment carries the same temperature, and a disagreement is refused rather than averaged.\n",
+]
+references = [
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/regression/PVTRegression.java`, its `PVTRegressionFunction`, `RegressionParameter`, and `calculateUncertainty` are the port source.",
+    "Levenberg, K. (1944). \"A Method for the Solution of Certain Non-Linear Problems in Least Squares.\" Quarterly of Applied Mathematics 2(2), 164-168.",
+    "Marquardt, D. W. (1963). \"An Algorithm for Least-Squares Estimation of Nonlinear Parameters.\" Journal of the Society for Industrial and Applied Mathematics 11(2), 431-441.",
+    "`validation/neqsim/captures/pvt_regression.tsv` - the class's own CSP viscosity fit, a CCE fit on a TBP fluid, and a DLE fit on a CO2-bearing fluid, each with its base state, objectives, uncertainty and optimizer exit.",
+]
+[source]
+standard = "NeqSim pvtsimulation/regression/PVTRegression.java"
+edition = "Its `runRegression`, `PVTRegressionFunction.calcValue`, the five sample scales, and `calculateUncertainty`."
+[algorithm]
+scheme = "levenberg_marquardt"
+convergence = "absolute"
+tolerance = 1.0e-6
+max_iterations = 100
+initialisation = "caller_stated_parameter_guesses"
+[inputs]
+[inputs.components]
+type = "record_list"
+row_type = "FluidComponent"
+description = "The fluid's components, one record each, in the mixture's order. Every row states the same fluid index: one id describes one fluid.\n"
+[inputs.components.fields.fluid]
+unit = "dimensionless"
+description = "Which fluid the row belongs to, 0-based. Fluids are ordered by first appearance, and a whole number from zero is required: a fractional or negative index is not a fluid.\n"
+[inputs.components.fields.name]
+type = "string"
+description = "The component's name. A base component merges by it across the fluids; a pseudo-component's is its own fluid's name and does not survive into the answer.\n"
+[inputs.components.fields.pseudo_component]
+type = "boolean"
+description = "Whether the row is a TBP or plus fraction rather than a base component. A base row's properties are absent and are the databank's at assembly.\n"
+[inputs.components.fields.moles]
+unit = "mol"
+description = "The component's mole amount. Only a positive one is read; a zero or negative amount is a row that is not on the grid.\n"
+[inputs.components.fields.molar_mass]
+unit = "kg/mol"
+optional = true
+description = "The pseudo-component's molar mass, which is what the row's mass is and what its sorting key falls back to. Required on a pseudo row and ignored on a base row.\n"
+[inputs.components.fields.density]
+unit = "kg/m**3"
+optional = true
+description = "The pseudo-component's normal liquid density, which a group's volume is the mass over. Required on a pseudo row and ignored on a base row.\n"
+[inputs.components.fields.normal_boiling_point]
+unit = "K"
+optional = true
+description = "The pseudo-component's normal boiling point, its sorting key where it states a finite positive one. A row without one sorts by its molar mass.\n"
+[inputs.components.fields.critical_temperature]
+unit = "K"
+optional = true
+description = "The pseudo-component's critical temperature, part of the blend's mole-fraction-weighted override.\n"
+[inputs.components.fields.critical_pressure]
+unit = "Pa"
+optional = true
+description = "The pseudo-component's critical pressure, part of the blend's mole-fraction-weighted override.\n"
+[inputs.components.fields.acentric_factor]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's acentric factor, part of the blend's mole-fraction-weighted override.\n"
+[inputs.components.fields.critical_volume]
+unit = "m**3/mol"
+optional = true
+description = "The pseudo-component's critical molar volume, mass-weighted into the group's.\n"
+[inputs.components.fields.racket_z]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's Rackett compressibility, mass-weighted into the group's and read again when the row becomes a component.\n"
+[inputs.components.fields.racket_z_cpa]
+unit = "dimensionless"
+optional = true
+description = "The same compressibility on the CPA basis, mass-weighted into the group's.\n"
+[inputs.components.fields.parachor]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's parachor, in NeqSim's mixed `(mN/m)**(1/4) * cm**3/mol`, mass-weighted into the group's.\n"
+[inputs.components.fields.critical_viscosity]
+unit = "Pa*s"
+optional = true
+description = "The pseudo-component's critical viscosity, mass-weighted into the group's.\n"
+[inputs.components.fields.triple_point_temperature]
+unit = "K"
+optional = true
+description = "The pseudo-component's triple-point temperature, mass-weighted into the group's.\n"
+[inputs.components.fields.heat_of_fusion]
+unit = "J/mol"
+optional = true
+description = "The pseudo-component's heat of fusion, mass-weighted into the group's.\n"
+[inputs.components.fields.ideal_gas_enthalpy_of_formation]
+unit = "J/mol"
+optional = true
+description = "The pseudo-component's ideal-gas enthalpy of formation, mass-weighted into the group's. It has no home on a `Component` and is dropped when a mixture is assembled.\n"
+[inputs.components.fields.cp_a]
+unit = "J/(mol*K)"
+optional = true
+description = "The constant term of the pseudo-component's ideal-gas heat capacity, mass-weighted into the group's.\n"
+[inputs.components.fields.cp_b]
+unit = "J/(mol*K**2)"
+optional = true
+description = "The coefficient of `T` in the pseudo-component's ideal-gas heat capacity.\n"
+[inputs.components.fields.cp_c]
+unit = "J/(mol*K**3)"
+optional = true
+description = "The coefficient of `T**2` in the pseudo-component's ideal-gas heat capacity.\n"
+[inputs.components.fields.cp_d]
+unit = "J/(mol*K**4)"
+optional = true
+description = "The coefficient of `T**3` in the pseudo-component's ideal-gas heat capacity, as `getCpD()` states it: the stored coefficient plus `1e-10`.\n"
+[inputs.components.fields.attractive_m]
+unit = "dimensionless"
+optional = true
+description = "The fitted coefficient of the pseudo-component's Soave alpha function, which NeqSim's `addTBPfraction` installs in place of the acentric factor's correlation.\n"
+[inputs.parameters]
+type = "record_list"
+row_type = "RegressionParameterRow"
+description = "The fitting parameters, in the order the class applies them. At least one is required.\n"
+[inputs.parameters.fields.parameter]
+type = "enum"
+values = ["bip_methane_c7plus", "bip_c2c6_c7plus", "bip_co2_hc", "bip_n2_hc", "volume_shift_c7plus", "tc_multiplier_c7plus", "pc_multiplier_c7plus", "omega_multiplier_c7plus", "viscosity_csp_1", "viscosity_csp_2", "viscosity_csp_3", "viscosity_csp_4"]
+description = "Which constant. The five owed members of the class's seventeen are named in the assumptions rather than listed here.\n"
+[inputs.parameters.fields.initial]
+unit = "dimensionless"
+description = "The initial guess, which the optimizer evaluates without clamping.\n"
+[inputs.parameters.fields.lower]
+unit = "dimensionless"
+description = "The lower bound the optimizer clamps its steps and derivative probes onto.\n"
+[inputs.parameters.fields.upper]
+unit = "dimensionless"
+description = "The upper bound, at least the lower one.\n"
+[inputs.cce]
+type = "record_list"
+row_type = "RegressionCceRow"
+optional = true
+description = "The CCE observations, grouped into experiments by `experiment`. One optional list.\n"
+[inputs.cce.fields.experiment]
+unit = "dimensionless"
+description = "The experiment index, a whole number from zero; rows of one experiment must be contiguous.\n"
+[inputs.cce.fields.temperature]
+unit = "K"
+description = "The experiment's temperature, the same on every row of it.\n"
+[inputs.cce.fields.pressure]
+unit = "Pa"
+description = "The point's pressure.\n"
+[inputs.cce.fields.relative_volume]
+unit = "dimensionless"
+description = "The measured relative volume, above zero.\n"
+[inputs.cvd]
+type = "record_list"
+row_type = "RegressionCvdRow"
+optional = true
+description = "The CVD observations, grouped into experiments by `experiment`.\n"
+[inputs.cvd.fields.experiment]
+unit = "dimensionless"
+description = "The experiment index.\n"
+[inputs.cvd.fields.temperature]
+unit = "K"
+description = "The experiment's temperature, the same on every row of it.\n"
+[inputs.cvd.fields.pressure]
+unit = "Pa"
+description = "The point's pressure.\n"
+[inputs.cvd.fields.liquid_dropout]
+unit = "dimensionless"
+description = "The measured liquid volume over the saturation volume.\n"
+[inputs.cvd.fields.z_factor]
+unit = "dimensionless"
+description = "The measured gas compressibility.\n"
+[inputs.dle]
+type = "record_list"
+row_type = "RegressionDleRow"
+optional = true
+description = "The DLE observations, grouped into experiments by `experiment`.\n"
+[inputs.dle.fields.experiment]
+unit = "dimensionless"
+description = "The experiment index.\n"
+[inputs.dle.fields.temperature]
+unit = "K"
+description = "The experiment's temperature, the same on every row of it.\n"
+[inputs.dle.fields.pressure]
+unit = "Pa"
+description = "The point's pressure.\n"
+[inputs.dle.fields.rs]
+unit = "dimensionless"
+description = "The measured solution gas-oil ratio.\n"
+[inputs.dle.fields.bo]
+unit = "dimensionless"
+description = "The measured formation volume factor.\n"
+[inputs.dle.fields.oil_density]
+unit = "kg/m**3"
+description = "The measured oil density.\n"
+[inputs.viscosity]
+type = "record_list"
+row_type = "RegressionViscosityRow"
+optional = true
+description = "The viscosity observations, one row per state.\n"
+[inputs.viscosity.fields.temperature]
+unit = "K"
+description = "The state's temperature.\n"
+[inputs.viscosity.fields.pressure]
+unit = "Pa"
+description = "The state's pressure.\n"
+[inputs.viscosity.fields.viscosity]
+unit = "Pa*s"
+description = "The measured dynamic viscosity.\n"
+[inputs.viscosity.fields.phase]
+type = "enum"
+values = ["gas", "oil", "aqueous"]
+description = "Which phase the measurement names.\n"
+[inputs.cce_weight]
+unit = "dimensionless"
+optional = true
+description = "The CCE weight dividing its sample standard deviation. **Absent is 1.**\n"
+[inputs.cvd_weight]
+unit = "dimensionless"
+optional = true
+description = "The CVD weight dividing its sample standard deviations. **Absent is 1.**\n"
+[inputs.dle_weight]
+unit = "dimensionless"
+optional = true
+description = "The DLE weight dividing its sample standard deviations. **Absent is 1.**\n"
+[inputs.viscosity_weight]
+unit = "dimensionless"
+optional = true
+description = "The viscosity weight dividing its sample standard deviation. **Absent is 0.5.**\n"
+[inputs.eos]
+type = "enum"
+values = ["srk", "pr"]
+optional = true
+description = "The cubic the rows are assembled for. **Absent is `srk`**, the class's fluid.\n"
+[inputs.mixing_rule]
+type = "enum"
+values = ["classic", "zero"]
+optional = true
+description = "Where the base components' interaction coefficients come from. **Absent is `classic`**, the databank's `setMixingRule(2)`.\n"
+[inputs.volume_correction]
+type = "boolean"
+optional = true
+description = "Whether the Peneloux translation is applied. **Absent is true**, the class's `useVolumeCorrection`.\n"
+[inputs.max_iterations]
+unit = "dimensionless"
+optional = true
+description = "The optimizer's step cap. **Absent is 100**; the class's five-iteration floor applies under it.\n"
+[outputs]
+[outputs.fitted_parameters]
+type = "record_list"
+description = "One row per fitting parameter, in the caller's order.\n"
+[outputs.fitted_parameters.fields.parameter]
+type = "enum"
+values = ["bip_methane_c7plus", "bip_c2c6_c7plus", "bip_co2_hc", "bip_n2_hc", "volume_shift_c7plus", "tc_multiplier_c7plus", "pc_multiplier_c7plus", "omega_multiplier_c7plus", "viscosity_csp_1", "viscosity_csp_2", "viscosity_csp_3", "viscosity_csp_4"]
+description = "Which constant.\n"
+[outputs.fitted_parameters.fields.value]
+unit = "dimensionless"
+description = "The fitted value.\n"
+[outputs.fitted_parameters.fields.lower]
+unit = "dimensionless"
+description = "The lower bound the fit used.\n"
+[outputs.fitted_parameters.fields.upper]
+unit = "dimensionless"
+description = "The upper bound the fit used.\n"
+[outputs.standard_errors]
+type = "vector"
+unit = "dimensionless"
+length = "one per fitting parameter, aligned with `fitted_parameters`"
+description = "The simplified standard error, `sqrt(chi-square/dof) * (upper - lower) * 0.1`.\n"
+[outputs.half_widths_95]
+type = "vector"
+unit = "dimensionless"
+length = "one per fitting parameter, aligned with `fitted_parameters`"
+description = "`1.96` times the standard error.\n"
+[outputs.objectives]
+type = "record_list"
+description = "One row per experiment that had observations, in the class's declaration order.\n"
+[outputs.objectives.fields.experiment]
+type = "enum"
+values = ["cce", "cvd", "dle", "viscosity"]
+description = "Which experiment.\n"
+[outputs.objectives.fields.value]
+unit = "dimensionless"
+description = "The unweighted objective, divided by the experiment's point count.\n"
+[outputs.final_chi_square]
+unit = "dimensionless"
+description = "The weighted chi-square the optimizer minimised.\n"
+[outputs.total_objective]
+unit = "dimensionless"
+description = "The objectives' sum, in declaration order.\n"
+[outputs.degrees_of_freedom]
+unit = "dimensionless"
+description = "The observation count less the parameter count, floored at one.\n"
+[outputs.residual_variance]
+unit = "dimensionless"
+description = "The class's residual variance, which is the final chi-square itself.\n"
+[outputs.average_absolute_deviation_percent]
+unit = "dimensionless"
+description = "`sqrt(chi-square) * 100`.\n"
+[outputs.iterations]
+unit = "dimensionless"
+description = "The steps the optimizer took.\n"
+[outputs.convergence_reason]
+type = "enum"
+values = ["chi_square_tolerance", "gradient_tolerance", "max_iterations_reached", "singular_matrix"]
+description = "Why the optimizer stopped.\n"
+[[valid_range]]
+quantity = "cce_weight"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a weight divides a standard deviation, and zero makes it infinite\n"
+[[valid_range]]
+quantity = "cvd_weight"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a weight divides a standard deviation, and zero makes it infinite\n"
+[[valid_range]]
+quantity = "dle_weight"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a weight divides a standard deviation, and zero makes it infinite\n"
+[[valid_range]]
+quantity = "viscosity_weight"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a weight divides a standard deviation, and zero makes it infinite\n"
+[[valid_range]]
+quantity = "max_iterations"
+min = 1
+min_inclusive = true
+severity = "error"
+rationale = "the optimizer needs at least one step budget; the class's floor is five either way\n"
+[implementations]
+python = "azoth.pvt.regression"
+rust = "azoth_pvt::regression"

@@ -898,6 +898,23 @@ class FiniteRateReleaseStation:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class FittedParameterRow:
+    """One row per fitting parameter, in the caller's order."""
+
+    #: Which constant.
+    parameter: str
+
+    #: The fitted value.
+    value: float
+
+    #: The lower bound the fit used.
+    lower: float
+
+    #: The upper bound the fit used.
+    upper: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class FlowlineScaleSegment:
     """The `N + 1` points, inlet first; a point's index is absent where its ions are."""
 
@@ -2230,6 +2247,17 @@ class RegisterFinding:
 
     #: the rule the row violates.
     rule: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class RegressionObjectiveRow:
+    """One row per experiment that had observations, in the class's declaration order."""
+
+    #: Which experiment.
+    experiment: str
+
+    #: The unweighted objective, divided by the experiment's point count.
+    value: float
 
 
 @dataclass(frozen=True, slots=True, eq=False)

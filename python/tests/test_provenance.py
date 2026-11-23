@@ -191,8 +191,9 @@ def test_the_block_exists_for_every_registered_id() -> None:
     # 383: the gas material balance; 384: the oil material balance; 385: the saturation
     # test; 386: the constant mass expansion; 387: the differential liberation; 388: the
     # constant volume depletion; 389: the separator test; 390: the swelling test; 391: the
-    # minimum miscibility pressure; 392: the property sweep.
-    assert len(registered) == 392
+    # minimum miscibility pressure; 392: the property sweep; 393: the PVT regression;
+    # 394: the plus-molar-mass saturation tuning.
+    assert len(registered) == 394
 
 
 def test_the_rust_table_carries_exactly_the_same_ids() -> None:

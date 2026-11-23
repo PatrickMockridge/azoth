@@ -1,0 +1,37 @@
+model = "pvt.tune_to_saturation"
+
+[[cases]]
+id = "capture_early_return"
+tolerance = 1.0e-6
+source = "The class's early return: a target 0.003 bar above the base saturation takes no step. The target is this port's own base plus 0.003 bar, not the class's: the plus end's lump cards are re-correlated from each lump's molar mass and density rather than mass-averaged over the cuts, which is 0.0127 bar (46 440 127 Pa against 46 441 393 Pa) from the class on this fluid. From `validation/neqsim/captures/pvt_tune_to_saturation.tsv` (`early_return`)."
+[cases.inputs]
+components = [
+    { fluid = 0.0, name = "methane", pseudo_component = false, moles = 0.8 },
+    { fluid = 0.0, name = "nC10", pseudo_component = false, moles = 0.1 },
+    { fluid = 0.0, name = "C11_PC", pseudo_component = true, moles = 0.1, molar_mass = 0.2562, density = 839.8, normal_boiling_point = 590.5954566560001, critical_temperature = 718.2840684775796, critical_pressure = 1538175.2886642318, acentric_factor = 0.8888791640238103, critical_volume = 0.0006495508812617179, racket_z = 0.26043758346060014, racket_z_cpa = 0.26043758346060014, parachor = 658.808, critical_viscosity = 2.62936974322256e-05, triple_point_temperature = 302.4693910023419, heat_of_fusion = 46266.210417662005, ideal_gas_enthalpy_of_formation = -422284.12, cp_a = 12.061362782895609, cp_b = 1.4613967296168557, cp_c = -0.0005795425404581572, cp_d = 0.0, attractive_m = 1.7400371185639998 },
+]
+plus_component = "C11_PC"
+saturation_temperature = 350.0
+saturation_pressure = 46440426.99127197
+[cases.expected]
+tuned_molar_mass = 0.2562
+final_saturation_pressure = 46440126.99127197
+iterations = 0.0
+converged = true
+
+[[cases]]
+id = "capture_loop"
+tolerance = 1.0e-4
+source = "The class's seventeen-step block: a target 0.02 bar above its base saturation. The target is the class's own; this port's base is 0.0127 bar lower, so its first error is 3265 Pa rather than 2000 Pa, and it takes twenty-two steps to a mass 1.8e-5 kg/mol from the class's. From `validation/neqsim/captures/pvt_tune_to_saturation.tsv` (`loop`)."
+[cases.inputs]
+components = [
+    { fluid = 0.0, name = "methane", pseudo_component = false, moles = 0.8 },
+    { fluid = 0.0, name = "nC10", pseudo_component = false, moles = 0.1 },
+    { fluid = 0.0, name = "C11_PC", pseudo_component = true, moles = 0.1, molar_mass = 0.2562, density = 839.8, normal_boiling_point = 590.5954566560001, critical_temperature = 718.2840684775796, critical_pressure = 1538175.2886642318, acentric_factor = 0.8888791640238103, critical_volume = 0.0006495508812617179, racket_z = 0.26043758346060014, racket_z_cpa = 0.26043758346060014, parachor = 658.808, critical_viscosity = 2.62936974322256e-05, triple_point_temperature = 302.4693910023419, heat_of_fusion = 46266.210417662005, ideal_gas_enthalpy_of_formation = -422284.12, cp_a = 12.061362782895609, cp_b = 1.4613967296168557, cp_c = -0.0005795425404581572, cp_d = 0.0, attractive_m = 1.7400371185639998 },
+]
+plus_component = "C11_PC"
+saturation_temperature = 350.0
+saturation_pressure = 46443392.517089844
+[cases.expected]
+tuned_molar_mass = 0.2562238822937013
+converged = true

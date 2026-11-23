@@ -1341,6 +1341,77 @@ pub struct RegisterEvidence {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct RegressionCceRow {
+    #[pyo3(item)]
+    pub experiment: f64,
+    #[pyo3(item)]
+    pub temperature: f64,
+    #[pyo3(item)]
+    pub pressure: f64,
+    #[pyo3(item)]
+    pub relative_volume: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct RegressionCvdRow {
+    #[pyo3(item)]
+    pub experiment: f64,
+    #[pyo3(item)]
+    pub temperature: f64,
+    #[pyo3(item)]
+    pub pressure: f64,
+    #[pyo3(item)]
+    pub liquid_dropout: f64,
+    #[pyo3(item)]
+    pub z_factor: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct RegressionDleRow {
+    #[pyo3(item)]
+    pub experiment: f64,
+    #[pyo3(item)]
+    pub temperature: f64,
+    #[pyo3(item)]
+    pub pressure: f64,
+    #[pyo3(item)]
+    pub rs: f64,
+    #[pyo3(item)]
+    pub bo: f64,
+    #[pyo3(item)]
+    pub oil_density: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct RegressionParameterRow {
+    #[pyo3(item)]
+    pub parameter: String,
+    #[pyo3(item)]
+    pub initial: f64,
+    #[pyo3(item)]
+    pub lower: f64,
+    #[pyo3(item)]
+    pub upper: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct RegressionViscosityRow {
+    #[pyo3(item)]
+    pub temperature: f64,
+    #[pyo3(item)]
+    pub pressure: f64,
+    #[pyo3(item)]
+    pub viscosity: f64,
+    #[pyo3(item)]
+    pub phase: String,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct ReliefContribution {
     #[pyo3(item)]
     pub item_name: String,
