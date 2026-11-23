@@ -30,10 +30,12 @@ A **direct** model: a computation over vectors, with no iteration and therefore 
 | `fouling_fraction` | dimensionless | *Optional.* `foulingFraction`: the effective `Kv` is the adjusted one times `1 - this`. **Absent is `0.0`.** |
 | `valve_characterization` | linear / equal_percentage / quick_opening / modified_parabolic | *Optional.* the opening characteristic `getOpeningFactor` applies: `x`, `R^(x-1)` with `R = 50`, `sqrt(x)`, or `x^2`. **Absent is `linear`**, `ValveMechanicalDesign`'s constructor default. |
 | `xt` | dimensionless | *Optional.* `xT`, the pressure-drop ratio factor of the gas branch. **Absent is `0.137`.** |
-| `allow_choked` | - | *Optional.* `allowChoked`: whether the sizing caps the flow at the choked limit. **Absent is `false`**, the class's initialiser - so the choked state is reported and not capped. |
+| `allow_choked` | - | *Optional.* `allowChoked`: whether the sizing caps the flow at the choked limit. **Absent is the selected standard's initialiser: `false` on `default`, `true` on the other eight**, whose constructors set it. A stated value is applied after the standard is selected. |
 | `is_calc_pressure` | - | *Optional.* `isCalcPressure`: solve the outlet pressure from the trim instead of dropping to `outlet_pressure`. **Absent is `false`**, the class's initialiser. **The stated `outlet_pressure` is then ignored and the solved one published.** |
 | `is_isothermal` | - | *Optional.* `isIsoThermal`: flash at the inlet temperature at the outlet pressure instead of isenthalpically. **Absent is `false`.** |
 | `sizing_standard` | default / iec_60534 / iec_60534_full / prod_choke / sachdeva / gilbert / baxendell / ros / achong | *Optional.* `setValveSizingStandard`: which `ControlValveSizingInterface` the sizing runs. **Absent is `default`**, `ControlValveSizing`; the other eight are refused by name, each naming its class. |
+| `choke_diameter` | m | *Optional.* `setChokeDiameter`: the throat the five multiphase correlations size. **Absent is `0.0254` m**, the class's initialiser. The four single-phase standards ignore it, as the setter does. |
+| `discharge_coefficient` | dimensionless | *Optional.* `setChokeDischargeCoefficient`: the multiphase `Cd`. **Absent is the model's own** - `0.84` for Sachdeva, and the four Gilbert-type correlations embed `1.0` and do not read it. |
 
 
 ## Outputs

@@ -38,6 +38,8 @@ STANDARD_TEMPERATURE_K = 273.15
 STANDARD_PRESSURE_KPA = 101.325
 #: ``xT``'s own initialiser.
 DEFAULT_XT = 0.137
+
+DEFAULT_CHOKE_DIAMETER_M = 0.0254
 #: ``Cg = Cv * 1360``.
 CG_PER_CV = 1360.0
 #: The bisection's ``Kv`` tolerance and cap, the class's own.
@@ -83,6 +85,8 @@ class ValveSizingGeometry:
     characteristic: str = "linear"
     xt: float = DEFAULT_XT
     allow_choked: bool = False
+    choke_diameter_m: float = 0.0254
+    discharge_coefficient: float | None = None
 
 
 @dataclass(frozen=True, slots=True)

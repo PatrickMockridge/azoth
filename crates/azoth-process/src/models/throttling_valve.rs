@@ -10,7 +10,7 @@
 //! taken at face value, exactly as this does. The entry was wrong about its *parameters*,
 //! not about its arithmetic.
 
-use azoth_core::units::{MolarEnergy, Pressure, ThermodynamicTemperature, joules_per_mole};
+use azoth_core::units::{Length, MolarEnergy, Pressure, ThermodynamicTemperature, joules_per_mole};
 use azoth_core::{AzothError, Result, Warning, apply_checks};
 
 use crate::kernels::throttling_valve as kernel;
@@ -56,7 +56,7 @@ pub struct ThrottlingValveResult {
 /// # Errors
 /// [`azoth_core::AzothError::InvalidInput`] if the inlet pressure is not positive and
 /// whatever the databank refuses.
-#[allow(clippy::too_many_arguments)] // one parameter per declared input, and there are fifteen
+#[allow(clippy::too_many_arguments)] // one parameter per declared input, and there are seventeen
 pub fn throttling_valve(
     components: &[String],
     inlet_n: f64,
@@ -73,6 +73,8 @@ pub fn throttling_valve(
     is_calc_pressure: Option<bool>,
     is_isothermal: Option<bool>,
     sizing_standard: Option<&str>,
+    choke_diameter: Option<Length>,
+    discharge_coefficient: Option<f64>,
 ) -> Result<ThrottlingValveResult> {
     let spec = &model_gen::THROTTLING_VALVE_SPEC;
     let mut warnings = Vec::new();
@@ -115,6 +117,10 @@ pub fn throttling_valve(
         characteristic: ValveCharacteristic::named(valve_characterization.unwrap_or("linear"))?,
         xt: xt.unwrap_or(DEFAULT_XT),
         allow_choked: allow_choked.unwrap_or(false),
+        choke_diameter_m: choke_diameter
+            .map(|diameter| diameter.value)
+            .unwrap_or(crate::valve::DEFAULT_CHOKE_DIAMETER_M),
+        discharge_coefficient,
     };
 
     let feed = Stream::from_pt(

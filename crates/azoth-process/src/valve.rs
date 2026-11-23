@@ -36,6 +36,8 @@ pub const STANDARD_TEMPERATURE_K: f64 = 273.15;
 pub const STANDARD_PRESSURE_KPA: f64 = 101.325;
 /// `ControlValveSizing.xT`, the pressure-drop ratio factor.
 pub const DEFAULT_XT: f64 = 0.137;
+
+pub const DEFAULT_CHOKE_DIAMETER_M: f64 = 0.0254;
 /// The ratio `Cg = Cv * 1360`.
 pub const CG_PER_CV: f64 = 1360.0;
 /// The bisection's `Kv` tolerance and cap, the class's own.
@@ -124,6 +126,10 @@ pub struct ValveSizingGeometry {
     pub xt: f64,
     /// `allowChoked`: whether the sizing caps the flow at the choked limit.
     pub allow_choked: bool,
+    /// `setChokeDiameter`: the multiphase correlations' throat, in metres.
+    pub choke_diameter_m: f64,
+    /// `setChokeDischargeCoefficient`: `None` is the selected model's own coefficient.
+    pub discharge_coefficient: Option<f64>,
 }
 
 impl Default for ValveSizingGeometry {
@@ -135,6 +141,8 @@ impl Default for ValveSizingGeometry {
             characteristic: DEFAULT_CHARACTERISTIC,
             xt: DEFAULT_XT,
             allow_choked: false,
+            choke_diameter_m: DEFAULT_CHOKE_DIAMETER_M,
+            discharge_coefficient: None,
         }
     }
 }

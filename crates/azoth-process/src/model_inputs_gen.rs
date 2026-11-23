@@ -5458,6 +5458,20 @@ static ALL: &[ModelInputs] = &[
                 optional: true,
                 dimension: None,
             },
+            ModelInput {
+                name: "choke_diameter",
+                kind: "quantity",
+                values: &[],
+                optional: true,
+                dimension: Some("length"),
+            },
+            ModelInput {
+                name: "discharge_coefficient",
+                kind: "quantity",
+                values: &[],
+                optional: true,
+                dimension: Some("dimensionless"),
+            },
         ],
     },
     ModelInputs {

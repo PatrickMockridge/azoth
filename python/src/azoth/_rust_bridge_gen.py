@@ -10072,7 +10072,7 @@ def three_phase_separator(components: list[str], feed_n: Q, feed_z: list[float],
     )
 
 
-def throttling_valve(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, inlet_t: Q, outlet_pressure: Q, valve_opening: float | None=None, kv: float | None=None, fouling_fraction: float | None=None, valve_characterization: str | None=None, xt: float | None=None, allow_choked: bool | None=None, is_calc_pressure: bool | None=None, is_isothermal: bool | None=None, sizing_standard: str | None=None) -> ThrottlingValveResult:
+def throttling_valve(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, inlet_t: Q, outlet_pressure: Q, valve_opening: float | None=None, kv: float | None=None, fouling_fraction: float | None=None, valve_characterization: str | None=None, xt: float | None=None, allow_choked: bool | None=None, is_calc_pressure: bool | None=None, is_isothermal: bool | None=None, sizing_standard: str | None=None, choke_diameter: Q | None=None, discharge_coefficient: float | None=None) -> ThrottlingValveResult:
     """``process.throttling_valve``, computed in Rust."""
     spec = _models_gen.model("process.throttling_valve")
     result = _core.throttling_valve(
@@ -10091,6 +10091,8 @@ def throttling_valve(components: list[str], inlet_n: Q, inlet_z: list[float], in
         is_calc_pressure,
         is_isothermal,
         sizing_standard,
+        None if choke_diameter is None else input_to_si(spec, "choke_diameter", choke_diameter),
+        None if discharge_coefficient is None else discharge_coefficient,
     )
     return ThrottlingValveResult(
         outlet_n=from_si(result.outlet_n.magnitude_si, result.outlet_n.unit),

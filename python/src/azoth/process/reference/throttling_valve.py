@@ -44,6 +44,8 @@ def throttling_valve(
     is_calc_pressure: bool | None = None,
     is_isothermal: bool | None = None,
     sizing_standard: str | None = None,
+    choke_diameter: Q | None = None,
+    discharge_coefficient: float | None = None,
 ) -> ThrottlingValveResult:
     """Drop a stream to a lower pressure without heat or work.
 
@@ -129,6 +131,14 @@ def throttling_valve(
         characteristic="linear" if valve_characterization is None else valve_characterization,
         xt=valve_sizing.DEFAULT_XT if xt is None else float(xt),
         allow_choked=bool(allow_choked),
+        choke_diameter_m=(
+            valve_sizing.DEFAULT_CHOKE_DIAMETER_M
+            if choke_diameter is None
+            else input_to_si(spec, "choke_diameter", choke_diameter)
+        ),
+        discharge_coefficient=(
+            None if discharge_coefficient is None else float(discharge_coefficient)
+        ),
     )
     report = valve_sizing.sizing_report(
         components, t, p, list(inlet_z), n, stated / 1.0e5, geometry

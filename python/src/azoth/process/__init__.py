@@ -5680,6 +5680,8 @@ def throttling_valve(
     is_calc_pressure: bool | None = None,
     is_isothermal: bool | None = None,
     sizing_standard: str | None = None,
+    choke_diameter: Q | None = None,
+    discharge_coefficient: float | None = None,
 ) -> ThrottlingValveResult:
     """Drop a stream to a lower pressure without heat or work.
 
@@ -5709,6 +5711,8 @@ def throttling_valve(
         is_calc_pressure=is_calc_pressure,
         is_isothermal=is_isothermal,
         sizing_standard=sizing_standard,
+        choke_diameter=choke_diameter,
+        discharge_coefficient=discharge_coefficient,
     )
 
 
