@@ -501,3 +501,207 @@ def objectives(fluid: Fluid, csp: tuple[float, ...], data: RegressionData) -> Ob
                 total += ((calculated - point.viscosity) / point.viscosity) ** 2
         values = replace(values, viscosity=total / len(data.viscosity))
     return values
+
+
+#: The class's constants.
+LM_CHI_SQUARE_TOLERANCE = 1.0e-6
+LM_GRADIENT_TOLERANCE = 1.0e-6
+LM_MINIMUM_ITERATIONS = 5
+LM_MAXIMUM_ITERATIONS = 100
+
+#: Why the optimizer stopped.
+CONVERGENCE_REASONS: tuple[str, ...] = (
+    "chi_square_tolerance",
+    "gradient_tolerance",
+    "max_iterations_reached",
+    "singular_matrix",
+)
+
+_RIDDERS_CON = 1.4
+_RIDDERS_NTAB = 10
+_RIDDERS_SAFE = 2.0
+_RIDDERS_BIG = 1.0e30
+
+
+@dataclass(frozen=True)
+class LmResult:
+    """The optimizer's answer."""
+
+    parameters: tuple[float, ...]
+    iterations: int
+    reason: str
+    chi_square: float
+    gradient_norm: float
+
+
+def _clamp(value: float, bound: tuple[float, float]) -> float:
+    return max(bound[0], min(bound[1], value))
+
+
+def _weighted_chi(
+    values: Sequence[float], observed: Sequence[float], sigma: Sequence[float]
+) -> float:
+    return sum(((o - v) / s) ** 2 for v, o, s in zip(values, observed, sigma, strict=True))
+
+
+def _ridders(
+    evaluate: Any,
+    bounds: Sequence[tuple[float, float]],
+    parameters: Sequence[float],
+    sample: int,
+    index: int,
+) -> float:
+    base = parameters[index]
+    bound = bounds[index]
+    h = abs(base) / 1.0e3
+    if h == 0.0:
+        h = 1.0e-10
+
+    def probe(offset: float) -> float:
+        trial = list(parameters)
+        trial[index] = _clamp(base + offset, bound)
+        return float(evaluate(trial)[sample])
+
+    tableau = [[0.0] * _RIDDERS_NTAB for _ in range(_RIDDERS_NTAB)]
+    tableau[0][0] = (probe(h) - probe(-h)) / (2.0 * h)
+    answer = tableau[0][0]
+    error = _RIDDERS_BIG
+    con2 = _RIDDERS_CON * _RIDDERS_CON
+    for level in range(1, _RIDDERS_NTAB):
+        h /= _RIDDERS_CON
+        tableau[0][level] = (probe(h) - probe(-h)) / (2.0 * h)
+        factor = con2
+        for higher in range(1, level + 1):
+            tableau[higher][level] = (
+                tableau[higher - 1][level] * factor - tableau[higher - 1][level - 1]
+            ) / (factor - 1.0)
+            factor *= con2
+            errt = max(
+                abs(tableau[higher][level] - tableau[higher - 1][level]),
+                abs(tableau[higher][level] - tableau[higher - 1][level - 1]),
+            )
+            if errt <= error:
+                error = errt
+                answer = tableau[higher][level]
+        if abs(tableau[level][level] - tableau[level - 1][level - 1]) >= _RIDDERS_SAFE * error:
+            break
+    return answer
+
+
+def _solve_system(matrix: Sequence[Sequence[float]], rhs: Sequence[float]) -> list[float] | None:
+    n = len(rhs)
+    a = [list(row) for row in matrix]
+    b = list(rhs)
+    for column in range(n):
+        pivot = column
+        for row in range(column + 1, n):
+            if abs(a[row][column]) > abs(a[pivot][column]):
+                pivot = row
+        if a[pivot][column] == 0.0:
+            return None
+        a[column], a[pivot] = a[pivot], a[column]
+        b[column], b[pivot] = b[pivot], b[column]
+        for row in range(column + 1, n):
+            factor = a[row][column] / a[column][column]
+            for entry in range(column, n):
+                a[row][entry] -= factor * a[column][entry]
+            b[row] -= factor * b[column]
+    solution = [0.0] * n
+    for row in range(n - 1, -1, -1):
+        total = b[row]
+        for column in range(row + 1, n):
+            total -= a[row][column] * solution[column]
+        solution[row] = total / a[row][row]
+    return solution
+
+
+def levenberg_marquardt(
+    bounds: Sequence[tuple[float, float]],
+    initial: Sequence[float],
+    max_iterations: int,
+    observed: Sequence[float],
+    sigma: Sequence[float],
+    evaluate: Any,
+) -> LmResult:
+    """The class's Levenberg-Marquardt loop.
+
+    ``evaluate`` returns every sample's model value at a parameter vector. The initial guess
+    is evaluated without clamping; steps and derivative probes are clamped onto ``bounds``.
+    """
+    if len(bounds) != len(initial) or len(observed) != len(sigma):
+        raise InvalidInputError(
+            "regression", "the parameter, observation and sigma vectors disagree in length"
+        )
+    parameters = list(initial)
+    damping = 10.0
+    iterations = 0
+    reason = "max_iterations_reached"
+    while True:
+        values = list(evaluate(parameters))
+        chi = _weighted_chi(values, observed, sigma)
+        count = len(parameters)
+        derivatives = [[0.0] * count for _ in observed]
+        for sample in range(len(observed)):
+            for index in range(count):
+                derivatives[sample][index] = _ridders(evaluate, bounds, parameters, sample, index)
+        alpha = [[0.0] * count for _ in range(count)]
+        beta = [0.0] * count
+        for first in range(count):
+            for second in range(count):
+                total = 0.0
+                for sample in range(len(observed)):
+                    total += (
+                        derivatives[sample][first]
+                        * derivatives[sample][second]
+                        / sigma[sample] ** 2
+                    )
+                alpha[first][second] = total * (1.0 + damping) if first == second else total
+            total = 0.0
+            for sample in range(len(observed)):
+                total += (
+                    (observed[sample] - values[sample])
+                    / sigma[sample] ** 2
+                    * derivatives[sample][first]
+                )
+            beta[first] = total
+        gradient_norm = math.sqrt(sum(value * value for value in beta))
+        if iterations >= LM_MINIMUM_ITERATIONS and abs(chi) <= LM_CHI_SQUARE_TOLERANCE:
+            reason = "chi_square_tolerance"
+            break
+        if iterations >= LM_MINIMUM_ITERATIONS and gradient_norm <= LM_GRADIENT_TOLERANCE:
+            reason = "gradient_tolerance"
+            break
+        if iterations >= max_iterations and iterations >= LM_MINIMUM_ITERATIONS:
+            break
+        iterations += 1
+        step = _solve_system(alpha, beta)
+        if step is None:
+            reason = "singular_matrix"
+            break
+        old_parameters = list(parameters)
+        following = [
+            _clamp(value + increment, bound)
+            for value, increment, bound in zip(old_parameters, step, bounds, strict=True)
+        ]
+        new_chi = _weighted_chi(list(evaluate(following)), observed, sigma)
+        if not (new_chi < chi) or not math.isfinite(new_chi):
+            following = old_parameters
+            damping *= 10.0
+        else:
+            damping /= 10.0
+        parameters = following
+    values = list(evaluate(parameters))
+    chi = _weighted_chi(values, observed, sigma)
+    gradient = [0.0] * len(parameters)
+    for sample in range(len(observed)):
+        for index in range(len(parameters)):
+            derivative = _ridders(evaluate, bounds, parameters, sample, index)
+            gradient[index] += (observed[sample] - values[sample]) / sigma[sample] ** 2 * derivative
+    gradient_norm = math.sqrt(sum(value * value for value in gradient))
+    return LmResult(
+        parameters=tuple(parameters),
+        iterations=iterations,
+        reason=reason,
+        chi_square=chi,
+        gradient_norm=gradient_norm,
+    )

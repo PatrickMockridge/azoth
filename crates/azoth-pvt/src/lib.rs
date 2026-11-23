@@ -56,10 +56,12 @@ pub use mmp::{MmpPoint, MmpResult, mmp};
 pub use oil_material_balance::{OilMaterialBalanceResult, oil_material_balance};
 pub use property_sweep::{PropertyPoint, PropertySweepResult, property_sweep};
 pub use regression::{
-    CceExperiment, CvdExperiment, CvdProperty, DleExperiment, DleProperty, ExperimentType,
-    ExperimentWeights, Objectives, RegressionData, RegressionFluid, RegressionParameter,
-    RegressionParameterConfig, Sample, SampleKind, ViscosityPhase, ViscosityPoint, build_fluid,
-    chi_square, objectives, sample_value,
+    CceExperiment, ConvergenceReason, CvdExperiment, CvdProperty, DleExperiment, DleProperty,
+    ExperimentType, ExperimentWeights, LM_CHI_SQUARE_TOLERANCE, LM_GRADIENT_TOLERANCE,
+    LM_MAXIMUM_ITERATIONS, LM_MINIMUM_ITERATIONS, LmResult, Objectives, RegressionData,
+    RegressionFluid, RegressionParameter, RegressionParameterConfig, Sample, SampleKind,
+    ViscosityPhase, ViscosityPoint, build_fluid, chi_square, levenberg_marquardt, objectives,
+    sample_value,
 };
 pub use saturation_test::{SaturationTestResult, saturation_test};
 pub use separator_test::{

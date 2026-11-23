@@ -899,3 +899,299 @@ pub fn objectives(fluid: &Fluid, csp: [f64; 4], data: &RegressionData) -> Result
     }
     Ok(values)
 }
+
+/// Why the optimizer stopped.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConvergenceReason {
+    /// The weighted chi-square reached `1e-6`.
+    ChiSquareTolerance,
+    /// The weighted gradient norm reached `1e-6`.
+    GradientTolerance,
+    /// The iteration cap was reached first.
+    MaxIterationsReached,
+    /// The normal matrix could not be solved.
+    SingularMatrix,
+}
+
+impl ConvergenceReason {
+    /// The spec's enum spelling.
+    #[must_use]
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::ChiSquareTolerance => "chi_square_tolerance",
+            Self::GradientTolerance => "gradient_tolerance",
+            Self::MaxIterationsReached => "max_iterations_reached",
+            Self::SingularMatrix => "singular_matrix",
+        }
+    }
+
+    /// The constant the spec's enum spelling names.
+    #[must_use]
+    pub fn from_name(name: &str) -> Option<Self> {
+        Some(match name {
+            "chi_square_tolerance" => Self::ChiSquareTolerance,
+            "gradient_tolerance" => Self::GradientTolerance,
+            "max_iterations_reached" => Self::MaxIterationsReached,
+            "singular_matrix" => Self::SingularMatrix,
+            _ => return None,
+        })
+    }
+}
+
+/// The optimizer's answer.
+#[derive(Debug, Clone, PartialEq)]
+pub struct LmResult {
+    /// The parameter vector at the last evaluation.
+    pub parameters: Vec<f64>,
+    /// The number of steps taken.
+    pub iterations: usize,
+    /// Why it stopped.
+    pub reason: ConvergenceReason,
+    /// The final weighted chi-square.
+    pub chi_square: f64,
+    /// The final weighted gradient norm.
+    pub gradient_norm: f64,
+}
+
+/// The class's constants.
+pub const LM_CHI_SQUARE_TOLERANCE: f64 = 1.0e-6;
+/// The class's gradient tolerance.
+pub const LM_GRADIENT_TOLERANCE: f64 = 1.0e-6;
+/// The class's five-iteration floor.
+pub const LM_MINIMUM_ITERATIONS: usize = 5;
+/// The class's default cap.
+pub const LM_MAXIMUM_ITERATIONS: usize = 100;
+
+const RIDDERS_CON: f64 = 1.4;
+const RIDDERS_NTAB: usize = 10;
+const RIDDERS_SAFE: f64 = 2.0;
+const RIDDERS_BIG: f64 = 1.0e30;
+
+fn clamp(value: f64, bound: (f64, f64)) -> f64 {
+    value.max(bound.0).min(bound.1)
+}
+
+/// The weighted chi-square of one model vector.
+fn weighted_chi(values: &[f64], observed: &[f64], sigma: &[f64]) -> f64 {
+    values
+        .iter()
+        .zip(observed)
+        .zip(sigma)
+        .map(|((value, observed), sigma)| ((observed - value) / sigma).powi(2))
+        .sum()
+}
+
+/// Ridders' derivative of one sample's model value in one parameter.
+///
+/// `evaluate` returns every sample's value at a parameter vector. Probes are clamped onto
+/// the declared bounds, as the class's `setFittingParams` clamps them.
+fn ridders<F>(
+    evaluate: &mut F,
+    bounds: &[(f64, f64)],
+    parameters: &[f64],
+    sample: usize,
+    index: usize,
+) -> Result<f64>
+where
+    F: FnMut(&[f64]) -> Result<Vec<f64>>,
+{
+    let base = parameters[index];
+    let bound = bounds[index];
+    let mut h = base.abs() / 1.0e3;
+    if h == 0.0 {
+        h = 1.0e-10;
+    }
+    let probe = |evaluate: &mut F, offset: f64| -> Result<f64> {
+        let mut probe = parameters.to_vec();
+        probe[index] = clamp(base + offset, bound);
+        Ok(evaluate(&probe)?[sample])
+    };
+    let mut tableau = [[0.0f64; RIDDERS_NTAB]; RIDDERS_NTAB];
+    let val1 = probe(evaluate, h)?;
+    let val2 = probe(evaluate, -h)?;
+    tableau[0][0] = (val1 - val2) / (2.0 * h);
+    let mut answer = tableau[0][0];
+    let mut error = RIDDERS_BIG;
+    let con2 = RIDDERS_CON * RIDDERS_CON;
+    for level in 1..RIDDERS_NTAB {
+        h /= RIDDERS_CON;
+        let val1 = probe(evaluate, h)?;
+        let val2 = probe(evaluate, -h)?;
+        tableau[0][level] = (val1 - val2) / (2.0 * h);
+        let mut factor = con2;
+        for higher in 1..=level {
+            tableau[higher][level] = (tableau[higher - 1][level] * factor
+                - tableau[higher - 1][level - 1])
+                / (factor - 1.0);
+            factor *= con2;
+            let errt = (tableau[higher][level] - tableau[higher - 1][level])
+                .abs()
+                .max((tableau[higher][level] - tableau[higher - 1][level - 1]).abs());
+            if errt <= error {
+                error = errt;
+                answer = tableau[higher][level];
+            }
+        }
+        if (tableau[level][level] - tableau[level - 1][level - 1]).abs() >= RIDDERS_SAFE * error {
+            break;
+        }
+    }
+    Ok(answer)
+}
+
+/// Solve `matrix * x = rhs` by Gaussian elimination with partial pivoting.
+fn solve_system(matrix: &[Vec<f64>], rhs: &[f64]) -> Option<Vec<f64>> {
+    let n = rhs.len();
+    let mut a = matrix.to_vec();
+    let mut b = rhs.to_vec();
+    for column in 0..n {
+        let mut pivot = column;
+        for row in (column + 1)..n {
+            if a[row][column].abs() > a[pivot][column].abs() {
+                pivot = row;
+            }
+        }
+        if a[pivot][column] == 0.0 {
+            return None;
+        }
+        a.swap(column, pivot);
+        b.swap(column, pivot);
+        for row in (column + 1)..n {
+            let factor = a[row][column] / a[column][column];
+            for entry in column..n {
+                a[row][entry] -= factor * a[column][entry];
+            }
+            b[row] -= factor * b[column];
+        }
+    }
+    let mut solution = vec![0.0; n];
+    for row in (0..n).rev() {
+        let mut sum = b[row];
+        for column in (row + 1)..n {
+            sum -= a[row][column] * solution[column];
+        }
+        solution[row] = sum / a[row][row];
+    }
+    Some(solution)
+}
+
+/// The class's Levenberg-Marquardt loop.
+///
+/// `evaluate` returns every sample's model value at a parameter vector. The initial guess
+/// is evaluated without clamping; steps and derivative probes are clamped onto `bounds`.
+///
+/// # Errors
+/// Propagates `evaluate`'s refusals.
+pub fn levenberg_marquardt<F>(
+    bounds: &[(f64, f64)],
+    initial: &[f64],
+    max_iterations: usize,
+    observed: &[f64],
+    sigma: &[f64],
+    mut evaluate: F,
+) -> Result<LmResult>
+where
+    F: FnMut(&[f64]) -> Result<Vec<f64>>,
+{
+    if bounds.len() != initial.len() || observed.len() != sigma.len() {
+        return Err(AzothError::invalid_input(
+            "regression",
+            "the parameter, observation and sigma vectors disagree in length",
+        ));
+    }
+    let mut parameters = initial.to_vec();
+    let mut damping = 10.0;
+    let mut iterations = 0;
+    let mut reason = ConvergenceReason::MaxIterationsReached;
+    loop {
+        let values = evaluate(&parameters)?;
+        let chi = weighted_chi(&values, observed, sigma);
+        let count = parameters.len();
+        let mut derivatives = vec![vec![0.0f64; count]; observed.len()];
+        for sample in 0..observed.len() {
+            for index in 0..count {
+                derivatives[sample][index] =
+                    ridders(&mut evaluate, bounds, &parameters, sample, index)?;
+            }
+        }
+        let mut alpha = vec![vec![0.0f64; count]; count];
+        let mut beta = vec![0.0f64; count];
+        for first in 0..count {
+            for second in 0..count {
+                let mut sum = 0.0;
+                for sample in 0..observed.len() {
+                    sum += derivatives[sample][first] * derivatives[sample][second]
+                        / sigma[sample].powi(2);
+                }
+                alpha[first][second] = if first == second {
+                    sum * (1.0 + damping)
+                } else {
+                    sum
+                };
+            }
+            let mut sum = 0.0;
+            for sample in 0..observed.len() {
+                sum += (observed[sample] - values[sample]) / sigma[sample].powi(2)
+                    * derivatives[sample][first];
+            }
+            beta[first] = sum;
+        }
+        let gradient_norm = beta.iter().map(|value| value * value).sum::<f64>().sqrt();
+        if iterations >= LM_MINIMUM_ITERATIONS && chi.abs() <= LM_CHI_SQUARE_TOLERANCE {
+            reason = ConvergenceReason::ChiSquareTolerance;
+            break;
+        }
+        if iterations >= LM_MINIMUM_ITERATIONS && gradient_norm <= LM_GRADIENT_TOLERANCE {
+            reason = ConvergenceReason::GradientTolerance;
+            break;
+        }
+        if iterations >= max_iterations && iterations >= LM_MINIMUM_ITERATIONS {
+            break;
+        }
+        iterations += 1;
+        let Some(step) = solve_system(&alpha, &beta) else {
+            reason = ConvergenceReason::SingularMatrix;
+            break;
+        };
+        let old_parameters = parameters.clone();
+        let mut next: Vec<f64> = parameters
+            .iter()
+            .zip(&step)
+            .zip(bounds)
+            .map(|((value, step), bound)| clamp(value + step, *bound))
+            .collect();
+        let new_chi = weighted_chi(&evaluate(&next)?, observed, sigma);
+        if !(new_chi < chi) || !new_chi.is_finite() {
+            next = old_parameters;
+            damping *= 10.0;
+        } else {
+            damping /= 10.0;
+        }
+        parameters = next;
+        // The class re-initialises at the current parameters; the next iteration's top does
+        // the same, so no state is carried between steps.
+    }
+    let values = evaluate(&parameters)?;
+    let chi = weighted_chi(&values, observed, sigma);
+    let count = parameters.len();
+    let mut gradient = vec![0.0; count];
+    for sample in 0..observed.len() {
+        for index in 0..count {
+            let derivative = ridders(&mut evaluate, bounds, &parameters, sample, index)?;
+            gradient[index] +=
+                (observed[sample] - values[sample]) / sigma[sample].powi(2) * derivative;
+        }
+    }
+    let gradient_norm = gradient
+        .iter()
+        .map(|value| value * value)
+        .sum::<f64>()
+        .sqrt();
+    Ok(LmResult {
+        parameters,
+        iterations,
+        reason,
+        chi_square: chi,
+        gradient_norm,
+    })
+}
