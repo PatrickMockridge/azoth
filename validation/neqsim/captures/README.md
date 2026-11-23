@@ -857,6 +857,8 @@ public surface of forty-odd getters.
   > captures/process_gibbs_algorithms.tsv
 ../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe valve_sizing \
   > captures/process_valve_sizing.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe valve_standards \
+  > captures/process_valve_standards.tsv
 ../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe filter_models \
   > captures/process_filter_models.tsv
 ../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe filter_loading \
@@ -1069,6 +1071,25 @@ the gas branch reads `gamma`, and the two libraries' heat capacities differ by t
 plug-flow reactor's own test measures, which the choked `Kv` scales as `1/sqrt(Fgamma)`; the
 liquid branch reads only the density. The `allow_choked` row is the cap: capping `x` at
 `Fgamma xT` raises the rich gas's `Kv` from `607.954` to `873.111`.
+
+**`ProcessProbe valve_standards` is the eight `setValveSizingStandard` alternatives.** The order
+is the factory's: the standard is selected first, then the choke diameter and discharge
+coefficient (both no-ops on the single-phase classes), and only then a stated `allowChoked`,
+because the factory constructs a new method object and resets the flag. The single-phase rows
+reuse the rich gas and water states above. **`IEC 60534 full` is the simplified sizing on the
+reachable route**: with `D1 = D = 0` it returns before its Reynolds/piping iteration, so its map
+carries `Rev = Infinity`, `laminar = false`, and its `Kv` equals `IEC 60534`'s. **The IEC liquid
+forward answers `FF = -Infinity` and never chokes**: the sizing passes the system `Z` into the
+`Psat` slot and `getPC()` is the unset `0`; its inverse passes the phase pressure as `Psat` and
+the phase pseudo-critical pressure as `Pc`, so it does choke and returns `9425` mol/s against the
+`26100` inlet. **`prod choke` divides the gas `Kv` by `Cd = 0.85`** and leaves the liquid branch
+alone. The two-phase rows are the separator capture's methane/n-butane `0.7/0.3` feed at `20`
+bara and `300` K, whose gas and oil phases the probe prints; Sachdeva's `y_c` and the two
+regimes are captured at `15` and `5` bara, and the four Gilbert-family correlations ignore the
+downstream pressure. **`massFlowRate` is the choke model's own and the `Kv` is derived from it**:
+the class's flow method ignores the sized `Kv`, and its pressure method answers `P1 * y_c`. An
+all-gas inlet gives `GLR = Infinity` and a `NaN` mass flow (`0 * Infinity`), captured as evidence
+rather than a case.
 
 **`ProcessProbe pump_curve` is `PumpChart`, the performance curve, and `Pump.run`'s chart
 branch.** The chart rows are fluid-free: the eight-speed table `PumpChartTest` states, read at the
