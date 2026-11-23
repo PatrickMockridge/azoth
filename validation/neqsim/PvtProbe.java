@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Map;
 import org.apache.commons.lang3.SerializationUtils;
+import neqsim.blackoil.BlackOilPVTTable.Record;
 import neqsim.pvtsimulation.modeltuning.TuneToSaturation;
 import neqsim.pvtsimulation.regression.ExperimentType;
 import neqsim.pvtsimulation.regression.PVTRegression;
@@ -20,8 +21,14 @@ import neqsim.pvtsimulation.regression.RegressionParameterConfig;
 import neqsim.pvtsimulation.regression.RegressionResult;
 import neqsim.pvtsimulation.regression.UncertaintyAnalysis;
 import neqsim.pvtsimulation.reservoirproperties.CompositionEstimation;
+import neqsim.pvtsimulation.reservoirproperties.materialbalance.FetkovichAquifer;
 import neqsim.pvtsimulation.reservoirproperties.materialbalance.GasMaterialBalance;
+import neqsim.pvtsimulation.reservoirproperties.materialbalance.GeneralizedMaterialBalance;
 import neqsim.pvtsimulation.reservoirproperties.materialbalance.OilMaterialBalance;
+import neqsim.pvtsimulation.reservoirproperties.materialbalance.VanEverdingenHurstAquifer;
+import neqsim.pvtsimulation.reservoirproperties.relpermeability.RelPermModelFamily;
+import neqsim.pvtsimulation.reservoirproperties.relpermeability.RelPermTableType;
+import neqsim.pvtsimulation.reservoirproperties.relpermeability.RelativePermeabilityGenerator;
 import neqsim.pvtsimulation.simulation.ConstantMassExpansion;
 import neqsim.pvtsimulation.simulation.ConstantVolumeDepletion;
 import neqsim.pvtsimulation.simulation.GOR;
@@ -1207,6 +1214,507 @@ public final class PvtProbe {
     tuningBlock("loop", 350.0, 0.02);
   }
 
+  /// Prints whether a call was refused, and why, instead of aborting the whole capture.
+  private static void refusal(String label, Runnable call) {
+    try {
+      call.run();
+      System.out.println(label + "=accepted");
+    } catch (RuntimeException error) {
+      System.out.println(label + "=" + error.getMessage().replace('\n', ' '));
+    }
+  }
+
+  /// The Van Everdingen-Hurst aquifer: the kernel's states, the time and constant conversions,
+  /// the Carter-Tracy recurrence and the influence table. The AQUTAB text is a report and is
+  /// printed only as the pressure values it contains.
+  private static void aquifer() {
+    final double INF = Double.POSITIVE_INFINITY;
+    System.out.println("pvt_van_everdingen_hurst");
+
+    // The test's infinite-acting monotonic points and its late-time semilog check.
+    double[] tDs = {0.005, 0.05, 0.5, 5.0, 50.0, 150.0, 500.0, 5000.0};
+    for (int i = 0; i < tDs.length; i++) {
+      line("pd_" + i, VanEverdingenHurstAquifer.dimensionlessPressure(tDs[i], INF));
+      line("dpd_" + i, VanEverdingenHurstAquifer.dimensionlessPressureDerivative(tDs[i], INF));
+    }
+    line("pd_late_semilog", VanEverdingenHurstAquifer.dimensionlessPressure(1.0e5, INF));
+    line("pd_bounded_100_5", VanEverdingenHurstAquifer.dimensionlessPressure(100.0, 5.0));
+    line("dpd_bounded_1e-4_10",
+        VanEverdingenHurstAquifer.dimensionlessPressureDerivative(1.0e-4, 10.0));
+
+    // The independent-reference times; the class's values at them are the oracle.
+    double[] referenceTimes = {1e-12, 1e-8, 1e-6, 3e-5, 1e-4, 0.003, 0.009999, 0.01, 0.010001, 0.3,
+        1.0, 7.5, 100.0, 199.999, 200.0, 200.001, 8000.0, 10000.0, 1e8, 1e12};
+    for (int i = 0; i < referenceTimes.length; i++) {
+      line("ref_td_" + i, referenceTimes[i]);
+      line("ref_pd_" + i, VanEverdingenHurstAquifer.dimensionlessPressure(referenceTimes[i], INF));
+      line("ref_dpd_" + i,
+          VanEverdingenHurstAquifer.dimensionlessPressureDerivative(referenceTimes[i], INF));
+    }
+
+    line("dimensionless_time_test",
+        VanEverdingenHurstAquifer.dimensionlessTime(1.0e-13, 8.64e7, 0.2, 5.0e-4, 1.0e-9, 3000.0));
+    line("dimensionless_time_zero_k",
+        VanEverdingenHurstAquifer.dimensionlessTime(0.0, 8.64e7, 0.2, 5.0e-4, 1.0e-9, 3000.0));
+    line("dimensionless_time_zero_t",
+        VanEverdingenHurstAquifer.dimensionlessTime(1.0e-13, 0.0, 0.2, 5.0e-4, 1.0e-9, 3000.0));
+
+    double uBar = VanEverdingenHurstAquifer.aquiferConstant(0.20, 1.0e-4, 30.0, 3000.0, 180.0);
+    line("aquifer_constant_bar", uBar);
+    line("aquifer_constant_pa", uBar * 1.0e-5);
+    line("aquifer_constant_zero_porosity",
+        VanEverdingenHurstAquifer.aquiferConstant(0.0, 1.0e-4, 30.0, 3000.0, 180.0));
+    line("aquifer_constant_zero_angle",
+        VanEverdingenHurstAquifer.aquiferConstant(0.20, 1.0e-4, 30.0, 3000.0, 0.0));
+
+    double[] ctTimes = {0.0, 10.0, 20.0, 40.0, 80.0, 160.0};
+    double[] ctDropsBar = {0.0, 5.0, 12.0, 22.0, 35.0, 50.0};
+    double[] we = VanEverdingenHurstAquifer.cumulativeInfluxCarterTracy(ctTimes, ctDropsBar, uBar, INF);
+    for (int i = 0; i < ctTimes.length; i++) {
+      line("carter_tracy_td_" + i, ctTimes[i]);
+      line("carter_tracy_drop_pa_" + i, ctDropsBar[i] * 1.0e5);
+      line("carter_tracy_we_" + i, we[i]);
+    }
+    double[] zeroSupport =
+        VanEverdingenHurstAquifer.cumulativeInfluxCarterTracy(ctTimes, ctDropsBar, 0.0, INF);
+    for (int i = 0; i < zeroSupport.length; i++) {
+      line("carter_tracy_zero_we_" + i, zeroSupport[i]);
+    }
+
+    double[] recoveryTimes = {0.0, 0.1, 0.2};
+    double[] recoveryDrops = {0.0, 1.0, -10.0};
+    double[] recovered =
+        VanEverdingenHurstAquifer.cumulativeInfluxCarterTracy(recoveryTimes, recoveryDrops, 1.0, INF);
+    for (int i = 0; i < recovered.length; i++) {
+      line("carter_tracy_recovery_we_" + i, recovered[i]);
+    }
+
+    // The first-step identity t/P_D, and the scale-loss rows the recurrence's products survive.
+    double[] extremeTimes = {Double.MIN_VALUE, 1e-300, 1e-200, 1e-100, 1e-70, 1e-50, 1e-8, 1.0};
+    for (int i = 0; i < extremeTimes.length; i++) {
+      double first = VanEverdingenHurstAquifer.cumulativeInfluxCarterTracy(
+          new double[] {0.0, extremeTimes[i]}, new double[] {0.0, 1.0}, 1.0, INF)[1];
+      line("first_step_we_" + i, first);
+      line("first_step_expected_" + i,
+          extremeTimes[i] / VanEverdingenHurstAquifer.dimensionlessPressure(extremeTimes[i], INF));
+    }
+    double[][] scaleRows = {{1e-300, 1e200, 1e200}, {Double.MAX_VALUE, 1e-200, 1e-200},
+        {1e-200, 1e250, 1e100}, {1e100, 1e-250, 1e-100}};
+    for (int i = 0; i < scaleRows.length; i++) {
+      line("scale_we_" + i, VanEverdingenHurstAquifer.cumulativeInfluxCarterTracy(
+          new double[] {0.0, scaleRows[i][0]}, new double[] {0.0, scaleRows[i][2]}, scaleRows[i][1],
+          INF)[1]);
+    }
+    line("bounded_first_step",
+        VanEverdingenHurstAquifer.cumulativeInfluxCarterTracy(new double[] {0.0, Double.MIN_VALUE},
+            new double[] {0.0, 1e200}, 1e200, 100.0)[1]);
+
+    double[] overflowRecovered = VanEverdingenHurstAquifer.cumulativeInfluxCarterTracy(
+        new double[] {0.0, 1e-300, 1e100}, new double[] {0.0, 1e200, -1e200}, 1e200, INF);
+    line("recovered_we_1", overflowRecovered[1]);
+    line("recovered_we_2", overflowRecovered[2]);
+    refusal("refused_later_overflow",
+        () -> VanEverdingenHurstAquifer.cumulativeInfluxCarterTracy(new double[] {0.0, 1e-200, 1e200},
+            new double[] {0.0, 1e100, 1e100}, 1e100, INF));
+    refusal("refused_unrepresentable",
+        () -> VanEverdingenHurstAquifer.cumulativeInfluxCarterTracy(new double[] {0.0, 1e100},
+            new double[] {0.0, Double.MAX_VALUE}, Double.MAX_VALUE, INF));
+    refusal("refused_empty",
+        () -> VanEverdingenHurstAquifer.cumulativeInfluxCarterTracy(new double[0], new double[0], 1.0,
+            INF));
+    refusal("refused_non_increasing", () -> VanEverdingenHurstAquifer
+        .cumulativeInfluxCarterTracy(new double[] {0.0, 0.0}, new double[] {0.0, 1.0}, 1.0, INF));
+    refusal("refused_negative_time",
+        () -> VanEverdingenHurstAquifer.dimensionlessPressure(-1.0, INF));
+    refusal("refused_nan_radius",
+        () -> VanEverdingenHurstAquifer.dimensionlessPressure(1.0, Double.NaN));
+
+    double[] tableTimes = {1.0, 10.0, 100.0, 1000.0};
+    double[] tablePressure = VanEverdingenHurstAquifer.influenceTable(tableTimes, INF);
+    for (int i = 0; i < tableTimes.length; i++) {
+      line("influence_table_td_" + i, tableTimes[i]);
+      line("influence_table_pd_" + i, tablePressure[i]);
+    }
+  }
+
+  /// Prints one Fetkovich state in the id's SI units.
+  private static void fetkovichState(String label, FetkovichAquifer.State state) {
+    line(label + "_time_s", state.getTimeSeconds());
+    line(label + "_cumulative_influx_m3", state.getCumulativeInfluxM3());
+    line(label + "_pressure_pa", state.getPressureBara() * 1.0e5);
+    line(label + "_interval_influx_m3", state.getIntervalInfluxM3());
+    line(label + "_minimum_influx_m3", state.getIntervalMinimumCumulativeInfluxM3());
+    line(label + "_maximum_influx_m3", state.getIntervalMaximumCumulativeInfluxM3());
+  }
+
+  /// The Fetkovich finite aquifer: every branch the class's own tests pin, plus the refusal rows.
+  private static void fetkovich() {
+    System.out.println("pvt_fetkovich_aquifer");
+
+    FetkovichAquifer constant = new FetkovichAquifer(1.0e6, 1.0e-4, 0.02, 300.0);
+    fetkovichState("constant_pressure",
+        constant.advance(constant.initialState(), 12000.0, 250.0, 250.0));
+    FetkovichAquifer ramp = new FetkovichAquifer(1.0e6, 1.0e-4, 0.02, 300.0);
+    fetkovichState("linear_ramp", ramp.advance(ramp.initialState(), 20000.0, 300.0, 180.0));
+
+    FetkovichAquifer small = new FetkovichAquifer(1.0e12, 1.0e-4, 0.02, 300.0);
+    fetkovichState("tiny_exposure", small.advance(small.initialState(), 1.0e-5, 300.0, 250.0));
+    fetkovichState("tiny_extrema", small.advance(small.initialState(), 1.0e-5, 250.0, 400.0));
+    fetkovichState("large_step", small.advance(small.initialState(), 1.0e20, 300.0, 200.0));
+
+    FetkovichAquifer finite = new FetkovichAquifer(1.0e6, 1.0e-4, 0.02, 300.0);
+    fetkovichState("ramp_up_extrema", finite.advance(finite.initialState(), 10000.0, 250.0, 400.0));
+    fetkovichState("ramp_down_extrema",
+        finite.advance(finite.initialState(), 10000.0, 350.0, 200.0));
+
+    FetkovichAquifer infinite = new FetkovichAquifer(Double.POSITIVE_INFINITY, 1.0e-4, 0.02, 300.0);
+    line("infinite_capacity", infinite.getCapacityM3PerBar());
+    fetkovichState("infinite_up", infinite.advance(infinite.initialState(), 1000.0, 250.0, 400.0));
+    fetkovichState("infinite_down",
+        infinite.advance(infinite.initialState(), 1000.0, 350.0, 200.0));
+    fetkovichState("infinite_drawdown",
+        infinite.advance(infinite.initialState(), 1000.0, 300.0, 100.0));
+
+    FetkovichAquifer noFlow = new FetkovichAquifer(1.0e6, 1.0e-4, 0.0, 300.0);
+    fetkovichState("zero_productivity", noFlow.advance(noFlow.initialState(), 1000.0, 300.0, 100.0));
+    FetkovichAquifer rigid = new FetkovichAquifer(1.0e6, 0.0, 0.02, 300.0);
+    fetkovichState("zero_storage", rigid.advance(rigid.initialState(), 1000.0, 300.0, 100.0));
+
+    FetkovichAquifer charged = new FetkovichAquifer(1.0e6, 1.0e-4, 0.02, 300.0);
+    FetkovichAquifer.State first = charged.advance(charged.initialState(), 100000.0, 350.0, 350.0);
+    fetkovichState("recharge", first);
+    fetkovichState("recharge_return", charged.advance(first, 100000.0, 300.0, 300.0));
+
+    // The 1e-3 small-exposure series switch, bracketed on both sides and both ramp directions.
+    double[] boundaryDurations = {0.00999999, 0.01, 0.01000001};
+    double[][] boundaryRamps = {{300.0, 150.0}, {200.0, 450.0}, {400.0, 150.0}};
+    for (int i = 0; i < boundaryDurations.length; i++) {
+      FetkovichAquifer boundary = new FetkovichAquifer(1000.0, 1.0e-6, 1.0e-5, 300.0);
+      for (int j = 0; j < boundaryRamps.length; j++) {
+        fetkovichState("boundary_" + i + "_" + j, boundary.advance(boundary.initialState(),
+            boundaryDurations[i], boundaryRamps[j][0], boundaryRamps[j][1]));
+      }
+    }
+    double[] laterDurations = {0.01, 1.0, 10.0};
+    for (int i = 0; i < laterDurations.length; i++) {
+      FetkovichAquifer later = new FetkovichAquifer(1000.0, 1.0e-6, 1.0e-5, 300.0);
+      fetkovichState("later_" + i,
+          later.advance(later.initialState(), laterDurations[i], 300.0, 150.0));
+    }
+    FetkovichAquifer strong = new FetkovichAquifer(1.0e6, 1.0e-4, 2.0, 300.0);
+    fetkovichState("strong_ramp", strong.advance(strong.initialState(), 0.004999995, 300.0, 150.0));
+
+    refusal("refused_negative_volume", () -> new FetkovichAquifer(-1.0, 1.0e-4, 0.02, 300.0));
+    refusal("refused_nan_compressibility", () -> new FetkovichAquifer(1.0, Double.NaN, 0.02, 300.0));
+    refusal("refused_negative_productivity", () -> new FetkovichAquifer(1.0, 1.0e-4, -0.02, 300.0));
+    refusal("refused_zero_pressure", () -> new FetkovichAquifer(1.0, 1.0e-4, 0.02, 0.0));
+    refusal("refused_unrepresentable_capacity",
+        () -> new FetkovichAquifer(Double.MAX_VALUE, 2.0, 0.02, 300.0));
+    FetkovichAquifer exhausted = new FetkovichAquifer(1.0, 0.1, 1.0, 300.0);
+    refusal("refused_zero_duration", () -> exhausted.advance(exhausted.initialState(), 0.0, 300.0, 250.0));
+    refusal("refused_nan_pressure",
+        () -> exhausted.advance(exhausted.initialState(), 1.0, 300.0, Double.NaN));
+    refusal("refused_exhausted_endpoint",
+        () -> exhausted.advance(exhausted.initialState(), 100.0, 250.0, 250.0));
+    refusal("refused_exhausted_interior",
+        () -> exhausted.advance(exhausted.initialState(), 10.0, 250.0, 1000.0));
+  }
+
+  /// A PVT record for the generalized balance; the viscosities are unused and carry no invented value.
+  private static Record pvtRecord(double pressure, double rs, double bo, double bg, double rv) {
+    return new Record(pressure, rs, bo, Double.NaN, bg, Double.NaN, rv, 1.02, Double.NaN);
+  }
+
+  /// The class test's synthetic history: independent inventories and a volume closure.
+  private static GeneralizedMaterialBalance history(double oil, double gas, boolean support) {
+    Record initial = pvtRecord(300.0, 100.0, 1.6, 0.004, 0.0002);
+    GeneralizedMaterialBalance balance = new GeneralizedMaterialBalance(initial);
+    Record[] records = {pvtRecord(260.0, 80.0, 1.5, 0.005, 0.00016),
+        pvtRecord(210.0, 60.0, 1.4, 0.008, 0.00012), pvtRecord(160.0, 40.0, 1.3, 0.012, 0.00008),
+        pvtRecord(110.0, 20.0, 1.2, 0.020, 0.00004)};
+    double initialVolume = oil * initial.Bo + gas * initial.Bg;
+    double initialOil = oil + initial.Rv * gas;
+    double initialGas = gas + initial.Rs * oil;
+    for (int i = 0; i < records.length; i++) {
+      Record current = records[i];
+      double fraction = support ? 0.001 * (i + 1) : 0.0;
+      double influx = support ? 0.002 * initialVolume * (i + 1) : 0.0;
+      double netWater = support ? -0.001 * initialVolume * (i + 1) : 0.0;
+      double remainingVolume = initialVolume * (1.0 - fraction) - influx + netWater * current.Bw;
+      double oilVolume = remainingVolume * (oil == 0.0 ? 0.01 * (i + 1) : 0.58 - 0.08 * i);
+      double gasVolume = remainingVolume - oilVolume;
+      double freeOil = oilVolume / current.Bo;
+      double freeGas = gasVolume / current.Bg;
+      double netOil = initialOil - (freeOil + current.Rv * freeGas);
+      double netGas = initialGas - (freeGas + current.Rs * freeOil);
+      balance.addObservation(current, netOil, netGas, netWater, influx, fraction);
+    }
+    return balance;
+  }
+
+  /// Prints one fit of the generalized balance.
+  private static void materialBalanceFit(String label, GeneralizedMaterialBalance balance,
+      String fit, double gasCap) {
+    GeneralizedMaterialBalance.Result result;
+    switch (fit) {
+      case "initially_oil":
+        result = balance.fitInitiallyOil();
+        break;
+      case "initially_gas":
+        result = balance.fitInitiallyGas();
+        break;
+      case "known_gas_cap":
+        result = balance.fitKnownGasCap(gasCap);
+        break;
+      default:
+        result = balance.fitOilAndGas();
+        break;
+    }
+    line(label + "_free_oil_m3", result.getInitialFreeOil());
+    line(label + "_free_gas_m3", result.getInitialFreeGas());
+    line(label + "_ooip_m3", result.getOoip());
+    line(label + "_ogip_m3", result.getOgip());
+    double ratio = result.getGasCapRatio();
+    if (Double.isInfinite(ratio)) {
+      System.out.println(label + "_gas_cap_ratio=infinite");
+    } else {
+      line(label + "_gas_cap_ratio", ratio);
+    }
+    double[] residuals = result.getResiduals();
+    for (int i = 0; i < residuals.length; i++) {
+      line(label + "_residual_" + i + "_m3", residuals[i]);
+    }
+    line(label + "_rms_residual_m3", result.getRmsResidual());
+    line(label + "_condition_number", result.getConditionNumber());
+  }
+
+  /// The generalized material balance: the four fits, the scaling states and the refusal rows.
+  private static void generalizedMb() {
+    System.out.println("pvt_generalized_material_balance");
+
+    materialBalanceFit("oil_and_gas", history(1.0e7, 2.0e9, false), "oil_and_gas", 0.0);
+    materialBalanceFit("oil_and_gas_supported", history(1.0e7, 2.0e9, true), "oil_and_gas", 0.0);
+    materialBalanceFit("initially_gas", history(0.0, 2.0e9, false), "initially_gas", 0.0);
+    materialBalanceFit("initially_oil", history(1.0e7, 0.0, false), "initially_oil", 0.0);
+    materialBalanceFit("known_gas_cap", history(1.0e7, 2.0e9, true), "known_gas_cap", 0.5);
+    for (double scale : new double[] {1.0e-8, 1.0, 1.0e8}) {
+      materialBalanceFit("scaled_" + scale, history(1.0e7 * scale, 2.0e9 * scale, true),
+          "oil_and_gas", 0.0);
+    }
+
+    // The conventional black-oil limit at Rv = 0, computed from the same closure the test uses.
+    Record initial = pvtRecord(300.0, 100.0, 1.5, 0.004, 0.0);
+    GeneralizedMaterialBalance conventional = new GeneralizedMaterialBalance(initial);
+    double expectedOil = 1.0e7;
+    for (int i = 1; i <= 4; i++) {
+      Record current = pvtRecord(300.0 - 40.0 * i, 100.0 - 15.0 * i, 1.5 - 0.04 * i,
+          0.004 + 0.002 * i, 0.0);
+      double expansion = OilMaterialBalance.eo(current.Bo, initial.Bo, initial.Rs, current.Rs,
+          current.Bg);
+      double np = 1.0e5 * i;
+      double gp = (expectedOil * expansion - np * current.Bo) / current.Bg + np * current.Rs;
+      conventional.addObservation(current, np, gp, 0.0, 0.0, 0.0);
+    }
+    materialBalanceFit("conventional_rv_zero", conventional, "initially_oil", 0.0);
+
+    refusal("refused_collinear", () -> {
+      GeneralizedMaterialBalance balance = new GeneralizedMaterialBalance(
+          pvtRecord(300.0, 0.0, 1.0, 0.01, 0.0));
+      balance.addObservation(pvtRecord(200.0, 0.0, 1.1, 0.02, 0.0), 1.0e5, 1.0e6, 0.0, 0.0, 0.0);
+      balance.addObservation(pvtRecord(100.0, 0.0, 1.2, 0.03, 0.0), 2.0e5, 2.0e6, 0.0, 0.0, 0.0);
+      balance.fitOilAndGas();
+    });
+    refusal("refused_negative_production", () -> {
+      GeneralizedMaterialBalance balance = new GeneralizedMaterialBalance(
+          pvtRecord(300.0, 100.0, 1.6, 0.004, 0.0002));
+      Record current = pvtRecord(200.0, 60.0, 1.4, 0.008, 0.00012);
+      balance.addObservation(current, -1.0e6, -1.0e8, 0.0, 0.0, 0.0);
+      balance.addObservation(current, -2.0e6, -2.0e8, 0.0, 0.0, 0.0);
+      balance.fitInitiallyOil();
+    });
+    refusal("refused_exhausted_inventory", () -> {
+      GeneralizedMaterialBalance balance = new GeneralizedMaterialBalance(
+          pvtRecord(300.0, 0.0, 1.0, 0.004, 0.0));
+      balance.addObservation(pvtRecord(200.0, 0.0, 1.0, 0.08, 0.0), 0.0, 5.0e8, 0.0, 0.0, 0.0);
+      balance.addObservation(pvtRecord(150.0, 0.0, 1.0, 0.008, 0.0), 0.0, 3.0e9, 0.0, 0.0, 0.0);
+      balance.fitInitiallyGas();
+    });
+    refusal("refused_near_critical_split",
+        () -> new GeneralizedMaterialBalance(pvtRecord(300.0, 100.0, 1.6, 0.004, 0.01)));
+    refusal("refused_nan_pressure",
+        () -> new GeneralizedMaterialBalance(pvtRecord(Double.NaN, 100.0, 1.6, 0.004, 0.0)));
+    refusal("refused_empty_history", () -> new GeneralizedMaterialBalance(
+        pvtRecord(300.0, 100.0, 1.6, 0.004, 0.0002)).fitInitiallyGas());
+    refusal("refused_negative_gas_cap", () -> history(1.0e7, 2.0e9, true).fitKnownGasCap(-1.0));
+    refusal("refused_zero_withdrawal", () -> {
+      GeneralizedMaterialBalance balance = new GeneralizedMaterialBalance(
+          pvtRecord(300.0, 100.0, 1.6, 0.004, 0.0002));
+      Record same = pvtRecord(300.0, 100.0, 1.6, 0.004, 0.0002);
+      balance.addObservation(same, 0.0, 0.0, 0.0, 0.0, 0.0);
+      balance.addObservation(same, 0.0, 0.0, 0.0, 0.0, 0.0);
+      balance.fitInitiallyGas();
+    });
+  }
+
+  /// The Corey and LET curve primitives, which are package-private and read by reflection.
+  private static double relPermCurve(String family, double saturation, double first, double second,
+      double third) throws ReflectiveOperationException {
+    if (family.equals("corey")) {
+      Method corey = RelativePermeabilityGenerator.class.getDeclaredMethod("coreyCurve",
+          double.class, double.class);
+      corey.setAccessible(true);
+      return (double) corey.invoke(null, saturation, first);
+    }
+    Method let = RelativePermeabilityGenerator.class.getDeclaredMethod("letCurve", double.class,
+        double.class, double.class, double.class);
+    let.setAccessible(true);
+    return (double) let.invoke(null, saturation, first, second, third);
+  }
+
+  /// Prints a generated relative-permeability table row by row.
+  private static void relPermTable(String label, RelativePermeabilityGenerator generator) {
+    System.out.println(label);
+    Map<String, double[]> table = generator.generate();
+    String[] columns = table.keySet().toArray(new String[0]);
+    System.out.println("columns=" + String.join(",", columns));
+    int rows = table.get(columns[0]).length;
+    line("rows", rows);
+    for (int i = 0; i < rows; i++) {
+      for (String column : columns) {
+        line(column.toLowerCase(java.util.Locale.ROOT) + "_" + i, table.get(column)[i]);
+      }
+    }
+    double[] values = table.get(columns[0]);
+    for (int i = 0; i < values.length; i++) {
+      for (String column : columns) {
+        if (!Double.isFinite(table.get(column)[i])) {
+          throw new IllegalStateException("a table value is not finite");
+        }
+      }
+    }
+  }
+
+  /// The relative-permeability table generator: the primitives, every table type and the boundaries.
+  private static void relperm() throws ReflectiveOperationException {
+    System.out.println("pvt_relative_permeability");
+
+    double[] samples = {0.0, 0.25, 0.5, 0.75, 1.0};
+    for (int i = 0; i < samples.length; i++) {
+      line("corey_n1_" + i, relPermCurve("corey", samples[i], 1.0, 0.0, 0.0));
+      line("corey_n2_" + i, relPermCurve("corey", samples[i], 2.0, 0.0, 0.0));
+      line("let_sym_" + i, relPermCurve("let", samples[i], 2.0, 1.0, 2.0));
+    }
+
+    RelativePermeabilityGenerator swofCorey = new RelativePermeabilityGenerator();
+    swofCorey.setTableType(RelPermTableType.SWOF);
+    swofCorey.setModelFamily(RelPermModelFamily.COREY);
+    swofCorey.setSwc(0.15);
+    swofCorey.setSorw(0.20);
+    swofCorey.setKroMax(1.0);
+    swofCorey.setKrwMax(0.25);
+    swofCorey.setNo(2.5);
+    swofCorey.setNw(1.5);
+    swofCorey.setRows(25);
+    relPermTable("swof_corey_25", swofCorey);
+
+    RelativePermeabilityGenerator swofCorey50 = new RelativePermeabilityGenerator();
+    swofCorey50.setTableType(RelPermTableType.SWOF);
+    swofCorey50.setSwc(0.10);
+    swofCorey50.setSorw(0.15);
+    swofCorey50.setNo(3.0);
+    swofCorey50.setNw(2.0);
+    swofCorey50.setRows(50);
+    relPermTable("swof_corey_50", swofCorey50);
+
+    RelativePermeabilityGenerator swofLet = new RelativePermeabilityGenerator();
+    swofLet.setTableType(RelPermTableType.SWOF);
+    swofLet.setModelFamily(RelPermModelFamily.LET);
+    swofLet.setSwc(0.15);
+    swofLet.setSorw(0.20);
+    swofLet.setKroMax(1.0);
+    swofLet.setKrwMax(0.3);
+    swofLet.setLo(2.5);
+    swofLet.setEo(1.25);
+    swofLet.setTo(1.75);
+    swofLet.setLw(1.2);
+    swofLet.setEw(1.5);
+    swofLet.setTw(2.0);
+    swofLet.setRows(30);
+    relPermTable("swof_let_30", swofLet);
+
+    RelativePermeabilityGenerator sgof = new RelativePermeabilityGenerator();
+    sgof.setTableType(RelPermTableType.SGOF);
+    sgof.setSwc(0.20);
+    sgof.setSorg(0.15);
+    sgof.setKroMax(1.0);
+    sgof.setKrgMax(0.8);
+    sgof.setNg(2.0);
+    sgof.setNog(3.0);
+    sgof.setRows(20);
+    relPermTable("sgof_corey_20", sgof);
+
+    RelativePermeabilityGenerator sof3 = new RelativePermeabilityGenerator();
+    sof3.setTableType(RelPermTableType.SOF3);
+    sof3.setSwc(0.20);
+    sof3.setSorw(0.15);
+    sof3.setSorg(0.10);
+    sof3.setKroMax(1.0);
+    sof3.setNo(2.0);
+    sof3.setNog(2.0);
+    sof3.setRows(15);
+    relPermTable("sof3_corey_15", sof3);
+
+    RelativePermeabilityGenerator slgofDefault = new RelativePermeabilityGenerator();
+    slgofDefault.setTableType(RelPermTableType.SLGOF);
+    slgofDefault.setRows(20);
+    relPermTable("slgof_default", slgofDefault);
+
+    RelativePermeabilityGenerator slgof = new RelativePermeabilityGenerator();
+    slgof.setTableType(RelPermTableType.SLGOF);
+    slgof.setSwc(0.20);
+    slgof.setSorg(0.15);
+    slgof.setKroMax(1.0);
+    slgof.setKrgMax(0.8);
+    slgof.setNg(2.0);
+    slgof.setNog(3.0);
+    slgof.setRows(20);
+    relPermTable("slgof_corey_20", slgof);
+
+    RelativePermeabilityGenerator critical = new RelativePermeabilityGenerator();
+    critical.setTableType(RelPermTableType.SWOF);
+    critical.setSwc(0.10);
+    critical.setSwcr(0.20);
+    critical.setSorw(0.20);
+    critical.setKrwMax(0.5);
+    critical.setNw(2.0);
+    critical.setNo(2.0);
+    critical.setRows(50);
+    relPermTable("swof_critical_swcr", critical);
+
+    RelativePermeabilityGenerator defaults = new RelativePermeabilityGenerator();
+    relPermTable("swof_default", defaults);
+
+    for (RelPermTableType type : new RelPermTableType[] {RelPermTableType.SWOF,
+        RelPermTableType.SGOF, RelPermTableType.SOF3, RelPermTableType.SLGOF}) {
+      RelativePermeabilityGenerator small = new RelativePermeabilityGenerator();
+      small.setTableType(type);
+      small.setRows(5);
+      relPermTable("small_" + type.name().toLowerCase(java.util.Locale.ROOT), small);
+    }
+
+    RelativePermeabilityGenerator descending = new RelativePermeabilityGenerator();
+    descending.setTableType(RelPermTableType.SWOF);
+    descending.setSwc(0.90);
+    descending.setSorw(0.20);
+    descending.setRows(5);
+    relPermTable("swof_descending_grid", descending);
+
+    refusal("refused_two_rows", () -> {
+      RelativePermeabilityGenerator tooSmall = new RelativePermeabilityGenerator();
+      tooSmall.setRows(2);
+    });
+  }
+
   public static void main(String[] args) throws Exception {
     String which = args.length > 0 ? args[0] : "black_oil";
     switch (which) {
@@ -1257,6 +1765,18 @@ public final class PvtProbe {
         break;
       case "tuning":
         tuning();
+        break;
+      case "aquifer":
+        aquifer();
+        break;
+      case "fetkovich":
+        fetkovich();
+        break;
+      case "generalized_mb":
+        generalizedMb();
+        break;
+      case "relperm":
+        relperm();
         break;
       default:
         System.err.println("unknown subcommand: " + which);

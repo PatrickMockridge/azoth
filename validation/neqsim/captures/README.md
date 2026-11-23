@@ -3398,7 +3398,7 @@ own strings, and a Class 4 or coarser basis adds its not-detailed flag after the
 
 ### The PVT laboratory captures
 
-`PvtProbe` against the pin: sixteen subcommands, one capture each, in the id's SI units and
+`PvtProbe` against the pin: twenty subcommands, one capture each, in the id's SI units and
 with absent fields omitted. Compile once, then run each:
 
 ```bash
@@ -3413,7 +3413,18 @@ with absent fields omitted. Compile once, then run each:
 ../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe property_sweep > captures/pvt_property_sweep.tsv
 ../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe regression > captures/pvt_regression.tsv
 ../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe tuning > captures/pvt_tune_to_saturation.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe aquifer > captures/pvt_van_everdingen_hurst.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe fetkovich > captures/pvt_fetkovich_aquifer.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe generalized_mb > captures/pvt_generalized_material_balance.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe relperm > captures/pvt_relative_permeability.tsv
 ```
+
+The four reservoir-property captures are the classes' own test states: the aquifer's
+dimensionless-pressure kernel at the independent-reference times and its Carter-Tracy
+recurrence, the Fetkovich march at the small-exposure boundary and both ramp directions, the
+four generalized-balance fits with the refusals beside them, and every relative-permeability
+table type. `exportAqutab` and `toEclipseKeyword` are reports, so only their arithmetic is
+captured.
 
 The probe reads a few private arrays by reflection, walking the superclass chain: that is
 probe surface, not the class surface, and a field rename at a later pin breaks this file
