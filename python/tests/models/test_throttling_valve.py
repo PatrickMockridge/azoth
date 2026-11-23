@@ -39,7 +39,7 @@ WELL = {
 }
 
 
-def _run(inputs: dict[str, Any], backend: str) -> Any:
+def _run(inputs: dict[str, Any], backend: Any) -> Any:
     with use_backend(backend):
         return resolve(MODEL_ID)(**h.model_kwargs(SPEC, inputs))
 
