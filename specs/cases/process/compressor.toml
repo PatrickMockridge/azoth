@@ -38,8 +38,8 @@ outlet_h = 3654.624827852691
 
 [[cases]]
 id = "the_chart_solves_the_pressure_and_the_power"
-tolerance = 0.02
-source = "`process_compressor_curve.tsv`'s `compressor_chart_run` row: `CompressorCalculationTest.testRun`'s state re-cased on PR - the nine-component gas at 24 C, 48 bara and 1 MSm3/day, the eight-speed `CompressorChartTest` table and speed `11918`. The chart solves `72.858` bara and `358.257` K, the head is `55.255` kJ/kg and the efficiency `0.42866`, and the shaft power is `1.169` MW. **The curve's head is stated in metres** - a kJ/kg curve multiplied by `1000/9.81`, the class's own `polytropicHeadMeter` - because the model carries the class's default head unit. **The `2e-2` is the two PR implementations' density divergence on this nine-component gas**: azoth's `Z` is `0.8474` against NeqSim's `0.8725` at the inlet, so the flow and the Schultz reference's isentropic enthalpy move together; the port's outlet pressure is `0.26%` above the capture and the chart head and efficiency agree to `1e-9`.\n"
+tolerance = 5.0e-3
+source = "`process_compressor_curve.tsv`'s `compressor_chart_run` row: `CompressorCalculationTest.testRun`'s state re-cased on PR - the nine-component gas at 24 C, 48 bara and 1 MSm3/day, the eight-speed `CompressorChartTest` table and speed `11918`. The chart solves `72.858` bara and `358.257` K, the head is `55.255` kJ/kg and the efficiency `0.42866`, and the shaft power is `1.169` MW. **The curve's head is stated in metres** - a kJ/kg curve multiplied by `1000/9.81`, the class's own `polytropicHeadMeter` - because the model carries the class's default head unit. The inlet `Z` is `0.8725238119535913` in both libraries; the port's outlet pressure is `0.33%` above the capture and the chart head, efficiency and power agree to `3e-5`.\n"
 [cases.inputs]
 components = ["nitrogen", "CO2", "methane", "ethane", "propane", "i-butane", "n-butane", "i-pentane", "n-pentane"]
 inlet_n = 489.4970603565765

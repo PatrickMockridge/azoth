@@ -11500,7 +11500,7 @@ static COMPRESSOR_CASES: &[TestCase] = &[
         property: None,
         status: "active",
         skip_reason: None,
-        tolerance: 0.02,
+        tolerance: 0.005,
         numbers: &[
             ("inlet_n", 489.4970603565765),
             ("inlet_p", 4800000.0),
