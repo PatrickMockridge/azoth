@@ -758,7 +758,8 @@ def _equipment_pec(
             volume = math.pi / 4.0 * diameter * diameter * length
         if volume <= 0.0:
             volume = _f(spec, "vessel_volume_m3")
-        return 0.0 if volume <= 0.0 else vertical_vessel_by_volume(volume, ratio)
+        # The class prices by the separator's orientation, whose default is horizontal.
+        return 0.0 if volume <= 0.0 else horizontal_vessel_by_volume(volume, ratio)
 
     if kind == "reactor":
         diameter = _f(spec, "vessel_diameter_m")
