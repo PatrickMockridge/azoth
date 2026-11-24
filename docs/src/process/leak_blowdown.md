@@ -8,7 +8,7 @@
 
 **NeqSim process/safety/release/LeakModel.java**
 
-Its `calculateSourceTerm`: the inventory from the corrected density and volume, the record-then-update loop, the choked/subsonic rate, the capped jet velocity, the unclamped momentum, the droplet SMD, the 1% floor, the isentropic update, and the totals.
+Its `calculateSourceTerm`: the inventory scaled by the EOS volume, the 1% substep loop, the VU flash at fixed volume and internal energy, the receiving-pressure bisection, the choked/subsonic rate, the capped jet velocity, the unclamped momentum, and the totals.
 
 
 ## Algorithm
@@ -18,10 +18,10 @@ not an equation, and both implementations read it from here.
 
 | Setting | Value |
 |---|---|
-| Scheme | `explicit_euler_isentropic_blowdown` |
+| Scheme | `substepped_vu_blowdown` |
 | Convergence | `relative` |
-| Tolerance | `0.01` |
-| Max iterations | `100000` |
+| Tolerance | `1e-07` |
+| Max iterations | `1000000` |
 | Initialisation | `tp_flash_at_the_initial_state` |
 
 ## Inputs
@@ -71,18 +71,17 @@ not an equation, and both implementations read it from here.
 ## Assumptions
 
 - **the legacy `LeakModel.calculateSourceTerm` path**, not the modern `calculateReleaseFlow` (which is `process.hem_release`). `calculateMassFlowRate`, `calculateJetVelocity`, `calculateJetMomentum` and `calculateDropletSMD` are this calculation's internal arithmetic and are not separate ids.
-- **the pin's component data moves the ten-second trajectory**: the class's `total_mass_released` is `4.0343 kg` where the port's recurrence answers `3.6649 kg`. The port retains the previous pin's recurrence, and the divergence is recorded rather than smoothed.
-- **the inventory is the corrected total density times `vessel_volume`**; the fluid's amount sets only the composition. The vessel is one homogeneous, adiabatic, rigid control volume.
-- **each step records then updates**: `mass -= mdot dt`, `total += mdot dt`, and above 1% of the initial mass `P2 = P1 (mass/initialMass)^gamma` - the **initial** mass denominator, as the code has it - floored at `back_pressure`, with `T2 = T1 (P2/P1)^((gamma-1)/gamma)` and a TP flash.
+- **the inventory is scaled by the EOS molar volume**: `moles = vessel_volume/(Z R T/P)` at the initial flash, so the mass is the unshifted density times the volume while the rate uses the physical-properties density; the two differ by the volume shift.
+- **each substep removes at most 1% of the current mass** and with it the stream's enthalpy; the remaining state is the VU flash at the vessel volume and `U - removed h`, with the composition unchanged.
+- **the receiving-pressure crossing is located by halving the removed mass**, 64 iterations, until `0 <= P - back <= max(1e-3, 1e-9 back)`; a crossing that cannot be bracketed is refused rather than clamped.
 - **the rate is the class's simplified orifice**: choked `Cd A P sqrt(gamma MW/(8314 T)) (2/(gamma+1))^((gamma+1)/(2(gamma-1)))` with `MW` in kg/kmol, else subsonic `Cd A sqrt(2 rho (P-back))`; zero when `P <= back`. `R = 8314` is the class's number.
-- **the jet is capped, the momentum is not**: `v = min(mdot/(rho A Cd), 1.2 sqrt(gamma 8314 T/MW))`; `momentum = mdot v + (P-back) A`, negative when the pressure is at or below the back pressure.
-- **the droplet SMD** is the class's Nukiyama-Tanasawa form with `0.02 N/m` as a fixed surrogate surface tension: only for two phases with liquid fraction `>= 0.001`, `585 d/sqrt(We) sqrt(rho_l/rho_v) (1-beta)^0.45`, capped at `d/2`; otherwise zero.
+- **the jet is capped, the momentum is not**: `v = min(mdot/(rho A Cd), 1.2 sqrt(gamma 8314 T/MW))`; `momentum = mdot v + (P-back) A`, both zero where the rate is zero.
+- **a single gas phase is required** at the initial state and after every VU flash, as `requireBlowdownGas`: a two-phase or liquid state is `invalid` with `PHASE_BOUNDARY`, so the droplet SMD is zero and the vapour mole fraction is one.
 - **gamma is the class's `getGamma()`**: `Cp/Cv`, summed over the phases, from the cubic's `cp` and `cv = cp + T (dP/dT)^2/(dP/dV)`; the port refuses a gamma outside `(1, 2]` rather than substituting the class's `1.3`.
 - **the class's silent fallbacks are refused**: ideal-gas density, `gamma = 1.3`, `MW = 16`, `rho = 1`, a NaN rate as zero, and the `init(3)` retry. A state that would need one is `invalid`, with the value in the diagnostic.
-- **the class's density cache is not reproduced.** It initialises physical properties once and reuses the density through the loop; this port flashes each step and uses the fresh corrected density (EOS volume less the Peneloux shift), a measured divergence.
-- **the series stops at the 1% floor or the declared points**. At the back-pressure floor the rate is zero, so the mass never reaches 1% and the loop runs to `ceil(duration/time_step)+1` in a zero-flow plateau.
-- **only visited rows are published.** The class allocates the declared slots and leaves unvisited ones as zeros; a zero row is not a state, so the result carries `number_of_points` and `recorded_points` and the rows themselves.
-- **`vapour_mole_fraction` is molar.** The class's `vaporMassFraction` is `getBeta()`, a mole fraction; this port publishes the physical value - 1 all-vapour, 0 all-liquid, beta two-phase - which differs from the class's single-phase `1.0`.
+- **mass and cumulative internal energy close to `1e-7`** relative on the initial inventory; a VU flash the solver cannot find is `VU_CLOSURE_FAILED`, and a closure miss is `CLOSURE_FAILED`.
+- **every declared point is published**, `ceil(duration/time_step)+1` rows at `0, dt, ... , duration`; the sample's state is the one the substeps reached at that time.
+- **the class's substep cap is the port's**: a run that reaches 1,000,000 substeps is refused with `SUBSTEP_LIMIT` rather than continued.
 - **`time_to_empty` is the class's estimate**, `totalReleased/(0.5 peakRate)`, not the time the series empties; `scenario_name` is report-only; `ReleaseOrientation` is stored by the class and read by no arithmetic, so it is owed.
 - **the fluid is PR with the classic mixing rule**; NeqSim's own `LeakModelTest` is SRK and is captured as evidence. `SourceTermResult`'s six exporters, `ReleaseFlowEnsemble`, `SourceTermSession`, the Fanno/pipe models and the frame envelope are owed and named in `ROADMAP.md`.
 
@@ -91,11 +90,11 @@ not an equation, and both implementations read it from here.
 | Case | Inputs | Expected |
 |---|---|---|
 | `no_forward_flow_is_a_valid_zero` | components = ['methane'], initial_z = [1.0], initial_t = 300.0, initial_p = 500000.0, duration = 3.0, vessel_volume = 1.0, hole_diameter = 0.01, discharge_coefficient = 0.62, back_pressure = 600000.0, time_step = 1.0 | status = valid, number_of_points = 4, recorded_points = 4, total_mass_released = 0.0, peak_mass_flow_rate = 0.0, time_to_empty = 0.0 |
-| `a_single_step_depletes_the_vessel` | components = ['methane'], initial_z = [1.0], initial_t = 300.0, initial_p = 5000000.0, duration = 100.0, vessel_volume = 1.0, hole_diameter = 0.01, discharge_coefficient = 0.62, back_pressure = 101325.0, time_step = 100.0 | status = valid, number_of_points = 2, recorded_points = 1, total_mass_released = 43.050562364190256, peak_mass_flow_rate = 0.4305056236419026, time_to_empty = 199.99999999999997 |
-| `methane_50bara_ten_seconds` | components = ['methane'], initial_z = [1.0], initial_t = 300.0, initial_p = 5000000.0, duration = 10.0, vessel_volume = 1.0, hole_diameter = 0.01, discharge_coefficient = 0.62, back_pressure = 101325.0, time_step = 1.0 | status = valid, number_of_points = 11, recorded_points = 11, total_mass_released = 3.6632755290249834, peak_mass_flow_rate = 0.4305056236419026, time_to_empty = 17.01847933151331 |
-| `propane_two_phase_blowdown` | components = ['propane'], initial_z = [1.0], initial_t = 300.0, initial_p = 1100000.0, duration = 10.0, vessel_volume = 0.01, hole_diameter = 0.01, discharge_coefficient = 0.62, back_pressure = 101325.0, time_step = 1.0 | status = valid, number_of_points = 11, recorded_points = 11 |
-| `subsonic_flow_uses_the_density_branch` | components = ['methane'], initial_z = [1.0], initial_t = 300.0, initial_p = 200000.0, duration = 1.0, vessel_volume = 1.0, hole_diameter = 0.01, discharge_coefficient = 0.62, back_pressure = 190000.0, time_step = 1.0 | status = valid, number_of_points = 2, recorded_points = 2, total_mass_released = 0.015005383850676528, peak_mass_flow_rate = 0.007825829692113012, time_to_empty = 3.834835267575316 |
-| `a_mixture_is_accepted` | components = ['methane', 'ethane'], initial_z = [0.9, 0.1], initial_t = 300.0, initial_p = 5000000.0, duration = 5.0, vessel_volume = 1.0, hole_diameter = 0.01, discharge_coefficient = 0.62, back_pressure = 101325.0, time_step = 1.0 | status = valid, number_of_points = 6, recorded_points = 6, total_mass_released = 2.4952489359443843, peak_mass_flow_rate = 0.45003692062306727, time_to_empty = 11.08908545765428 |
+| `a_hundred_second_sample_is_the_state_at_its_time` | components = ['methane'], initial_z = [1.0], initial_t = 300.0, initial_p = 5000000.0, duration = 100.0, vessel_volume = 1.0, hole_diameter = 0.01, discharge_coefficient = 0.62, back_pressure = 101325.0, time_step = 100.0 | status = valid, number_of_points = 2, recorded_points = 2, total_mass_released = 23.85093447583642, peak_mass_flow_rate = 0.4305101553432282, time_to_empty = 110.80312127281199 |
+| `methane_50bara_ten_seconds` | components = ['methane'], initial_z = [1.0], initial_t = 300.0, initial_p = 5000000.0, duration = 10.0, vessel_volume = 1.0, hole_diameter = 0.01, discharge_coefficient = 0.62, back_pressure = 101325.0, time_step = 1.0 | status = valid, number_of_points = 11, recorded_points = 11, total_mass_released = 4.034316523740702, peak_mass_flow_rate = 0.4305101553432282, time_to_empty = 18.74202721431417 |
+| `a_liquid_initial_state_is_refused` | components = ['propane'], initial_z = [1.0], initial_t = 300.0, initial_p = 1100000.0, duration = 10.0, vessel_volume = 0.01, hole_diameter = 0.01, discharge_coefficient = 0.62, back_pressure = 101325.0, time_step = 1.0 | status = invalid, number_of_points = 11, recorded_points = 0 |
+| `subsonic_flow_uses_the_density_branch` | components = ['methane'], initial_z = [1.0], initial_t = 300.0, initial_p = 200000.0, duration = 1.0, vessel_volume = 1.0, hole_diameter = 0.01, discharge_coefficient = 0.62, back_pressure = 190000.0, time_step = 1.0 | status = valid, number_of_points = 2, recorded_points = 2, total_mass_released = 0.007825829692113012, peak_mass_flow_rate = 0.007825829692113012, time_to_empty = 2.0 |
+| `a_mixture_is_accepted` | components = ['methane', 'ethane'], initial_z = [0.9, 0.1], initial_t = 300.0, initial_p = 5000000.0, duration = 5.0, vessel_volume = 1.0, hole_diameter = 0.01, discharge_coefficient = 0.62, back_pressure = 101325.0, time_step = 1.0 | status = valid, number_of_points = 6, recorded_points = 6, total_mass_released = 2.1890466050202106, peak_mass_flow_rate = 0.45004143245628836, time_to_empty = 9.728200326234756 |
 
 ## How far this is checked
 **`partially_verified`** — exercised against expectations pinned in its own spec, with no independent oracle recorded for it - **the normal case rather than a defect**.

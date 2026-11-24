@@ -74,7 +74,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.ideal_gas_release`](./ideal_gas_release.md) | `ideal_gas_isentropic_orifice` | NeqSim process/safety/release/IdealGasReleaseModel.java |
 | [`process.inherent_safety`](./inherent_safety.md) | `kletz_inherent_safety_index` | NeqSim process/safety/inherent/InherentSafetyEvaluator.java |
 | [`process.jet_fire`](./jet_fire.md) | `api521_point_source_wayne_transmissivity` | NeqSim process/safety/fire/JetFireModel.java |
-| [`process.leak_blowdown`](./leak_blowdown.md) | `explicit_euler_isentropic_blowdown` | NeqSim process/safety/release/LeakModel.java |
+| [`process.leak_blowdown`](./leak_blowdown.md) | `substepped_vu_blowdown` | NeqSim process/safety/release/LeakModel.java |
 | [`process.legacy_screening_release`](./legacy_screening_release.md) | `legacy_orifice_screening` | NeqSim process/safety/release/LegacyScreeningReleaseModel.java |
 | [`process.lopa`](./lopa.md) | `closed_form_lopa` | NeqSim process/safety/risk/sis/LOPAResult.java |
 | [`process.mah_bow_tie_skeleton`](./mah_bow_tie_skeleton.md) | `mah_bow_tie_catalogue` | NeqSim process/safety/hazid/MahBowTieBuilder.java |

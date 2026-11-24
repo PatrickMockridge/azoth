@@ -51,8 +51,8 @@ fn the_first_point_is_the_class_s_scalar_oracle() {
     assert_eq!(result.recorded_points, 11);
     let first = &result.points[0];
     let error =
-        (first.mass_flow_rate.value - 0.430_505_623_641_902_6).abs() / 0.430_505_623_641_902_6;
-    assert!(error <= 2.0e-5, "the first rate differs by {error:.3e}");
+        (first.mass_flow_rate.value - 0.430_510_155_343_228_2).abs() / 0.430_510_155_343_228_2;
+    assert!(error <= 1.0e-6, "the first rate differs by {error:.3e}");
     assert_eq!(first.time.value, 0.0);
     assert_eq!(first.temperature.value, 300.0);
     assert_eq!(first.pressure.value, 5_000_000.0);
@@ -63,7 +63,7 @@ fn the_first_point_is_the_class_s_scalar_oracle() {
 }
 
 #[test]
-fn the_update_uses_the_initial_mass_denominator() {
+fn the_substeps_land_on_the_captured_second_state() {
     let result = run(
         &["methane"],
         &[1.0],
@@ -76,14 +76,19 @@ fn the_update_uses_the_initial_mass_denominator() {
         101_325.0,
         1.0,
     );
-    // The captured second state: `(mass/initialMass)^gamma`, not `(m2/m1)^gamma`.
+    // The captured one-second state: the VU flash at `U - removed h`, 1% substeps.
     let second = &result.points[1];
-    assert!((second.pressure.value - 4_910_169.899_738_68).abs() / 4_910_169.899_738_68 <= 2.0e-5);
+    assert!((second.pressure.value - 4_918_856.095_330_249_5).abs() / 4_918_856.095_330_249_5 <= 1.0e-6);
+    assert!((second.temperature.value - 298.759_028_771_403_9).abs() / 298.759_028_771_403_9 <= 1.0e-6);
+    assert!(
+        (second.mass_flow_rate.value - 0.424_401_558_884_396_35).abs() / 0.424_401_558_884_396_35
+            <= 1.0e-6
+    );
     assert!(second.pressure.value < result.points[0].pressure.value);
 }
 
 #[test]
-fn the_pressure_floor_is_a_zero_flow_plateau() {
+fn a_long_horizon_lands_on_the_captured_end_state() {
     let result = run(
         &["methane"],
         &[1.0],
@@ -97,19 +102,16 @@ fn the_pressure_floor_is_a_zero_flow_plateau() {
         1.0,
     );
     assert_eq!(result.recorded_points, 61);
+    let total = result.total_mass_released.expect("a total").value;
+    assert!((total - 17.708_274_360_596_057).abs() / 17.708_274_360_596_057 <= 1.0e-6);
     let last = &result.points[60];
-    assert_eq!(last.pressure.value, 101_325.0);
-    assert_eq!(last.mass_flow_rate.value, 0.0);
-    assert!(
-        result
-            .diagnostic_codes
-            .iter()
-            .any(|code| code == "PRESSURE_FLOOR_REACHED")
-    );
+    assert!((last.pressure.value - 1_997_215.737_462_847).abs() / 1_997_215.737_462_847 <= 1.0e-6);
+    assert!((last.temperature.value - 236.326_329_588_963_4).abs() / 236.326_329_588_963_4 <= 1.0e-6);
+    assert!(last.mass_flow_rate.value > 0.0);
 }
 
 #[test]
-fn a_single_step_depletes_the_vessel_and_reports_the_tail() {
+fn a_hundred_second_sample_stops_where_the_capture_does() {
     let result = run(
         &["methane"],
         &[1.0],
@@ -123,19 +125,14 @@ fn a_single_step_depletes_the_vessel_and_reports_the_tail() {
         100.0,
     );
     assert_eq!(result.number_of_points, 2);
-    assert_eq!(result.recorded_points, 1);
+    assert_eq!(result.recorded_points, 2);
     let total = result.total_mass_released.expect("a total").value;
-    assert!(total > 35.0, "the unclamped total is {total} kg");
-    assert!(
-        result
-            .diagnostic_codes
-            .iter()
-            .any(|code| code == "MASS_FLOOR_REACHED")
-    );
+    assert!((total - 23.850_934_475_836_42).abs() / 23.850_934_475_836_42 <= 1.0e-6);
+    assert!((result.points[1].temperature.value - 203.727_033_879_957_9).abs() / 203.727_033_879_957_9 <= 1.0e-6);
 }
 
 #[test]
-fn a_single_phase_liquid_reports_no_vapour_and_no_droplet() {
+fn a_liquid_initial_state_is_refused() {
     let result = run(
         &["propane"],
         &[1.0],
@@ -148,13 +145,31 @@ fn a_single_phase_liquid_reports_no_vapour_and_no_droplet() {
         101_325.0,
         1.0,
     );
-    assert_eq!(result.status, "valid");
-    assert_eq!(result.points[0].vapour_mole_fraction, 0.0);
-    assert_eq!(result.points[0].droplet_smd.value, 0.0);
+    assert_eq!(result.status, "invalid");
+    assert_eq!(result.recorded_points, 0);
+    assert_eq!(result.diagnostic_codes, vec!["PHASE_BOUNDARY".to_string()]);
 }
 
 #[test]
-fn no_forward_flow_records_a_negative_momentum() {
+fn a_two_phase_initial_state_is_refused() {
+    let result = run(
+        &["methane", "ethane"],
+        &[0.5, 0.5],
+        200.0,
+        1_000_000.0,
+        1.0,
+        1.0,
+        0.01,
+        0.62,
+        100_000.0,
+        1.0,
+    );
+    assert_eq!(result.status, "invalid");
+    assert_eq!(result.diagnostic_codes, vec!["PHASE_BOUNDARY".to_string()]);
+}
+
+#[test]
+fn no_forward_flow_records_a_zero_rate_and_momentum() {
     let result = run(
         &["methane"],
         &[1.0],
@@ -168,37 +183,14 @@ fn no_forward_flow_records_a_negative_momentum() {
         1.0,
     );
     assert_eq!(result.total_mass_released.expect("a total").value, 0.0);
-    assert!(result.points[0].jet_momentum.value < 0.0);
+    assert_eq!(result.points[0].jet_momentum.value, 0.0);
+    assert_eq!(result.points[0].jet_velocity.value, 0.0);
     assert!(
         result
             .diagnostic_codes
             .iter()
             .any(|code| code == "NO_FORWARD_FLOW")
     );
-}
-
-#[test]
-fn a_two_phase_initial_state_carries_the_weighted_gamma_and_a_droplet() {
-    let result = run(
-        &["methane", "ethane"],
-        &[0.5, 0.5],
-        200.0,
-        1_000_000.0,
-        1.0,
-        1.0,
-        0.01,
-        0.62,
-        100_000.0,
-        1.0,
-    );
-    assert_eq!(result.status, "valid");
-    let first = &result.points[0];
-    assert!(
-        first.vapour_mole_fraction > 0.0 && first.vapour_mole_fraction < 1.0,
-        "beta={}",
-        first.vapour_mole_fraction
-    );
-    assert!(first.droplet_smd.value > 0.0);
 }
 
 #[test]

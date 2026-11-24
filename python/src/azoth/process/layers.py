@@ -2914,9 +2914,8 @@ def _probit(inputs: Mapping[str, Any]) -> dict[str, float]:
 def _leak_blowdown(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.leak_blowdown`'s series, from the reference's own arithmetic.
 
-    **No `beta`, velocity, momentum or SMD.** The class's single-phase `getBeta()` and its
-    cached density make those a record of the class's behaviour rather than the state's; the
-    rate, pressure, temperature and gamma compare directly.
+    The rate, state, capped velocity, unclamped momentum and zero droplet SMD are the
+    class's own arithmetic at the recorded state; the gamma is a fresh flash there.
     """
     from azoth.process.reference.leak_blowdown import _states
 
@@ -2939,7 +2938,7 @@ def _leak_blowdown(inputs: Mapping[str, Any]) -> dict[str, float]:
         str(inputs.get("scenario_name", "Release")),
     )
     dumped: dict[str, float] = {
-        "initial_density_kg_m3": states.initial_mass / volume,
+        "initial_density_kg_m3": states.initial_density,
         "initial_gamma": states.initial_gamma,
         "total_mass_released_kg": (
             0.0 if states.total_mass_released is None else states.total_mass_released
@@ -2957,6 +2956,10 @@ def _leak_blowdown(inputs: Mapping[str, Any]) -> dict[str, float]:
         dumped[prefix + "mass_flow_kg_s"] = row.mass_flow_rate
         dumped[prefix + "temperature_k"] = row.temperature
         dumped[prefix + "pressure_pa"] = row.pressure
+        dumped[prefix + "beta"] = row.vapour_mole_fraction
+        dumped[prefix + "jet_velocity_m_per_s"] = row.jet_velocity
+        dumped[prefix + "jet_momentum_n"] = row.jet_momentum
+        dumped[prefix + "droplet_smd_m"] = row.droplet_smd
         dumped[prefix + "gamma"] = states.gammas[index]
     return dumped
 
@@ -7435,6 +7438,16 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=3,
         identified_by=("#label", "esd_zero_time"),
     ),
+    # The ten-second methane blowdown: the class's substep loop and VU flash, cased on the
+    # capture's first block. The long horizons, the refusals and the SRK evidence rows are
+    # declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.leak_blowdown",
+        case="methane_50bara_ten_seconds",
+        capture="process_leak_blowdown.tsv",
+        block=0,
+        identified_by=("#label", "pr_methane_50bara_10s_1s"),
+    ),
     # The leak sensitivity's four cased states; the SRK evidence row is uncased.
     LayerCase(
         model="process.mass_balance_leak_detection",
@@ -9768,12 +9781,10 @@ UNCASED_ROWS: dict[str, int] = {
     # The Fanno capture's six: the short pipe, the high-back-pressure, no-flow, NASA and
     # no-path rows and the SRK evidence row.
     "process_ideal_gas_fanno_release.tsv": 6,
-    # The blowdown capture's eleven: the ten-second methane run is not layer-cased, because
-    # the pin's component data moved the class's trajectory away from the port's recurrence.
-    # The rest are the long horizons held to the capture as evidence, the SRK rows, the
-    # propane row whose single-phase beta and cached density are class artefacts, and the
-    # refusals.
-    "process_leak_blowdown.tsv": 11,
+    # The blowdown capture's eleven blocks less the ten-second methane run, which is cased:
+    # the long horizons, the SRK evidence rows, the propane phase-boundary refusal and the
+    # no-forward-flow row.
+    "process_leak_blowdown.tsv": 10,
     # The pump design's five: the reversible-efficiency repeat, the sealless state (a seal
     # spelling on the plain design), the zero-flow state the model refuses, and the two chart
     # blocks, whose state is the chart branch rather than the dumper's isentropic one.

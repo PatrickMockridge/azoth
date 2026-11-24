@@ -3,10 +3,11 @@
 //! Spec: `specs/models/process/leak_blowdown.toml`. The port source is
 //! `process/safety/release/LeakModel.java`, through `calculateSourceTerm(duration, timeStep)`.
 //!
-//! The class records the simplified orifice rate, the capped jet velocity, the unclamped
-//! momentum and the droplet SMD, then depletes the inventory and updates the pressure and
-//! temperature isentropically. Its scalar methods are this arithmetic, not separate ids; the
-//! modern `calculateReleaseFlow` path is `process.hem_release`.
+//! The class integrates the inventory at fixed volume and internal energy: each substep
+//! removes at most one percent of the mass, takes the removed stream's enthalpy with it and
+//! solves the remaining state with a VU flash. The rate is the simplified orifice, the jet
+//! velocity is capped and the momentum is not. Its scalar methods are this arithmetic, not
+//! separate ids; the modern `calculateReleaseFlow` path is `process.hem_release`.
 
 use std::f64::consts::PI;
 
@@ -22,26 +23,27 @@ use azoth_eos::databank;
 use azoth_eos::entropy_state::molar_mass_of;
 use azoth_eos::heat_capacity::phase_capacity;
 use azoth_eos::mixture::{Mixture, ReducedParameters, RootSide};
-use azoth_eos::molar_enthalpy_entropy::IdealGasModel;
+use azoth_eos::molar_enthalpy_entropy::{IdealGasModel, molar_enthalpy_entropy};
 use azoth_eos::pr_molar_volume::MOLAR_GAS_CONSTANT;
 use azoth_eos::pt_flash::pt_flash;
-use azoth_eos::results::{Phase, PtFlashResult};
+use azoth_eos::results::Phase;
 
 use crate::executor::json::{optional_scalar, scalar, warnings as wire_warnings};
 use crate::model_gen;
+use crate::models::vu_flash_route::vu_at;
 
 /// The class's fixed gas constant, J/(kmol K).
 const R: f64 = 8314.0;
-/// The class's surrogate surface tension for the droplet correlation, N/m.
-const SURFACE_TENSION: f64 = 0.02;
-/// The class's Nukiyama-Tanasawa coefficient.
-const SMD_COEFFICIENT: f64 = 585.0;
-/// The class's liquid-fraction exponent.
-const SMD_LIQUID_EXPONENT: f64 = 0.45;
-/// The class's liquid-fraction gate.
-const SMD_LIQUID_FLOOR: f64 = 0.001;
-/// The inventory floor, relative to the initial mass.
-const MASS_FLOOR: f64 = 0.01;
+/// The largest mass one substep may remove, as a fraction of the current inventory.
+const SUBSTEP_MASS_FRACTION: f64 = 0.01;
+/// The class's substep cap; a run that reaches it is refused rather than continued.
+const MAX_SUBSTEPS: u64 = 1_000_000;
+/// The receiving-pressure event's absolute bracket, Pa.
+const RECEIVING_PRESSURE_FLOOR: f64 = 1e-3;
+/// The receiving-pressure event's relative bracket.
+const RECEIVING_PRESSURE_RELATIVE: f64 = 1e-9;
+/// The closure check's relative tolerance.
+const CLOSURE_TOLERANCE: f64 = 1e-7;
 /// The declared-point cap; a finer request is refused rather than run for hours.
 const MAX_POINTS: u32 = 100_000;
 /// The velocity cap, as a multiple of the ideal-gas sound speed.
@@ -53,7 +55,7 @@ pub struct LeakBlowdownPoint {
     /// The step's time.
     #[serde(serialize_with = "scalar")]
     pub time: Time,
-    /// The simplified orifice rate at the state.
+    /// The simplified orifice rate at the recorded state.
     #[serde(serialize_with = "scalar")]
     pub mass_flow_rate: MassRate,
     /// The state's temperature.
@@ -62,15 +64,15 @@ pub struct LeakBlowdownPoint {
     /// The state's pressure.
     #[serde(serialize_with = "scalar")]
     pub pressure: Pressure,
-    /// The physical vapour mole fraction: 1 all-vapour, 0 all-liquid, beta two-phase.
+    /// The vapour mole fraction: one, because the model requires a single gas phase.
     pub vapour_mole_fraction: f64,
     /// `mdot/(rho A Cd)`, capped at 1.2 times the ideal-gas sound speed.
     #[serde(serialize_with = "scalar")]
     pub jet_velocity: Velocity,
-    /// `mdot v + (P - back) A`, unclamped.
+    /// `mdot v + (P - back) A`, unclamped; zero where the rate is zero.
     #[serde(serialize_with = "scalar")]
     pub jet_momentum: Force,
-    /// The liquid Sauter mean diameter, zero for a single phase or a trace liquid.
+    /// The liquid Sauter mean diameter, always zero for the required single gas phase.
     #[serde(serialize_with = "scalar")]
     pub droplet_smd: Length,
 }
@@ -125,7 +127,12 @@ enum BlowdownFailure {
     Density(String),
     MolarMass(String),
     Gamma(String),
-    Droplet(String),
+    PhaseBoundary(String),
+    Vu(String),
+    Closure(String),
+    SubstepLimit(String),
+    TimestepUnrepresentable(String),
+    EventFailed(String),
 }
 
 impl BlowdownFailure {
@@ -135,7 +142,12 @@ impl BlowdownFailure {
             Self::Density(_) => "DENSITY_UNAVAILABLE",
             Self::MolarMass(_) => "MOLAR_MASS_UNAVAILABLE",
             Self::Gamma(_) => "GAMMA_OUT_OF_RANGE",
-            Self::Droplet(_) => "DROPLET_SMD_NOT_FINITE",
+            Self::PhaseBoundary(_) => "PHASE_BOUNDARY",
+            Self::Vu(_) => "VU_CLOSURE_FAILED",
+            Self::Closure(_) => "CLOSURE_FAILED",
+            Self::SubstepLimit(_) => "SUBSTEP_LIMIT",
+            Self::TimestepUnrepresentable(_) => "TIMESTEP_UNREPRESENTABLE",
+            Self::EventFailed(_) => "RECEIVING_PRESSURE_EVENT_FAILED",
         }
     }
 
@@ -145,37 +157,43 @@ impl BlowdownFailure {
             | Self::Density(message)
             | Self::MolarMass(message)
             | Self::Gamma(message)
-            | Self::Droplet(message) => message,
+            | Self::PhaseBoundary(message)
+            | Self::Vu(message)
+            | Self::Closure(message)
+            | Self::SubstepLimit(message)
+            | Self::TimestepUnrepresentable(message)
+            | Self::EventFailed(message) => message,
         }
     }
 }
 
-/// One flashed state and the quantities the class reads from it.
+/// One flashed gas state and the quantities the class reads from it.
 struct State {
-    flash: PtFlashResult,
-    pressure: f64,
     temperature: f64,
+    pressure: f64,
     /// The corrected total density, kg/m3.
     density: f64,
-    /// The class's `Cp/Cv`, summed over the phases.
+    /// The class's `Cp/Cv`.
     gamma: f64,
-    /// The two-phase vapour fraction; `None` for a single phase.
-    vapour_fraction: Option<f64>,
-    /// The vapour-phase corrected density, when two phases exist.
-    vapour_density: Option<f64>,
-    /// The liquid-phase corrected density, when two phases exist.
-    liquid_density: Option<f64>,
+    /// The molar enthalpy, J/mol.
+    molar_enthalpy: f64,
+    /// The cubic root at the state, so `U = H - Z R T` uses the solver's volume.
+    compressibility: f64,
 }
 
 impl State {
-    /// The physical vapour mole fraction the row reports.
-    fn vapour_mole_fraction(&self) -> f64 {
-        match self.flash.phase {
-            Phase::TwoPhase => self.vapour_fraction.unwrap_or(0.0),
-            Phase::AllVapour => 1.0,
-            Phase::AllLiquid | Phase::Trivial => 0.0,
-        }
+    /// The molar internal energy on the same volume the VU flash inverts, J/mol.
+    fn molar_internal_energy(&self) -> f64 {
+        self.molar_enthalpy - self.compressibility * MOLAR_GAS_CONSTANT * self.temperature
     }
+}
+
+/// The inventory after one substep.
+struct Advanced {
+    state: State,
+    moles: f64,
+    mass: f64,
+    energy: f64,
 }
 
 /// Blow a vessel down through a circular opening.
@@ -183,7 +201,8 @@ impl State {
 /// # Errors
 /// `InvalidInput` for a state or opening the class refuses at construction, a composition
 /// that is not one entry per component and sums to one, a non-positive duration or step, or a
-/// declared point count over the port's cap.
+/// declared point count over the port's cap. A state the class would throw on is reported as
+/// an `invalid` result rather than an error.
 #[allow(clippy::too_many_arguments)] // one parameter per declared input
 pub fn leak_blowdown(
     components: &[String],
@@ -278,7 +297,7 @@ pub fn leak_blowdown(
 
     let mut diagnostics = vec![LeakBlowdownDiagnostic {
         code: "MODEL_ASSUMPTIONS".to_string(),
-        message: "Rigid adiabatic vessel; equilibrium TP flashes; simplified orifice; no slip \
+        message: "Rigid adiabatic vessel; equilibrium flashes; simplified orifice; no slip \
                   or friction in the jet"
             .to_string(),
     }];
@@ -289,6 +308,18 @@ pub fn leak_blowdown(
         });
     }
 
+    let molar_mass = match molar_mass_of(&mixture, initial_z) {
+        Ok(value) => value,
+        Err(error) => {
+            return Ok(failure_result(
+                &scenario,
+                diameter,
+                number_of_points,
+                BlowdownFailure::MolarMass(format!("{error}")),
+                warnings,
+            ));
+        }
+    };
     let mut state = match flash_state(
         &mixture,
         &ideal_gas,
@@ -307,99 +338,241 @@ pub fn leak_blowdown(
             ));
         }
     };
-    let initial_mass = state.density * volume;
+    // The class scales the inventory by the **EOS** volume, `V / (Z R T / P)`, not by the
+    // physical-properties density the rate uses. The two differ by the volume shift.
+    let initial_molar_volume =
+        state.compressibility * MOLAR_GAS_CONSTANT * initial_t.value / initial_p.value;
+    if !initial_molar_volume.is_finite() || initial_molar_volume <= 0.0 {
+        return Ok(failure_result(
+            &scenario,
+            diameter,
+            number_of_points,
+            BlowdownFailure::Density(format!(
+                "the initial molar volume is {initial_molar_volume} m3/mol"
+            )),
+            warnings,
+        ));
+    }
+    let mut moles = volume / initial_molar_volume;
+    let initial_mass = moles * molar_mass;
     if !initial_mass.is_finite() || initial_mass <= 0.0 {
         return Ok(failure_result(
             &scenario,
             diameter,
             number_of_points,
             BlowdownFailure::Density(format!(
-                "the initial density is {} kg/m3 and the volume {volume} m3",
-                state.density
+                "the initial inventory is {initial_mass} kg for a {volume} m3 vessel"
             )),
             warnings,
         ));
     }
 
     let area = PI * diameter.value * diameter.value / 4.0;
+    let molar_mass_kmol = 1000.0 * molar_mass;
     let mut mass = initial_mass;
+    let mut energy = moles * state.molar_internal_energy();
+    let initial_energy = energy;
     let mut total = 0.0;
+    let mut released_energy = 0.0;
     let mut peak: f64 = 0.0;
     let mut points: Vec<LeakBlowdownPoint> = Vec::new();
-    let mut floor_reached = false;
-    let mut mass_floor = false;
+    let mut substeps: u64 = 0;
+    let mut stopped = state.pressure <= back;
+    let mut elapsed = 0.0;
 
     for index in 0..number_of_points {
-        if mass <= MASS_FLOOR * initial_mass || mass.is_nan() {
-            mass_floor = true;
-            break;
+        let sample_time = if index + 1 == number_of_points {
+            span.value
+        } else {
+            f64::from(index) * step.value
+        };
+        while !stopped && elapsed < sample_time {
+            substeps += 1;
+            if substeps > MAX_SUBSTEPS {
+                return Ok(failure_result(
+                    &scenario,
+                    diameter,
+                    number_of_points,
+                    BlowdownFailure::SubstepLimit(format!(
+                        "the run reached the class's {MAX_SUBSTEPS} substeps"
+                    )),
+                    warnings,
+                ));
+            }
+            let rate = match screening_rate(&state, molar_mass_kmol, back, area, coefficient) {
+                Ok(rate) => rate,
+                Err(failure) => {
+                    return Ok(failure_result(
+                        &scenario,
+                        diameter,
+                        number_of_points,
+                        failure,
+                        warnings,
+                    ));
+                }
+            };
+            if rate == 0.0 {
+                stopped = true;
+                break;
+            }
+            let mut sub_step = (sample_time - elapsed).min(SUBSTEP_MASS_FRACTION * mass / rate);
+            if !(sub_step > 0.0) || elapsed + sub_step <= elapsed {
+                return Ok(failure_result(
+                    &scenario,
+                    diameter,
+                    number_of_points,
+                    BlowdownFailure::TimestepUnrepresentable(format!(
+                        "a substep of {sub_step} s at {elapsed} s is not representable"
+                    )),
+                    warnings,
+                ));
+            }
+            let mut next = match advance(
+                &mixture,
+                &ideal_gas,
+                &state,
+                initial_z,
+                volume,
+                moles,
+                mass,
+                energy,
+                molar_mass,
+                rate * sub_step,
+                state.pressure,
+            ) {
+                Ok(next) => next,
+                Err(failure) => {
+                    return Ok(failure_result(
+                        &scenario,
+                        diameter,
+                        number_of_points,
+                        failure,
+                        warnings,
+                    ));
+                }
+            };
+            let tolerance = RECEIVING_PRESSURE_FLOOR.max(back * RECEIVING_PRESSURE_RELATIVE);
+            if next.state.pressure < back {
+                // Locate the event by withdrawing less mass, never by clamping pressure.
+                let mut lower = 0.0;
+                let mut upper = sub_step;
+                let mut located = false;
+                for _ in 0..64 {
+                    sub_step = 0.5 * (lower + upper);
+                    next = match advance(
+                        &mixture,
+                        &ideal_gas,
+                        &state,
+                        initial_z,
+                        volume,
+                        moles,
+                        mass,
+                        energy,
+                        molar_mass,
+                        rate * sub_step,
+                        state.pressure,
+                    ) {
+                        Ok(next) => next,
+                        Err(failure) => {
+                            return Ok(failure_result(
+                                &scenario,
+                                diameter,
+                                number_of_points,
+                                failure,
+                                warnings,
+                            ));
+                        }
+                    };
+                    let difference = next.state.pressure - back;
+                    if difference >= 0.0 && difference <= tolerance {
+                        located = true;
+                        break;
+                    }
+                    if difference >= 0.0 {
+                        lower = sub_step;
+                    } else {
+                        upper = sub_step;
+                    }
+                }
+                if !located {
+                    return Ok(failure_result(
+                        &scenario,
+                        diameter,
+                        number_of_points,
+                        BlowdownFailure::EventFailed(
+                            "the receiving-pressure crossing could not be bracketed".to_string(),
+                        ),
+                        warnings,
+                    ));
+                }
+                stopped = true;
+            }
+            let removed = rate * sub_step;
+            total += removed;
+            released_energy += removed * state.molar_enthalpy / molar_mass;
+            elapsed += sub_step;
+            state = next.state;
+            moles = next.moles;
+            mass = next.mass;
+            energy = next.energy;
+            stopped |= state.pressure <= back + tolerance;
         }
-        let time = f64::from(index) * step.value;
-        let (row, mdot) = match record_point(
-            &mixture,
+        elapsed = sample_time;
+        let rate = if stopped {
+            0.0
+        } else {
+            match screening_rate(&state, molar_mass_kmol, back, area, coefficient) {
+                Ok(rate) => rate,
+                Err(failure) => {
+                    return Ok(failure_result(
+                        &scenario,
+                        diameter,
+                        number_of_points,
+                        failure,
+                        warnings,
+                    ));
+                }
+            }
+        };
+        peak = peak.max(rate);
+        points.push(record_point(
             &state,
-            initial_z,
+            rate,
+            sample_time,
+            molar_mass_kmol,
             back,
-            diameter.value,
-            coefficient,
             area,
-            time,
-        ) {
-            Ok(row) => row,
-            Err(failure) => {
-                return Ok(failure_result(
-                    &scenario,
-                    diameter,
-                    number_of_points,
-                    failure,
-                    warnings,
-                ));
-            }
-        };
-        peak = peak.max(mdot);
-        points.push(row);
-
-        mass -= mdot * step.value;
-        total += mdot * step.value;
-        if mass <= MASS_FLOOR * initial_mass || mass.is_nan() {
-            mass_floor = true;
-            break;
-        }
-
-        let ratio = (mass / initial_mass).powf(state.gamma);
-        let new_pressure = state.pressure * ratio;
-        let floored = new_pressure.max(back);
-        if floored > new_pressure {
-            floor_reached = true;
-        }
-        let new_temperature =
-            state.temperature * (floored / state.pressure).powf((state.gamma - 1.0) / state.gamma);
-        state = match flash_state(&mixture, &ideal_gas, new_temperature, floored, initial_z) {
-            Ok(state) => state,
-            Err(failure) => {
-                return Ok(failure_result(
-                    &scenario,
-                    diameter,
-                    number_of_points,
-                    failure,
-                    warnings,
-                ));
-            }
-        };
+            coefficient,
+        ));
     }
 
-    if floor_reached {
-        diagnostics.push(LeakBlowdownDiagnostic {
-            code: "PRESSURE_FLOOR_REACHED".to_string(),
-            message: "The isentropic update was floored at the receiving pressure".to_string(),
-        });
+    let scale = initial_mass;
+    if !closes(mass + total, initial_mass, scale) {
+        return Ok(failure_result(
+            &scenario,
+            diameter,
+            number_of_points,
+            BlowdownFailure::Closure(format!(
+                "the final inventory {mass} kg plus {total} kg released does not close on \
+                 {initial_mass} kg"
+            )),
+            warnings,
+        ));
     }
-    if mass_floor {
-        diagnostics.push(LeakBlowdownDiagnostic {
-            code: "MASS_FLOOR_REACHED".to_string(),
-            message: "The loop ended below 1% of the initial inventory".to_string(),
-        });
+    let energy_scale = initial_energy.abs().max(released_energy.abs());
+    if !closes(energy + released_energy, initial_energy, energy_scale) {
+        return Ok(failure_result(
+            &scenario,
+            diameter,
+            number_of_points,
+            BlowdownFailure::Closure(format!(
+                "the final energy {} J plus {released_energy} J released does not close",
+                energy
+            )),
+            warnings,
+        ));
     }
+
     let recorded_points = points.len() as u32;
     let time_to_empty = if peak > 0.0 {
         total / (0.5 * peak)
@@ -422,21 +595,14 @@ pub fn leak_blowdown(
     })
 }
 
-/// One step's row and the rate, from the current flashed state.
-#[allow(clippy::too_many_arguments)] // one argument per state the step reads
-fn record_point(
-    mixture: &Mixture,
+/// The class's screening rate at a state, kg/s; zero when the state is at the receiver.
+fn screening_rate(
     state: &State,
-    z: &[f64],
+    molar_mass_kmol: f64,
     back: f64,
-    diameter: f64,
-    coefficient: f64,
     area: f64,
-    time: f64,
-) -> std::result::Result<(LeakBlowdownPoint, f64), BlowdownFailure> {
-    let molar_mass = molar_mass_of(mixture, z)
-        .map_err(|error| BlowdownFailure::MolarMass(format!("{error}")))?;
-    let mw = 1000.0 * molar_mass;
+    coefficient: f64,
+) -> std::result::Result<f64, BlowdownFailure> {
     let mdot = if state.pressure <= back {
         0.0
     } else {
@@ -448,7 +614,7 @@ fn record_point(
             coefficient
                 * area
                 * state.pressure
-                * (state.gamma * mw / (R * state.temperature)).sqrt()
+                * (state.gamma * molar_mass_kmol / (R * state.temperature)).sqrt()
                 * factor
         } else {
             let drop = state.pressure - back;
@@ -461,67 +627,105 @@ fn record_point(
             state.pressure
         )));
     }
-    let velocity = if mdot <= 0.0 {
-        0.0
-    } else {
-        let raw = mdot / (state.density * area * coefficient);
-        let sound = (state.gamma * R * state.temperature / mw).sqrt();
-        raw.min(VELOCITY_CAP * sound)
-    };
-    let momentum = mdot * velocity + (state.pressure - back) * area;
-    let smd = droplet_smd(state, diameter, velocity)?;
-    Ok((
-        LeakBlowdownPoint {
-            time: seconds(time),
-            mass_flow_rate: kilograms_per_second(mdot),
-            temperature: kelvins(state.temperature),
-            pressure: pascals(state.pressure),
-            vapour_mole_fraction: state.vapour_mole_fraction(),
-            jet_velocity: meters_per_second(velocity),
-            jet_momentum: newtons(momentum),
-            droplet_smd: meters(smd),
-        },
-        mdot,
-    ))
+    Ok(mdot)
 }
 
-/// The class's liquid droplet Sauter mean diameter, m.
-fn droplet_smd(
+/// One recorded row from the state at a sample time.
+fn record_point(
     state: &State,
-    diameter: f64,
-    velocity: f64,
-) -> std::result::Result<f64, BlowdownFailure> {
-    let Some(beta) = state.vapour_fraction else {
-        return Ok(0.0);
+    rate: f64,
+    time: f64,
+    molar_mass_kmol: f64,
+    back: f64,
+    area: f64,
+    coefficient: f64,
+) -> LeakBlowdownPoint {
+    let (velocity, momentum) = if rate == 0.0 {
+        (0.0, 0.0)
+    } else {
+        let raw = rate / (state.density * area * coefficient);
+        let sound = (state.gamma * R * state.temperature / molar_mass_kmol).sqrt();
+        let velocity = raw.min(VELOCITY_CAP * sound);
+        (
+            velocity,
+            rate * velocity + (state.pressure - back) * area,
+        )
     };
-    let liquid_fraction = 1.0 - beta;
-    if liquid_fraction < SMD_LIQUID_FLOOR {
-        return Ok(0.0);
+    LeakBlowdownPoint {
+        time: seconds(time),
+        mass_flow_rate: kilograms_per_second(rate),
+        temperature: kelvins(state.temperature),
+        pressure: pascals(state.pressure),
+        vapour_mole_fraction: 1.0,
+        jet_velocity: meters_per_second(velocity),
+        jet_momentum: newtons(momentum),
+        droplet_smd: meters(0.0),
     }
-    let (Some(vapour), Some(liquid)) = (state.vapour_density, state.liquid_density) else {
-        return Ok(0.0);
-    };
-    if vapour <= 0.0 || liquid <= 0.0 || vapour.is_nan() || liquid.is_nan() {
-        return Ok(0.0);
-    }
-    let weber = vapour * velocity * velocity * diameter / SURFACE_TENSION;
-    if weber.is_nan() {
-        return Err(BlowdownFailure::Droplet(
-            "the droplet Weber number is NaN".to_string(),
-        ));
-    }
-    let smd = SMD_COEFFICIENT * diameter / weber.sqrt()
-        * (liquid / vapour).sqrt()
-        * liquid_fraction.powf(SMD_LIQUID_EXPONENT);
-    if smd.is_nan() {
-        return Err(BlowdownFailure::Droplet(
-            "the droplet Sauter mean diameter is NaN".to_string(),
-        ));
-    }
-    Ok(smd.min(diameter / 2.0))
 }
 
-/// Flash one state and read the density, gamma and phase densities the class uses.
+/// One substep: remove `removed` kg of mass and its enthalpy, then solve the VU state.
+#[allow(clippy::too_many_arguments)] // one argument per quantity the advance reads
+fn advance(
+    mixture: &Mixture,
+    ideal_gas: &IdealGasModel,
+    before: &State,
+    z: &[f64],
+    volume: f64,
+    moles: f64,
+    mass: f64,
+    energy: f64,
+    molar_mass: f64,
+    removed: f64,
+    previous_pressure: f64,
+) -> std::result::Result<Advanced, BlowdownFailure> {
+    let new_moles = moles * (1.0 - removed / mass);
+    if !new_moles.is_finite() || new_moles <= 0.0 {
+        return Err(BlowdownFailure::Vu(format!(
+            "removing {removed} kg of a {mass} kg inventory leaves {new_moles} mol"
+        )));
+    }
+    let target_energy = energy - removed * before.molar_enthalpy / molar_mass;
+    let molar_volume = volume / new_moles;
+    let molar_energy = target_energy / new_moles;
+    if !molar_volume.is_finite()
+        || molar_volume <= 0.0
+        || !molar_energy.is_finite()
+        || !target_energy.is_finite()
+    {
+        return Err(BlowdownFailure::Vu(format!(
+            "the VU target is {molar_volume} m3/mol at {molar_energy} J/mol"
+        )));
+    }
+    let flash = vu_at(
+        mixture,
+        ideal_gas,
+        previous_pressure,
+        molar_volume,
+        molar_energy,
+        z,
+    )
+    .map_err(|error| {
+        BlowdownFailure::Vu(format!(
+            "the VU flash at {molar_volume} m3/mol and {molar_energy} J/mol refused: {error}"
+        ))
+    })?;
+    let state = flash_state(mixture, ideal_gas, flash.temperature, flash.pressure, z)?;
+    Ok(Advanced {
+        state,
+        moles: new_moles,
+        mass: new_moles * molar_mass,
+        energy: target_energy,
+    })
+}
+
+/// Whether `actual` closes on `expected` to the class's relative tolerance.
+fn closes(actual: f64, expected: f64, scale: f64) -> bool {
+    actual.is_finite()
+        && expected.is_finite()
+        && (actual - expected).abs() <= CLOSURE_TOLERANCE * scale.abs().max(1e-10)
+}
+
+/// Flash one state and require the single gas phase the class requires.
 fn flash_state(
     mixture: &Mixture,
     ideal_gas: &IdealGasModel,
@@ -536,52 +740,24 @@ fn flash_state(
         .map_err(|error| BlowdownFailure::Flash(format!("{error}")))?;
     let flash =
         pt_flash(mixture, t, p, z).map_err(|error| BlowdownFailure::Flash(format!("{error}")))?;
-    let (density, gamma, vapour_fraction, vapour_density, liquid_density) = match flash.phase {
-        Phase::TwoPhase => {
-            let beta = flash.vapour_fraction.ok_or_else(|| {
-                BlowdownFailure::Flash(
-                    "the flash split the feed and reported no vapour fraction".to_string(),
-                )
-            })?;
-            let vapour = phase_of(mixture, ideal_gas, &reduced, t, p, &flash.y, flash.z_vapour)?;
-            let liquid = phase_of(mixture, ideal_gas, &reduced, t, p, &flash.x, flash.z_liquid)?;
-            let mass = beta * vapour.molar_mass + (1.0 - beta) * liquid.molar_mass;
-            let volume = beta * vapour.molar_volume + (1.0 - beta) * liquid.molar_volume;
-            let density = mass / volume;
-            let cp = beta * vapour.cp + (1.0 - beta) * liquid.cp;
-            let cv = beta * vapour.cv + (1.0 - beta) * liquid.cv;
-            (
-                density,
-                cp / cv,
-                Some(beta),
-                Some(vapour.density),
-                Some(liquid.density),
-            )
-        }
-        Phase::AllVapour | Phase::AllLiquid | Phase::Trivial => {
-            if matches!(flash.phase, Phase::Trivial) {
-                return Err(BlowdownFailure::Flash(format!(
-                    "the flash found a trivial solution at {pressure} Pa"
-                )));
-            }
-            let side = if matches!(flash.phase, Phase::AllVapour) {
-                RootSide::Vapour
-            } else {
-                RootSide::Liquid
-            };
-            let root = mixture
-                .phase_state(&reduced, z, side)
-                .map_err(|error| BlowdownFailure::Flash(format!("{error}")))?
-                .z;
-            let phase = phase_of(mixture, ideal_gas, &reduced, t, p, z, root)?;
-            (phase.density, phase.cp / phase.cv, None, None, None)
-        }
-    };
-    if !density.is_finite() || density <= 0.0 {
-        return Err(BlowdownFailure::Density(format!(
-            "the density at {pressure} Pa is {density} kg/m3"
+    if flash.phase != Phase::AllVapour {
+        return Err(BlowdownFailure::PhaseBoundary(format!(
+            "the flash at {pressure:.6} Pa found a non-gas state, and the class requires a \
+             single gas phase"
         )));
     }
+    let root = mixture
+        .phase_state(&reduced, z, RootSide::Vapour)
+        .map_err(|error| BlowdownFailure::Flash(format!("{error}")))?
+        .z;
+    let phase = phase_of(mixture, ideal_gas, &reduced, t, p, z, root)?;
+    if !phase.density.is_finite() || phase.density <= 0.0 {
+        return Err(BlowdownFailure::Density(format!(
+            "the density at {pressure} Pa is {} kg/m3",
+            phase.density
+        )));
+    }
+    let gamma = phase.cp / phase.cv;
     if !gamma.is_finite() || gamma <= 1.0 || gamma > 2.0 {
         return Err(BlowdownFailure::Gamma(format!(
             "the capacity ratio at {pressure} Pa is {gamma}, and the port refuses one outside \
@@ -589,24 +765,21 @@ fn flash_state(
         )));
     }
     Ok(State {
-        flash,
-        pressure,
         temperature,
-        density,
+        pressure,
+        density: phase.density,
         gamma,
-        vapour_fraction,
-        vapour_density,
-        liquid_density,
+        molar_enthalpy: phase.molar_enthalpy,
+        compressibility: root,
     })
 }
 
-/// One phase's molar mass, corrected molar volume, density and capacities.
+/// One phase's molar mass, corrected molar volume, density, capacities and enthalpy.
 struct PhaseProperties {
-    molar_mass: f64,
-    molar_volume: f64,
     density: f64,
     cp: f64,
     cv: f64,
+    molar_enthalpy: f64,
 }
 
 #[allow(clippy::too_many_arguments)] // one argument per phase input
@@ -631,12 +804,13 @@ fn phase_of(
     }
     let capacity = phase_capacity(mixture, ideal_gas, reduced, t, p, composition, root)
         .map_err(|error| BlowdownFailure::Gamma(format!("{error}")))?;
+    let enthalpy = molar_enthalpy_entropy(mixture, ideal_gas, t, p, composition, root)
+        .map_err(|error| BlowdownFailure::Flash(format!("{error}")))?;
     Ok(PhaseProperties {
-        molar_mass,
-        molar_volume,
         density: molar_mass / molar_volume,
         cp: capacity.cp,
         cv: capacity.cv,
+        molar_enthalpy: enthalpy.h.value,
     })
 }
 
