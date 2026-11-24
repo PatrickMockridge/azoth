@@ -5538,6 +5538,9 @@ class HeatExchangerResult:
     wall_temperature: Qty | None
     shell_fluid_temperature: Qty | None
     tube_fluid_temperature: Qty | None
+    thermal_inventory_energy: Qty | None
+    balance_accumulation: Qty | None
+    balance_boundary_energy: Qty | None
     mechanical_selected_type: str | None
     mechanical_selected_area: Qty | None
     log_mean_temperature_difference: Qty | None
