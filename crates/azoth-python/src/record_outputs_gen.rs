@@ -441,7 +441,7 @@ pub struct PyCcePoint {
     /// the absolute pressure.
     #[pyo3(get)]
     pub pressure: PyQty,
-    /// the untranslated total volume.
+    /// the Peneloux-corrected total volume.
     #[pyo3(get)]
     pub total_volume: PyQty,
     /// the total volume over the saturation volume.
@@ -459,7 +459,7 @@ pub struct PyCcePoint {
     /// the gas volume over the standard volume.
     #[pyo3(get)]
     pub bg: f64,
-    /// phase 0's cubic compressibility.
+    /// phase 0's corrected compressibility `P V / (R T)`.
     #[pyo3(get)]
     pub z_gas: f64,
     /// the oil phase's density; absent where the flash labels no oil.
@@ -1419,13 +1419,13 @@ pub struct PyDlePoint {
     /// the removed gas's translated volume; absent in a single phase.
     #[pyo3(get)]
     pub gas_volume: Option<PyQty>,
-    /// the removed gas at 288.15 K and 1.01325 bar; absent in a single phase.
+    /// the removed gas at 288.15 K and 1.01325 bar with Z = 1, its liquid dropout counted as equivalent gas; absent in a single phase.
     #[pyo3(get)]
     pub gas_standard_volume: Option<PyQty>,
-    /// the gas phase's cubic compressibility.
+    /// the gas phase's corrected compressibility `P V / (R T)`.
     #[pyo3(get)]
     pub z_gas: Option<f64>,
-    /// the gas molar mass over the class's 0.028 kg/mol air constant.
+    /// the gas molar mass over air's 28.96546 g/mol.
     #[pyo3(get)]
     pub relative_gas_gravity: Option<f64>,
     /// the oil formation volume factor; absent without a stock-tank oil volume.
@@ -3900,16 +3900,16 @@ pub struct PyLeakBlowdownPoint {
     /// the recorded state's pressure.
     #[pyo3(get)]
     pub pressure: PyQty,
-    /// the physical vapour mole fraction: 1 all-vapour, 0 all-liquid, beta two-phase.
+    /// one, because the model requires a single gas phase.
     #[pyo3(get)]
     pub vapour_mole_fraction: f64,
-    /// `mdot/(rho A Cd)`, capped at 1.2 times the ideal-gas sound speed.
+    /// `mdot/(rho A Cd)`, capped at 1.2 times the ideal-gas sound speed; zero where the rate is zero.
     #[pyo3(get)]
     pub jet_velocity: PyQty,
-    /// `mdot v + (P-back) A`, unclamped.
+    /// `mdot v + (P-back) A`, under the same zero-rate rule.
     #[pyo3(get)]
     pub jet_momentum: PyQty,
-    /// the liquid Sauter mean diameter, zero for a single phase or a trace liquid.
+    /// zero; the model requires a single gas phase.
     #[pyo3(get)]
     pub droplet_smd: PyQty,
 }

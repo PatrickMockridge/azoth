@@ -172,7 +172,7 @@ class CcePoint:
     #: the absolute pressure.
     pressure: Q
 
-    #: the untranslated total volume.
+    #: the Peneloux-corrected total volume.
     total_volume: Q
 
     #: the total volume over the saturation volume.
@@ -190,7 +190,7 @@ class CcePoint:
     #: the gas volume over the standard volume.
     bg: float
 
-    #: phase 0's cubic compressibility.
+    #: phase 0's corrected compressibility `P V / (R T)`.
     z_gas: float
 
     #: the oil phase's density; absent where the flash labels no oil.
@@ -560,13 +560,13 @@ class DlePoint:
     #: the removed gas's translated volume; absent in a single phase.
     gas_volume: Q | None
 
-    #: the removed gas at 288.15 K and 1.01325 bar; absent in a single phase.
+    #: the removed gas at 288.15 K and 1.01325 bar with Z = 1, its liquid dropout counted as equivalent gas; absent in a single phase.
     gas_standard_volume: Q | None
 
-    #: the gas phase's cubic compressibility.
+    #: the gas phase's corrected compressibility `P V / (R T)`.
     z_gas: float | None
 
-    #: the gas molar mass over the class's 0.028 kg/mol air constant.
+    #: the gas molar mass over air's 28.96546 g/mol.
     relative_gas_gravity: float | None
 
     #: the oil formation volume factor; absent without a stock-tank oil volume.
@@ -1468,16 +1468,16 @@ class LeakBlowdownPoint:
     #: the recorded state's pressure.
     pressure: Q
 
-    #: the physical vapour mole fraction: 1 all-vapour, 0 all-liquid, beta two-phase.
+    #: one, because the model requires a single gas phase.
     vapour_mole_fraction: float
 
-    #: `mdot/(rho A Cd)`, capped at 1.2 times the ideal-gas sound speed.
+    #: `mdot/(rho A Cd)`, capped at 1.2 times the ideal-gas sound speed; zero where the rate is zero.
     jet_velocity: Q
 
-    #: `mdot v + (P-back) A`, unclamped.
+    #: `mdot v + (P-back) A`, under the same zero-rate rule.
     jet_momentum: Q
 
-    #: the liquid Sauter mean diameter, zero for a single phase or a trace liquid.
+    #: zero; the model requires a single gas phase.
     droplet_smd: Q
 
 
