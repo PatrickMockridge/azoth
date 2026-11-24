@@ -515,7 +515,7 @@ def _advance(
             f"the VU target is {molar_volume} m3/mol at {molar_energy} J/mol",
         )
     try:
-        pressure, temperature, phase = _vu_at(
+        pressure, temperature, _phase = _vu_at(
             mixture, ideal_gas, previous_pressure, molar_volume, molar_energy, z
         )
     except Exception as error:  # the class's VU flash throws out of the loop
@@ -575,7 +575,9 @@ def _flash_state(
     root = phase_state(reduced, kij, z, liquid=False).z
     phase = _phase_of(mixture, ideal_gas, reduced, kij, temperature, pressure, z, root)
     if not phase.density > 0.0 or not math.isfinite(phase.density):
-        raise _Failure("DENSITY_UNAVAILABLE", f"the density at {pressure} Pa is {phase.density} kg/m3")
+        raise _Failure(
+            "DENSITY_UNAVAILABLE", f"the density at {pressure} Pa is {phase.density} kg/m3"
+        )
     gamma = phase.cp / phase.cv
     if not math.isfinite(gamma) or not 1.0 < gamma <= 2.0:
         raise _Failure(

@@ -1099,7 +1099,9 @@ def _transient_states(
             )
     for name, value in (("shell_holdup_volume", shell_holdup), ("tube_holdup_volume", tube_holdup)):
         if not math.isfinite(value) or value < 0.0:
-            raise InvalidInputError(name, f"a finite nonnegative volume is required, and {value} is not")
+            raise InvalidInputError(
+                name, f"a finite nonnegative volume is required, and {value} is not"
+            )
     for name, value in (
         ("wall_temperature", wall_temperature),
         ("shell_fluid_temperature", shell_fluid_temperature),
@@ -1125,8 +1127,26 @@ def _transient_states(
         *_transient_properties(cold_components, cold_in_z, cold_in_p, cold_in_t),
     )
     shell, tube = (cold, hot) if tube_is_hot else (hot, cold)
-    shell_names, shell_z, shell_p, shell_in_t, shell_in_h, _, shell_in_density, shell_molar_mass = shell
-    tube_names, tube_z, tube_p, tube_in_t, tube_in_h, _, tube_in_density, tube_molar_mass = tube
+    (
+        shell_names,
+        shell_z,
+        shell_p,
+        shell_in_t,
+        shell_in_h,
+        _,
+        shell_in_density,
+        _,
+    ) = shell
+    (
+        tube_names,
+        tube_z,
+        tube_p,
+        tube_in_t,
+        tube_in_h,
+        _,
+        tube_in_density,
+        _,
+    ) = tube
     hot_molar_mass = hot[7]
     cold_molar_mass = cold[7]
     shell_flow = cold_in_n * cold_molar_mass if tube_is_hot else hot_in_n * hot_molar_mass
