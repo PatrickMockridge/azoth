@@ -20,11 +20,8 @@ model_0_sigma_N_per_m=0.009424889197268286
 parachor_direct_sigma_N_per_m=0.009424889197268286
 firozabadi_direct_sigma_N_per_m=0.03622765708367235
 model_1_sigma_N_per_m=0.009424889197268286
-model_1_milliseconds=1552
 model_2_sigma_N_per_m=0.010011889708138912
-model_2_milliseconds=10
 model_4_sigma_N_per_m=0.009519731859031853
-model_4_milliseconds=32
 
 co2_water_313K_50bara
 components=CO2 water
@@ -48,11 +45,8 @@ model_0_sigma_N_per_m=0.053145026912194734
 parachor_direct_sigma_N_per_m=0.053145026912194734
 firozabadi_direct_sigma_N_per_m=0.10420927512440828
 model_1_sigma_N_per_m=0.053145026912194734
-model_1_milliseconds=1
 model_2_sigma_N_per_m=0.06287843226092453
-model_2_milliseconds=3
 model_4_sigma_N_per_m=0.053145026912194734
-model_4_milliseconds=0
 
 nheptane_water_300K_1bara
 components=n-heptane water
@@ -76,9 +70,6 @@ model_0_sigma_N_per_m=0.05083361859364053
 parachor_direct_sigma_N_per_m=3.932397216657956E-4
 firozabadi_direct_sigma_N_per_m=0.05083361859364053
 model_1_sigma_N_per_m=0.05083361859364053
-model_1_milliseconds=1
 model_2_sigma_N_per_m=0.07252054882360127
-model_2_milliseconds=4
 model_4_sigma_N_per_m=0.07252054882360127
-model_4_milliseconds=3
 

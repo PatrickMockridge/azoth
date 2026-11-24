@@ -109,7 +109,6 @@ public class SurfaceTensionProbe {
 
     if (solvers) {
       for (int model : new int[] { 1, 2, 4 }) {
-        long started = System.currentTimeMillis();
         try {
           system.getInterphaseProperties().setInterfacialTensionModel(model);
           System.out.println("model_" + model + "_sigma_N_per_m="
@@ -118,8 +117,6 @@ public class SurfaceTensionProbe {
           System.out.println("model_" + model + "_error=" + ex.getClass().getSimpleName() + ":"
               + ex.getMessage());
         }
-        System.out.println("model_" + model + "_milliseconds="
-            + (System.currentTimeMillis() - started));
       }
     }
     System.out.println();
