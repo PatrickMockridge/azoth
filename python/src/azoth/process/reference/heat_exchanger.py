@@ -1102,14 +1102,14 @@ def _transient_states(
             raise InvalidInputError(
                 name, f"a finite nonnegative volume is required, and {value} is not"
             )
-    for name, value in (
+    for name, carried in (
         ("wall_temperature", wall_temperature),
         ("shell_fluid_temperature", shell_fluid_temperature),
         ("tube_fluid_temperature", tube_fluid_temperature),
     ):
-        if value is not None and not math.isfinite(value) and not math.isnan(value):
+        if carried is not None and not math.isfinite(carried) and not math.isnan(carried):
             raise InvalidInputError(
-                name, f"a carried temperature is finite or NaN, and {value} is neither"
+                name, f"a carried temperature is finite or NaN, and {carried} is neither"
             )
 
     hot = (
@@ -1181,7 +1181,9 @@ def _transient_states(
     mass_flow = [shell_flow, tube_flow]
     inlet_enthalpy = [shell_in_h, tube_in_h]
 
-    def evaluate(temperature: list[float]) -> tuple[list[float], list[float], list[list[float]]]:
+    def evaluate(
+        temperature: list[float],
+    ) -> tuple[list[float], list[tuple[float, float, float, float]], list[list[float]]]:
         sides = [
             _transient_properties(shell_names, shell_z, shell_p, temperature[0]),
             _transient_properties(tube_names, tube_z, tube_p, temperature[1]),
