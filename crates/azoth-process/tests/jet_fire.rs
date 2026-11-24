@@ -159,18 +159,16 @@ fn the_guards_are_the_class_constructor_and_the_captures() {
         .is_err(),
         "the class throws on a non-positive target"
     );
-    assert!(
-        jet_fire(
-            kilograms_per_second(2.0),
-            50.0e6,
-            0.20,
-            Some(0.0),
-            Some(meters(50.0)),
-            None,
-        )
-        .is_err(),
-        "zero humidity makes the class's transmissivity NaN"
-    );
+    let dry = jet_fire(
+        kilograms_per_second(2.0),
+        50.0e6,
+        0.20,
+        Some(0.0),
+        Some(meters(50.0)),
+        None,
+    )
+    .expect("zero humidity is unit transmissivity at the pin");
+    assert_eq!(dry.transmissivity, Some(1.0));
     assert!(
         jet_fire(
             kilograms_per_second(2.0),

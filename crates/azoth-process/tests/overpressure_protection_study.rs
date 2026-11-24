@@ -244,30 +244,17 @@ fn a_capacity_shortfall_names_the_largest_orifice() {
 }
 
 #[test]
-fn an_acceptance_failure_carries_the_basis_prose() {
+fn a_set_pressure_above_the_mawp_is_refused() {
     let study = run(8.0e5, &[vapour("Blocked outlet gas", 2.0)], Some(1.0e6));
-    assert_eq!(study.recommended_orifice.as_deref(), Some("K"));
-    close(
-        study.acceptance_peak_pressure.expect("accepted").value,
-        1_089_867.5,
-        "the peak pressure",
-    );
-    close(
-        study.acceptance_allowable_pressure.expect("accepted").value,
-        869_867.5,
-        "the allowable pressure",
-    );
-    close(
-        study.acceptance_margin.expect("accepted").value,
-        -220_000.0,
-        "the margin",
-    );
-    assert_eq!(study.accepted, Some(false));
+    assert!(study.recommended_orifice.is_none());
+    assert!(study.accepted.is_none());
     assert_eq!(
         study.messages,
         vec![
-            "Relieving pressure exceeds the allowable accumulated pressure: 110% of gauge MAWP \
-             (6.99 barg x 1.10, standard atmosphere) for Blocked outlet, single device"
+            "Blocked outlet gas: Missing or invalid pressure, relief demand, cause or \
+             relieving-phase property basis"
+                .to_string(),
+            "Resolve all credible relief demands before selecting an orifice".to_string()
         ]
     );
 }

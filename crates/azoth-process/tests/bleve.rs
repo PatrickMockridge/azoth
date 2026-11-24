@@ -140,18 +140,16 @@ fn the_guards_include_the_fraction_the_class_omits() {
         .is_err(),
         "a fraction above one is refused"
     );
-    assert!(
-        bleve(
-            kilograms(1000.0),
-            46.0e6,
-            0.30,
-            Some(0.0),
-            Some(meters(50.0)),
-            None,
-        )
-        .is_err(),
-        "zero humidity makes the shared transmissivity NaN"
-    );
+    let dry = bleve(
+        kilograms(1000.0),
+        46.0e6,
+        0.30,
+        Some(0.0),
+        Some(meters(50.0)),
+        None,
+    )
+    .expect("zero humidity is unit transmissivity at the pin");
+    assert_eq!(dry.transmissivity, Some(1.0));
     assert!(
         bleve(
             kilograms(1000.0),
