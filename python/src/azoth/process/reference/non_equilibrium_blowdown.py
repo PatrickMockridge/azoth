@@ -376,9 +376,7 @@ def _evaluate(
                 coefficient
                 * area
                 * pressure
-                * math.sqrt(
-                    gas.gamma * gas.molar_mass / (z_gas * GAS_CONSTANT * gas_temperature)
-                )
+                * math.sqrt(gas.gamma * gas.molar_mass / (z_gas * GAS_CONSTANT * gas_temperature))
                 * (2.0 / (gas.gamma + 1.0)) ** ((gas.gamma + 1.0) / (2.0 * (gas.gamma - 1.0)))
             )
         else:
@@ -535,8 +533,7 @@ def _evaluate(
                     gas_total = gas_moles + moved_moles
                     if gas_total > 0.0:
                         gas_composition = [
-                            (gas_moles * gas_component + moved_moles * vapour_component)
-                            / gas_total
+                            (gas_moles * gas_component + moved_moles * vapour_component) / gas_total
                             for gas_component, vapour_component in zip(
                                 gas_composition, solution.y, strict=True
                             )

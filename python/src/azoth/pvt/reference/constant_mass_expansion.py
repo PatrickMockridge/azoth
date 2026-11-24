@@ -145,8 +145,7 @@ def _constant_mass_expansion_of(
     saturation_pressure, saturation, warnings = _saturation_state(fluid, t)
     saturation_volume = saturation.volume()
     z_saturation = (
-        saturation_pressure * saturation_volume
-        / (saturation.total_moles * NEQSIM_GAS_CONSTANT * t)
+        saturation_pressure * saturation_volume / (saturation.total_moles * NEQSIM_GAS_CONSTANT * t)
     )
     # The phase carrying the material: NeqSim's flash is single-phase at the class's
     # midpoint, while ours can leave a trace incipient gas there.
@@ -172,9 +171,7 @@ def _constant_mass_expansion_of(
                     "flash",
                     "a two-phase CCE point has no oil phase, so its liquid volume is absent",
                 )
-            liquid_relative_volume: float | None = (
-                oil.volume(flash.total_moles) / saturation_volume
-            )
+            liquid_relative_volume: float | None = oil.volume(flash.total_moles) / saturation_volume
             y_factor: float | None = (
                 (saturation_pressure - pressure)
                 / pressure

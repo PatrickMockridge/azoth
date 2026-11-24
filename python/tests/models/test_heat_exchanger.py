@@ -140,9 +140,7 @@ def test_an_unknown_selection_criterion_is_refused() -> None:
 def test_the_dynamic_state_is_carried_by_the_outputs(backend: str) -> None:
     result = _run(_case("the_first_dynamic_step_seeds_the_wall"), backend)
     assert result.wall_temperature is not None
-    assert result.wall_temperature.to("K").magnitude == pytest.approx(
-        322.1428614599108, rel=1e-9
-    )
+    assert result.wall_temperature.to("K").magnitude == pytest.approx(322.1428614599108, rel=1e-9)
     # A holdup was not stated, so the fluids follow the inlets without storing energy.
     assert result.shell_fluid_temperature.to("K").magnitude == pytest.approx(
         349.1333795590421, rel=1e-9

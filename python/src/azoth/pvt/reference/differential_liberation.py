@@ -166,9 +166,7 @@ def _differential_liberation_of(
             gas_standard = gas.moles(flash.total_moles) * NEQSIM_GAS_CONSTANT * T_SC / P_SC
             total_gas_standard += gas_standard
             row["z_gas"] = pressure * gas.molar_volume / (NEQSIM_GAS_CONSTANT * t)
-            row["relative_gas_gravity"] = (
-                gas.molar_mass / NEQSIM_AIR_MOLAR_MASS_KG_PER_MOL
-            )
+            row["relative_gas_gravity"] = gas.molar_mass / NEQSIM_AIR_MOLAR_MASS_KG_PER_MOL
             oil = flash.oil()
             liquid = oil if oil is not None else flash.phases[0]
             row["oil_density"] = liquid.density()
