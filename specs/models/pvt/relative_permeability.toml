@@ -1,0 +1,185 @@
+id = "pvt.relative_permeability"
+name = "Relative permeability"
+kind = "direct"
+assumptions = [
+    "**the four tables are the class's**: SWOF (Sw, Krw, Krow, Pcow), SGOF (Sg, Krg, Krog, Pcog), SOF3 (So, Krow, Krog) and SLGOF (Sl, Krg, Krog, Pcog), each a `linspace` grid whose first and last rows are overwritten with the endpoint values.\n",
+    "**`Krog` does not subtract the critical gas saturation**: the class normalises it by `1 - swc - sorg` alone, and the port carries that asymmetry.\n",
+    "**a descending grid is published**: when `swc > 1 - sorw` the first row's saturation is above the last, and the endpoint overwrites still apply.\n",
+    "**the capillary pressures are the class's hardcoded zero**, the Eclipse column rather than a computed pressure.\n",
+    "**a negative `critical_water_saturation` is the class's sentinel for `swc`**, and absent takes the same value.\n",
+    "**fewer than three rows, a non-finite parameter and a non-finite table value are refused.**\n",
+    "**the Eclipse keyword text is a report and session surface**, so only the table rows its arithmetic produces are published.\n",
+]
+references = [
+    "Corey, A. T. (1954). \"The Interrelation Between Gas and Oil Relative Permeabilities.\" Producers Monthly 19(1), 38-41.",
+    "Lomeland, F., Ebeltoft, E. & Thomas, W. H. (2005). \"A New Versatile Relative Permeability Correlation.\" Society of Core Analysts, SCA2005-32.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/reservoirproperties/relpermeability/RelativePermeabilityGenerator.java` at commit 118d9af is the port source.",
+    "`validation/neqsim/captures/pvt_relative_permeability.tsv` - the curve primitives and every table type at the class test's parameters, the critical-saturation state and the descending grid.",
+]
+[source]
+standard = "NeqSim pvtsimulation/reservoirproperties/relpermeability/RelativePermeabilityGenerator.java"
+edition = "The Corey and LET curves, the four Eclipse table types, the saturation normalisations and the endpoint overwrites; the keyword text is a report."
+[inputs]
+[inputs.table_type]
+type = "enum"
+values = ["swof", "sgof", "sof3", "slgof"]
+optional = true
+description = "the Eclipse table type. **Absent is `swof`**, the class's own default.\n"
+[inputs.model_family]
+type = "enum"
+values = ["corey", "let"]
+optional = true
+description = "the curve family. **Absent is `corey`**, the class's own default.\n"
+[inputs.rows]
+unit = "dimensionless"
+optional = true
+description = "the table row count, at least three. **Absent is 20**, the class's own default.\n"
+[inputs.swc]
+unit = "dimensionless"
+optional = true
+description = "connate water saturation. **Absent is zero.**\n"
+[inputs.critical_water_saturation]
+unit = "dimensionless"
+optional = true
+description = "the onset of water flow. **Absent, and a negative value, are `swc`**, the class's sentinel.\n"
+[inputs.sorw]
+unit = "dimensionless"
+optional = true
+description = "residual oil saturation to water. **Absent is zero.**\n"
+[inputs.sorg]
+unit = "dimensionless"
+optional = true
+description = "residual oil saturation to gas. **Absent is zero.**\n"
+[inputs.sgcr]
+unit = "dimensionless"
+optional = true
+description = "critical gas saturation. **Absent is zero.**\n"
+[inputs.kro_max]
+unit = "dimensionless"
+optional = true
+description = "the maximum oil relative permeability. **Absent is one.**\n"
+[inputs.krw_max]
+unit = "dimensionless"
+optional = true
+description = "the maximum water relative permeability. **Absent is one.**\n"
+[inputs.krg_max]
+unit = "dimensionless"
+optional = true
+description = "the maximum gas relative permeability. **Absent is one.**\n"
+[inputs.no]
+unit = "dimensionless"
+optional = true
+description = "the oil Corey exponent, water-oil system. **Absent is two.**\n"
+[inputs.nw]
+unit = "dimensionless"
+optional = true
+description = "the water Corey exponent. **Absent is two.**\n"
+[inputs.ng]
+unit = "dimensionless"
+optional = true
+description = "the gas Corey exponent. **Absent is two.**\n"
+[inputs.nog]
+unit = "dimensionless"
+optional = true
+description = "the oil Corey exponent, gas-oil system. **Absent is two.**\n"
+[inputs.lo]
+unit = "dimensionless"
+optional = true
+description = "the oil L parameter, water-oil LET. **Absent is two.**\n"
+[inputs.eo]
+unit = "dimensionless"
+optional = true
+description = "the oil E parameter, water-oil LET. **Absent is one.**\n"
+[inputs.to]
+unit = "dimensionless"
+optional = true
+description = "the oil T parameter, water-oil LET. **Absent is two.**\n"
+[inputs.lw]
+unit = "dimensionless"
+optional = true
+description = "the water L parameter. **Absent is two.**\n"
+[inputs.ew]
+unit = "dimensionless"
+optional = true
+description = "the water E parameter. **Absent is one.**\n"
+[inputs.tw]
+unit = "dimensionless"
+optional = true
+description = "the water T parameter. **Absent is two.**\n"
+[inputs.lg]
+unit = "dimensionless"
+optional = true
+description = "the gas L parameter. **Absent is two.**\n"
+[inputs.eg]
+unit = "dimensionless"
+optional = true
+description = "the gas E parameter. **Absent is one.**\n"
+[inputs.tg]
+unit = "dimensionless"
+optional = true
+description = "the gas T parameter. **Absent is two.**\n"
+[inputs.log]
+unit = "dimensionless"
+optional = true
+description = "the oil L parameter, gas-oil LET. **Absent is two.**\n"
+[inputs.eog]
+unit = "dimensionless"
+optional = true
+description = "the oil E parameter, gas-oil LET. **Absent is one.**\n"
+[inputs.tog]
+unit = "dimensionless"
+optional = true
+description = "the oil T parameter, gas-oil LET. **Absent is two.**\n"
+[outputs]
+[outputs.table_type]
+type = "string"
+description = "the Eclipse table type: SWOF, SGOF, SOF3 or SLGOF.\n"
+[outputs.saturation_name]
+type = "string"
+description = "the saturation column's name.\n"
+[outputs.table]
+type = "record_list"
+description = "one row per saturation point, in the grid's order.\n"
+[outputs.table.fields.sw]
+unit = "dimensionless"
+optional = true
+description = "water saturation, for SWOF.\n"
+[outputs.table.fields.sg]
+unit = "dimensionless"
+optional = true
+description = "gas saturation, for SGOF.\n"
+[outputs.table.fields.so]
+unit = "dimensionless"
+optional = true
+description = "oil saturation, for SOF3.\n"
+[outputs.table.fields.sl]
+unit = "dimensionless"
+optional = true
+description = "liquid saturation, for SLGOF.\n"
+[outputs.table.fields.krw]
+unit = "dimensionless"
+optional = true
+description = "water relative permeability.\n"
+[outputs.table.fields.krg]
+unit = "dimensionless"
+optional = true
+description = "gas relative permeability.\n"
+[outputs.table.fields.krow]
+unit = "dimensionless"
+optional = true
+description = "oil relative permeability, water-oil system.\n"
+[outputs.table.fields.krog]
+unit = "dimensionless"
+optional = true
+description = "oil relative permeability, gas-oil system.\n"
+[outputs.table.fields.pcow]
+unit = "Pa"
+optional = true
+description = "the water-oil capillary pressure column; the class hardcodes zero.\n"
+[outputs.table.fields.pcog]
+unit = "Pa"
+optional = true
+description = "the gas-oil capillary pressure column; the class hardcodes zero.\n"
+[implementations]
+python = "azoth.pvt.relative_permeability"
+rust = "azoth_pvt::relative_permeability"

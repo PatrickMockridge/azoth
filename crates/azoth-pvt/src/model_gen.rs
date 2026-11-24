@@ -14,6 +14,7 @@
 //!   - specs/models/pvt/oil_material_balance.toml
 //!   - specs/models/pvt/property_sweep.toml
 //!   - specs/models/pvt/regression.toml
+//!   - specs/models/pvt/relative_permeability.toml
 //!   - specs/models/pvt/saturation_test.toml
 //!   - specs/models/pvt/separator_test.toml
 //!   - specs/models/pvt/swelling_test.toml
@@ -10461,6 +10462,689 @@ pub static REGRESSION_SPEC: ModelSpec = ModelSpec {
     cases: REGRESSION_CASES,
 };
 
+static RELATIVE_PERMEABILITY_CHECKS: &[SpecCheck] = &[];
+
+static RELATIVE_PERMEABILITY_CASES: &[TestCase] = &[
+    TestCase {
+        id: "swof_default_5",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("rows", 5.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("table_type", "SWOF"), ("saturation_name", "Sw")],
+        records: &[],
+        expected_records: &[(
+            "table",
+            &[
+                &[
+                    RecordField {
+                        name: "sw",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "krw",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "pcow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sw",
+                        value: FieldValue::Number(0.25),
+                    },
+                    RecordField {
+                        name: "krw",
+                        value: FieldValue::Number(0.0625),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(0.5625),
+                    },
+                    RecordField {
+                        name: "pcow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sw",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "krw",
+                        value: FieldValue::Number(0.25),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(0.25),
+                    },
+                    RecordField {
+                        name: "pcow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sw",
+                        value: FieldValue::Number(0.75),
+                    },
+                    RecordField {
+                        name: "krw",
+                        value: FieldValue::Number(0.5625),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(0.0625),
+                    },
+                    RecordField {
+                        name: "pcow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sw",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "krw",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pcow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "sgof_default_5",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("rows", 5.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("table_type", "sgof")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("table_type", "SGOF"), ("saturation_name", "Sg")],
+        records: &[],
+        expected_records: &[(
+            "table",
+            &[
+                &[
+                    RecordField {
+                        name: "sg",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "krg",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "krog",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "pcog",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sg",
+                        value: FieldValue::Number(0.25),
+                    },
+                    RecordField {
+                        name: "krg",
+                        value: FieldValue::Number(0.0625),
+                    },
+                    RecordField {
+                        name: "krog",
+                        value: FieldValue::Number(0.5625),
+                    },
+                    RecordField {
+                        name: "pcog",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sg",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "krg",
+                        value: FieldValue::Number(0.25),
+                    },
+                    RecordField {
+                        name: "krog",
+                        value: FieldValue::Number(0.25),
+                    },
+                    RecordField {
+                        name: "pcog",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sg",
+                        value: FieldValue::Number(0.75),
+                    },
+                    RecordField {
+                        name: "krg",
+                        value: FieldValue::Number(0.5625),
+                    },
+                    RecordField {
+                        name: "krog",
+                        value: FieldValue::Number(0.0625),
+                    },
+                    RecordField {
+                        name: "pcog",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sg",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "krg",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "krog",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pcog",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "sof3_default_5",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("rows", 5.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("table_type", "sof3")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("table_type", "SOF3"), ("saturation_name", "So")],
+        records: &[],
+        expected_records: &[(
+            "table",
+            &[
+                &[
+                    RecordField {
+                        name: "so",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "krog",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "so",
+                        value: FieldValue::Number(0.25),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(0.0625),
+                    },
+                    RecordField {
+                        name: "krog",
+                        value: FieldValue::Number(0.0625),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "so",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(0.25),
+                    },
+                    RecordField {
+                        name: "krog",
+                        value: FieldValue::Number(0.25),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "so",
+                        value: FieldValue::Number(0.75),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(0.5625),
+                    },
+                    RecordField {
+                        name: "krog",
+                        value: FieldValue::Number(0.5625),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "so",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "krog",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "slgof_default_5",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("rows", 5.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("table_type", "slgof")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("table_type", "SLGOF"), ("saturation_name", "Sl")],
+        records: &[],
+        expected_records: &[(
+            "table",
+            &[
+                &[
+                    RecordField {
+                        name: "sl",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "krg",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "krog",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pcog",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sl",
+                        value: FieldValue::Number(0.25),
+                    },
+                    RecordField {
+                        name: "krg",
+                        value: FieldValue::Number(0.5625),
+                    },
+                    RecordField {
+                        name: "krog",
+                        value: FieldValue::Number(0.0625),
+                    },
+                    RecordField {
+                        name: "pcog",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sl",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "krg",
+                        value: FieldValue::Number(0.25),
+                    },
+                    RecordField {
+                        name: "krog",
+                        value: FieldValue::Number(0.25),
+                    },
+                    RecordField {
+                        name: "pcog",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sl",
+                        value: FieldValue::Number(0.75),
+                    },
+                    RecordField {
+                        name: "krg",
+                        value: FieldValue::Number(0.0625),
+                    },
+                    RecordField {
+                        name: "krog",
+                        value: FieldValue::Number(0.5625),
+                    },
+                    RecordField {
+                        name: "pcog",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sl",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "krg",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "krog",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "pcog",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "swof_let_5",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("rows", 5.0),
+            ("swc", 0.15),
+            ("sorw", 0.2),
+            ("krw_max", 0.3),
+            ("lo", 2.5),
+            ("eo", 1.25),
+            ("to", 1.75),
+            ("lw", 1.2),
+            ("ew", 1.5),
+            ("tw", 2.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("model_family", "let")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("table_type", "SWOF"), ("saturation_name", "Sw")],
+        records: &[],
+        expected_records: &[(
+            "table",
+            &[
+                &[
+                    RecordField {
+                        name: "sw",
+                        value: FieldValue::Number(0.15),
+                    },
+                    RecordField {
+                        name: "krw",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "pcow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sw",
+                        value: FieldValue::Number(0.3125),
+                    },
+                    RecordField {
+                        name: "krw",
+                        value: FieldValue::Number(0.05501216576859834),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(0.8151257300970868),
+                    },
+                    RecordField {
+                        name: "pcow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sw",
+                        value: FieldValue::Number(0.475),
+                    },
+                    RecordField {
+                        name: "krw",
+                        value: FieldValue::Number(0.16115829700348225),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(0.3223476150652073),
+                    },
+                    RecordField {
+                        name: "pcow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sw",
+                        value: FieldValue::Number(0.6375000000000001),
+                    },
+                    RecordField {
+                        name: "krw",
+                        value: FieldValue::Number(0.2649233579068012),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(0.039717491917012314),
+                    },
+                    RecordField {
+                        name: "pcow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sw",
+                        value: FieldValue::Number(0.8),
+                    },
+                    RecordField {
+                        name: "krw",
+                        value: FieldValue::Number(0.3),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pcow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "swof_descending_5",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("rows", 5.0), ("swc", 0.9), ("sorw", 0.2)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("table_type", "SWOF"), ("saturation_name", "Sw")],
+        records: &[],
+        expected_records: &[(
+            "table",
+            &[
+                &[
+                    RecordField {
+                        name: "sw",
+                        value: FieldValue::Number(0.9),
+                    },
+                    RecordField {
+                        name: "krw",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "pcow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sw",
+                        value: FieldValue::Number(0.875),
+                    },
+                    RecordField {
+                        name: "krw",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "pcow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sw",
+                        value: FieldValue::Number(0.8500000000000001),
+                    },
+                    RecordField {
+                        name: "krw",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "pcow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sw",
+                        value: FieldValue::Number(0.8250000000000001),
+                    },
+                    RecordField {
+                        name: "krw",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "pcow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "sw",
+                        value: FieldValue::Number(0.8),
+                    },
+                    RecordField {
+                        name: "krw",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "krow",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pcow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        )],
+    },
+];
+
+/// Registry entry for `pvt.relative_permeability`.
+pub static RELATIVE_PERMEABILITY_SPEC: ModelSpec = ModelSpec {
+    id: "pvt.relative_permeability",
+    kind: "direct",
+    algorithm: None,
+    checks: RELATIVE_PERMEABILITY_CHECKS,
+    cases: RELATIVE_PERMEABILITY_CASES,
+};
+
 static SATURATION_TEST_CHECKS: &[SpecCheck] = &[];
 
 static SATURATION_TEST_CASES: &[TestCase] = &[
@@ -13232,6 +13916,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &OIL_MATERIAL_BALANCE_SPEC,
     &PROPERTY_SWEEP_SPEC,
     &REGRESSION_SPEC,
+    &RELATIVE_PERMEABILITY_SPEC,
     &SATURATION_TEST_SPEC,
     &SEPARATOR_TEST_SPEC,
     &SWELLING_TEST_SPEC,

@@ -479,6 +479,7 @@ Five sections, and the difference between them is the point:
 - [`pvt.oil_material_balance`](./pvt/oil_material_balance.md) — Oil material balance
 - [`pvt.property_sweep`](./pvt/property_sweep.md) — Property sweep
 - [`pvt.regression`](./pvt/regression.md) — PVT multi-target regression
+- [`pvt.relative_permeability`](./pvt/relative_permeability.md) — Relative permeability
 - [`pvt.saturation_test`](./pvt/saturation_test.md) — Saturation test
 - [`pvt.separator_test`](./pvt/separator_test.md) — Separator test
 - [`pvt.swelling_test`](./pvt/swelling_test.md) — Swelling test

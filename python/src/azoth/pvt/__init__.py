@@ -34,6 +34,7 @@ from azoth.core.result import (
     OilMaterialBalanceResult,
     PropertySweepResult,
     RegressionResult,
+    RelativePermeabilityResult,
     SaturationTestResult,
     SeparatorTestResult,
     SwellingTestResult,
@@ -56,6 +57,7 @@ _MMP = "pvt.mmp"
 _OIL_MATERIAL_BALANCE = "pvt.oil_material_balance"
 _PROPERTY_SWEEP = "pvt.property_sweep"
 _REGRESSION = "pvt.regression"
+_RELATIVE_PERMEABILITY = "pvt.relative_permeability"
 _SATURATION_TEST = "pvt.saturation_test"
 _SEPARATOR_TEST = "pvt.separator_test"
 _SWELLING_TEST = "pvt.swelling_test"
@@ -78,6 +80,7 @@ __all__ = [
     "oil_material_balance",
     "property_sweep",
     "regression",
+    "relative_permeability",
     "saturation_test",
     "separator_test",
     "swelling_test",
@@ -917,4 +920,82 @@ def generalized_material_balance(
         initial_bw=initial_bw,
         initial_rv=initial_rv,
         observations=observations,
+    )
+
+
+def relative_permeability(
+    table_type: str | None = None,
+    model_family: str | None = None,
+    rows: Any = None,
+    swc: float | None = None,
+    critical_water_saturation: float | None = None,
+    sorw: float | None = None,
+    sorg: float | None = None,
+    sgcr: float | None = None,
+    kro_max: float | None = None,
+    krw_max: float | None = None,
+    krg_max: float | None = None,
+    no: float | None = None,
+    nw: float | None = None,
+    ng: float | None = None,
+    nog: float | None = None,
+    lo: float | None = None,
+    eo: float | None = None,
+    to: float | None = None,
+    lw: float | None = None,
+    ew: float | None = None,
+    tw: float | None = None,
+    lg: float | None = None,
+    eg: float | None = None,
+    tg: float | None = None,
+    log: float | None = None,
+    eog: float | None = None,
+    tog: float | None = None,
+) -> RelativePermeabilityResult:
+    """A Corey or LET relative-permeability table in one of four Eclipse forms.
+
+    ``table_type`` is ``"swof"`` (the default), ``"sgof"``, ``"sof3"`` or ``"slgof"``;
+    ``model_family`` is ``"corey"`` (the default) or ``"let"``; ``rows`` defaults to 20 and
+    must be at least three. Every endpoint, maximum and curve parameter defaults to the
+    class's own, stated in the spec. A negative ``critical_water_saturation`` means ``swc``.
+
+    Returns:
+        The table type, the saturation column's name and one row per grid point; only the
+        columns the type answers are present, and the class's hardcoded capillary pressures
+        are zero.
+
+    Raises:
+        InvalidInputError: for an unknown type or family, fewer than three rows, a non-finite
+            parameter or a non-finite table value.
+
+    See :func:`azoth.pvt.reference.relative_permeability.relative_permeability`.
+    """
+    return resolve(_RELATIVE_PERMEABILITY)(  # type: ignore[no-any-return]
+        table_type=table_type,
+        model_family=model_family,
+        rows=rows,
+        swc=swc,
+        critical_water_saturation=critical_water_saturation,
+        sorw=sorw,
+        sorg=sorg,
+        sgcr=sgcr,
+        kro_max=kro_max,
+        krw_max=krw_max,
+        krg_max=krg_max,
+        no=no,
+        nw=nw,
+        ng=ng,
+        nog=nog,
+        lo=lo,
+        eo=eo,
+        to=to,
+        lw=lw,
+        ew=ew,
+        tw=tw,
+        lg=lg,
+        eg=eg,
+        tg=tg,
+        log=log,
+        eog=eog,
+        tog=tog,
     )

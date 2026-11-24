@@ -2645,6 +2645,21 @@ class RegressionObjectiveRow:
     value: float
 
 @final
+class RelativePermeabilityRow:
+    """one row per saturation point, in the grid's order."""
+
+    sw: float | None
+    sg: float | None
+    so: float | None
+    sl: float | None
+    krw: float | None
+    krg: float | None
+    krow: float | None
+    krog: float | None
+    pcow: Qty | None
+    pcog: Qty | None
+
+@final
 class SeparatorStageResult:
     """one row per stage."""
 
@@ -7091,6 +7106,13 @@ class RegressionResult:
     warnings: list[Warning]
 
 @final
+class RelativePermeabilityResult:
+    table_type: str
+    saturation_name: str
+    table: list[RelativePermeabilityRow]
+    warnings: list[Warning]
+
+@final
 class SaturationTestResult:
     saturation_pressure: Qty | None
     saturation_temperature: Qty | None
@@ -11410,6 +11432,35 @@ def regression(
     volume_correction: bool | None = None,
     max_iterations: float | None = None,
 ) -> RegressionResult: ...
+def relative_permeability(
+    table_type: str | None = None,
+    model_family: str | None = None,
+    rows: float | None = None,
+    swc: float | None = None,
+    critical_water_saturation: float | None = None,
+    sorw: float | None = None,
+    sorg: float | None = None,
+    sgcr: float | None = None,
+    kro_max: float | None = None,
+    krw_max: float | None = None,
+    krg_max: float | None = None,
+    no: float | None = None,
+    nw: float | None = None,
+    ng: float | None = None,
+    nog: float | None = None,
+    lo: float | None = None,
+    eo: float | None = None,
+    to: float | None = None,
+    lw: float | None = None,
+    ew: float | None = None,
+    tw: float | None = None,
+    lg: float | None = None,
+    eg: float | None = None,
+    tg: float | None = None,
+    log: float | None = None,
+    eog: float | None = None,
+    tog: float | None = None,
+) -> RelativePermeabilityResult: ...
 def saturation_test(
     components: list[FluidComponent],
     mode: str,

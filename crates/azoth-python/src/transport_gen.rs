@@ -35,17 +35,17 @@ use crate::record_outputs_gen::{
     PyPerformanceSif, PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation,
     PyProcessCostEquipmentResult, PyProcessCostFlag, PyProcessCostMtoRow, PyProjectCostLine,
     PyPropertyPoint, PyPulsationModeResult, PyRanzMarshallReleaseStation,
-    PyRealGasFannoReleaseStation, PyRegisterFinding, PyRegressionObjectiveRow, PyReliefDisposalRow,
-    PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage, PyReviewVerdict,
-    PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem, PySafeChartMissingDevice,
-    PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow,
-    PySelfHeatingTimePoint, PySeparatorStageResult, PySettleOutCompartmentResult, PySilIssue,
-    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
-    PySwellingPoint, PyTopsidesBreakdownLine, PyTopsidesCapitalLine, PyTopsidesFlag,
-    PyTopsidesMtoRow, PyTopsidesProjectLine, PyTopsidesProjectSummaryLine, PyTopsidesSummaryLine,
-    PyTopsidesWeightLine, PyTr3001Finding, PyTrappedInventorySegmentResult, PyTypeCostLine,
-    PyVesselFillingPoint, PyVesselRuptureStep, PyWaterMixingResult, PyWaterResultRow,
-    PyZoneRatingRow,
+    PyRealGasFannoReleaseStation, PyRegisterFinding, PyRegressionObjectiveRow,
+    PyRelativePermeabilityRow, PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment,
+    PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem,
+    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
+    PyScenarioIndexRow, PySelfHeatingTimePoint, PySeparatorStageResult,
+    PySettleOutCompartmentResult, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
+    PySts0131FindingResult, PySubFraction, PySwellingPoint, PyTopsidesBreakdownLine,
+    PyTopsidesCapitalLine, PyTopsidesFlag, PyTopsidesMtoRow, PyTopsidesProjectLine,
+    PyTopsidesProjectSummaryLine, PyTopsidesSummaryLine, PyTopsidesWeightLine, PyTr3001Finding,
+    PyTrappedInventorySegmentResult, PyTypeCostLine, PyVesselFillingPoint, PyVesselRuptureStep,
+    PyWaterMixingResult, PyWaterResultRow, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -31241,6 +31241,58 @@ impl From<&azoth_pvt::regression::RegressionResult> for PyRegressionResult {
             average_absolute_deviation_percent: r.average_absolute_deviation_percent,
             iterations: r.iterations,
             convergence_reason: r.convergence_reason.name().to_string(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.relative_permeability`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "RelativePermeabilityResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyRelativePermeabilityResult {
+    /// the Eclipse table type: SWOF, SGOF, SOF3 or SLGOF.
+    #[pyo3(get)]
+    pub table_type: String,
+    /// the saturation column's name.
+    #[pyo3(get)]
+    pub saturation_name: String,
+    /// one row per saturation point, in the grid's order.
+    #[pyo3(get)]
+    pub table: Vec<PyRelativePermeabilityRow>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyRelativePermeabilityResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "RelativePermeabilityResult(table_type={:?}, saturation_name={:?}, table={:?}, {} warning(s))",
+            self.table_type,
+            self.saturation_name,
+            self.table,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::relative_permeability::RelativePermeabilityResult>
+    for PyRelativePermeabilityResult
+{
+    fn from(r: &azoth_pvt::relative_permeability::RelativePermeabilityResult) -> Self {
+        Self {
+            table_type: r.table_type.clone(),
+            saturation_name: r.saturation_name.clone(),
+            table: r
+                .table
+                .iter()
+                .map(PyRelativePermeabilityRow::from)
+                .collect(),
             warnings: transport(&r.warnings),
         }
     }

@@ -103,6 +103,7 @@ from azoth.core.record_outputs_gen import (
     RealGasFannoReleaseStation,
     RegisterFinding,
     RegressionObjectiveRow,
+    RelativePermeabilityRow,
     ReliefDisposalRow,
     RemediationOptionRow,
     ReviewAssessment,
@@ -12657,6 +12658,25 @@ class RegressionResult(_HasWarnings):
 
     #: Why the optimizer stopped.
     convergence_reason: ConvergenceReason
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class RelativePermeabilityResult(_HasWarnings):
+    """Result of ``pvt.relative_permeability``."""
+
+    CALC_ID: ClassVar[str] = "pvt.relative_permeability"
+
+    #: the Eclipse table type: SWOF, SGOF, SOF3 or SLGOF.
+    table_type: str
+
+    #: the saturation column's name.
+    saturation_name: str
+
+    #: one row per saturation point, in the grid's order.
+    table: tuple[RelativePermeabilityRow, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

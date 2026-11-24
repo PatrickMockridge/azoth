@@ -368,6 +368,7 @@
 //!   - specs/models/pvt/oil_material_balance.toml
 //!   - specs/models/pvt/property_sweep.toml
 //!   - specs/models/pvt/regression.toml
+//!   - specs/models/pvt/relative_permeability.toml
 //!   - specs/models/pvt/saturation_test.toml
 //!   - specs/models/pvt/separator_test.toml
 //!   - specs/models/pvt/swelling_test.toml
@@ -6983,6 +6984,35 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("pvt.regression", "dle_weight", "dimensionless"),
     ("pvt.regression", "viscosity_weight", "dimensionless"),
     ("pvt.regression", "max_iterations", "dimensionless"),
+    ("pvt.relative_permeability", "rows", "dimensionless"),
+    ("pvt.relative_permeability", "swc", "dimensionless"),
+    (
+        "pvt.relative_permeability",
+        "critical_water_saturation",
+        "dimensionless",
+    ),
+    ("pvt.relative_permeability", "sorw", "dimensionless"),
+    ("pvt.relative_permeability", "sorg", "dimensionless"),
+    ("pvt.relative_permeability", "sgcr", "dimensionless"),
+    ("pvt.relative_permeability", "kro_max", "dimensionless"),
+    ("pvt.relative_permeability", "krw_max", "dimensionless"),
+    ("pvt.relative_permeability", "krg_max", "dimensionless"),
+    ("pvt.relative_permeability", "no", "dimensionless"),
+    ("pvt.relative_permeability", "nw", "dimensionless"),
+    ("pvt.relative_permeability", "ng", "dimensionless"),
+    ("pvt.relative_permeability", "nog", "dimensionless"),
+    ("pvt.relative_permeability", "lo", "dimensionless"),
+    ("pvt.relative_permeability", "eo", "dimensionless"),
+    ("pvt.relative_permeability", "to", "dimensionless"),
+    ("pvt.relative_permeability", "lw", "dimensionless"),
+    ("pvt.relative_permeability", "ew", "dimensionless"),
+    ("pvt.relative_permeability", "tw", "dimensionless"),
+    ("pvt.relative_permeability", "lg", "dimensionless"),
+    ("pvt.relative_permeability", "eg", "dimensionless"),
+    ("pvt.relative_permeability", "tg", "dimensionless"),
+    ("pvt.relative_permeability", "log", "dimensionless"),
+    ("pvt.relative_permeability", "eog", "dimensionless"),
+    ("pvt.relative_permeability", "tog", "dimensionless"),
     (
         "pvt.saturation_test",
         "temperature",

@@ -383,6 +383,8 @@ from azoth.core.result import (
     RegisterFinding,
     RegressionObjectiveRow,
     RegressionResult,
+    RelativePermeabilityResult,
+    RelativePermeabilityRow,
     ReliefDisposalNetworkResult,
     ReliefDisposalRow,
     ReliefPhase,
@@ -863,6 +865,7 @@ __all__ = [
     "real_gas_fanno_release",
     "reference_potentials",
     "regression",
+    "relative_permeability",
     "relief_disposal_network",
     "reynolds_number",
     "risk_matrix",
@@ -10827,6 +10830,45 @@ def regression(components: Sequence[Mapping[str, Any]], parameters: Sequence[Map
         average_absolute_deviation_percent=result.average_absolute_deviation_percent,
         iterations=result.iterations,
         convergence_reason=ConvergenceReason(result.convergence_reason),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def relative_permeability(table_type: str | None=None, model_family: str | None=None, rows: Any=None, swc: float | None=None, critical_water_saturation: float | None=None, sorw: float | None=None, sorg: float | None=None, sgcr: float | None=None, kro_max: float | None=None, krw_max: float | None=None, krg_max: float | None=None, no: float | None=None, nw: float | None=None, ng: float | None=None, nog: float | None=None, lo: float | None=None, eo: float | None=None, to: float | None=None, lw: float | None=None, ew: float | None=None, tw: float | None=None, lg: float | None=None, eg: float | None=None, tg: float | None=None, log: float | None=None, eog: float | None=None, tog: float | None=None) -> RelativePermeabilityResult:
+    """``pvt.relative_permeability``, computed in Rust."""
+    result = _core.relative_permeability(
+        table_type,
+        model_family,
+        None if rows is None else _count("rows", rows),
+        None if swc is None else swc,
+        None if critical_water_saturation is None else critical_water_saturation,
+        None if sorw is None else sorw,
+        None if sorg is None else sorg,
+        None if sgcr is None else sgcr,
+        None if kro_max is None else kro_max,
+        None if krw_max is None else krw_max,
+        None if krg_max is None else krg_max,
+        None if no is None else no,
+        None if nw is None else nw,
+        None if ng is None else ng,
+        None if nog is None else nog,
+        None if lo is None else lo,
+        None if eo is None else eo,
+        None if to is None else to,
+        None if lw is None else lw,
+        None if ew is None else ew,
+        None if tw is None else tw,
+        None if lg is None else lg,
+        None if eg is None else eg,
+        None if tg is None else tg,
+        None if log is None else log,
+        None if eog is None else eog,
+        None if tog is None else tog,
+    )
+    return RelativePermeabilityResult(
+        table_type=result.table_type,
+        saturation_name=result.saturation_name,
+        table=tuple(RelativePermeabilityRow(sw=c.sw, sg=c.sg, so=c.so, sl=c.sl, krw=c.krw, krg=c.krg, krow=c.krow, krog=c.krog, pcow=None if c.pcow is None else from_si(c.pcow.magnitude_si, c.pcow.unit), pcog=None if c.pcog is None else from_si(c.pcog.magnitude_si, c.pcog.unit)) for c in result.table),
         warnings=_warnings(result.warnings),
     )
 

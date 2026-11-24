@@ -27,6 +27,7 @@ pub mod model_records_gen;
 pub mod oil_material_balance;
 pub mod property_sweep;
 pub mod regression;
+pub mod relative_permeability;
 pub mod saturation;
 pub mod saturation_test;
 pub mod separator_test;
@@ -73,6 +74,9 @@ pub use regression::{
     RegressionParameter, RegressionParameterConfig, RegressionParameterRow, RegressionResult,
     Sample, SampleKind, ViscosityPhase, ViscosityPoint, ViscosityRow, build_fluid, chi_square, fit,
     levenberg_marquardt, objectives, regression, sample_value, sample_values,
+};
+pub use relative_permeability::{
+    RelativePermeabilityResult, RelativePermeabilityRow, relative_permeability,
 };
 pub use saturation_test::{SaturationTestResult, saturation_test};
 pub use separator_test::{

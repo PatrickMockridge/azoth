@@ -6164,6 +6164,91 @@ impl From<&azoth_pvt::regression::RegressionObjectiveRow> for PyRegressionObject
     }
 }
 
+/// one row per saturation point, in the grid's order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "RelativePermeabilityRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyRelativePermeabilityRow {
+    /// water saturation, for SWOF.
+    #[pyo3(get)]
+    pub sw: Option<f64>,
+    /// gas saturation, for SGOF.
+    #[pyo3(get)]
+    pub sg: Option<f64>,
+    /// oil saturation, for SOF3.
+    #[pyo3(get)]
+    pub so: Option<f64>,
+    /// liquid saturation, for SLGOF.
+    #[pyo3(get)]
+    pub sl: Option<f64>,
+    /// water relative permeability.
+    #[pyo3(get)]
+    pub krw: Option<f64>,
+    /// gas relative permeability.
+    #[pyo3(get)]
+    pub krg: Option<f64>,
+    /// oil relative permeability, water-oil system.
+    #[pyo3(get)]
+    pub krow: Option<f64>,
+    /// oil relative permeability, gas-oil system.
+    #[pyo3(get)]
+    pub krog: Option<f64>,
+    /// the water-oil capillary pressure column; the class hardcodes zero.
+    #[pyo3(get)]
+    pub pcow: Option<PyQty>,
+    /// the gas-oil capillary pressure column; the class hardcodes zero.
+    #[pyo3(get)]
+    pub pcog: Option<PyQty>,
+}
+
+#[pymethods]
+impl PyRelativePermeabilityRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "RelativePermeabilityRow(sw={:?}, sg={:?}, so={:?}, sl={:?}, krw={:?}, krg={:?}, krow={:?}, krog={:?}, pcow={:?}, pcog={:?})",
+            self.sw,
+            self.sg,
+            self.so,
+            self.sl,
+            self.krw,
+            self.krg,
+            self.krow,
+            self.krog,
+            self.pcow,
+            self.pcog
+        )
+    }
+}
+
+impl From<&azoth_pvt::relative_permeability::RelativePermeabilityRow>
+    for PyRelativePermeabilityRow
+{
+    fn from(row: &azoth_pvt::relative_permeability::RelativePermeabilityRow) -> Self {
+        Self {
+            sw: row.sw,
+            sg: row.sg,
+            so: row.so,
+            sl: row.sl,
+            krw: row.krw,
+            krg: row.krg,
+            krow: row.krow,
+            krog: row.krog,
+            pcow: row.pcow.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa".to_string(),
+            }),
+            pcog: row.pcog.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa".to_string(),
+            }),
+        }
+    }
+}
+
 /// one row per input row, in caller order.
 #[pyclass(
     frozen,

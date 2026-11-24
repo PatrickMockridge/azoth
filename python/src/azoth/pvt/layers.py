@@ -412,6 +412,10 @@ NO_INTERIOR: dict[str, str] = {
         "each call is one regression's answer; the scaled matrix and its residual columns are "
         "the fit's method, not a state a capture names"
     ),
+    "pvt.relative_permeability": (
+        "each call is one table's answer; the curve normalisations are the method, not a state "
+        "a capture names"
+    ),
 }
 
 #: Capture blocks that are evidence rather than a case - a refusal, a fallback or a fluid the

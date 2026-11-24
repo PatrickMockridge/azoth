@@ -4052,6 +4052,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 2,
         "tests_skipped": 0,
     },
+    'pvt.relative_permeability': {
+        "calc_id": 'pvt.relative_permeability',
+        "name": 'Relative permeability',
+        "spec": {'path': 'specs/models/pvt/relative_permeability.toml', 'sha256': '5aa8e51c7e8abb131a73d6d12d4ddbe0eb817faf72d8910ab37cb6c1aab1d37d'},
+        "code": [{'path': 'python/src/azoth/pvt/reference/relative_permeability.py', 'sha256': 'f48f0e2b410390ee08dd5415b93f072cc29180c4ee7706a6f4027505a83785db'}, {'path': 'crates/azoth-pvt/src/relative_permeability.rs', 'sha256': 'cffda3b6ad69d8e4677c4f998c482d09886d8d126f8507416dbb0d3775c59fb1'}],
+        "source": 'NeqSim pvtsimulation/reservoirproperties/relpermeability/RelativePermeabilityGenerator.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 6,
+        "tests_skipped": 0,
+    },
     'pvt.saturation_test': {
         "calc_id": 'pvt.saturation_test',
         "name": 'Saturation test',

@@ -24,6 +24,7 @@ use crate::mmp::MmpResult;
 use crate::oil_material_balance::OilMaterialBalanceResult;
 use crate::property_sweep::PropertySweepResult;
 use crate::regression::RegressionResult;
+use crate::relative_permeability::RelativePermeabilityResult;
 use crate::saturation_test::SaturationTestResult;
 use crate::separator_test::SeparatorTestResult;
 use crate::swelling_test::SwellingTestResult;
@@ -241,6 +242,15 @@ impl CalcResult for RegressionResult {
         "convergence_reason",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for RelativePermeabilityResult {
+    const CALC_ID: &'static str = "pvt.relative_permeability";
+    const FIELDS: &'static [&'static str] = &["table_type", "saturation_name", "table", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

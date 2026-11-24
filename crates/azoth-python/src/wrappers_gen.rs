@@ -10674,6 +10674,78 @@ pub fn property_sweep(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Relative permeability.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (table_type, model_family, rows, swc, critical_water_saturation, sorw, sorg, sgcr, kro_max, krw_max, krg_max, no, nw, ng, nog, lo, eo, to, lw, ew, tw, lg, eg, tg, log, eog, tog))]
+#[pyo3(
+    text_signature = "(table_type, model_family, rows, swc, critical_water_saturation, sorw, sorg, sgcr, kro_max, krw_max, krg_max, no, nw, ng, nog, lo, eo, to, lw, ew, tw, lg, eg, tg, log, eog, tog)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn relative_permeability(
+    py: Python<'_>,
+    table_type: Option<&str>,
+    model_family: Option<&str>,
+    rows: Option<u32>,
+    swc: Option<f64>,
+    critical_water_saturation: Option<f64>,
+    sorw: Option<f64>,
+    sorg: Option<f64>,
+    sgcr: Option<f64>,
+    kro_max: Option<f64>,
+    krw_max: Option<f64>,
+    krg_max: Option<f64>,
+    no: Option<f64>,
+    nw: Option<f64>,
+    ng: Option<f64>,
+    nog: Option<f64>,
+    lo: Option<f64>,
+    eo: Option<f64>,
+    to: Option<f64>,
+    lw: Option<f64>,
+    ew: Option<f64>,
+    tw: Option<f64>,
+    lg: Option<f64>,
+    eg: Option<f64>,
+    tg: Option<f64>,
+    log: Option<f64>,
+    eog: Option<f64>,
+    tog: Option<f64>,
+) -> PyResult<crate::transport_gen::PyRelativePermeabilityResult> {
+    azoth_pvt::relative_permeability::relative_permeability(
+        table_type,
+        model_family,
+        rows,
+        swc,
+        critical_water_saturation,
+        sorw,
+        sorg,
+        sgcr,
+        kro_max,
+        krw_max,
+        krg_max,
+        no,
+        nw,
+        ng,
+        nog,
+        lo,
+        eo,
+        to,
+        lw,
+        ew,
+        tw,
+        lg,
+        eg,
+        tg,
+        log,
+        eog,
+        tog,
+    )
+    .map(|r| crate::transport_gen::PyRelativePermeabilityResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Saturation test.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

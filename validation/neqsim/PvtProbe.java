@@ -1702,6 +1702,22 @@ public final class PvtProbe {
       relPermTable("small_" + type.name().toLowerCase(java.util.Locale.ROOT), small);
     }
 
+    RelativePermeabilityGenerator smallLet = new RelativePermeabilityGenerator();
+    smallLet.setTableType(RelPermTableType.SWOF);
+    smallLet.setModelFamily(RelPermModelFamily.LET);
+    smallLet.setSwc(0.15);
+    smallLet.setSorw(0.20);
+    smallLet.setKroMax(1.0);
+    smallLet.setKrwMax(0.3);
+    smallLet.setLo(2.5);
+    smallLet.setEo(1.25);
+    smallLet.setTo(1.75);
+    smallLet.setLw(1.2);
+    smallLet.setEw(1.5);
+    smallLet.setTw(2.0);
+    smallLet.setRows(5);
+    relPermTable("small_swof_let", smallLet);
+
     RelativePermeabilityGenerator descending = new RelativePermeabilityGenerator();
     descending.setTableType(RelPermTableType.SWOF);
     descending.setSwc(0.90);

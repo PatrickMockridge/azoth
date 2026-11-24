@@ -2284,6 +2284,41 @@ class RegressionObjectiveRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class RelativePermeabilityRow:
+    """one row per saturation point, in the grid's order."""
+
+    #: water saturation, for SWOF.
+    sw: float | None
+
+    #: gas saturation, for SGOF.
+    sg: float | None
+
+    #: oil saturation, for SOF3.
+    so: float | None
+
+    #: liquid saturation, for SLGOF.
+    sl: float | None
+
+    #: water relative permeability.
+    krw: float | None
+
+    #: gas relative permeability.
+    krg: float | None
+
+    #: oil relative permeability, water-oil system.
+    krow: float | None
+
+    #: oil relative permeability, gas-oil system.
+    krog: float | None
+
+    #: the water-oil capillary pressure column; the class hardcodes zero.
+    pcow: Q | None
+
+    #: the gas-oil capillary pressure column; the class hardcodes zero.
+    pcog: Q | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class ReliefDisposalRow:
     """one row per input row, in caller order."""
 

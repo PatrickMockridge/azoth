@@ -382,6 +382,7 @@
   - [Oil material balance](./pvt/oil_material_balance.md)
   - [Property sweep](./pvt/property_sweep.md)
   - [PVT multi-target regression](./pvt/regression.md)
+  - [Relative permeability](./pvt/relative_permeability.md)
   - [Saturation test](./pvt/saturation_test.md)
   - [Separator test](./pvt/separator_test.md)
   - [Swelling test](./pvt/swelling_test.md)

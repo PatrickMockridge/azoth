@@ -386,6 +386,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyOilMaterialBalanceResult>()?;
     m.add_class::<crate::transport_gen::PyPropertySweepResult>()?;
     m.add_class::<crate::transport_gen::PyRegressionResult>()?;
+    m.add_class::<crate::transport_gen::PyRelativePermeabilityResult>()?;
     m.add_class::<crate::transport_gen::PySaturationTestResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorTestResult>()?;
     m.add_class::<crate::transport_gen::PySwellingTestResult>()?;
@@ -497,6 +498,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyRealGasFannoReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyRegisterFinding>()?;
     m.add_class::<crate::record_outputs_gen::PyRegressionObjectiveRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyRelativePermeabilityRow>()?;
     m.add_class::<crate::record_outputs_gen::PyReliefDisposalRow>()?;
     m.add_class::<crate::record_outputs_gen::PyRemediationOptionRow>()?;
     m.add_class::<crate::record_outputs_gen::PyReviewAssessment>()?;
@@ -1414,6 +1416,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::property_sweep, m)?)?;
     m.add_function(wrap_pyfunction!(crate::pvt::regression, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::relative_permeability,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::saturation_test, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::separator_test, m)?)?;
     m.add_function(wrap_pyfunction!(crate::pvt::swelling_test, m)?)?;
