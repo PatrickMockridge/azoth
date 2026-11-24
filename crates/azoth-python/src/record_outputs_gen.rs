@@ -2230,6 +2230,81 @@ impl From<&azoth_process::models::event_tree::EventTreeOutcome> for PyEventTreeO
     }
 }
 
+/// the initial state followed by one state per interval, in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FetkovichState"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFetkovichState {
+    /// the elapsed time at the end of the interval.
+    #[pyo3(get)]
+    pub time: PyQty,
+    /// the cumulative water influx.
+    #[pyo3(get)]
+    pub cumulative_influx: PyQty,
+    /// the average aquifer pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the water influx over this interval.
+    #[pyo3(get)]
+    pub interval_influx: PyQty,
+    /// the smallest cumulative influx reached inside the interval.
+    #[pyo3(get)]
+    pub interval_minimum_cumulative_influx: PyQty,
+    /// the largest cumulative influx reached inside the interval.
+    #[pyo3(get)]
+    pub interval_maximum_cumulative_influx: PyQty,
+}
+
+#[pymethods]
+impl PyFetkovichState {
+    fn __repr__(&self) -> String {
+        format!(
+            "FetkovichState(time={:?}, cumulative_influx={:?}, pressure={:?}, interval_influx={:?}, interval_minimum_cumulative_influx={:?}, interval_maximum_cumulative_influx={:?})",
+            self.time,
+            self.cumulative_influx,
+            self.pressure,
+            self.interval_influx,
+            self.interval_minimum_cumulative_influx,
+            self.interval_maximum_cumulative_influx
+        )
+    }
+}
+
+impl From<&azoth_pvt::fetkovich_aquifer::FetkovichState> for PyFetkovichState {
+    fn from(row: &azoth_pvt::fetkovich_aquifer::FetkovichState) -> Self {
+        Self {
+            time: PyQty {
+                magnitude_si: row.time,
+                unit: "s".to_string(),
+            },
+            cumulative_influx: PyQty {
+                magnitude_si: row.cumulative_influx,
+                unit: "m**3".to_string(),
+            },
+            pressure: PyQty {
+                magnitude_si: row.pressure,
+                unit: "Pa".to_string(),
+            },
+            interval_influx: PyQty {
+                magnitude_si: row.interval_influx,
+                unit: "m**3".to_string(),
+            },
+            interval_minimum_cumulative_influx: PyQty {
+                magnitude_si: row.interval_minimum_cumulative_influx,
+                unit: "m**3".to_string(),
+            },
+            interval_maximum_cumulative_influx: PyQty {
+                magnitude_si: row.interval_maximum_cumulative_influx,
+                unit: "m**3".to_string(),
+            },
+        }
+    }
+}
+
 /// the base stations, with the opening's relaxed phase velocities solved. Empty on failure.
 #[pyclass(
     frozen,
@@ -6085,6 +6160,91 @@ impl From<&azoth_pvt::regression::RegressionObjectiveRow> for PyRegressionObject
         Self {
             experiment: row.experiment.clone(),
             value: row.value,
+        }
+    }
+}
+
+/// one row per saturation point, in the grid's order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "RelativePermeabilityRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyRelativePermeabilityRow {
+    /// water saturation, for SWOF.
+    #[pyo3(get)]
+    pub sw: Option<f64>,
+    /// gas saturation, for SGOF.
+    #[pyo3(get)]
+    pub sg: Option<f64>,
+    /// oil saturation, for SOF3.
+    #[pyo3(get)]
+    pub so: Option<f64>,
+    /// liquid saturation, for SLGOF.
+    #[pyo3(get)]
+    pub sl: Option<f64>,
+    /// water relative permeability.
+    #[pyo3(get)]
+    pub krw: Option<f64>,
+    /// gas relative permeability.
+    #[pyo3(get)]
+    pub krg: Option<f64>,
+    /// oil relative permeability, water-oil system.
+    #[pyo3(get)]
+    pub krow: Option<f64>,
+    /// oil relative permeability, gas-oil system.
+    #[pyo3(get)]
+    pub krog: Option<f64>,
+    /// the water-oil capillary pressure column; the class hardcodes zero.
+    #[pyo3(get)]
+    pub pcow: Option<PyQty>,
+    /// the gas-oil capillary pressure column; the class hardcodes zero.
+    #[pyo3(get)]
+    pub pcog: Option<PyQty>,
+}
+
+#[pymethods]
+impl PyRelativePermeabilityRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "RelativePermeabilityRow(sw={:?}, sg={:?}, so={:?}, sl={:?}, krw={:?}, krg={:?}, krow={:?}, krog={:?}, pcow={:?}, pcog={:?})",
+            self.sw,
+            self.sg,
+            self.so,
+            self.sl,
+            self.krw,
+            self.krg,
+            self.krow,
+            self.krog,
+            self.pcow,
+            self.pcog
+        )
+    }
+}
+
+impl From<&azoth_pvt::relative_permeability::RelativePermeabilityRow>
+    for PyRelativePermeabilityRow
+{
+    fn from(row: &azoth_pvt::relative_permeability::RelativePermeabilityRow) -> Self {
+        Self {
+            sw: row.sw,
+            sg: row.sg,
+            so: row.so,
+            sl: row.sl,
+            krw: row.krw,
+            krg: row.krg,
+            krow: row.krow,
+            krog: row.krog,
+            pcow: row.pcow.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa".to_string(),
+            }),
+            pcog: row.pcog.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa".to_string(),
+            }),
         }
     }
 }

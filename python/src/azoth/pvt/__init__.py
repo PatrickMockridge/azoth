@@ -26,16 +26,20 @@ from azoth.core.result import (
     ConstantVolumeDepletionResult,
     DeclineCurveResult,
     DifferentialLiberationResult,
+    FetkovichAquiferResult,
     GasCorrelationsResult,
     GasMaterialBalanceResult,
+    GeneralizedMaterialBalanceResult,
     MmpResult,
     OilMaterialBalanceResult,
     PropertySweepResult,
     RegressionResult,
+    RelativePermeabilityResult,
     SaturationTestResult,
     SeparatorTestResult,
     SwellingTestResult,
     TuneToSaturationResult,
+    VanEverdingenHurstAquiferResult,
     WaterCorrelationsResult,
 )
 from azoth.pvt import layers as layers
@@ -45,16 +49,20 @@ _CONSTANT_MASS_EXPANSION = "pvt.constant_mass_expansion"
 _CONSTANT_VOLUME_DEPLETION = "pvt.constant_volume_depletion"
 _DECLINE_CURVE = "pvt.decline_curve"
 _DIFFERENTIAL_LIBERATION = "pvt.differential_liberation"
+_FETKOVICH_AQUIFER = "pvt.fetkovich_aquifer"
 _GAS_CORRELATIONS = "pvt.gas_correlations"
 _GAS_MATERIAL_BALANCE = "pvt.gas_material_balance"
+_GENERALIZED_MATERIAL_BALANCE = "pvt.generalized_material_balance"
 _MMP = "pvt.mmp"
 _OIL_MATERIAL_BALANCE = "pvt.oil_material_balance"
 _PROPERTY_SWEEP = "pvt.property_sweep"
 _REGRESSION = "pvt.regression"
+_RELATIVE_PERMEABILITY = "pvt.relative_permeability"
 _SATURATION_TEST = "pvt.saturation_test"
 _SEPARATOR_TEST = "pvt.separator_test"
 _SWELLING_TEST = "pvt.swelling_test"
 _TUNE_TO_SATURATION = "pvt.tune_to_saturation"
+_VAN_EVERDINGEN_HURST_AQUIFER = "pvt.van_everdingen_hurst_aquifer"
 _WATER_CORRELATIONS = "pvt.water_correlations"
 
 __all__ = [
@@ -63,17 +71,21 @@ __all__ = [
     "constant_volume_depletion",
     "decline_curve",
     "differential_liberation",
+    "fetkovich_aquifer",
     "gas_correlations",
     "gas_material_balance",
+    "generalized_material_balance",
     "layers",
     "mmp",
     "oil_material_balance",
     "property_sweep",
     "regression",
+    "relative_permeability",
     "saturation_test",
     "separator_test",
     "swelling_test",
     "tune_to_saturation",
+    "van_everdingen_hurst_aquifer",
     "water_correlations",
 ]
 
@@ -766,4 +778,222 @@ def oil_material_balance(
         eo_history=eo_history,
         eg_history=eg_history,
         we_history=we_history,
+    )
+
+
+def van_everdingen_hurst_aquifer(
+    calculation: str,
+    *,
+    dimensionless_time_value: float | None = None,
+    dimensionless_times: Sequence[float] | None = None,
+    dimensionless_outer_radius: float | None = None,
+    permeability: Any = None,
+    time: Any = None,
+    porosity: float | None = None,
+    viscosity: Any = None,
+    total_compressibility: float | None = None,
+    reservoir_radius: Any = None,
+    thickness: Any = None,
+    encroachment_angle: float | None = None,
+    aquifer_constant_value: float | None = None,
+    pressure_drop: Sequence[Any] | None = None,
+) -> VanEverdingenHurstAquiferResult:
+    """The radial aquifer influence functions, time and constant, and water influx.
+
+    ``calculation`` selects the answer: the dimensionless pressure or its derivative at a
+    time, the physical dimensionless time or aquifer constant from the aquifer's properties,
+    the Carter-Tracy cumulative influx over a history, or the influence table. ``permeability``
+    is an area, ``time`` a duration, ``viscosity`` a dynamic viscosity, the two radii and the
+    thickness lengths, and ``pressure_drop`` a pressure history. The aquifer constant is in
+    reservoir m3 per Pa, because ``total_compressibility`` is 1/Pa throughout.
+
+    ``dimensionless_outer_radius`` absent, non-positive or infinite is infinite-acting; a
+    finite radius selects the class's legacy bounded policy, the maximum of the infinite-acting
+    pressure and its pseudo-steady form. A negative total pressure drop sets a Carter-Tracy
+    increment to zero rather than creating a water credit.
+
+    Returns:
+        The dimensionless pressures, time and constant, or the cumulative influx history; the
+        fields a calculation does not answer are absent.
+
+    Raises:
+        InvalidInputError: for an unknown calculation, a missing input, a physical input outside
+            its domain, a non-increasing Carter-Tracy history or an unrepresentable answer.
+
+    See :func:`azoth.pvt.reference.van_everdingen_hurst_aquifer.van_everdingen_hurst_aquifer`.
+    """
+    return resolve(_VAN_EVERDINGEN_HURST_AQUIFER)(  # type: ignore[no-any-return]
+        calculation=calculation,
+        dimensionless_time_value=dimensionless_time_value,
+        dimensionless_times=dimensionless_times,
+        dimensionless_outer_radius=dimensionless_outer_radius,
+        permeability=permeability,
+        time=time,
+        porosity=porosity,
+        viscosity=viscosity,
+        total_compressibility=total_compressibility,
+        reservoir_radius=reservoir_radius,
+        thickness=thickness,
+        encroachment_angle=encroachment_angle,
+        aquifer_constant_value=aquifer_constant_value,
+        pressure_drop=pressure_drop,
+    )
+
+
+def fetkovich_aquifer(
+    total_compressibility: float,
+    productivity: float,
+    initial_pressure: Any,
+    intervals: Sequence[Mapping[str, Any]],
+    initial_water_volume: Any = None,
+) -> FetkovichAquiferResult:
+    """The finite, constant-property water aquifer over a prescribed interval schedule.
+
+    ``intervals`` is one row per prescribed linear reservoir-pressure interval, with
+    ``duration``, ``reservoir_pressure_start`` and ``reservoir_pressure_end``. Each interval
+    is integrated exactly; the cumulative-influx minimum and maximum are sampled at any
+    within-interval flow reversal. ``initial_water_volume`` absent is infinite storage; a
+    present zero is zero capacity. The capacitance is absent exactly when storage is infinite.
+
+    Returns:
+        The capacitance and the initial state followed by one state per interval.
+
+    Raises:
+        InvalidInputError: for a negative or NaN coefficient, a non-positive pressure or
+            duration, an unrepresentable finite capacity, or an interval that exhausts the
+            finite water inventory.
+
+    See :func:`azoth.pvt.reference.fetkovich_aquifer.fetkovich_aquifer`.
+    """
+    return resolve(_FETKOVICH_AQUIFER)(  # type: ignore[no-any-return]
+        initial_water_volume=initial_water_volume,
+        total_compressibility=total_compressibility,
+        productivity=productivity,
+        initial_pressure=initial_pressure,
+        intervals=intervals,
+    )
+
+
+def generalized_material_balance(
+    fit: str,
+    initial_pressure: Any,
+    initial_rs: float,
+    initial_bo: float,
+    initial_bg: float,
+    initial_bw: float,
+    initial_rv: float,
+    observations: Sequence[Mapping[str, Any]],
+    gas_cap_ratio: float | None = None,
+) -> GeneralizedMaterialBalanceResult:
+    """The generalized oil and gas material balance over a stated history.
+
+    ``fit`` is ``"initially_oil"``, ``"initially_gas"``, ``"known_gas_cap"`` (which needs
+    ``gas_cap_ratio``) or ``"oil_and_gas"``. ``observations`` is one row per aligned
+    pressure/PVT/production state: the formation volume factors are reservoir m3 per
+    standard m3, the production volumes are signed standard volumes, and ``water_influx``
+    is a reservoir volume. The model column-scales its predictors, refuses a scaled
+    condition number above ``1e8`` and publishes that number beside the residuals.
+
+    A fit with no free oil publishes the gas-cap ratio absent with a warning, where the
+    class answers an infinity.
+
+    Returns:
+        The free-phase and total in-place volumes, the optional gas-cap ratio, the
+        observed-minus-fitted residuals, their RMS and the condition number.
+
+    Raises:
+        InvalidInputError: for an unknown fit, a missing input, a history that is too short,
+            a zero withdrawal or expansion signal, an ill-conditioned or singular solve,
+            unphysical volumes, or production above the fitted inventory.
+
+    See :func:`azoth.pvt.reference.generalized_material_balance.generalized_material_balance`.
+    """
+    return resolve(_GENERALIZED_MATERIAL_BALANCE)(  # type: ignore[no-any-return]
+        fit=fit,
+        gas_cap_ratio=gas_cap_ratio,
+        initial_pressure=initial_pressure,
+        initial_rs=initial_rs,
+        initial_bo=initial_bo,
+        initial_bg=initial_bg,
+        initial_bw=initial_bw,
+        initial_rv=initial_rv,
+        observations=observations,
+    )
+
+
+def relative_permeability(
+    table_type: str | None = None,
+    model_family: str | None = None,
+    rows: Any = None,
+    swc: float | None = None,
+    critical_water_saturation: float | None = None,
+    sorw: float | None = None,
+    sorg: float | None = None,
+    sgcr: float | None = None,
+    kro_max: float | None = None,
+    krw_max: float | None = None,
+    krg_max: float | None = None,
+    no: float | None = None,
+    nw: float | None = None,
+    ng: float | None = None,
+    nog: float | None = None,
+    lo: float | None = None,
+    eo: float | None = None,
+    to: float | None = None,
+    lw: float | None = None,
+    ew: float | None = None,
+    tw: float | None = None,
+    lg: float | None = None,
+    eg: float | None = None,
+    tg: float | None = None,
+    log: float | None = None,
+    eog: float | None = None,
+    tog: float | None = None,
+) -> RelativePermeabilityResult:
+    """A Corey or LET relative-permeability table in one of four Eclipse forms.
+
+    ``table_type`` is ``"swof"`` (the default), ``"sgof"``, ``"sof3"`` or ``"slgof"``;
+    ``model_family`` is ``"corey"`` (the default) or ``"let"``; ``rows`` defaults to 20 and
+    must be at least three. Every endpoint, maximum and curve parameter defaults to the
+    class's own, stated in the spec. A negative ``critical_water_saturation`` means ``swc``.
+
+    Returns:
+        The table type, the saturation column's name and one row per grid point; only the
+        columns the type answers are present, and the class's hardcoded capillary pressures
+        are zero.
+
+    Raises:
+        InvalidInputError: for an unknown type or family, fewer than three rows, a non-finite
+            parameter or a non-finite table value.
+
+    See :func:`azoth.pvt.reference.relative_permeability.relative_permeability`.
+    """
+    return resolve(_RELATIVE_PERMEABILITY)(  # type: ignore[no-any-return]
+        table_type=table_type,
+        model_family=model_family,
+        rows=rows,
+        swc=swc,
+        critical_water_saturation=critical_water_saturation,
+        sorw=sorw,
+        sorg=sorg,
+        sgcr=sgcr,
+        kro_max=kro_max,
+        krw_max=krw_max,
+        krg_max=krg_max,
+        no=no,
+        nw=nw,
+        ng=ng,
+        nog=nog,
+        lo=lo,
+        eo=eo,
+        to=to,
+        lw=lw,
+        ew=ew,
+        tw=tw,
+        lg=lg,
+        eg=eg,
+        tg=tg,
+        log=log,
+        eog=eog,
+        tog=tog,
     )

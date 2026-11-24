@@ -360,16 +360,20 @@
 //!   - specs/models/pvt/constant_volume_depletion.toml
 //!   - specs/models/pvt/decline_curve.toml
 //!   - specs/models/pvt/differential_liberation.toml
+//!   - specs/models/pvt/fetkovich_aquifer.toml
 //!   - specs/models/pvt/gas_correlations.toml
 //!   - specs/models/pvt/gas_material_balance.toml
+//!   - specs/models/pvt/generalized_material_balance.toml
 //!   - specs/models/pvt/mmp.toml
 //!   - specs/models/pvt/oil_material_balance.toml
 //!   - specs/models/pvt/property_sweep.toml
 //!   - specs/models/pvt/regression.toml
+//!   - specs/models/pvt/relative_permeability.toml
 //!   - specs/models/pvt/saturation_test.toml
 //!   - specs/models/pvt/separator_test.toml
 //!   - specs/models/pvt/swelling_test.toml
 //!   - specs/models/pvt/tune_to_saturation.toml
+//!   - specs/models/pvt/van_everdingen_hurst_aquifer.toml
 //!   - specs/models/pvt/water_correlations.toml
 //!   - specs/models/reactions/chemical_equilibrium.toml
 //!   - specs/calcs/reactions/equilibrium_constant.toml
@@ -6882,6 +6886,14 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "thermodynamic_temperature",
     ),
     ("pvt.differential_liberation", "pressures", "pressure"),
+    (
+        "pvt.fetkovich_aquifer",
+        "total_compressibility",
+        "dimensionless",
+    ),
+    ("pvt.fetkovich_aquifer", "productivity", "dimensionless"),
+    ("pvt.fetkovich_aquifer", "initial_pressure", "pressure"),
+    ("pvt.fetkovich_aquifer", "initial_water_volume", "volume"),
     ("pvt.gas_material_balance", "pressure", "pressure"),
     ("pvt.gas_material_balance", "z", "dimensionless"),
     ("pvt.gas_material_balance", "gp", "dimensionless"),
@@ -6894,6 +6906,41 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "thermodynamic_temperature",
     ),
     ("pvt.gas_material_balance", "gas_gravity", "dimensionless"),
+    (
+        "pvt.generalized_material_balance",
+        "initial_pressure",
+        "pressure",
+    ),
+    (
+        "pvt.generalized_material_balance",
+        "initial_rs",
+        "dimensionless",
+    ),
+    (
+        "pvt.generalized_material_balance",
+        "initial_bo",
+        "dimensionless",
+    ),
+    (
+        "pvt.generalized_material_balance",
+        "initial_bg",
+        "dimensionless",
+    ),
+    (
+        "pvt.generalized_material_balance",
+        "initial_bw",
+        "dimensionless",
+    ),
+    (
+        "pvt.generalized_material_balance",
+        "initial_rv",
+        "dimensionless",
+    ),
+    (
+        "pvt.generalized_material_balance",
+        "gas_cap_ratio",
+        "dimensionless",
+    ),
     ("pvt.mmp", "temperature", "thermodynamic_temperature"),
     ("pvt.mmp", "recovery_threshold", "dimensionless"),
     ("pvt.mmp", "number_of_pressure_points", "dimensionless"),
@@ -6937,6 +6984,35 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("pvt.regression", "dle_weight", "dimensionless"),
     ("pvt.regression", "viscosity_weight", "dimensionless"),
     ("pvt.regression", "max_iterations", "dimensionless"),
+    ("pvt.relative_permeability", "rows", "dimensionless"),
+    ("pvt.relative_permeability", "swc", "dimensionless"),
+    (
+        "pvt.relative_permeability",
+        "critical_water_saturation",
+        "dimensionless",
+    ),
+    ("pvt.relative_permeability", "sorw", "dimensionless"),
+    ("pvt.relative_permeability", "sorg", "dimensionless"),
+    ("pvt.relative_permeability", "sgcr", "dimensionless"),
+    ("pvt.relative_permeability", "kro_max", "dimensionless"),
+    ("pvt.relative_permeability", "krw_max", "dimensionless"),
+    ("pvt.relative_permeability", "krg_max", "dimensionless"),
+    ("pvt.relative_permeability", "no", "dimensionless"),
+    ("pvt.relative_permeability", "nw", "dimensionless"),
+    ("pvt.relative_permeability", "ng", "dimensionless"),
+    ("pvt.relative_permeability", "nog", "dimensionless"),
+    ("pvt.relative_permeability", "lo", "dimensionless"),
+    ("pvt.relative_permeability", "eo", "dimensionless"),
+    ("pvt.relative_permeability", "to", "dimensionless"),
+    ("pvt.relative_permeability", "lw", "dimensionless"),
+    ("pvt.relative_permeability", "ew", "dimensionless"),
+    ("pvt.relative_permeability", "tw", "dimensionless"),
+    ("pvt.relative_permeability", "lg", "dimensionless"),
+    ("pvt.relative_permeability", "eg", "dimensionless"),
+    ("pvt.relative_permeability", "tg", "dimensionless"),
+    ("pvt.relative_permeability", "log", "dimensionless"),
+    ("pvt.relative_permeability", "eog", "dimensionless"),
+    ("pvt.relative_permeability", "tog", "dimensionless"),
     (
         "pvt.saturation_test",
         "temperature",
@@ -6999,6 +7075,59 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("pvt.tune_to_saturation", "saturation_pressure", "pressure"),
     ("pvt.tune_to_saturation", "number_of_lumps", "dimensionless"),
     ("pvt.tune_to_saturation", "max_iterations", "dimensionless"),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "dimensionless_time_value",
+        "dimensionless",
+    ),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "dimensionless_times",
+        "dimensionless",
+    ),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "dimensionless_outer_radius",
+        "dimensionless",
+    ),
+    ("pvt.van_everdingen_hurst_aquifer", "permeability", "area"),
+    ("pvt.van_everdingen_hurst_aquifer", "time", "time"),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "porosity",
+        "dimensionless",
+    ),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "viscosity",
+        "dynamic_viscosity",
+    ),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "total_compressibility",
+        "dimensionless",
+    ),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "reservoir_radius",
+        "length",
+    ),
+    ("pvt.van_everdingen_hurst_aquifer", "thickness", "length"),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "encroachment_angle",
+        "dimensionless",
+    ),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "aquifer_constant_value",
+        "dimensionless",
+    ),
+    (
+        "pvt.van_everdingen_hurst_aquifer",
+        "pressure_drop",
+        "pressure",
+    ),
     (
         "reactions.chemical_equilibrium",
         "a_matrix",

@@ -16,16 +16,20 @@ use crate::constant_mass_expansion::ConstantMassExpansionResult;
 use crate::constant_volume_depletion::ConstantVolumeDepletionResult;
 use crate::decline_curve::DeclineCurveResult;
 use crate::differential_liberation::DifferentialLiberationResult;
+use crate::fetkovich_aquifer::FetkovichAquiferResult;
 use crate::gas_correlations::GasCorrelationsResult;
 use crate::gas_material_balance::GasMaterialBalanceResult;
+use crate::generalized_material_balance::GeneralizedMaterialBalanceResult;
 use crate::mmp::MmpResult;
 use crate::oil_material_balance::OilMaterialBalanceResult;
 use crate::property_sweep::PropertySweepResult;
 use crate::regression::RegressionResult;
+use crate::relative_permeability::RelativePermeabilityResult;
 use crate::saturation_test::SaturationTestResult;
 use crate::separator_test::SeparatorTestResult;
 use crate::swelling_test::SwellingTestResult;
 use crate::tune_to_saturation::TuneToSaturationResult;
+use crate::van_everdingen_hurst_aquifer::VanEverdingenHurstAquiferResult;
 use crate::water_correlations::WaterCorrelationsResult;
 
 impl CalcResult for BlackOilCorrelationsResult {
@@ -127,6 +131,15 @@ impl CalcResult for DifferentialLiberationResult {
     }
 }
 
+impl CalcResult for FetkovichAquiferResult {
+    const CALC_ID: &'static str = "pvt.fetkovich_aquifer";
+    const FIELDS: &'static [&'static str] = &["capacity", "states", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for GasCorrelationsResult {
     const CALC_ID: &'static str = "pvt.gas_correlations";
     const FIELDS: &'static [&'static str] = &["queries", "warnings"];
@@ -146,6 +159,25 @@ impl CalcResult for GasMaterialBalanceResult {
         "r_squared",
         "cole_gp",
         "cole_f_over_eg",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for GeneralizedMaterialBalanceResult {
+    const CALC_ID: &'static str = "pvt.generalized_material_balance";
+    const FIELDS: &'static [&'static str] = &[
+        "free_oil",
+        "free_gas",
+        "ooip",
+        "ogip",
+        "gas_cap_ratio",
+        "residuals",
+        "rms_residual",
+        "condition_number",
         "warnings",
     ];
 
@@ -216,6 +248,15 @@ impl CalcResult for RegressionResult {
     }
 }
 
+impl CalcResult for RelativePermeabilityResult {
+    const CALC_ID: &'static str = "pvt.relative_permeability";
+    const FIELDS: &'static [&'static str] = &["table_type", "saturation_name", "table", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for SaturationTestResult {
     const CALC_ID: &'static str = "pvt.saturation_test";
     const FIELDS: &'static [&'static str] =
@@ -270,6 +311,23 @@ impl CalcResult for TuneToSaturationResult {
         "final_saturation_pressure",
         "iterations",
         "converged",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for VanEverdingenHurstAquiferResult {
+    const CALC_ID: &'static str = "pvt.van_everdingen_hurst_aquifer";
+    const FIELDS: &'static [&'static str] = &[
+        "dimensionless_pressure",
+        "dimensionless_pressure_derivative",
+        "dimensionless_time",
+        "aquifer_constant",
+        "dimensionless_pressures",
+        "cumulative_influx",
         "warnings",
     ];
 

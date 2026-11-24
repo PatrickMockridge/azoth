@@ -851,6 +851,29 @@ class EventTreeOutcome:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class FetkovichState:
+    """the initial state followed by one state per interval, in caller order."""
+
+    #: the elapsed time at the end of the interval.
+    time: Q
+
+    #: the cumulative water influx.
+    cumulative_influx: Q
+
+    #: the average aquifer pressure.
+    pressure: Q
+
+    #: the water influx over this interval.
+    interval_influx: Q
+
+    #: the smallest cumulative influx reached inside the interval.
+    interval_minimum_cumulative_influx: Q
+
+    #: the largest cumulative influx reached inside the interval.
+    interval_maximum_cumulative_influx: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class FiniteRateReleaseStation:
     """the base stations, with the opening's relaxed phase velocities solved. Empty on failure."""
 
@@ -2258,6 +2281,41 @@ class RegressionObjectiveRow:
 
     #: The unweighted objective, divided by the experiment's point count.
     value: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class RelativePermeabilityRow:
+    """one row per saturation point, in the grid's order."""
+
+    #: water saturation, for SWOF.
+    sw: float | None
+
+    #: gas saturation, for SGOF.
+    sg: float | None
+
+    #: oil saturation, for SOF3.
+    so: float | None
+
+    #: liquid saturation, for SLGOF.
+    sl: float | None
+
+    #: water relative permeability.
+    krw: float | None
+
+    #: gas relative permeability.
+    krg: float | None
+
+    #: oil relative permeability, water-oil system.
+    krow: float | None
+
+    #: oil relative permeability, gas-oil system.
+    krog: float | None
+
+    #: the water-oil capillary pressure column; the class hardcodes zero.
+    pcow: Q | None
+
+    #: the gas-oil capillary pressure column; the class hardcodes zero.
+    pcog: Q | None
 
 
 @dataclass(frozen=True, slots=True, eq=False)

@@ -1,0 +1,112 @@
+model = "pvt.relative_permeability"
+[[cases]]
+id = "swof_default_5"
+tolerance = 1.0e-12
+source = "The default SWOF table at five rows, from `validation/neqsim/captures/pvt_relative_permeability.tsv` (`small_swof`)."
+[cases.inputs]
+rows = 5
+[cases.expected]
+table_type = "SWOF"
+saturation_name = "Sw"
+table = [
+  { sw = 0.0, krw = 0.0, krow = 1.0, pcow = 0.0 },
+  { sw = 0.25, krw = 0.0625, krow = 0.5625, pcow = 0.0 },
+  { sw = 0.5, krw = 0.25, krow = 0.25, pcow = 0.0 },
+  { sw = 0.75, krw = 0.5625, krow = 0.0625, pcow = 0.0 },
+  { sw = 1.0, krw = 1.0, krow = 0.0, pcow = 0.0 },
+]
+[[cases]]
+id = "sgof_default_5"
+tolerance = 1.0e-12
+source = "The default SGOF table at five rows (`small_sgof`)."
+[cases.inputs]
+table_type = "sgof"
+rows = 5
+[cases.expected]
+table_type = "SGOF"
+saturation_name = "Sg"
+table = [
+  { sg = 0.0, krg = 0.0, krog = 1.0, pcog = 0.0 },
+  { sg = 0.25, krg = 0.0625, krog = 0.5625, pcog = 0.0 },
+  { sg = 0.5, krg = 0.25, krog = 0.25, pcog = 0.0 },
+  { sg = 0.75, krg = 0.5625, krog = 0.0625, pcog = 0.0 },
+  { sg = 1.0, krg = 1.0, krog = 0.0, pcog = 0.0 },
+]
+[[cases]]
+id = "sof3_default_5"
+tolerance = 1.0e-12
+source = "The default SOF3 table at five rows (`small_sof3`)."
+[cases.inputs]
+table_type = "sof3"
+rows = 5
+[cases.expected]
+table_type = "SOF3"
+saturation_name = "So"
+table = [
+  { so = 0.0, krow = 0.0, krog = 0.0 },
+  { so = 0.25, krow = 0.0625, krog = 0.0625 },
+  { so = 0.5, krow = 0.25, krog = 0.25 },
+  { so = 0.75, krow = 0.5625, krog = 0.5625 },
+  { so = 1.0, krow = 1.0, krog = 1.0 },
+]
+[[cases]]
+id = "slgof_default_5"
+tolerance = 1.0e-12
+source = "The default SLGOF table at five rows (`small_slgof`)."
+[cases.inputs]
+table_type = "slgof"
+rows = 5
+[cases.expected]
+table_type = "SLGOF"
+saturation_name = "Sl"
+table = [
+  { sl = 0.0, krg = 1.0, krog = 0.0, pcog = 0.0 },
+  { sl = 0.25, krg = 0.5625, krog = 0.0625, pcog = 0.0 },
+  { sl = 0.5, krg = 0.25, krog = 0.25, pcog = 0.0 },
+  { sl = 0.75, krg = 0.0625, krog = 0.5625, pcog = 0.0 },
+  { sl = 1.0, krg = 0.0, krog = 1.0, pcog = 0.0 },
+]
+[[cases]]
+id = "swof_let_5"
+tolerance = 1.0e-12
+source = "A five-row LET SWOF table at the class test's parameters (`small_swof_let`)."
+[cases.inputs]
+model_family = "let"
+rows = 5
+swc = 0.15
+sorw = 0.2
+krw_max = 0.3
+lo = 2.5
+eo = 1.25
+to = 1.75
+lw = 1.2
+ew = 1.5
+tw = 2.0
+[cases.expected]
+table_type = "SWOF"
+saturation_name = "Sw"
+table = [
+  { sw = 0.15, krw = 0.0, krow = 1.0, pcow = 0.0 },
+  { sw = 0.3125, krw = 0.05501216576859834, krow = 0.8151257300970868, pcow = 0.0 },
+  { sw = 0.475, krw = 0.16115829700348225, krow = 0.3223476150652073, pcow = 0.0 },
+  { sw = 0.6375000000000001, krw = 0.2649233579068012, krow = 0.039717491917012314, pcow = 0.0 },
+  { sw = 0.8, krw = 0.3, krow = 0.0, pcow = 0.0 },
+]
+[[cases]]
+id = "swof_descending_5"
+tolerance = 1.0e-12
+source = "A descending SWOF grid at swc 0.9 and sorw 0.2 (`swof_descending_grid`), published rather than refused."
+[cases.inputs]
+rows = 5
+swc = 0.9
+sorw = 0.2
+[cases.expected]
+table_type = "SWOF"
+saturation_name = "Sw"
+table = [
+  { sw = 0.9, krw = 0.0, krow = 1.0, pcow = 0.0 },
+  { sw = 0.875, krw = 0.0, krow = 1.0, pcow = 0.0 },
+  { sw = 0.8500000000000001, krw = 0.0, krow = 1.0, pcow = 0.0 },
+  { sw = 0.8250000000000001, krw = 0.0, krow = 1.0, pcow = 0.0 },
+  { sw = 0.8, krw = 1.0, krow = 0.0, pcow = 0.0 },
+]

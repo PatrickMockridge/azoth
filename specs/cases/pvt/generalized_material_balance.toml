@@ -1,0 +1,151 @@
+model = "pvt.generalized_material_balance"
+[[cases]]
+id = "oil_and_gas"
+tolerance = 1.0e-9
+source = "The class test's four-observation history with no support, from `validation/neqsim/captures/pvt_generalized_material_balance.tsv`."
+[cases.inputs]
+fit = "oil_and_gas"
+initial_pressure = 30000000.0
+initial_rs = 100.0
+initial_bo = 1.6
+initial_bg = 0.004
+initial_bw = 1.02
+initial_rv = 0.0002
+observations = [
+  { pressure = 26000000.0, rs = 80.0, bo = 1.5, bg = 0.005, bw = 1.02, rv = 0.00016, net_oil_produced = 797440.0000000019, net_gas_produced = 241600000.0, net_water_produced = 0.0, water_influx = 0.0, expansion_fraction = 0.0 },
+  { pressure = 21000000.0, rs = 60.0, bo = 1.4, bg = 0.008, bw = 1.02, rv = 0.00012, net_oil_produced = 1648571.428571429, net_gas_produced = 985714285.7142854, net_water_produced = 0.0, water_influx = 0.0, expansion_fraction = 0.0 },
+  { pressure = 16000000.0, rs = 40.0, bo = 1.3, bg = 0.012, bw = 1.02, rv = 8.0e-5, net_oil_produced = 2553353.846153848, net_gas_produced = 1529846153.8461537, net_water_produced = 0.0, water_influx = 0.0, expansion_fraction = 0.0 },
+  { pressure = 11000000.0, rs = 20.0, bo = 1.2, bg = 0.02, bw = 1.02, rv = 4.0e-5, net_oil_produced = 3568320.000000001, net_gas_produced = 2072000000.0, net_water_produced = 0.0, water_influx = 0.0, expansion_fraction = 0.0 },
+]
+[cases.expected]
+free_oil = 9999999.999999976
+free_gas = 2000000000.0000012
+ooip = 10399999.999999976
+ogip = 2999999999.999999
+gas_cap_ratio = 0.5000000000000014
+condition_number = 10.34514772279802
+[[cases]]
+id = "oil_and_gas_supported"
+tolerance = 1.0e-9
+source = "The same history with water injection, aquifer influx and rock expansion."
+[cases.inputs]
+fit = "oil_and_gas"
+initial_pressure = 30000000.0
+initial_rs = 100.0
+initial_bo = 1.6
+initial_bg = 0.004
+initial_bw = 1.02
+initial_rv = 0.0002
+observations = [
+  { pressure = 26000000.0, rs = 80.0, bo = 1.5, bg = 0.005, bw = 1.02, rv = 0.00016, net_oil_produced = 836042.2911999989, net_gas_produced = 252688768.0, net_water_produced = -24000.0, water_influx = 48000.0, expansion_fraction = 0.001 },
+  { pressure = 21000000.0, rs = 60.0, bo = 1.4, bg = 0.008, bw = 1.02, rv = 0.00012, net_oil_produced = 1718932.9142857138, net_gas_produced = 1001909142.8571427, net_water_produced = -48000.0, water_influx = 96000.0, expansion_fraction = 0.002 },
+  { pressure = 16000000.0, rs = 40.0, bo = 1.3, bg = 0.012, bw = 1.02, rv = 8.0e-5, net_oil_produced = 2647984.3987692324, net_gas_produced = 1547576209.2307692, net_water_produced = -72000.0, water_influx = 144000.0, expansion_fraction = 0.003 },
+  { pressure = 11000000.0, rs = 20.0, bo = 1.2, bg = 0.02, bw = 1.02, rv = 4.0e-5, net_oil_produced = 3678173.4144, net_gas_produced = 2086922240.0, net_water_produced = -96000.0, water_influx = 192000.0, expansion_fraction = 0.004 },
+]
+[cases.expected]
+free_oil = 10000000.00000001
+free_gas = 1999999999.9999998
+ooip = 10400000.00000001
+ogip = 3000000000.000001
+gas_cap_ratio = 0.4999999999999995
+condition_number = 10.49078135775767
+[[cases]]
+id = "initially_gas"
+tolerance = 1.0e-9
+source = "The class test's initially-gas fit: no free oil, the gas-cap ratio absent rather than infinite."
+[cases.inputs]
+fit = "initially_gas"
+initial_pressure = 30000000.0
+initial_rs = 100.0
+initial_bo = 1.6
+initial_bg = 0.004
+initial_bw = 1.02
+initial_rv = 0.0002
+observations = [
+  { pressure = 26000000.0, rs = 80.0, bo = 1.5, bg = 0.005, bw = 1.02, rv = 0.00016, net_oil_produced = 93226.66666666663, net_gas_produced = 411733333.33333325, net_water_produced = 0.0, water_influx = 0.0, expansion_fraction = 0.0 },
+  { pressure = 21000000.0, rs = 60.0, bo = 1.4, bg = 0.008, bw = 1.02, rv = 0.00012, net_oil_produced = 168114.2857142857, net_gas_produced = 1013142857.1428572, net_water_produced = 0.0, water_influx = 0.0, expansion_fraction = 0.0 },
+  { pressure = 16000000.0, rs = 40.0, bo = 1.3, bg = 0.012, bw = 1.02, rv = 8.0e-5, net_oil_produced = 163651.28205128206, net_gas_produced = 1345948717.948718, net_water_produced = 0.0, water_influx = 0.0, expansion_fraction = 0.0 },
+  { pressure = 11000000.0, rs = 20.0, bo = 1.2, bg = 0.02, bw = 1.02, rv = 4.0e-5, net_oil_produced = 117973.33333333331, net_gas_produced = 1610666666.6666667, net_water_produced = 0.0, water_influx = 0.0, expansion_fraction = 0.0 },
+]
+[cases.expected]
+free_oil = 0.0
+free_gas = 1999999999.9999993
+ooip = 399999.9999999999
+ogip = 1999999999.9999993
+condition_number = 1.0
+[[cases]]
+id = "initially_oil"
+tolerance = 1.0e-9
+source = "The class test's initially-oil fit: no free gas and a zero gas-cap ratio."
+[cases.inputs]
+fit = "initially_oil"
+initial_pressure = 30000000.0
+initial_rs = 100.0
+initial_bo = 1.6
+initial_bg = 0.004
+initial_bw = 1.02
+initial_rv = 0.0002
+observations = [
+  { pressure = 26000000.0, rs = 80.0, bo = 1.5, bg = 0.005, bw = 1.02, rv = 0.00016, net_oil_produced = 3598293.333333333, net_gas_produced = -838933333.3333335, net_water_produced = 0.0, water_influx = 0.0, expansion_fraction = 0.0 },
+  { pressure = 21000000.0, rs = 60.0, bo = 1.4, bg = 0.008, bw = 1.02, rv = 0.00012, net_oil_produced = 4165714.2857142864, net_gas_produced = -342857142.8571429, net_water_produced = 0.0, water_influx = 0.0, expansion_fraction = 0.0 },
+  { pressure = 16000000.0, rs = 40.0, bo = 1.3, bg = 0.012, bw = 1.02, rv = 8.0e-5, net_oil_produced = 4768902.564102565, net_gas_produced = 19897435.897435904, net_water_produced = 0.0, water_influx = 0.0, expansion_fraction = 0.0 },
+  { pressure = 11000000.0, rs = 20.0, bo = 1.2, bg = 0.02, bw = 1.02, rv = 4.0e-5, net_oil_produced = 5445546.666666667, net_gas_produced = 381333333.3333334, net_water_produced = 0.0, water_influx = 0.0, expansion_fraction = 0.0 },
+]
+[cases.expected]
+free_oil = 9999999.999999998
+free_gas = 0.0
+ooip = 9999999.999999998
+ogip = 999999999.9999998
+gas_cap_ratio = 0.0
+condition_number = 1.0
+[[cases]]
+id = "known_gas_cap"
+tolerance = 1.0e-9
+source = "The supported history with a stated 0.5 gas-cap ratio."
+[cases.inputs]
+fit = "known_gas_cap"
+gas_cap_ratio = 0.5
+initial_pressure = 30000000.0
+initial_rs = 100.0
+initial_bo = 1.6
+initial_bg = 0.004
+initial_bw = 1.02
+initial_rv = 0.0002
+observations = [
+  { pressure = 26000000.0, rs = 80.0, bo = 1.5, bg = 0.005, bw = 1.02, rv = 0.00016, net_oil_produced = 836042.2911999989, net_gas_produced = 252688768.0, net_water_produced = -24000.0, water_influx = 48000.0, expansion_fraction = 0.001 },
+  { pressure = 21000000.0, rs = 60.0, bo = 1.4, bg = 0.008, bw = 1.02, rv = 0.00012, net_oil_produced = 1718932.9142857138, net_gas_produced = 1001909142.8571427, net_water_produced = -48000.0, water_influx = 96000.0, expansion_fraction = 0.002 },
+  { pressure = 16000000.0, rs = 40.0, bo = 1.3, bg = 0.012, bw = 1.02, rv = 8.0e-5, net_oil_produced = 2647984.3987692324, net_gas_produced = 1547576209.2307692, net_water_produced = -72000.0, water_influx = 144000.0, expansion_fraction = 0.003 },
+  { pressure = 11000000.0, rs = 20.0, bo = 1.2, bg = 0.02, bw = 1.02, rv = 4.0e-5, net_oil_produced = 3678173.4144, net_gas_produced = 2086922240.0, net_water_produced = -96000.0, water_influx = 192000.0, expansion_fraction = 0.004 },
+]
+[cases.expected]
+free_oil = 10000000.0
+free_gas = 2000000000.0
+ooip = 10400000.0
+ogip = 3000000000.0
+gas_cap_ratio = 0.5
+condition_number = 1.0
+[[cases]]
+id = "conventional_rv_zero"
+tolerance = 1.0e-9
+source = "The conventional black-oil limit at Rv = 0, from the class test's independent closure."
+[cases.inputs]
+fit = "initially_oil"
+initial_pressure = 30000000.0
+initial_rs = 100.0
+initial_bo = 1.5
+initial_bg = 0.004
+initial_bw = 1.02
+initial_rv = 0.0
+observations = [
+  { pressure = 26000000.0, rs = 85.0, bo = 1.46, bg = 0.006, bw = 1.02, rv = 0.0, net_oil_produced = 100000.0, net_gas_produced = 67499999.99999994, net_water_produced = 0.0, water_influx = 0.0, expansion_fraction = 0.0 },
+  { pressure = 22000000.0, rs = 70.0, bo = 1.42, bg = 0.008, bw = 1.02, rv = 0.0, net_oil_produced = 200000.0, net_gas_produced = 178499999.9999999, net_water_produced = 0.0, water_influx = 0.0, expansion_fraction = 0.0 },
+  { pressure = 18000000.0, rs = 55.0, bo = 1.38, bg = 0.01, bw = 1.02, rv = 0.0, net_oil_produced = 300000.0, net_gas_produced = 305099999.9999999, net_water_produced = 0.0, water_influx = 0.0, expansion_fraction = 0.0 },
+  { pressure = 14000000.0, rs = 40.0, bo = 1.34, bg = 0.012, bw = 1.02, rv = 0.0, net_oil_produced = 400000.0, net_gas_produced = 438000000.00000006, net_water_produced = 0.0, water_influx = 0.0, expansion_fraction = 0.0 },
+]
+[cases.expected]
+free_oil = 10000000.0
+free_gas = 0.0
+ooip = 10000000.0
+ogip = 1000000000.0
+gas_cap_ratio = 0.0
+condition_number = 1.0

@@ -142,6 +142,8 @@ from azoth.core.result import (
     ExpanderResult,
     FaultTreeResult,
     FeSMorphology,
+    FetkovichAquiferResult,
+    FetkovichState,
     FilippovConductivityResult,
     FilterResult,
     FiniteRateReleaseResult,
@@ -176,6 +178,7 @@ from azoth.core.result import (
     GasScrubberResult,
     GaussianPlumeResult,
     GeFlashResult,
+    GeneralizedMaterialBalanceResult,
     GeNrtlFlashResult,
     GeNrtlPhaseResult,
     Gerg2008PhaseResult,
@@ -380,6 +383,8 @@ from azoth.core.result import (
     RegisterFinding,
     RegressionObjectiveRow,
     RegressionResult,
+    RelativePermeabilityResult,
+    RelativePermeabilityRow,
     ReliefDisposalNetworkResult,
     ReliefDisposalRow,
     ReliefPhase,
@@ -525,6 +530,7 @@ from azoth.core.result import (
     VacuumCollapseResult,
     VacuumVerdict,
     ValveScaleDriftResult,
+    VanEverdingenHurstAquiferResult,
     VanLaarAcidActivityCoefficientsResult,
     VceResult,
     Vdw1fMixBinaryResult,
@@ -678,6 +684,7 @@ __all__ = [
     "event_tree",
     "expander",
     "fault_tree",
+    "fetkovich_aquifer",
     "filippov_conductivity",
     "filter",
     "finite_rate_release",
@@ -713,6 +720,7 @@ __all__ = [
     "ge_uniquac_phase",
     "ge_van_laar_acid_phase",
     "ge_wilson_phase",
+    "generalized_material_balance",
     "gerg2008_phase",
     "gibbs_reactor",
     "gt_surface_tension",
@@ -857,6 +865,7 @@ __all__ = [
     "real_gas_fanno_release",
     "reference_potentials",
     "regression",
+    "relative_permeability",
     "relief_disposal_network",
     "reynolds_number",
     "risk_matrix",
@@ -959,6 +968,7 @@ __all__ = [
     "uniquac_activity_coefficients",
     "vacuum_collapse",
     "valve_scale_drift",
+    "van_everdingen_hurst_aquifer",
     "van_laar_acid_activity_coefficients",
     "vce",
     "vdw1f_mix_binary",
@@ -10618,6 +10628,23 @@ def differential_liberation(components: Sequence[Mapping[str, Any]], *, pressure
     )
 
 
+def fetkovich_aquifer(total_compressibility: float, productivity: float, initial_pressure: Any, intervals: Sequence[Mapping[str, Any]], initial_water_volume: Any=None) -> FetkovichAquiferResult:
+    """``pvt.fetkovich_aquifer``, computed in Rust."""
+    spec = _models_gen.model("pvt.fetkovich_aquifer")
+    result = _core.fetkovich_aquifer(
+        total_compressibility,
+        productivity,
+        _si(spec, "initial_pressure", initial_pressure),
+        input_records_to_si(spec, "intervals", intervals),
+        None if initial_water_volume is None else _si(spec, "initial_water_volume", initial_water_volume),
+    )
+    return FetkovichAquiferResult(
+        capacity=result.capacity,
+        states=tuple(FetkovichState(time=from_si(c.time.magnitude_si, c.time.unit), cumulative_influx=from_si(c.cumulative_influx.magnitude_si, c.cumulative_influx.unit), pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), interval_influx=from_si(c.interval_influx.magnitude_si, c.interval_influx.unit), interval_minimum_cumulative_influx=from_si(c.interval_minimum_cumulative_influx.magnitude_si, c.interval_minimum_cumulative_influx.unit), interval_maximum_cumulative_influx=from_si(c.interval_maximum_cumulative_influx.magnitude_si, c.interval_maximum_cumulative_influx.unit)) for c in result.states),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def gas_correlations(queries: Sequence[Mapping[str, Any]]) -> GasCorrelationsResult:
     """``pvt.gas_correlations``, computed in Rust."""
     spec = _models_gen.model("pvt.gas_correlations")
@@ -10652,6 +10679,33 @@ def gas_material_balance(calculation: str, *, pressure: Sequence[Any] | None=Non
         r_squared=result.r_squared,
         cole_gp=None if result.cole_gp is None else tuple(result.cole_gp),
         cole_f_over_eg=None if result.cole_f_over_eg is None else tuple(result.cole_f_over_eg),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def generalized_material_balance(fit: str, initial_pressure: Any, initial_rs: float, initial_bo: float, initial_bg: float, initial_bw: float, initial_rv: float, observations: Sequence[Mapping[str, Any]], gas_cap_ratio: float | None=None) -> GeneralizedMaterialBalanceResult:
+    """``pvt.generalized_material_balance``, computed in Rust."""
+    spec = _models_gen.model("pvt.generalized_material_balance")
+    result = _core.generalized_material_balance(
+        fit,
+        _si(spec, "initial_pressure", initial_pressure),
+        initial_rs,
+        initial_bo,
+        initial_bg,
+        initial_bw,
+        initial_rv,
+        input_records_to_si(spec, "observations", observations),
+        None if gas_cap_ratio is None else gas_cap_ratio,
+    )
+    return GeneralizedMaterialBalanceResult(
+        free_oil=from_si(result.free_oil.magnitude_si, result.free_oil.unit),
+        free_gas=from_si(result.free_gas.magnitude_si, result.free_gas.unit),
+        ooip=from_si(result.ooip.magnitude_si, result.ooip.unit),
+        ogip=from_si(result.ogip.magnitude_si, result.ogip.unit),
+        gas_cap_ratio=result.gas_cap_ratio,
+        residuals=tuple(from_si(q.magnitude_si, q.unit) for q in result.residuals),
+        rms_residual=from_si(result.rms_residual.magnitude_si, result.rms_residual.unit),
+        condition_number=result.condition_number,
         warnings=_warnings(result.warnings),
     )
 
@@ -10780,6 +10834,45 @@ def regression(components: Sequence[Mapping[str, Any]], parameters: Sequence[Map
     )
 
 
+def relative_permeability(table_type: str | None=None, model_family: str | None=None, rows: Any=None, swc: float | None=None, critical_water_saturation: float | None=None, sorw: float | None=None, sorg: float | None=None, sgcr: float | None=None, kro_max: float | None=None, krw_max: float | None=None, krg_max: float | None=None, no: float | None=None, nw: float | None=None, ng: float | None=None, nog: float | None=None, lo: float | None=None, eo: float | None=None, to: float | None=None, lw: float | None=None, ew: float | None=None, tw: float | None=None, lg: float | None=None, eg: float | None=None, tg: float | None=None, log: float | None=None, eog: float | None=None, tog: float | None=None) -> RelativePermeabilityResult:
+    """``pvt.relative_permeability``, computed in Rust."""
+    result = _core.relative_permeability(
+        table_type,
+        model_family,
+        None if rows is None else _count("rows", rows),
+        None if swc is None else swc,
+        None if critical_water_saturation is None else critical_water_saturation,
+        None if sorw is None else sorw,
+        None if sorg is None else sorg,
+        None if sgcr is None else sgcr,
+        None if kro_max is None else kro_max,
+        None if krw_max is None else krw_max,
+        None if krg_max is None else krg_max,
+        None if no is None else no,
+        None if nw is None else nw,
+        None if ng is None else ng,
+        None if nog is None else nog,
+        None if lo is None else lo,
+        None if eo is None else eo,
+        None if to is None else to,
+        None if lw is None else lw,
+        None if ew is None else ew,
+        None if tw is None else tw,
+        None if lg is None else lg,
+        None if eg is None else eg,
+        None if tg is None else tg,
+        None if log is None else log,
+        None if eog is None else eog,
+        None if tog is None else tog,
+    )
+    return RelativePermeabilityResult(
+        table_type=result.table_type,
+        saturation_name=result.saturation_name,
+        table=tuple(RelativePermeabilityRow(sw=c.sw, sg=c.sg, so=c.so, sl=c.sl, krw=c.krw, krg=c.krg, krow=c.krow, krog=c.krog, pcow=None if c.pcow is None else from_si(c.pcow.magnitude_si, c.pcow.unit), pcog=None if c.pcog is None else from_si(c.pcog.magnitude_si, c.pcog.unit)) for c in result.table),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def saturation_test(components: Sequence[Mapping[str, Any]], mode: str, *, eos: str | None=None, mixing_rule: str | None=None, temperature: Any=None, pressure: Any=None, temperature_search_min: Any=None, temperature_search_max: Any=None) -> SaturationTestResult:
     """``pvt.saturation_test``, computed in Rust."""
     spec = _models_gen.model("pvt.saturation_test")
@@ -10877,6 +10970,36 @@ def tune_to_saturation(components: Sequence[Mapping[str, Any]], plus_component: 
         final_saturation_pressure=from_si(result.final_saturation_pressure.magnitude_si, result.final_saturation_pressure.unit),
         iterations=result.iterations,
         converged=result.converged,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def van_everdingen_hurst_aquifer(calculation: str, *, dimensionless_time_value: float | None=None, dimensionless_times: Sequence[float] | None=None, dimensionless_outer_radius: float | None=None, permeability: Any=None, time: Any=None, porosity: float | None=None, viscosity: Any=None, total_compressibility: float | None=None, reservoir_radius: Any=None, thickness: Any=None, encroachment_angle: float | None=None, aquifer_constant_value: float | None=None, pressure_drop: Sequence[Any] | None=None) -> VanEverdingenHurstAquiferResult:
+    """``pvt.van_everdingen_hurst_aquifer``, computed in Rust."""
+    spec = _models_gen.model("pvt.van_everdingen_hurst_aquifer")
+    result = _core.van_everdingen_hurst_aquifer(
+        calculation,
+        None if dimensionless_time_value is None else dimensionless_time_value,
+        None if dimensionless_times is None else list(dimensionless_times),
+        None if dimensionless_outer_radius is None else dimensionless_outer_radius,
+        None if permeability is None else _si(spec, "permeability", permeability),
+        None if time is None else _si(spec, "time", time),
+        None if porosity is None else porosity,
+        None if viscosity is None else _si(spec, "viscosity", viscosity),
+        None if total_compressibility is None else total_compressibility,
+        None if reservoir_radius is None else _si(spec, "reservoir_radius", reservoir_radius),
+        None if thickness is None else _si(spec, "thickness", thickness),
+        None if encroachment_angle is None else encroachment_angle,
+        None if aquifer_constant_value is None else aquifer_constant_value,
+        None if pressure_drop is None else [_si(spec, "pressure_drop", v) for v in pressure_drop],
+    )
+    return VanEverdingenHurstAquiferResult(
+        dimensionless_pressure=result.dimensionless_pressure,
+        dimensionless_pressure_derivative=result.dimensionless_pressure_derivative,
+        dimensionless_time=result.dimensionless_time,
+        aquifer_constant=result.aquifer_constant,
+        dimensionless_pressures=None if result.dimensionless_pressures is None else tuple(result.dimensionless_pressures),
+        cumulative_influx=None if result.cumulative_influx is None else tuple(from_si(q.magnitude_si, q.unit) for q in result.cumulative_influx),
         warnings=_warnings(result.warnings),
     )
 

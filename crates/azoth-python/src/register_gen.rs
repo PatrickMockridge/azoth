@@ -378,16 +378,20 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyConstantVolumeDepletionResult>()?;
     m.add_class::<crate::transport_gen::PyDeclineCurveResult>()?;
     m.add_class::<crate::transport_gen::PyDifferentialLiberationResult>()?;
+    m.add_class::<crate::transport_gen::PyFetkovichAquiferResult>()?;
     m.add_class::<crate::transport_gen::PyGasCorrelationsResult>()?;
     m.add_class::<crate::transport_gen::PyGasMaterialBalanceResult>()?;
+    m.add_class::<crate::transport_gen::PyGeneralizedMaterialBalanceResult>()?;
     m.add_class::<crate::transport_gen::PyMmpResult>()?;
     m.add_class::<crate::transport_gen::PyOilMaterialBalanceResult>()?;
     m.add_class::<crate::transport_gen::PyPropertySweepResult>()?;
     m.add_class::<crate::transport_gen::PyRegressionResult>()?;
+    m.add_class::<crate::transport_gen::PyRelativePermeabilityResult>()?;
     m.add_class::<crate::transport_gen::PySaturationTestResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorTestResult>()?;
     m.add_class::<crate::transport_gen::PySwellingTestResult>()?;
     m.add_class::<crate::transport_gen::PyTuneToSaturationResult>()?;
+    m.add_class::<crate::transport_gen::PyVanEverdingenHurstAquiferResult>()?;
     m.add_class::<crate::transport_gen::PyWaterCorrelationsResult>()?;
     m.add_class::<crate::transport_gen::PyChemicalEquilibriumResult>()?;
     m.add_class::<crate::transport_gen::PyEquilibriumConstantResult>()?;
@@ -442,6 +446,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyEscalationItemResult>()?;
     m.add_class::<crate::record_outputs_gen::PyEsdContribution>()?;
     m.add_class::<crate::record_outputs_gen::PyEventTreeOutcome>()?;
+    m.add_class::<crate::record_outputs_gen::PyFetkovichState>()?;
     m.add_class::<crate::record_outputs_gen::PyFiniteRateReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyFittedParameterRow>()?;
     m.add_class::<crate::record_outputs_gen::PyFlowlineScaleSegment>()?;
@@ -493,6 +498,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyRealGasFannoReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyRegisterFinding>()?;
     m.add_class::<crate::record_outputs_gen::PyRegressionObjectiveRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyRelativePermeabilityRow>()?;
     m.add_class::<crate::record_outputs_gen::PyReliefDisposalRow>()?;
     m.add_class::<crate::record_outputs_gen::PyRemediationOptionRow>()?;
     m.add_class::<crate::record_outputs_gen::PyReviewAssessment>()?;
@@ -1393,9 +1399,14 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         crate::wrappers_gen::differential_liberation,
         m
     )?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::fetkovich_aquifer, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_correlations, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::gas_material_balance,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::generalized_material_balance,
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::mmp, m)?)?;
@@ -1405,11 +1416,19 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::property_sweep, m)?)?;
     m.add_function(wrap_pyfunction!(crate::pvt::regression, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::relative_permeability,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::saturation_test, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::separator_test, m)?)?;
     m.add_function(wrap_pyfunction!(crate::pvt::swelling_test, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::tune_to_saturation,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::van_everdingen_hurst_aquifer,
         m
     )?)?;
     m.add_function(wrap_pyfunction!(

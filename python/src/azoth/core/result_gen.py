@@ -51,6 +51,7 @@ from azoth.core.record_outputs_gen import (
     EscalationItemResult,
     EsdContribution,
     EventTreeOutcome,
+    FetkovichState,
     FiniteRateReleaseStation,
     FittedParameterRow,
     FlowlineScaleSegment,
@@ -102,6 +103,7 @@ from azoth.core.record_outputs_gen import (
     RealGasFannoReleaseStation,
     RegisterFinding,
     RegressionObjectiveRow,
+    RelativePermeabilityRow,
     ReliefDisposalRow,
     RemediationOptionRow,
     ReviewAssessment,
@@ -12450,6 +12452,22 @@ class DifferentialLiberationResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class FetkovichAquiferResult(_HasWarnings):
+    """Result of ``pvt.fetkovich_aquifer``."""
+
+    CALC_ID: ClassVar[str] = "pvt.fetkovich_aquifer"
+
+    #: the volume-pressure capacitance in reservoir m3 per Pa; absent exactly when storage is infinite.
+    capacity: float | None
+
+    #: the initial state followed by one state per interval, in caller order.
+    states: tuple[FetkovichState, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class GasCorrelationsResult(_HasWarnings):
     """Result of ``pvt.gas_correlations``."""
 
@@ -12488,6 +12506,40 @@ class GasMaterialBalanceResult(_HasWarnings):
 
     #: the Cole plot's F/Eg, from the second history point.
     cole_f_over_eg: tuple[float, ...] | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class GeneralizedMaterialBalanceResult(_HasWarnings):
+    """Result of ``pvt.generalized_material_balance``."""
+
+    CALC_ID: ClassVar[str] = "pvt.generalized_material_balance"
+
+    #: the initial free-oil surface component, excluding oil in the gas phase.
+    free_oil: Q
+
+    #: the initial free-gas surface component, excluding dissolved gas.
+    free_gas: Q
+
+    #: the total original oil in place, including vaporized oil.
+    ooip: Q
+
+    #: the total original gas in place, including dissolved gas.
+    ogip: Q
+
+    #: the initial free-gas over free-oil reservoir-volume ratio; absent when the fit has no free oil.
+    gas_cap_ratio: float | None
+
+    #: the observed-minus-fitted volume residual, one per observation.
+    residuals: tuple[Q, ...]
+
+    #: the root-mean-square volume residual.
+    rms_residual: Q
+
+    #: the 2-norm condition number of the column-scaled predictor matrix.
+    condition_number: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -12612,6 +12664,25 @@ class RegressionResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class RelativePermeabilityResult(_HasWarnings):
+    """Result of ``pvt.relative_permeability``."""
+
+    CALC_ID: ClassVar[str] = "pvt.relative_permeability"
+
+    #: the Eclipse table type: SWOF, SGOF, SOF3 or SLGOF.
+    table_type: str
+
+    #: the saturation column's name.
+    saturation_name: str
+
+    #: one row per saturation point, in the grid's order.
+    table: tuple[RelativePermeabilityRow, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class SaturationTestResult(_HasWarnings):
     """Result of ``pvt.saturation_test``."""
 
@@ -12709,6 +12780,34 @@ class TuneToSaturationResult(_HasWarnings):
 
     #: Whether the loop exited on its own tolerance rather than the iteration cap.
     converged: bool
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class VanEverdingenHurstAquiferResult(_HasWarnings):
+    """Result of ``pvt.van_everdingen_hurst_aquifer``."""
+
+    CALC_ID: ClassVar[str] = "pvt.van_everdingen_hurst_aquifer"
+
+    #: the dimensionless pressure at the stated time and radius.
+    dimensionless_pressure: float | None
+
+    #: the derivative of the selected pressure branch with respect to dimensionless time.
+    dimensionless_pressure_derivative: float | None
+
+    #: the dimensionless time from the physical inputs.
+    dimensionless_time: float | None
+
+    #: the aquifer constant in reservoir m3 per Pa.
+    aquifer_constant: float | None
+
+    #: the influence table's pressures, one per time.
+    dimensionless_pressures: tuple[float, ...] | None
+
+    #: the Carter-Tracy cumulative water influx, one per time.
+    cumulative_influx: tuple[Q, ...] | None
 
     #: Caveats.
     warnings: tuple[Warning, ...]

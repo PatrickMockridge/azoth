@@ -1192,6 +1192,13 @@ class BlackOilQuery(TypedDict):
     molar_mass: float | None
     z: float | None
 
+class FetkovichInterval(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    duration: float
+    reservoir_pressure_start: float
+    reservoir_pressure_end: float
+
 class GasQuery(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -1208,6 +1215,21 @@ class GasQuery(TypedDict):
     tpr: float | None
     ppr: float | None
     molar_mass: float | None
+
+class MaterialBalanceObservation(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    pressure: float
+    rs: float
+    bo: float
+    bg: float
+    bw: float
+    rv: float
+    net_oil_produced: float
+    net_gas_produced: float
+    net_water_produced: float
+    water_influx: float
+    expansion_fraction: float
 
 class RegressionParameterRow(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
@@ -2560,6 +2582,17 @@ class DlePoint:
     rs: float | None
 
 @final
+class FetkovichState:
+    """the initial state followed by one state per interval, in caller order."""
+
+    time: Qty
+    cumulative_influx: Qty
+    pressure: Qty
+    interval_influx: Qty
+    interval_minimum_cumulative_influx: Qty
+    interval_maximum_cumulative_influx: Qty
+
+@final
 class GasResultRow:
     """one row per input row, in caller order; only the fields the calculation answers are present."""
 
@@ -2610,6 +2643,21 @@ class RegressionObjectiveRow:
 
     experiment: str
     value: float
+
+@final
+class RelativePermeabilityRow:
+    """one row per saturation point, in the grid's order."""
+
+    sw: float | None
+    sg: float | None
+    so: float | None
+    sl: float | None
+    krw: float | None
+    krg: float | None
+    krow: float | None
+    krog: float | None
+    pcow: Qty | None
+    pcog: Qty | None
 
 @final
 class SeparatorStageResult:
@@ -6982,6 +7030,12 @@ class DifferentialLiberationResult:
     warnings: list[Warning]
 
 @final
+class FetkovichAquiferResult:
+    capacity: float | None
+    states: list[FetkovichState]
+    warnings: list[Warning]
+
+@final
 class GasCorrelationsResult:
     queries: list[GasResultRow]
     warnings: list[Warning]
@@ -6995,6 +7049,18 @@ class GasMaterialBalanceResult:
     r_squared: float | None
     cole_gp: list[float] | None
     cole_f_over_eg: list[float] | None
+    warnings: list[Warning]
+
+@final
+class GeneralizedMaterialBalanceResult:
+    free_oil: Qty
+    free_gas: Qty
+    ooip: Qty
+    ogip: Qty
+    gas_cap_ratio: float | None
+    residuals: list[Qty]
+    rms_residual: Qty
+    condition_number: float
     warnings: list[Warning]
 
 @final
@@ -7040,6 +7106,13 @@ class RegressionResult:
     warnings: list[Warning]
 
 @final
+class RelativePermeabilityResult:
+    table_type: str
+    saturation_name: str
+    table: list[RelativePermeabilityRow]
+    warnings: list[Warning]
+
+@final
 class SaturationTestResult:
     saturation_pressure: Qty | None
     saturation_temperature: Qty | None
@@ -7074,6 +7147,16 @@ class TuneToSaturationResult:
     final_saturation_pressure: Qty
     iterations: float
     converged: bool
+    warnings: list[Warning]
+
+@final
+class VanEverdingenHurstAquiferResult:
+    dimensionless_pressure: float | None
+    dimensionless_pressure_derivative: float | None
+    dimensionless_time: float | None
+    aquifer_constant: float | None
+    dimensionless_pressures: list[float] | None
+    cumulative_influx: list[Qty] | None
     warnings: list[Warning]
 
 @final
@@ -11252,6 +11335,13 @@ def differential_liberation(
     mixing_rule: str | None = None,
     volume_correction: bool | None = None,
 ) -> DifferentialLiberationResult: ...
+def fetkovich_aquifer(
+    total_compressibility: float,
+    productivity: float,
+    initial_pressure: float,
+    intervals: list[FetkovichInterval],
+    initial_water_volume: float | None = None,
+) -> FetkovichAquiferResult: ...
 def gas_correlations(queries: list[GasQuery]) -> GasCorrelationsResult: ...
 def gas_material_balance(
     calculation: str,
@@ -11264,6 +11354,17 @@ def gas_material_balance(
     temperature: float | None = None,
     gas_gravity: float | None = None,
 ) -> GasMaterialBalanceResult: ...
+def generalized_material_balance(
+    fit: str,
+    initial_pressure: float,
+    initial_rs: float,
+    initial_bo: float,
+    initial_bg: float,
+    initial_bw: float,
+    initial_rv: float,
+    observations: list[MaterialBalanceObservation],
+    gas_cap_ratio: float | None = None,
+) -> GeneralizedMaterialBalanceResult: ...
 def mmp(
     oil_components: list[FluidComponent],
     gas_components: list[FluidComponent],
@@ -11331,6 +11432,35 @@ def regression(
     volume_correction: bool | None = None,
     max_iterations: float | None = None,
 ) -> RegressionResult: ...
+def relative_permeability(
+    table_type: str | None = None,
+    model_family: str | None = None,
+    rows: float | None = None,
+    swc: float | None = None,
+    critical_water_saturation: float | None = None,
+    sorw: float | None = None,
+    sorg: float | None = None,
+    sgcr: float | None = None,
+    kro_max: float | None = None,
+    krw_max: float | None = None,
+    krg_max: float | None = None,
+    no: float | None = None,
+    nw: float | None = None,
+    ng: float | None = None,
+    nog: float | None = None,
+    lo: float | None = None,
+    eo: float | None = None,
+    to: float | None = None,
+    lw: float | None = None,
+    ew: float | None = None,
+    tw: float | None = None,
+    lg: float | None = None,
+    eg: float | None = None,
+    tg: float | None = None,
+    log: float | None = None,
+    eog: float | None = None,
+    tog: float | None = None,
+) -> RelativePermeabilityResult: ...
 def saturation_test(
     components: list[FluidComponent],
     mode: str,
@@ -11379,6 +11509,22 @@ def tune_to_saturation(
     volume_correction: bool | None = None,
     max_iterations: float | None = None,
 ) -> TuneToSaturationResult: ...
+def van_everdingen_hurst_aquifer(
+    calculation: str,
+    dimensionless_time_value: float | None = None,
+    dimensionless_times: list[float] | None = None,
+    dimensionless_outer_radius: float | None = None,
+    permeability: float | None = None,
+    time: float | None = None,
+    porosity: float | None = None,
+    viscosity: float | None = None,
+    total_compressibility: float | None = None,
+    reservoir_radius: float | None = None,
+    thickness: float | None = None,
+    encroachment_angle: float | None = None,
+    aquifer_constant_value: float | None = None,
+    pressure_drop: list[float] | None = None,
+) -> VanEverdingenHurstAquiferResult: ...
 def water_correlations(queries: list[WaterQuery]) -> WaterCorrelationsResult: ...
 def chemical_equilibrium(
     a_matrix: list[list[float]],

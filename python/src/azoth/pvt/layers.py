@@ -400,6 +400,22 @@ NO_INTERIOR: dict[str, str] = {
         "the answer is the tuned molar mass and the last saturation pressure; the iteration "
         "path is the loop's own and no intermediate state is published"
     ),
+    "pvt.van_everdingen_hurst_aquifer": (
+        "each calculation is one quadrature, conversion or recurrence answer; the nodes are "
+        "the method, not a state a capture names"
+    ),
+    "pvt.fetkovich_aquifer": (
+        "the answer is the interval schedule's states; the march's intermediate branches are "
+        "the method, not a state a capture names"
+    ),
+    "pvt.generalized_material_balance": (
+        "each call is one regression's answer; the scaled matrix and its residual columns are "
+        "the fit's method, not a state a capture names"
+    ),
+    "pvt.relative_permeability": (
+        "each call is one table's answer; the curve normalisations are the method, not a state "
+        "a capture names"
+    ),
 }
 
 #: Capture blocks that are evidence rather than a case - a refusal, a fallback or a fluid the

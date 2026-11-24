@@ -22,30 +22,30 @@ use crate::record_outputs_gen::{
     PyDriftFluxReleaseStation, PyEnvelopePoint, PyEnvelopeQuery, PyEnvelopeSummary,
     PyEquilibriumSoundSpeedSample, PyEquipmentCostResultRow, PyEquipmentMtoRow,
     PyEquipmentQualityFlag, PyEscalationItemResult, PyEsdContribution, PyEventTreeOutcome,
-    PyFiniteRateReleaseStation, PyFittedParameterRow, PyFlowlineScaleSegment, PyFmeaRankedEntry,
-    PyGasResultRow, PyHazopPopulationRow, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
-    PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
-    PyHydrateRiskPoint, PyIdealGasFannoReleaseStation, PyIdealGasReleaseStation,
-    PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
-    PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier, PyMahConsequence,
-    PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet, PyMmpPoint,
+    PyFetkovichState, PyFiniteRateReleaseStation, PyFittedParameterRow, PyFlowlineScaleSegment,
+    PyFmeaRankedEntry, PyGasResultRow, PyHazopPopulationRow, PyHazopTemplateDeviation,
+    PyHeatExchangerMechanicalType, PyHeaterInstrument, PyHeaterMechanicalType,
+    PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIdealGasFannoReleaseStation,
+    PyIdealGasReleaseStation, PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic,
+    PyLeakBlowdownPoint, PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier,
+    PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet, PyMmpPoint,
     PyMultiVesselContributionRow, PyMultiVesselProfileRow, PyNaceIssueRow,
     PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment, PyOpenDrainResult, PyOperatingCostLine,
     PyP002FindingResult, PyPerformanceAssessment, PyPerformanceFinding, PyPerformanceInstrument,
     PyPerformanceSif, PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation,
     PyProcessCostEquipmentResult, PyProcessCostFlag, PyProcessCostMtoRow, PyProjectCostLine,
     PyPropertyPoint, PyPulsationModeResult, PyRanzMarshallReleaseStation,
-    PyRealGasFannoReleaseStation, PyRegisterFinding, PyRegressionObjectiveRow, PyReliefDisposalRow,
-    PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage, PyReviewVerdict,
-    PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem, PySafeChartMissingDevice,
-    PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow,
-    PySelfHeatingTimePoint, PySeparatorStageResult, PySettleOutCompartmentResult, PySilIssue,
-    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
-    PySwellingPoint, PyTopsidesBreakdownLine, PyTopsidesCapitalLine, PyTopsidesFlag,
-    PyTopsidesMtoRow, PyTopsidesProjectLine, PyTopsidesProjectSummaryLine, PyTopsidesSummaryLine,
-    PyTopsidesWeightLine, PyTr3001Finding, PyTrappedInventorySegmentResult, PyTypeCostLine,
-    PyVesselFillingPoint, PyVesselRuptureStep, PyWaterMixingResult, PyWaterResultRow,
-    PyZoneRatingRow,
+    PyRealGasFannoReleaseStation, PyRegisterFinding, PyRegressionObjectiveRow,
+    PyRelativePermeabilityRow, PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment,
+    PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem,
+    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
+    PyScenarioIndexRow, PySelfHeatingTimePoint, PySeparatorStageResult,
+    PySettleOutCompartmentResult, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
+    PySts0131FindingResult, PySubFraction, PySwellingPoint, PyTopsidesBreakdownLine,
+    PyTopsidesCapitalLine, PyTopsidesFlag, PyTopsidesMtoRow, PyTopsidesProjectLine,
+    PyTopsidesProjectSummaryLine, PyTopsidesSummaryLine, PyTopsidesWeightLine, PyTr3001Finding,
+    PyTrappedInventorySegmentResult, PyTypeCostLine, PyVesselFillingPoint, PyVesselRuptureStep,
+    PyWaterMixingResult, PyWaterResultRow, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -30735,6 +30735,47 @@ impl From<&azoth_pvt::differential_liberation::DifferentialLiberationResult>
         }
     }
 }
+/// Result of `pvt.fetkovich_aquifer`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FetkovichAquiferResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFetkovichAquiferResult {
+    /// the volume-pressure capacitance in reservoir m3 per Pa; absent exactly when storage is infinite.
+    #[pyo3(get)]
+    pub capacity: Option<f64>,
+    /// the initial state followed by one state per interval, in caller order.
+    #[pyo3(get)]
+    pub states: Vec<PyFetkovichState>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyFetkovichAquiferResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "FetkovichAquiferResult(capacity={:?}, states={:?}, {} warning(s))",
+            self.capacity,
+            self.states,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::fetkovich_aquifer::FetkovichAquiferResult> for PyFetkovichAquiferResult {
+    fn from(r: &azoth_pvt::fetkovich_aquifer::FetkovichAquiferResult) -> Self {
+        Self {
+            capacity: r.capacity,
+            states: r.states.iter().map(PyFetkovichState::from).collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `pvt.gas_correlations`, transported.
 #[pyclass(
     frozen,
@@ -30838,6 +30879,101 @@ impl From<&azoth_pvt::gas_material_balance::GasMaterialBalanceResult>
             r_squared: r.r_squared,
             cole_gp: r.cole_gp.as_ref().map(|values| values.to_vec()),
             cole_f_over_eg: r.cole_f_over_eg.as_ref().map(|values| values.to_vec()),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.generalized_material_balance`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "GeneralizedMaterialBalanceResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyGeneralizedMaterialBalanceResult {
+    /// the initial free-oil surface component, excluding oil in the gas phase.
+    #[pyo3(get)]
+    pub free_oil: PyQty,
+    /// the initial free-gas surface component, excluding dissolved gas.
+    #[pyo3(get)]
+    pub free_gas: PyQty,
+    /// the total original oil in place, including vaporized oil.
+    #[pyo3(get)]
+    pub ooip: PyQty,
+    /// the total original gas in place, including dissolved gas.
+    #[pyo3(get)]
+    pub ogip: PyQty,
+    /// the initial free-gas over free-oil reservoir-volume ratio; absent when the fit has no free oil.
+    #[pyo3(get)]
+    pub gas_cap_ratio: Option<f64>,
+    /// the observed-minus-fitted volume residual, one per observation.
+    #[pyo3(get)]
+    pub residuals: Vec<PyQty>,
+    /// the root-mean-square volume residual.
+    #[pyo3(get)]
+    pub rms_residual: PyQty,
+    /// the 2-norm condition number of the column-scaled predictor matrix.
+    #[pyo3(get)]
+    pub condition_number: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyGeneralizedMaterialBalanceResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "GeneralizedMaterialBalanceResult(free_oil={:?}, free_gas={:?}, ooip={:?}, ogip={:?}, gas_cap_ratio={:?}, residuals={:?}, rms_residual={:?}, condition_number={:?}, {} warning(s))",
+            self.free_oil,
+            self.free_gas,
+            self.ooip,
+            self.ogip,
+            self.gas_cap_ratio,
+            self.residuals,
+            self.rms_residual,
+            self.condition_number,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::generalized_material_balance::GeneralizedMaterialBalanceResult>
+    for PyGeneralizedMaterialBalanceResult
+{
+    fn from(r: &azoth_pvt::generalized_material_balance::GeneralizedMaterialBalanceResult) -> Self {
+        Self {
+            free_oil: PyQty {
+                magnitude_si: r.free_oil,
+                unit: "m**3".to_string(),
+            },
+            free_gas: PyQty {
+                magnitude_si: r.free_gas,
+                unit: "m**3".to_string(),
+            },
+            ooip: PyQty {
+                magnitude_si: r.ooip,
+                unit: "m**3".to_string(),
+            },
+            ogip: PyQty {
+                magnitude_si: r.ogip,
+                unit: "m**3".to_string(),
+            },
+            gas_cap_ratio: r.gas_cap_ratio,
+            residuals: r
+                .residuals
+                .iter()
+                .map(|v| PyQty {
+                    magnitude_si: *v,
+                    unit: "m**3".to_string(),
+                })
+                .collect(),
+            rms_residual: PyQty {
+                magnitude_si: r.rms_residual,
+                unit: "m**3".to_string(),
+            },
+            condition_number: r.condition_number,
             warnings: transport(&r.warnings),
         }
     }
@@ -31109,6 +31245,58 @@ impl From<&azoth_pvt::regression::RegressionResult> for PyRegressionResult {
         }
     }
 }
+/// Result of `pvt.relative_permeability`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "RelativePermeabilityResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyRelativePermeabilityResult {
+    /// the Eclipse table type: SWOF, SGOF, SOF3 or SLGOF.
+    #[pyo3(get)]
+    pub table_type: String,
+    /// the saturation column's name.
+    #[pyo3(get)]
+    pub saturation_name: String,
+    /// one row per saturation point, in the grid's order.
+    #[pyo3(get)]
+    pub table: Vec<PyRelativePermeabilityRow>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyRelativePermeabilityResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "RelativePermeabilityResult(table_type={:?}, saturation_name={:?}, table={:?}, {} warning(s))",
+            self.table_type,
+            self.saturation_name,
+            self.table,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::relative_permeability::RelativePermeabilityResult>
+    for PyRelativePermeabilityResult
+{
+    fn from(r: &azoth_pvt::relative_permeability::RelativePermeabilityResult) -> Self {
+        Self {
+            table_type: r.table_type.clone(),
+            saturation_name: r.saturation_name.clone(),
+            table: r
+                .table
+                .iter()
+                .map(PyRelativePermeabilityRow::from)
+                .collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `pvt.saturation_test`, transported.
 #[pyclass(
     frozen,
@@ -31361,6 +31549,80 @@ impl From<&azoth_pvt::tune_to_saturation::TuneToSaturationResult> for PyTuneToSa
             },
             iterations: r.iterations,
             converged: r.converged,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.van_everdingen_hurst_aquifer`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "VanEverdingenHurstAquiferResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyVanEverdingenHurstAquiferResult {
+    /// the dimensionless pressure at the stated time and radius.
+    #[pyo3(get)]
+    pub dimensionless_pressure: Option<f64>,
+    /// the derivative of the selected pressure branch with respect to dimensionless time.
+    #[pyo3(get)]
+    pub dimensionless_pressure_derivative: Option<f64>,
+    /// the dimensionless time from the physical inputs.
+    #[pyo3(get)]
+    pub dimensionless_time: Option<f64>,
+    /// the aquifer constant in reservoir m3 per Pa.
+    #[pyo3(get)]
+    pub aquifer_constant: Option<f64>,
+    /// the influence table's pressures, one per time.
+    #[pyo3(get)]
+    pub dimensionless_pressures: Option<Vec<f64>>,
+    /// the Carter-Tracy cumulative water influx, one per time.
+    #[pyo3(get)]
+    pub cumulative_influx: Option<Vec<PyQty>>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyVanEverdingenHurstAquiferResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "VanEverdingenHurstAquiferResult(dimensionless_pressure={:?}, dimensionless_pressure_derivative={:?}, dimensionless_time={:?}, aquifer_constant={:?}, dimensionless_pressures={:?}, cumulative_influx={:?}, {} warning(s))",
+            self.dimensionless_pressure,
+            self.dimensionless_pressure_derivative,
+            self.dimensionless_time,
+            self.aquifer_constant,
+            self.dimensionless_pressures,
+            self.cumulative_influx,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::van_everdingen_hurst_aquifer::VanEverdingenHurstAquiferResult>
+    for PyVanEverdingenHurstAquiferResult
+{
+    fn from(r: &azoth_pvt::van_everdingen_hurst_aquifer::VanEverdingenHurstAquiferResult) -> Self {
+        Self {
+            dimensionless_pressure: r.dimensionless_pressure,
+            dimensionless_pressure_derivative: r.dimensionless_pressure_derivative,
+            dimensionless_time: r.dimensionless_time,
+            aquifer_constant: r.aquifer_constant,
+            dimensionless_pressures: r
+                .dimensionless_pressures
+                .as_ref()
+                .map(|values| values.to_vec()),
+            cumulative_influx: r.cumulative_influx.as_ref().map(|values| {
+                values
+                    .iter()
+                    .map(|v| PyQty {
+                        magnitude_si: *v,
+                        unit: "m**3".to_string(),
+                    })
+                    .collect()
+            }),
             warnings: transport(&r.warnings),
         }
     }

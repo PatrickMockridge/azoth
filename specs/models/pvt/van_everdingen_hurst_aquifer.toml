@@ -1,0 +1,110 @@
+id = "pvt.van_everdingen_hurst_aquifer"
+name = "Van Everdingen-Hurst aquifer"
+kind = "direct"
+assumptions = [
+    "**the infinite-acting pressure is a positive spectral quadrature**, not the Edwardson polynomial a later upstream revision uses. `RadialInfiniteInfluence` is this calculation's kernel; it is package-private and has no separate id.\n",
+    "**the bounded outer-radius policy is the class's legacy one**: the maximum of the infinite-acting pressure and `2 tD/(reD^2 - 1) + ln reD - 3/4`, with the selected branch's derivative. The port carries it as the class states it.\n",
+    "**the exponent-scaled conversion is carried; a conversion at the subnormal or overflow boundary is refused** rather than rounded differently from the class's exact decimal path.\n",
+    "**Carter-Tracy is the recurrence normalized by `P_D`**, with the class's nonnegative projection: a negative total pressure drop sets an increment to zero rather than creating a water credit. It is not a water-mixing or recharge model.\n",
+    "**`dimensionlessTime` takes 1/Pa while `aquiferConstant` takes 1/bar upstream**; this id takes 1/Pa uniformly. The constant is therefore in reservoir m3 per Pa, and one bar is `1e5` Pa.\n",
+    "**the influence table is arithmetic and the AQUTAB export is a report**: the table's pressures are a vector, and the ECLIPSE text is not published.\n",
+    "**a negative, non-finite or NaN time, a NaN radius, a non-increasing Carter-Tracy history, unequal array lengths, negative support and an unrepresentable answer are refused.**\n",
+]
+references = [
+    "Van Everdingen, A. F. & Hurst, W. (1949). \"The Application of the Laplace Transformation to Flow Problems in Reservoirs.\" Transactions of the AIME 186, 305-324. DOI 10.2118/949305-G.",
+    "Carter, R. D. & Tracy, G. W. (1960). \"An Improved Method for Calculating Water Influx.\" Transactions of the AIME 219, 415-417. DOI 10.2118/1519-G.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/reservoirproperties/materialbalance/VanEverdingenHurstAquifer.java` and `RadialInfiniteInfluence.java` at commit 118d9af are the port source.",
+    "`validation/neqsim/captures/pvt_van_everdingen_hurst.tsv` - the infinite-acting pressure and derivative at the class's own reference times, the bounded policy, the dimensionless time and constant, the Carter-Tracy recurrence and the influence table.",
+]
+[source]
+standard = "NeqSim pvtsimulation/reservoirproperties/materialbalance/VanEverdingenHurstAquifer.java and RadialInfiniteInfluence.java"
+edition = "The influence functions, the dimensionless time and aquifer constant, the Carter-Tracy recurrence and the influence table; the AQUTAB text is a report rather than a result."
+[inputs]
+[inputs.calculation]
+type = "enum"
+values = ["dimensionless_pressure", "dimensionless_pressure_derivative", "dimensionless_time", "aquifer_constant", "carter_tracy", "influence_table"]
+description = "the aquifer calculation this call asks for.\n"
+[inputs.dimensionless_time_value]
+unit = "dimensionless"
+optional = true
+description = "the dimensionless time `tD` for the pressure or its derivative.\n"
+[inputs.dimensionless_times]
+type = "vector"
+unit = "dimensionless"
+optional = true
+description = "the dimensionless times, strictly increasing and starting at zero, for the Carter-Tracy history or the influence table.\n"
+[inputs.dimensionless_outer_radius]
+unit = "dimensionless"
+optional = true
+description = "the dimensionless outer radius `reD`. **Absent, non-positive or infinite is infinite-acting**, and `0 < reD <= 1` also falls to the infinite branch because `reD^2 - 1 <= 0`.\n"
+[inputs.permeability]
+unit = "m**2"
+optional = true
+description = "the aquifer permeability, for the dimensionless time. **Zero gives a zero time.**\n"
+[inputs.time]
+unit = "s"
+optional = true
+description = "the elapsed time, for the dimensionless time. **Zero gives a zero time.**\n"
+[inputs.porosity]
+unit = "dimensionless"
+optional = true
+description = "the porosity, in `(0, 1]` for the dimensionless time and `[0, 1]` for the constant.\n"
+[inputs.viscosity]
+unit = "Pa*s"
+optional = true
+description = "the water viscosity, for the dimensionless time.\n"
+[inputs.total_compressibility]
+unit = "dimensionless"
+optional = true
+description = "the total aquifer compressibility, in 1/Pa.\n"
+[inputs.reservoir_radius]
+unit = "m"
+optional = true
+description = "the aquifer inner radius.\n"
+[inputs.thickness]
+unit = "m"
+optional = true
+description = "the aquifer thickness, for the constant.\n"
+[inputs.encroachment_angle]
+unit = "dimensionless"
+optional = true
+description = "the encroachment angle in degrees, in `[0, 360]`, for the constant.\n"
+[inputs.aquifer_constant_value]
+unit = "dimensionless"
+optional = true
+description = "the aquifer constant `U` in reservoir m3 per Pa, for the Carter-Tracy recurrence.\n"
+[inputs.pressure_drop]
+type = "vector"
+unit = "Pa"
+optional = true
+description = "the total pressure drop `p_i - p` at each time, for the Carter-Tracy recurrence. A negative drop is accepted and projected to a zero increment.\n"
+[outputs]
+[outputs.dimensionless_pressure]
+unit = "dimensionless"
+optional = true
+description = "the dimensionless pressure at the stated time and radius.\n"
+[outputs.dimensionless_pressure_derivative]
+unit = "dimensionless"
+optional = true
+description = "the derivative of the selected pressure branch with respect to dimensionless time.\n"
+[outputs.dimensionless_time]
+unit = "dimensionless"
+optional = true
+description = "the dimensionless time from the physical inputs.\n"
+[outputs.aquifer_constant]
+unit = "dimensionless"
+optional = true
+description = "the aquifer constant in reservoir m3 per Pa.\n"
+[outputs.dimensionless_pressures]
+type = "vector"
+unit = "dimensionless"
+optional = true
+description = "the influence table's pressures, one per time.\n"
+[outputs.cumulative_influx]
+type = "vector"
+unit = "m**3"
+optional = true
+description = "the Carter-Tracy cumulative water influx, one per time.\n"
+[implementations]
+python = "azoth.pvt.van_everdingen_hurst_aquifer"
+rust = "azoth_pvt::van_everdingen_hurst_aquifer"

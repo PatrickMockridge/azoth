@@ -142,6 +142,12 @@ _DIAGNOSTIC_FIELDS: frozenset[str] = frozenset(
         # threshold rather than relatively - the same shape as `residual` above.
         "maximum_complementarity_violation",
         "maximum_ion_balance_residual",
+        # `pvt.generalized_material_balance`'s residual ledger. The fitted terms are of order
+        # `1e7` m3, so the observed-minus-fitted residual is a cancellation whose own rounding
+        # floor is `1e-9` m3; two kernels that agree on the volumes to `1e-15` relative still
+        # differ by that much here. The spec declares the bound.
+        "residuals",
+        "rms_residual",
     }
 )
 

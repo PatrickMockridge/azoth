@@ -154,6 +154,7 @@ dependencies = [
  "azoth-characterization",
  "azoth-core",
  "azoth-eos",
+ "azoth-reactions",
  "azoth-test-support",
 ]
 

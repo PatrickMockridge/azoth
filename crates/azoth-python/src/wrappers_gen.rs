@@ -10278,6 +10278,41 @@ pub fn differential_liberation(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Fetkovich aquifer.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (total_compressibility, productivity, initial_pressure, intervals, initial_water_volume))]
+#[pyo3(
+    text_signature = "(total_compressibility, productivity, initial_pressure, intervals, initial_water_volume)"
+)]
+pub fn fetkovich_aquifer(
+    py: Python<'_>,
+    total_compressibility: f64,
+    productivity: f64,
+    initial_pressure: f64,
+    intervals: Vec<crate::records_gen::FetkovichInterval>,
+    initial_water_volume: Option<f64>,
+) -> PyResult<crate::transport_gen::PyFetkovichAquiferResult> {
+    let intervals_records: Vec<azoth_pvt::fetkovich_aquifer::FetkovichInterval> = intervals
+        .into_iter()
+        .map(|row| azoth_pvt::fetkovich_aquifer::FetkovichInterval {
+            duration: row.duration,
+            reservoir_pressure_start: row.reservoir_pressure_start,
+            reservoir_pressure_end: row.reservoir_pressure_end,
+        })
+        .collect();
+    azoth_pvt::fetkovich_aquifer::fetkovich_aquifer(
+        total_compressibility,
+        productivity,
+        pascals(initial_pressure),
+        &intervals_records,
+        initial_water_volume.map(cubic_meters),
+    )
+    .map(|r| crate::transport_gen::PyFetkovichAquiferResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Gas correlation table.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -10344,6 +10379,62 @@ pub fn gas_material_balance(
         gas_gravity,
     )
     .map(|r| crate::transport_gen::PyGasMaterialBalanceResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Generalized material balance.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (fit, initial_pressure, initial_rs, initial_bo, initial_bg, initial_bw, initial_rv, observations, gas_cap_ratio))]
+#[pyo3(
+    text_signature = "(fit, initial_pressure, initial_rs, initial_bo, initial_bg, initial_bw, initial_rv, observations, gas_cap_ratio)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn generalized_material_balance(
+    py: Python<'_>,
+    fit: &str,
+    initial_pressure: f64,
+    initial_rs: f64,
+    initial_bo: f64,
+    initial_bg: f64,
+    initial_bw: f64,
+    initial_rv: f64,
+    observations: Vec<crate::records_gen::MaterialBalanceObservation>,
+    gas_cap_ratio: Option<f64>,
+) -> PyResult<crate::transport_gen::PyGeneralizedMaterialBalanceResult> {
+    let observations_records: Vec<
+        azoth_pvt::generalized_material_balance::MaterialBalanceObservation,
+    > = observations
+        .into_iter()
+        .map(
+            |row| azoth_pvt::generalized_material_balance::MaterialBalanceObservation {
+                pressure: row.pressure,
+                rs: row.rs,
+                bo: row.bo,
+                bg: row.bg,
+                bw: row.bw,
+                rv: row.rv,
+                net_oil_produced: row.net_oil_produced,
+                net_gas_produced: row.net_gas_produced,
+                net_water_produced: row.net_water_produced,
+                water_influx: row.water_influx,
+                expansion_fraction: row.expansion_fraction,
+            },
+        )
+        .collect();
+    azoth_pvt::generalized_material_balance::generalized_material_balance(
+        fit,
+        pascals(initial_pressure),
+        initial_rs,
+        initial_bo,
+        initial_bg,
+        initial_bw,
+        initial_rv,
+        &observations_records,
+        gas_cap_ratio,
+    )
+    .map(|r| crate::transport_gen::PyGeneralizedMaterialBalanceResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 
@@ -10583,6 +10674,78 @@ pub fn property_sweep(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Relative permeability.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (table_type, model_family, rows, swc, critical_water_saturation, sorw, sorg, sgcr, kro_max, krw_max, krg_max, no, nw, ng, nog, lo, eo, to, lw, ew, tw, lg, eg, tg, log, eog, tog))]
+#[pyo3(
+    text_signature = "(table_type, model_family, rows, swc, critical_water_saturation, sorw, sorg, sgcr, kro_max, krw_max, krg_max, no, nw, ng, nog, lo, eo, to, lw, ew, tw, lg, eg, tg, log, eog, tog)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn relative_permeability(
+    py: Python<'_>,
+    table_type: Option<&str>,
+    model_family: Option<&str>,
+    rows: Option<u32>,
+    swc: Option<f64>,
+    critical_water_saturation: Option<f64>,
+    sorw: Option<f64>,
+    sorg: Option<f64>,
+    sgcr: Option<f64>,
+    kro_max: Option<f64>,
+    krw_max: Option<f64>,
+    krg_max: Option<f64>,
+    no: Option<f64>,
+    nw: Option<f64>,
+    ng: Option<f64>,
+    nog: Option<f64>,
+    lo: Option<f64>,
+    eo: Option<f64>,
+    to: Option<f64>,
+    lw: Option<f64>,
+    ew: Option<f64>,
+    tw: Option<f64>,
+    lg: Option<f64>,
+    eg: Option<f64>,
+    tg: Option<f64>,
+    log: Option<f64>,
+    eog: Option<f64>,
+    tog: Option<f64>,
+) -> PyResult<crate::transport_gen::PyRelativePermeabilityResult> {
+    azoth_pvt::relative_permeability::relative_permeability(
+        table_type,
+        model_family,
+        rows,
+        swc,
+        critical_water_saturation,
+        sorw,
+        sorg,
+        sgcr,
+        kro_max,
+        krw_max,
+        krg_max,
+        no,
+        nw,
+        ng,
+        nog,
+        lo,
+        eo,
+        to,
+        lw,
+        ew,
+        tw,
+        lg,
+        eg,
+        tg,
+        log,
+        eog,
+        tog,
+    )
+    .map(|r| crate::transport_gen::PyRelativePermeabilityResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Saturation test.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -10797,6 +10960,52 @@ pub fn tune_to_saturation(
         max_iterations,
     )
     .map(|r| crate::transport_gen::PyTuneToSaturationResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Van Everdingen-Hurst aquifer.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (calculation, dimensionless_time_value, dimensionless_times, dimensionless_outer_radius, permeability, time, porosity, viscosity, total_compressibility, reservoir_radius, thickness, encroachment_angle, aquifer_constant_value, pressure_drop))]
+#[pyo3(
+    text_signature = "(calculation, dimensionless_time_value, dimensionless_times, dimensionless_outer_radius, permeability, time, porosity, viscosity, total_compressibility, reservoir_radius, thickness, encroachment_angle, aquifer_constant_value, pressure_drop)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn van_everdingen_hurst_aquifer(
+    py: Python<'_>,
+    calculation: &str,
+    dimensionless_time_value: Option<f64>,
+    dimensionless_times: Option<Vec<f64>>,
+    dimensionless_outer_radius: Option<f64>,
+    permeability: Option<f64>,
+    time: Option<f64>,
+    porosity: Option<f64>,
+    viscosity: Option<f64>,
+    total_compressibility: Option<f64>,
+    reservoir_radius: Option<f64>,
+    thickness: Option<f64>,
+    encroachment_angle: Option<f64>,
+    aquifer_constant_value: Option<f64>,
+    pressure_drop: Option<Vec<f64>>,
+) -> PyResult<crate::transport_gen::PyVanEverdingenHurstAquiferResult> {
+    azoth_pvt::van_everdingen_hurst_aquifer::van_everdingen_hurst_aquifer(
+        calculation,
+        dimensionless_time_value,
+        dimensionless_times.as_deref(),
+        dimensionless_outer_radius,
+        permeability.map(square_meters),
+        time.map(seconds),
+        porosity,
+        viscosity.map(pascal_seconds),
+        total_compressibility,
+        reservoir_radius.map(meters),
+        thickness.map(meters),
+        encroachment_angle,
+        aquifer_constant_value,
+        pressure_drop.as_deref(),
+    )
+    .map(|r| crate::transport_gen::PyVanEverdingenHurstAquiferResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 

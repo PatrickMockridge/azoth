@@ -14,10 +14,12 @@ pub mod constant_mass_expansion;
 pub mod constant_volume_depletion;
 pub mod decline_curve;
 pub mod differential_liberation;
+pub mod fetkovich_aquifer;
 pub mod flash;
 pub mod fluid;
 pub mod gas_correlations;
 pub mod gas_material_balance;
+pub mod generalized_material_balance;
 pub mod ledger;
 pub mod mmp;
 pub mod model_gen;
@@ -25,6 +27,7 @@ pub mod model_records_gen;
 pub mod oil_material_balance;
 pub mod property_sweep;
 pub mod regression;
+pub mod relative_permeability;
 pub mod saturation;
 pub mod saturation_test;
 pub mod separator_test;
@@ -32,6 +35,7 @@ pub mod standard;
 pub mod swelling_test;
 pub mod transport;
 pub mod tune_to_saturation;
+pub mod van_everdingen_hurst_aquifer;
 pub mod volume;
 pub mod water_correlations;
 
@@ -49,10 +53,16 @@ pub use decline_curve::{DeclineCurveResult, decline_curve};
 pub use differential_liberation::{
     DifferentialLiberationResult, DlePoint, differential_liberation, differential_liberation_of,
 };
+pub use fetkovich_aquifer::{
+    FetkovichAquiferResult, FetkovichInterval, FetkovichState, fetkovich_aquifer,
+};
 pub use flash::{Flash, FlashMode, Phase};
 pub use fluid::{Fluid, GasTemplate};
 pub use gas_correlations::{GasCorrelationsResult, GasQuery, GasResultRow, gas_correlations};
 pub use gas_material_balance::{GasMaterialBalanceResult, gas_material_balance};
+pub use generalized_material_balance::{
+    GeneralizedMaterialBalanceResult, MaterialBalanceObservation, generalized_material_balance,
+};
 pub use mmp::{MmpPoint, MmpResult, mmp};
 pub use oil_material_balance::{OilMaterialBalanceResult, oil_material_balance};
 pub use property_sweep::{PropertyPoint, PropertySweepResult, property_sweep};
@@ -65,12 +75,18 @@ pub use regression::{
     Sample, SampleKind, ViscosityPhase, ViscosityPoint, ViscosityRow, build_fluid, chi_square, fit,
     levenberg_marquardt, objectives, regression, sample_value, sample_values,
 };
+pub use relative_permeability::{
+    RelativePermeabilityResult, RelativePermeabilityRow, relative_permeability,
+};
 pub use saturation_test::{SaturationTestResult, saturation_test};
 pub use separator_test::{
     SeparatorStageInput, SeparatorStageResult, SeparatorTestResult, separator_test,
 };
 pub use swelling_test::{SwellingPoint, SwellingTestResult, swelling_test};
 pub use tune_to_saturation::{TuneToSaturationResult, tune_to_saturation};
+pub use van_everdingen_hurst_aquifer::{
+    VanEverdingenHurstAquiferResult, van_everdingen_hurst_aquifer,
+};
 pub use water_correlations::{
     WaterCorrelationsResult, WaterQuery, WaterResultRow, water_correlations,
 };

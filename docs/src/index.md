@@ -471,16 +471,20 @@ Five sections, and the difference between them is the point:
 - [`pvt.constant_volume_depletion`](./pvt/constant_volume_depletion.md) — Constant volume depletion
 - [`pvt.decline_curve`](./pvt/decline_curve.md) — Decline-curve analysis
 - [`pvt.differential_liberation`](./pvt/differential_liberation.md) — Differential liberation
+- [`pvt.fetkovich_aquifer`](./pvt/fetkovich_aquifer.md) — Fetkovich aquifer
 - [`pvt.gas_correlations`](./pvt/gas_correlations.md) — Gas correlation table
 - [`pvt.gas_material_balance`](./pvt/gas_material_balance.md) — Gas material balance
+- [`pvt.generalized_material_balance`](./pvt/generalized_material_balance.md) — Generalized material balance
 - [`pvt.mmp`](./pvt/mmp.md) — Minimum miscibility pressure
 - [`pvt.oil_material_balance`](./pvt/oil_material_balance.md) — Oil material balance
 - [`pvt.property_sweep`](./pvt/property_sweep.md) — Property sweep
 - [`pvt.regression`](./pvt/regression.md) — PVT multi-target regression
+- [`pvt.relative_permeability`](./pvt/relative_permeability.md) — Relative permeability
 - [`pvt.saturation_test`](./pvt/saturation_test.md) — Saturation test
 - [`pvt.separator_test`](./pvt/separator_test.md) — Separator test
 - [`pvt.swelling_test`](./pvt/swelling_test.md) — Swelling test
 - [`pvt.tune_to_saturation`](./pvt/tune_to_saturation.md) — Plus-molar-mass saturation tuning
+- [`pvt.van_everdingen_hurst_aquifer`](./pvt/van_everdingen_hurst_aquifer.md) — Van Everdingen-Hurst aquifer
 - [`pvt.water_correlations`](./pvt/water_correlations.md) — Water and brine correlation table
 
 **Reactions** - [`reactions/index.md`](./reactions/index.md):
