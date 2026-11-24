@@ -65789,7 +65789,7 @@ static NON_EQUILIBRIUM_BLOWDOWN_CASES: &[TestCase] = &[TestCase {
     property: None,
     status: "active",
     skip_reason: None,
-    tolerance: 0.02,
+    tolerance: 0.001,
     numbers: &[
         ("initial_t", 280.0),
         ("initial_p", 5000000.0),
@@ -65797,6 +65797,7 @@ static NON_EQUILIBRIUM_BLOWDOWN_CASES: &[TestCase] = &[TestCase {
         ("orifice_diameter", 0.012),
         ("discharge_coefficient", 0.85),
         ("back_pressure", 100000.0),
+        ("fire_flame_temperature", 1200.0),
         ("fire_exposed_area", 20.0),
         ("wall_mass", 4000.0),
         ("wall_specific_heat", 470.0),
@@ -65816,8 +65817,9 @@ static NON_EQUILIBRIUM_BLOWDOWN_CASES: &[TestCase] = &[TestCase {
     expected: &[
         ("initial_pressure", 5000000.0),
         ("flash_fallback_count", 0.0),
-        ("final_gas_temperature", 280.0960285030623),
-        ("final_liquid_temperature", 280.0001237418308),
+        ("final_gas_temperature", 277.59753549478376),
+        ("final_liquid_temperature", 279.65720995478966),
+        ("max_temperature_bifurcation", 0.0),
         ("recorded_points", 21.0),
     ],
     expected_vectors: &[],

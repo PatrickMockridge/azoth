@@ -21,6 +21,8 @@ from azoth.eos import components as _components
 from azoth.eos.reference._entropy_state import molar_mass_of
 from azoth.eos.reference._heat_capacity import phase_capacity
 from azoth.eos.reference._mixture_state import phase_state, reduced_parameters
+from azoth.eos.reference.molar_enthalpy_entropy import molar_enthalpy_entropy
+from azoth.eos.reference.ph_flash import ph_flash
 from azoth.eos.reference.pr_molar_volume import MOLAR_GAS_CONSTANT
 from azoth.eos.reference.pt_flash import check_composition, pt_flash
 from azoth.eos.reference.thermal_conductivity import thermal_conductivity
@@ -292,35 +294,18 @@ def _evaluate(
     beta = flash.vapour_fraction
     gas_composition = list(flash.y)
     liquid_composition = list(flash.x)
-    reduced = reduced_parameters(mixture, initial_t_si, initial_p_si)
-    kij = mixture.effective_kij(reduced.t_kelvin)
-    vapour = _phase_props(
-        mixture,
-        ideal_gas,
-        reduced,
-        kij,
-        initial_t_si,
-        initial_p_si,
-        gas_composition,
-        flash.z_vapour,
+    # **The class charges by the EOS volume**: ``getVolume("m3")`` sums each phase's
+    # ``Z R T / P``, not the physical-properties density, and the inventory is scaled so
+    # that volume fills the vessel.
+    eos_molar_volume = (
+        beta * flash.z_vapour * MOLAR_GAS_CONSTANT * initial_t_si / initial_p_si
+        + (1.0 - beta) * flash.z_liquid * MOLAR_GAS_CONSTANT * initial_t_si / initial_p_si
     )
-    liquid = _phase_props(
-        mixture,
-        ideal_gas,
-        reduced,
-        kij,
-        initial_t_si,
-        initial_p_si,
-        liquid_composition,
-        flash.z_liquid,
-    )
-    bulk_mass = beta * vapour.molar_mass + (1.0 - beta) * liquid.molar_mass
-    bulk_volume = beta * (vapour.molar_mass / vapour.density) + (1.0 - beta) * (
-        liquid.molar_mass / liquid.density
-    )
-    bulk_density = bulk_mass / bulk_volume
-    molar_mass_bulk = molar_mass_of(mixture, feed)
-    total_moles = bulk_density * volume / molar_mass_bulk
+    if not eos_molar_volume > 0.0 or not math.isfinite(eos_molar_volume):
+        raise InvalidInputError(
+            "initial_p", f"the EOS molar volume of the feed is {eos_molar_volume} m3/mol"
+        )
+    total_moles = volume / eos_molar_volume
     gas_moles = beta * total_moles
     liquid_moles = (1.0 - beta) * total_moles
     gas_temperature = initial_t_si
@@ -358,6 +343,14 @@ def _evaluate(
         except Exception:  # the class's guarded zone flash
             fallbacks += 1.0
             break
+        # The class reads the compressibility from the physical-properties density at the
+        # pressure the step started from, and uses it in both the rate and the flow work.
+        if gas.density > 0.0 and gas.molar_mass > 0.0:
+            z_gas = pressure * gas.molar_mass / (gas.density * GAS_CONSTANT * gas_temperature)
+            if not math.isfinite(z_gas) or z_gas <= 0.0:
+                z_gas = 1.0
+        else:
+            z_gas = 1.0
         gas_mass = gas_moles * gas.molar_mass
         liquid_mass = liquid_moles * zone_liquid.molar_mass
         liquid_volume = liquid_mass / zone_liquid.density if zone_liquid.density > 0.0 else 0.0
@@ -383,7 +376,9 @@ def _evaluate(
                 coefficient
                 * area
                 * pressure
-                * math.sqrt(gas.gamma * gas.molar_mass / (GAS_CONSTANT * gas_temperature))
+                * math.sqrt(
+                    gas.gamma * gas.molar_mass / (z_gas * GAS_CONSTANT * gas_temperature)
+                )
                 * (2.0 / (gas.gamma + 1.0)) ** ((gas.gamma + 1.0) / (2.0 * (gas.gamma - 1.0)))
             )
         else:
@@ -397,7 +392,7 @@ def _evaluate(
                 coefficient
                 * area
                 * pressure
-                * math.sqrt(gas.molar_mass / (GAS_CONSTANT * gas_temperature))
+                * math.sqrt(gas.molar_mass / (z_gas * GAS_CONSTANT * gas_temperature))
                 * math.sqrt(term)
             )
         if rate < 0.0 or math.isnan(rate):
@@ -464,10 +459,17 @@ def _evaluate(
         )
         wall_temperature = min(max(wall_temperature, MIN_ZONE_TEMPERATURE), flame)
         if gas_mass > 1.0e-9 and gas.cp_mass > 0.0:
-            d_u = (wall_to_gas - interface_heat) * step + dm_vap * gas.cp_mass * (
-                liquid_temperature - gas_temperature
+            # **A fixed-volume open system**: ``m cv dT = Q - (h - u) dm_out``, with
+            # ``h - u = Z R T / M``; without the flow work the vapour does not cool on
+            # depressurisation at all.
+            cv_gas_mass = gas.cp_mass / max(gas.gamma, 1.0)
+            flow_work = z_gas * GAS_CONSTANT * gas_temperature / gas.molar_mass * dm_out
+            d_u = (
+                (wall_to_gas - interface_heat) * step
+                + dm_vap * cv_gas_mass * (liquid_temperature - gas_temperature)
+                - flow_work
             )
-            gas_temperature += d_u / (gas_mass * gas.cp_mass)
+            gas_temperature += d_u / (gas_mass * cv_gas_mass)
         gas_temperature = min(max(gas_temperature, MIN_ZONE_TEMPERATURE), wall_temperature)
         if liquid_mass > 1.0e-9 and zone_liquid.cp_mass > 0.0:
             d_u = (interface_heat + wall_to_liquid) * step - dm_vap * latent
@@ -491,6 +493,64 @@ def _evaluate(
                 ]
             gas_moles = gas_total
             liquid_moles -= moved
+        # **Flash boil-off**: liquid left superheated by the pressure drop flashes
+        # isenthalpically at the new pressure, and the vapour it forms moves to the vapour
+        # zone, cooling the liquid. Without this the liquid zone only boiled from wall heat
+        # and stayed at its initial pressure-equilibrium state.
+        liquid_mass_now = liquid_moles * molar_mass_of(mixture, liquid_composition)
+        if liquid_moles > 0.0 and liquid_mass_now > 1.0e-6:
+            try:
+                # **The liquid system is a single oil phase, so its enthalpy is the liquid
+                # root's, not the equilibrium split's**: the class's ``TPflash`` on the
+                # phase system leaves one phase, and the PH flash is what creates the
+                # vapour.
+                reduced = reduced_parameters(mixture, liquid_temperature, pressure)
+                kij = mixture.effective_kij(reduced.t_kelvin)
+                root = phase_state(reduced, kij, liquid_composition, liquid=True).z
+                enthalpy = float(
+                    molar_enthalpy_entropy(
+                        mixture,
+                        ideal_gas,
+                        quantity(liquid_temperature, "K"),
+                        quantity(pressure, "Pa"),
+                        liquid_composition,
+                        root,
+                    )
+                    .h.to("J/mol")
+                    .magnitude
+                )
+                solution = ph_flash(
+                    mixture,
+                    ideal_gas,
+                    quantity(pressure, "Pa"),
+                    quantity(enthalpy, "J/mol"),
+                    liquid_composition,
+                )
+                liquid_temperature = solution.T.to("K").magnitude
+                if solution.phase == "two_phase":
+                    split = 0.0 if solution.vapour_fraction is None else solution.vapour_fraction
+                    moved_moles = split * liquid_moles
+                    vapour_mass = moved_moles * molar_mass_of(mixture, list(solution.y))
+                    gas_mass_before = gas_moles * molar_mass_of(mixture, gas_composition)
+                    gas_total = gas_moles + moved_moles
+                    if gas_total > 0.0:
+                        gas_composition = [
+                            (gas_moles * gas_component + moved_moles * vapour_component)
+                            / gas_total
+                            for gas_component, vapour_component in zip(
+                                gas_composition, solution.y, strict=True
+                            )
+                        ]
+                    gas_moles = gas_total
+                    liquid_moles *= 1.0 - split
+                    liquid_composition = list(solution.x)
+                    if vapour_mass > 0.0:
+                        mixed = gas_mass_before + vapour_mass
+                        gas_temperature = (
+                            gas_mass_before * gas_temperature + vapour_mass * liquid_temperature
+                        ) / mixed
+            except Exception:  # the class's guarded flash boil-off
+                fallbacks += 1.0
         time += step
         record()
 
