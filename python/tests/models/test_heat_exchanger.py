@@ -140,20 +140,35 @@ def test_an_unknown_selection_criterion_is_refused() -> None:
 def test_the_dynamic_state_is_carried_by_the_outputs(backend: str) -> None:
     result = _run(_case("the_first_dynamic_step_seeds_the_wall"), backend)
     assert result.wall_temperature is not None
-    assert result.wall_temperature.to("K").magnitude == pytest.approx(321.35, rel=1e-9)
-    # A holdup was not stated, so the two CSTR temperatures stay absent.
-    assert result.shell_fluid_temperature is None
-    assert result.tube_fluid_temperature is None
+    assert result.wall_temperature.to("K").magnitude == pytest.approx(
+        322.1428614599108, rel=1e-9
+    )
+    # A holdup was not stated, so the fluids follow the inlets without storing energy.
+    assert result.shell_fluid_temperature.to("K").magnitude == pytest.approx(
+        349.1333795590421, rel=1e-9
+    )
+    assert result.tube_fluid_temperature.to("K").magnitude == pytest.approx(
+        298.9791717723966, rel=1e-9
+    )
 
 
 @pytest.mark.parametrize("backend", sorted(available()))
-def test_the_holdup_outputs_are_present_only_with_a_holdup(backend: str) -> None:
+def test_a_zero_holdup_leaves_the_fluids_quasi_steady(backend: str) -> None:
     holdup = _run(_case("the_holdup_step_carries_three_temperatures"), backend)
-    assert holdup.shell_fluid_temperature is not None
-    assert holdup.tube_fluid_temperature is not None
+    assert holdup.shell_fluid_temperature.to("K").magnitude == pytest.approx(
+        423.1115830175229, rel=1e-9
+    )
+    assert holdup.tube_fluid_temperature.to("K").magnitude == pytest.approx(
+        303.212009416177, rel=1e-9
+    )
+    # With no holdup the fluids carry no capacity, so they settle where the wall puts them.
     control = _run(_case("the_zero_holdup_control_is_the_wall_only"), backend)
-    assert control.shell_fluid_temperature is None
-    assert control.tube_fluid_temperature is None
+    assert control.shell_fluid_temperature.to("K").magnitude == pytest.approx(
+        422.35687699984055, rel=1e-9
+    )
+    assert control.tube_fluid_temperature.to("K").magnitude == pytest.approx(
+        304.5315761168193, rel=1e-9
+    )
 
 
 def test_a_transient_input_without_time_step_is_refused() -> None:

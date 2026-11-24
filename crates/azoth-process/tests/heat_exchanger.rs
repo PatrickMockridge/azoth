@@ -57,41 +57,76 @@ fn the_first_step_seeds_the_wall_to_the_mean_of_the_inlets() {
     let state = outcome
         .transient
         .expect("the dynamic branch carries a state");
-    close(state.wall_temperature.value, 321.35, 1e-12, "wall seed");
-    assert!(state.shell_fluid_temperature.is_none());
-    assert!(state.tube_fluid_temperature.is_none());
+    close(
+        state.wall_temperature.value,
+        322.142_861_459_910_8,
+        1e-9,
+        "wall",
+    );
+    close(
+        state
+            .shell_fluid_temperature
+            .expect("the solved state")
+            .value,
+        349.133_379_559_042_1,
+        1e-6,
+        "shell fluid",
+    );
+    close(
+        state
+            .tube_fluid_temperature
+            .expect("the solved state")
+            .value,
+        298.979_171_772_396_6,
+        1e-6,
+        "tube fluid",
+    );
     close(
         outcome.hot_out.t.value,
-        348.6848889155141,
-        1e-5,
+        349.133_379_559_042_1,
+        1e-6,
         "hot outlet",
     );
     close(
         outcome.cold_out.t.value,
-        300.6934680836265,
-        1e-5,
+        298.979_171_772_396_6,
+        1e-6,
         "cold outlet",
     );
-    close(outcome.duty.value, 300_000.0, 1e-5, "duty");
+    close(outcome.duty.value, 269_905.180_991_312_95, 1e-6, "duty");
+    close(
+        state.thermal_inventory_energy.value,
+        3.221_428_614_599_108_3e7,
+        1e-9,
+        "inventory",
+    );
+    close(
+        state.balance_accumulation.value,
+        -100_713.854_008_913_04,
+        1e-9,
+        "accumulation",
+    );
+    close(
+        state.balance_boundary_energy.value,
+        -100_713.854_008_911_18,
+        1e-9,
+        "boundary",
+    );
+    assert!(
+        state.balance_residual.value.abs() < 1e-6,
+        "residual {}",
+        state.balance_residual.value
+    );
 }
 
 #[test]
 fn ten_steps_of_the_wall_ode_follow_the_capture() {
     let hot = methane(353.15, 1.0e6, N);
     let cold = methane(293.15, 1.0e6, N);
-    let expected = [
-        321.35,
-        320.018,
-        319.03232,
-        318.3029168,
-        317.763158432,
-        317.36373723968,
-        317.0681655573632,
-        316.8494425124488,
-        316.68758745921207,
-        316.5678147198169,
-    ];
-    let mut settings = settings();
+    // With no fluid holdup the wall reaches its stationary state on the first interval, so
+    // every captured step carries the same wall.
+    let expected = [322.142_861_459_910_8; 10];
+    let settings = settings();
     for (step, want) in expected.iter().enumerate() {
         let outcome = heat_exchanger_transient(&hot, &cold, &settings).expect("the step runs");
         let state = outcome
@@ -103,7 +138,6 @@ fn ten_steps_of_the_wall_ode_follow_the_capture() {
             1e-9,
             &format!("step {}", step + 1),
         );
-        settings.wall_temperature_k = Some(state.wall_temperature.value);
     }
 }
 
@@ -121,56 +155,69 @@ fn the_holdup_cstrs_carry_the_fluid_temperatures() {
     let state = first.transient.expect("the dynamic branch carries a state");
     close(
         state.wall_temperature.value,
-        362.9703196616055,
+        362.972_610_059_641_7,
         1e-9,
         "wall 1",
     );
     close(
-        state.shell_fluid_temperature.expect("shell holdup").value,
-        423.10975376724326,
+        state
+            .shell_fluid_temperature
+            .expect("the solved state")
+            .value,
+        423.111_583_017_522_9,
         1e-6,
-        "shell CSTR 1",
+        "shell fluid 1",
     );
     close(
-        state.tube_fluid_temperature.expect("tube holdup").value,
-        303.2151115961644,
+        state
+            .tube_fluid_temperature
+            .expect("the solved state")
+            .value,
+        303.212_009_416_177,
         1e-6,
-        "tube CSTR 1",
+        "tube fluid 1",
     );
 
-    settings.wall_temperature_k = Some(state.wall_temperature.value);
-    settings.shell_fluid_temperature_k = state.shell_fluid_temperature.map(|t| t.value);
-    settings.tube_fluid_temperature_k = state.tube_fluid_temperature.map(|t| t.value);
+    // The probe's five rows replay one interval under the same UUID; the capture's rows are
+    // identical, so a second call with the same start state is the same state.
     let second = heat_exchanger_transient(&hot, &cold, &settings).expect("the step runs");
     let state = second
         .transient
         .expect("the dynamic branch carries a state");
     close(
         state.wall_temperature.value,
-        362.79327843795187,
+        362.972_610_059_641_7,
         1e-9,
         "wall 2",
     );
     close(
-        state.shell_fluid_temperature.expect("shell holdup").value,
-        423.0714363325721,
+        state
+            .shell_fluid_temperature
+            .expect("the solved state")
+            .value,
+        423.111_583_017_522_9,
         1e-6,
-        "shell CSTR 2",
+        "shell fluid 2",
     );
     close(
-        state.tube_fluid_temperature.expect("tube holdup").value,
-        303.27696878554656,
+        state
+            .tube_fluid_temperature
+            .expect("the solved state")
+            .value,
+        303.212_009_416_177,
         1e-6,
-        "tube CSTR 2",
+        "tube fluid 2",
     );
 }
 
 #[test]
-fn the_outlet_shift_does_not_scale_with_dt() {
+fn the_interval_scale_moves_the_wall_and_the_outlets() {
     let hot = methane(353.15, 1.0e6, N);
     let cold = methane(293.15, 1.0e6, N);
-    let mut first: Option<(f64, f64, f64)> = None;
-    for (dt, wall) in [(0.0, 323.15), (0.5, 322.25), (1.0, 321.35)] {
+    for (dt, wall, shell_out) in [
+        (0.5, 322.597_568_647_903_8, 349.192_396_367_343_4),
+        (1.0, 322.142_861_459_910_8, 349.133_379_559_042_1),
+    ] {
         let mut settings = settings();
         settings.time_step_s = dt;
         settings.wall_temperature_k = Some(323.15);
@@ -178,19 +225,8 @@ fn the_outlet_shift_does_not_scale_with_dt() {
         let state = outcome
             .transient
             .expect("the dynamic branch carries a state");
-        close(state.wall_temperature.value, wall, 1e-12, "wall");
-        let here = (
-            outcome.hot_out.t.value,
-            outcome.cold_out.t.value,
-            outcome.duty.value,
-        );
-        if let Some(before) = first {
-            close(here.0, before.0, 1e-12, "hot outlet");
-            close(here.1, before.1, 1e-12, "cold outlet");
-            close(here.2, before.2, 1e-12, "duty");
-        } else {
-            first = Some(here);
-        }
+        close(state.wall_temperature.value, wall, 1e-9, "wall");
+        close(outcome.hot_out.t.value, shell_out, 1e-6, "hot outlet");
     }
 }
 
@@ -204,14 +240,18 @@ fn a_hot_tube_maps_the_duty_to_the_hot_side() {
     let state = outcome
         .transient
         .expect("the dynamic branch carries a state");
-    close(state.wall_temperature.value, 324.95, 1e-12, "wall");
-    // The class's own duty is `qShellToWall = -300 000`, on the cold shell; this id's duty is
-    // the hot side's release, `-tube_duty = 480 000`.
+    close(
+        state.wall_temperature.value,
+        324.206_422_677_742_07,
+        1e-9,
+        "wall",
+    );
+    // The class's `getDuty()` is the shell-to-wall transfer; on a cold shell it is negative.
     close(
         outcome.duty.value,
-        479_999.9989547981,
+        -268_331.746_688_753_6,
         1e-6,
-        "hot-side duty",
+        "shell-to-wall duty",
     );
 }
 
@@ -264,18 +304,20 @@ fn a_non_positive_wall_cp_is_refused() {
 }
 
 #[test]
-fn a_negative_step_is_refused() {
+fn a_non_positive_step_is_refused() {
     let hot = methane(353.15, 1.0e6, N);
     let cold = methane(293.15, 1.0e6, N);
-    let mut settings = settings();
-    settings.time_step_s = -1.0;
-    let error = heat_exchanger_transient(&hot, &cold, &settings)
-        .err()
-        .expect("backwards step");
-    assert!(
-        matches!(&error, AzothError::InvalidInput { field, .. } if field.as_str() == "time_step"),
-        "{error:?}"
-    );
+    for dt in [0.0, -1.0] {
+        let mut settings = settings();
+        settings.time_step_s = dt;
+        let error = heat_exchanger_transient(&hot, &cold, &settings)
+            .err()
+            .expect("a non-positive interval");
+        assert!(
+            matches!(&error, AzothError::InvalidInput { field, .. } if field.as_str() == "time_step"),
+            "{error:?}"
+        );
+    }
 }
 
 #[test]
@@ -303,5 +345,10 @@ fn a_nan_wall_temperature_is_the_first_step_seed() {
     let state = outcome
         .transient
         .expect("the dynamic branch carries a state");
-    close(state.wall_temperature.value, 321.35, 1e-12, "wall seed");
+    close(
+        state.wall_temperature.value,
+        322.142_861_459_910_8,
+        1e-9,
+        "wall seed",
+    );
 }

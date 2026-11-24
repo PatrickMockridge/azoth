@@ -16936,7 +16936,7 @@ pub struct PyDynamicPsvSizingResult {
     /// the steady-to-dynamic oversizing; absent only at a zero dynamic area.
     #[pyo3(get)]
     pub oversizing_ratio: Option<f64>,
-    /// the allowable accumulated pressure `set_pressure (1 + overpressure_fraction)`.
+    /// the allowable accumulated pressure `set_pressure + (set_pressure - atm) overpressure_fraction`.
     #[pyo3(get)]
     pub allowable_pressure: PyQty,
     /// the peak vessel pressure at the dynamically required area.
@@ -20042,12 +20042,21 @@ pub struct PyHeatExchangerResult {
     /// the post-step metal-wall temperature. Present on the dynamic branch, echoed from the stated state on a steady fallback, and absent when the class's field is NaN.
     #[pyo3(get)]
     pub wall_temperature: Option<PyQty>,
-    /// the post-step shell-side CSTR temperature; present only with a positive `shell_holdup_volume` (or echoed on a fallback), absent where the class's field stays NaN.
+    /// the shell-side fluid temperature the step solved; absent on a steady fallback.
     #[pyo3(get)]
     pub shell_fluid_temperature: Option<PyQty>,
-    /// the post-step tube-side CSTR temperature, on the same terms.
+    /// the tube-side fluid temperature the step solved, on the same terms.
     #[pyo3(get)]
     pub tube_fluid_temperature: Option<PyQty>,
+    /// the post-step fluid-plus-wall thermal inventory, `sum_i m_i h_i + m_wall cp_wall T_wall`; absent on a steady fallback.
+    #[pyo3(get)]
+    pub thermal_inventory_energy: Option<PyQty>,
+    /// the interval's inventory change, `E_end - E_start`; absent on a steady fallback.
+    #[pyo3(get)]
+    pub balance_accumulation: Option<PyQty>,
+    /// the interval's boundary energy, `dt sum_i mdot_i (h_in,i - h_out,i)`; absent on a steady fallback.
+    #[pyo3(get)]
+    pub balance_boundary_energy: Option<PyQty>,
     /// the selected configuration's spelling; present only with `mechanical_design`.
     #[pyo3(get)]
     pub mechanical_selected_type: Option<String>,
@@ -20126,7 +20135,7 @@ pub struct PyHeatExchangerResult {
 impl PyHeatExchangerResult {
     fn __repr__(&self) -> String {
         format!(
-            "HeatExchangerResult(hot_out_n={:?}, hot_out_z={:?}, hot_out_p={:?}, hot_out_t={:?}, hot_out_h={:?}, cold_out_n={:?}, cold_out_z={:?}, cold_out_p={:?}, cold_out_t={:?}, cold_out_h={:?}, duty={:?}, ntu={:?}, effectiveness={:?}, c_min={:?}, c_max={:?}, capacity_ratio={:?}, ua_value={:?}, delta_t_side={:?}, wall_temperature={:?}, shell_fluid_temperature={:?}, tube_fluid_temperature={:?}, mechanical_selected_type={:?}, mechanical_selected_area={:?}, log_mean_temperature_difference={:?}, mechanical_approach_temperature={:?}, used_overall_heat_transfer_coefficient={:?}, calculated_ua={:?}, rating_u={:?}, rating_ua={:?}, rating_area={:?}, tube_side_pressure_drop={:?}, shell_side_pressure_drop={:?}, tube_side_heat_transfer_coefficient={:?}, shell_side_heat_transfer_coefficient={:?}, tube_side_reynolds={:?}, shell_side_reynolds={:?}, tube_side_velocity={:?}, shell_side_velocity={:?}, jc={:?}, jl={:?}, jb={:?}, js={:?}, jr={:?}, mechanical_types={:?}, {} warning(s))",
+            "HeatExchangerResult(hot_out_n={:?}, hot_out_z={:?}, hot_out_p={:?}, hot_out_t={:?}, hot_out_h={:?}, cold_out_n={:?}, cold_out_z={:?}, cold_out_p={:?}, cold_out_t={:?}, cold_out_h={:?}, duty={:?}, ntu={:?}, effectiveness={:?}, c_min={:?}, c_max={:?}, capacity_ratio={:?}, ua_value={:?}, delta_t_side={:?}, wall_temperature={:?}, shell_fluid_temperature={:?}, tube_fluid_temperature={:?}, thermal_inventory_energy={:?}, balance_accumulation={:?}, balance_boundary_energy={:?}, mechanical_selected_type={:?}, mechanical_selected_area={:?}, log_mean_temperature_difference={:?}, mechanical_approach_temperature={:?}, used_overall_heat_transfer_coefficient={:?}, calculated_ua={:?}, rating_u={:?}, rating_ua={:?}, rating_area={:?}, tube_side_pressure_drop={:?}, shell_side_pressure_drop={:?}, tube_side_heat_transfer_coefficient={:?}, shell_side_heat_transfer_coefficient={:?}, tube_side_reynolds={:?}, shell_side_reynolds={:?}, tube_side_velocity={:?}, shell_side_velocity={:?}, jc={:?}, jl={:?}, jb={:?}, js={:?}, jr={:?}, mechanical_types={:?}, {} warning(s))",
             self.hot_out_n,
             self.hot_out_z,
             self.hot_out_p,
@@ -20148,6 +20157,9 @@ impl PyHeatExchangerResult {
             self.wall_temperature,
             self.shell_fluid_temperature,
             self.tube_fluid_temperature,
+            self.thermal_inventory_energy,
+            self.balance_accumulation,
+            self.balance_boundary_energy,
             self.mechanical_selected_type,
             self.mechanical_selected_area,
             self.log_mean_temperature_difference,
@@ -20244,6 +20256,18 @@ impl From<&azoth_process::models::heat_exchanger::HeatExchangerResult> for PyHea
             tube_fluid_temperature: r.tube_fluid_temperature.map(|v| PyQty {
                 magnitude_si: v.value,
                 unit: "K".to_string(),
+            }),
+            thermal_inventory_energy: r.thermal_inventory_energy.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "J".to_string(),
+            }),
+            balance_accumulation: r.balance_accumulation.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "J".to_string(),
+            }),
+            balance_boundary_energy: r.balance_boundary_energy.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "J".to_string(),
             }),
             mechanical_selected_type: r.mechanical_selected_type.clone(),
             mechanical_selected_area: r.mechanical_selected_area.map(|v| PyQty {
@@ -22433,7 +22457,7 @@ pub struct PyOverpressureAcceptanceResult {
     /// 1.21 fire, 1.16 multiple non-fire, 1.10 single non-fire.
     #[pyo3(get)]
     pub accumulation_factor: f64,
-    /// `mawp accumulation_factor`.
+    /// `mawp + (mawp - atm) (accumulation_factor - 1)`.
     #[pyo3(get)]
     pub allowable_pressure: PyQty,
     /// `allowable_pressure - peak_pressure`.
@@ -22524,7 +22548,7 @@ pub struct PyOverpressureProtectionStudyResult {
     /// the peak pressure the acceptance compared; absent when no credible scenario exists.
     #[pyo3(get)]
     pub acceptance_peak_pressure: Option<PyQty>,
-    /// `mawp accumulation_factor`.
+    /// `mawp + (mawp - atm) (accumulation_factor - 1)`.
     #[pyo3(get)]
     pub acceptance_allowable_pressure: Option<PyQty>,
     /// 1.21 fire, 1.16 multiple non-fire, 1.10 single non-fire.
@@ -24398,7 +24422,7 @@ impl From<&azoth_process::models::psv_fire_sizing::PsvFireSizingResult> for PyPs
 )]
 #[derive(Debug, Clone, PartialEq)]
 pub struct PyPsvSizingResult {
-    /// `set_pressure (1 + overpressure_fraction)`.
+    /// `set_pressure + (set_pressure - atm) overpressure_fraction`.
     #[pyo3(get)]
     pub relieving_pressure: PyQty,
     /// `back_pressure / relieving_pressure`.
@@ -27802,7 +27826,7 @@ pub struct PySplitterResult {
     /// each outlet's temperature, which is `feed_t`.
     #[pyo3(get)]
     pub products_t: Vec<PyQty>,
-    /// each outlet's molar enthalpy, which is the feed's. A splitter adds no heat and no work and does not flash, so this is the one field an oracle cannot be asked for - see the assumptions.
+    /// each outlet's molar enthalpy, which is the feed's. A splitter adds no heat and no work and does not flash, so the branch states and the fraction-weighted balance are the capture's own evidence.
     #[pyo3(get)]
     pub products_h: Vec<PyQty>,
     /// the `pressureDrop` constraint's current value: `0.0` by construction, the class's "ideal splitter". Present only when the constraint is in the map.
@@ -30363,7 +30387,7 @@ pub struct PyConstantMassExpansionResult {
     /// the untranslated saturation volume.
     #[pyo3(get)]
     pub saturation_volume: PyQty,
-    /// the mole-fraction-weighted compressibility at the saturation state.
+    /// the corrected compressibility `P V / (R T)` of the whole cell at the saturation state.
     #[pyo3(get)]
     pub z_saturation: f64,
     /// the saturation state's isothermal compressibility, in 1/Pa; the vocabulary has no inverse-pressure unit.

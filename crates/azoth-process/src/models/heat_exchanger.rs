@@ -142,6 +142,15 @@ pub struct HeatExchangerResult {
     /// The post-step tube CSTR temperature; present only with a tube holdup.
     #[serde(serialize_with = "optional_scalar")]
     pub tube_fluid_temperature: Option<ThermodynamicTemperature>,
+    /// The post-step fluid-plus-wall thermal inventory, J.
+    #[serde(serialize_with = "optional_scalar")]
+    pub thermal_inventory_energy: Option<azoth_core::units::Energy>,
+    /// The interval's inventory change, J.
+    #[serde(serialize_with = "optional_scalar")]
+    pub balance_accumulation: Option<azoth_core::units::Energy>,
+    /// The interval's boundary energy, J.
+    #[serde(serialize_with = "optional_scalar")]
+    pub balance_boundary_energy: Option<azoth_core::units::Energy>,
     /// The selected mechanical configuration.
     pub mechanical_selected_type: Option<String>,
     /// The selected configuration's required area.
@@ -493,10 +502,9 @@ pub fn heat_exchanger(
     let holdup_shell = shell_holdup_volume.map_or(0.0, |value| value.value.max(0.0));
     let holdup_tube = tube_holdup_volume.map_or(0.0, |value| value.value.max(0.0));
     let area_m2 = heat_transfer_area.map_or(0.0, |value| value.value.max(0.0));
-    let active_transient = transient_requested
-        && dynamic_model_enabled.unwrap_or(false)
-        && wall_mass_kg > 0.0
-        && area_m2 > 0.0;
+    // `dynamicModelEnabled` alone selects the active branch at the pin; a zero wall mass or
+    // area is then a refusal from the class's thermal-configuration guard, not a fallback.
+    let active_transient = transient_requested && dynamic_model_enabled.unwrap_or(false);
 
     // `runDeltaT`'s `guessOutTemperature` only seeds the pass the `else` branch then
     // overwrites, so it is carried and unused. The declaration keeps the surface whole.
@@ -636,6 +644,10 @@ pub fn heat_exchanger(
             wall_temperature: wall_temperature.unwrap_or_else(|| kelvins(f64::NAN)),
             shell_fluid_temperature,
             tube_fluid_temperature,
+            thermal_inventory_energy: azoth_core::units::joules(f64::NAN),
+            balance_accumulation: azoth_core::units::joules(f64::NAN),
+            balance_boundary_energy: azoth_core::units::joules(f64::NAN),
+            balance_residual: azoth_core::units::joules(f64::NAN),
         });
     }
     let mechanical = if mechanical_requested {
@@ -725,6 +737,21 @@ impl HeatExchangerResult {
                 .transient
                 .as_ref()
                 .and_then(|state| state.tube_fluid_temperature)
+                .filter(|value| !value.value.is_nan()),
+            thermal_inventory_energy: outcome
+                .transient
+                .as_ref()
+                .map(|state| state.thermal_inventory_energy)
+                .filter(|value| !value.value.is_nan()),
+            balance_accumulation: outcome
+                .transient
+                .as_ref()
+                .map(|state| state.balance_accumulation)
+                .filter(|value| !value.value.is_nan()),
+            balance_boundary_energy: outcome
+                .transient
+                .as_ref()
+                .map(|state| state.balance_boundary_energy)
                 .filter(|value| !value.value.is_nan()),
             mechanical_selected_type: mechanical
                 .map(|value| value.selected.kind.spelling().to_string()),

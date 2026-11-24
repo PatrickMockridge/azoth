@@ -1,8 +1,8 @@
 //! `unit_ops.heat_exchanger` - two streams, coupled by an overall conductance.
 
 use azoth_core::units::{
-    MolarEnergy, Power, ThermalConductance, ThermodynamicTemperature, joules_per_mole, kelvins,
-    pascals, watts, watts_per_kelvin,
+    Energy, MolarEnergy, Power, ThermalConductance, ThermodynamicTemperature, joules,
+    joules_per_mole, kelvins, pascals, watts, watts_per_kelvin,
 };
 use azoth_core::{AzothError, Result};
 use azoth_eos::{Phase, pt_flash};
@@ -82,10 +82,18 @@ pub struct HeatExchangerOutcome {
 pub struct TransientState {
     /// The post-step metal-wall temperature, K.
     pub wall_temperature: ThermodynamicTemperature,
-    /// The post-step shell-side CSTR temperature; absent without a shell holdup.
+    /// The shell-side fluid temperature the step solved, K.
     pub shell_fluid_temperature: Option<ThermodynamicTemperature>,
-    /// The post-step tube-side CSTR temperature; absent without a tube holdup.
+    /// The tube-side fluid temperature the step solved, K.
     pub tube_fluid_temperature: Option<ThermodynamicTemperature>,
+    /// The post-step fluid-plus-wall thermal inventory, J.
+    pub thermal_inventory_energy: Energy,
+    /// The interval's inventory change, J.
+    pub balance_accumulation: Energy,
+    /// The interval's boundary energy, J.
+    pub balance_boundary_energy: Energy,
+    /// The interval's first-law residual, J.
+    pub balance_residual: Energy,
 }
 
 /// One `HeatExchanger.runTransient` step's settings, in SI.
@@ -373,20 +381,19 @@ pub fn heat_exchanger(
     ))
 }
 
-/// `HeatExchanger.runTransient`'s enabled branch, one step.
+/// `HeatExchanger.runTransient`'s enabled branch, one interval.
 ///
-/// The class's stream 0 is the **shell** and stream 1 the **tube**, the reverse of
-/// [`heat_exchanger_rating`]'s convention; `settings.tube_is_hot` states the mapping. The wall
-/// and the two optional CSTR holdups are integrated with forward Euler, and the two side
-/// duties are then applied to the **total** inlet enthalpy as though a watt were a joule -
-/// `h_out = h_in - q`, not `q * dt` - while the temperatures integrate by `dt`. That is
-/// reproduced rather than corrected: it is the class's answer, and the capture's `dt_quirk_*`
-/// rows pin it.
+/// **The state is the class's own**: both fluid temperatures and the wall are solved
+/// together from the interval's first law, with each side's enthalpy, heat capacity and
+/// corrected density taken at the candidate temperature. The class's 40-iteration Newton,
+/// its halving line search and the `max(1e-5, 1e-5/dt)` residual bound are transcribed, as
+/// are the energy-balance receipt and the `q_shell_to_wall` duty. The class's stream 0 is
+/// the **shell** and stream 1 the **tube**, the reverse of [`heat_exchanger_rating`]'s
+/// convention; `settings.tube_is_hot` states the mapping.
 ///
 /// # Errors
-/// [`AzothError::InvalidInput`] for a non-positive side flow, a non-positive wall mass, wall
-/// heat capacity or area, a negative film coefficient or holdup, a non-finite parameter, a
-/// two-phase side, or whatever either PH flash refuses.
+/// [`AzothError::InvalidInput`] for a non-positive side flow or timestep, a non-finite gate,
+/// a two-phase candidate, or a solve that cannot reduce its residual.
 pub fn heat_exchanger_transient(
     hot: &Stream,
     cold: &Stream,
@@ -401,34 +408,34 @@ pub fn heat_exchanger_transient(
         }
     }
     let dt = settings.time_step_s;
-    if !dt.is_finite() || dt < 0.0 {
+    if !dt.is_finite() || dt <= 0.0 {
         return Err(AzothError::invalid_input(
             "time_step",
-            format!("a forward-Euler interval is finite and non-negative, and {dt} s is not"),
+            format!("a finite positive timestep is required, and {dt} s is not"),
         ));
     }
     for (field, value) in [
         ("wall_mass", settings.wall_mass_kg),
         ("wall_cp", settings.wall_cp_j_per_kg_k),
         ("heat_transfer_area", settings.heat_transfer_area_m2),
+        ("shell_side_htc", settings.shell_side_htc_w_per_m2_k),
+        ("tube_side_htc", settings.tube_side_htc_w_per_m2_k),
     ] {
         if !value.is_finite() || value <= 0.0 {
             return Err(AzothError::invalid_input(
                 field,
-                format!("the dynamic branch divides by this, and {value} is not positive"),
+                "Wall mass/Cp, both film coefficients and area must be finite and positive",
             ));
         }
     }
     for (field, value) in [
         ("shell_holdup_volume", settings.shell_holdup_volume_m3),
         ("tube_holdup_volume", settings.tube_holdup_volume_m3),
-        ("shell_side_htc", settings.shell_side_htc_w_per_m2_k),
-        ("tube_side_htc", settings.tube_side_htc_w_per_m2_k),
     ] {
         if !value.is_finite() || value < 0.0 {
             return Err(AzothError::invalid_input(
                 field,
-                format!("a non-negative finite quantity is required, and {value} is not"),
+                format!("a finite nonnegative volume is required, and {value} is not"),
             ));
         }
     }
@@ -441,8 +448,7 @@ pub fn heat_exchanger_transient(
         ("tube_fluid_temperature", settings.tube_fluid_temperature_k),
     ] {
         if let Some(value) = value {
-            // **NaN is the class's first-step sentinel**, so it is admitted; an infinity is a
-            // state the ODEs cannot carry and is refused.
+            // NaN is the class's seed sentinel; an infinity is not a state.
             if !value.is_finite() && !value.is_nan() {
                 return Err(AzothError::invalid_input(
                     field,
@@ -457,97 +463,327 @@ pub fn heat_exchanger_transient(
     } else {
         (hot, cold)
     };
-    for stream in [shell, tube] {
-        let (mixture, _) = stream.mixture()?;
-        if pt_flash(&mixture, stream.t, stream.p, &stream.z)?.phase == Phase::TwoPhase {
-            return Err(AzothError::invalid_input(
-                "stream",
-                "the exchanger's transient step requires single-phase streams",
-            ));
-        }
-    }
 
-    let t_shell_in = shell.t.value;
-    let t_tube_in = tube.t.value;
-    let area = settings.heat_transfer_area_m2;
-    let h_shell = settings.shell_side_htc_w_per_m2_k;
-    let h_tube = settings.tube_side_htc_w_per_m2_k;
-    let mut wall = settings
+    let shell_inlet = side_properties(shell, shell.t.value)?;
+    let tube_inlet = side_properties(tube, tube.t.value)?;
+    let mass_flow = [shell.mass_flow()?, tube.mass_flow()?];
+
+    let t_shell = settings
+        .shell_fluid_temperature_k
+        .filter(|value| !value.is_nan())
+        .unwrap_or(shell.t.value);
+    let t_tube = settings
+        .tube_fluid_temperature_k
+        .filter(|value| !value.is_nan())
+        .unwrap_or(tube.t.value);
+    let wall = settings
         .wall_temperature_k
         .filter(|value| !value.is_nan())
-        .unwrap_or(0.5 * (t_shell_in + t_tube_in));
-
-    // **The shell CSTR uses the pre-step wall.** The class updates both holdups before the
-    // wall, and each update reads the wall as it arrived.
-    let (t_shell_for_wall, shell_fluid) = if settings.shell_holdup_volume_m3 > 0.0 {
-        let mut state = settings
-            .shell_fluid_temperature_k
-            .filter(|value| !value.is_nan())
-            .unwrap_or(t_shell_in);
-        let fluid_mass = shell.corrected_density()? * settings.shell_holdup_volume_m3;
-        let cp = shell.molar_heat_capacity()? / shell.molar_mass()?.value;
-        if fluid_mass > 0.0 && cp > 0.0 {
-            let mass_flow = shell.mass_flow()?;
-            let mixing = mass_flow * cp * (t_shell_in - state);
-            let to_wall = h_shell * area * (state - wall);
-            state += (mixing - to_wall) / (fluid_mass * cp) * dt;
-        }
-        (state, Some(state))
-    } else {
-        (t_shell_in, None)
+        .unwrap_or(0.5 * (t_shell + t_tube));
+    if !(wall.is_finite() && wall > 0.0) {
+        return Err(AzothError::invalid_input(
+            "wall_temperature",
+            "the initial wall temperature must be finite and positive",
+        ));
+    }
+    let shell_start = side_properties(shell, t_shell)?;
+    let tube_start = side_properties(tube, t_tube)?;
+    let start = ThermalState {
+        temperature: [t_shell, t_tube, wall],
+        enthalpy: [shell_start.h_mass, tube_start.h_mass],
+        // The class fixes the holdup mass on the first interval and carries it; the inlet
+        // density is the one its `initialState` used for that first inventory.
+        mass: [
+            settings.shell_holdup_volume_m3 * shell_inlet.density,
+            settings.tube_holdup_volume_m3 * tube_inlet.density,
+        ],
     };
+    let wall_capacity = settings.wall_mass_kg * settings.wall_cp_j_per_kg_k;
+    let conductance = [
+        settings.shell_side_htc_w_per_m2_k * settings.heat_transfer_area_m2,
+        settings.tube_side_htc_w_per_m2_k * settings.heat_transfer_area_m2,
+    ];
 
-    let (t_tube_for_wall, tube_fluid) = if settings.tube_holdup_volume_m3 > 0.0 {
-        let mut state = settings
-            .tube_fluid_temperature_k
-            .filter(|value| !value.is_nan())
-            .unwrap_or(t_tube_in);
-        let fluid_mass = tube.corrected_density()? * settings.tube_holdup_volume_m3;
-        let cp = tube.molar_heat_capacity()? / tube.molar_mass()?.value;
-        if fluid_mass > 0.0 && cp > 0.0 {
-            let mass_flow = tube.mass_flow()?;
-            let mixing = mass_flow * cp * (t_tube_in - state);
-            let wall_to_fluid = h_tube * area * (wall - state);
-            state += (mixing + wall_to_fluid) / (fluid_mass * cp) * dt;
-        }
-        (state, Some(state))
-    } else {
-        (t_tube_in, None)
-    };
+    let evaluation = solve_transient(
+        shell,
+        tube,
+        &start,
+        mass_flow,
+        [shell_inlet.h_mass, tube_inlet.h_mass],
+        conductance,
+        wall_capacity,
+        dt,
+    )?;
 
-    let q_shell_to_wall = h_shell * area * (t_shell_for_wall - wall);
-    let q_wall_to_tube = h_tube * area * (wall - t_tube_for_wall);
-    wall += (q_shell_to_wall - q_wall_to_tube)
-        / (settings.wall_mass_kg * settings.wall_cp_j_per_kg_k)
-        * dt;
-
-    let shell_out = Stream::from_ph(
+    let shell_out = Stream::from_pt(
         shell.components.clone(),
         shell.z.clone(),
         shell.n,
         shell.p,
-        moles_with(shell, -q_shell_to_wall),
+        kelvins(evaluation.temperature[0]),
     )?;
-    let tube_out = Stream::from_ph(
+    let tube_out = Stream::from_pt(
         tube.components.clone(),
         tube.z.clone(),
         tube.n,
         tube.p,
-        moles_with(tube, q_wall_to_tube),
+        kelvins(evaluation.temperature[1]),
     )?;
-
     let (hot_out, cold_out) = if settings.tube_is_hot {
         (tube_out, shell_out)
     } else {
         (shell_out, tube_out)
     };
     let mut outcome = HeatExchangerOutcome::of(hot, hot_out, cold_out, None);
+    // The class's `getDuty()` is the shell-to-wall transfer; the steady branches publish
+    // the hot-side release instead.
+    outcome.duty = watts(conductance[0] * (evaluation.temperature[0] - evaluation.temperature[2]));
+
+    let start_energy = start.mass[0] * start.enthalpy[0]
+        + start.mass[1] * start.enthalpy[1]
+        + wall_capacity * start.temperature[2];
+    let end_energy = start.mass[0] * evaluation.enthalpy[0]
+        + start.mass[1] * evaluation.enthalpy[1]
+        + wall_capacity * evaluation.temperature[2];
+    let boundary_energy = dt
+        * (mass_flow[0] * (shell_inlet.h_mass - evaluation.enthalpy[0])
+            + mass_flow[1] * (tube_inlet.h_mass - evaluation.enthalpy[1]));
+    let accumulation = end_energy - start_energy;
+
     outcome.transient = Some(TransientState {
-        wall_temperature: kelvins(wall),
-        shell_fluid_temperature: shell_fluid.map(kelvins),
-        tube_fluid_temperature: tube_fluid.map(kelvins),
+        wall_temperature: kelvins(evaluation.temperature[2]),
+        shell_fluid_temperature: Some(kelvins(evaluation.temperature[0])),
+        tube_fluid_temperature: Some(kelvins(evaluation.temperature[1])),
+        thermal_inventory_energy: joules(end_energy),
+        balance_accumulation: joules(accumulation),
+        balance_boundary_energy: joules(boundary_energy),
+        balance_residual: joules(accumulation - boundary_energy),
     });
     Ok(outcome)
+}
+
+struct ThermalState {
+    temperature: [f64; 3],
+    enthalpy: [f64; 2],
+    mass: [f64; 2],
+}
+
+struct SideProperties {
+    h_mass: f64,
+    cp_mass: f64,
+    density: f64,
+}
+
+fn side_properties(stream: &Stream, temperature: f64) -> Result<SideProperties> {
+    let state = Stream::from_pt(
+        stream.components.clone(),
+        stream.z.clone(),
+        1.0,
+        stream.p,
+        kelvins(temperature),
+    )?;
+    let (mixture, _) = stream.mixture()?;
+    if pt_flash(&mixture, kelvins(temperature), stream.p, &stream.z)?.phase == Phase::TwoPhase {
+        return Err(AzothError::invalid_input(
+            "stream",
+            "the exchanger's thermal inventory requires a finite stable single-phase fluid",
+        ));
+    }
+    let molar_mass = state.molar_mass()?.value;
+    Ok(SideProperties {
+        h_mass: state.h.value / molar_mass,
+        cp_mass: state.molar_heat_capacity()? / molar_mass,
+        density: state.corrected_density()?,
+    })
+}
+
+struct Evaluation {
+    temperature: [f64; 3],
+    enthalpy: [f64; 2],
+    residual: [f64; 3],
+    jacobian: [[f64; 3]; 3],
+    maximum_residual: f64,
+}
+
+#[allow(clippy::too_many_arguments)]
+fn solve_transient(
+    shell: &Stream,
+    tube: &Stream,
+    start: &ThermalState,
+    mass_flow: [f64; 2],
+    inlet_enthalpy: [f64; 2],
+    conductance: [f64; 2],
+    wall_capacity: f64,
+    dt: f64,
+) -> Result<Evaluation> {
+    let mut temperature = start.temperature;
+    let mut minimum = start
+        .temperature
+        .iter()
+        .copied()
+        .fold(f64::INFINITY, f64::min);
+    let mut maximum = start
+        .temperature
+        .iter()
+        .copied()
+        .fold(f64::NEG_INFINITY, f64::max);
+    for inlet in [shell.t.value, tube.t.value] {
+        minimum = minimum.min(inlet);
+        maximum = maximum.max(inlet);
+    }
+    for _ in 0..40 {
+        let evaluated = evaluate_transient(
+            shell,
+            tube,
+            start,
+            mass_flow,
+            inlet_enthalpy,
+            conductance,
+            wall_capacity,
+            dt,
+            temperature,
+        )?;
+        if evaluated.maximum_residual < (1.0e-5f64).max(1.0e-5 / dt) {
+            return Ok(evaluated);
+        }
+        let change = match solve3(
+            evaluated.jacobian,
+            [
+                -evaluated.residual[0],
+                -evaluated.residual[1],
+                -evaluated.residual[2],
+            ],
+        ) {
+            Some(change) => change,
+            None => {
+                return Err(AzothError::invalid_input(
+                    "time_step",
+                    "the exchanger enthalpy Jacobian is singular",
+                ));
+            }
+        };
+        let mut accepted = false;
+        let mut fraction = 1.0;
+        while fraction >= 1.0e-6 {
+            let mut trial = [0.0; 3];
+            let mut bounded = true;
+            for node in 0..3 {
+                trial[node] = temperature[node] + fraction * change[node];
+                bounded &= trial[node].is_finite()
+                    && trial[node] >= minimum - 1.0e-8
+                    && trial[node] <= maximum + 1.0e-8;
+            }
+            if bounded {
+                let candidate = evaluate_transient(
+                    shell,
+                    tube,
+                    start,
+                    mass_flow,
+                    inlet_enthalpy,
+                    conductance,
+                    wall_capacity,
+                    dt,
+                    trial,
+                )?;
+                if candidate.maximum_residual < evaluated.maximum_residual {
+                    temperature = trial;
+                    accepted = true;
+                    break;
+                }
+            }
+            fraction *= 0.5;
+        }
+        if !accepted {
+            return Err(AzothError::invalid_input(
+                "time_step",
+                "bounded exchanger enthalpy solve failed to reduce its residual",
+            ));
+        }
+    }
+    Err(AzothError::invalid_input(
+        "time_step",
+        "exchanger enthalpy solve exceeded 40 iterations",
+    ))
+}
+
+#[allow(clippy::too_many_arguments)]
+fn evaluate_transient(
+    shell: &Stream,
+    tube: &Stream,
+    start: &ThermalState,
+    mass_flow: [f64; 2],
+    inlet_enthalpy: [f64; 2],
+    conductance: [f64; 2],
+    wall_capacity: f64,
+    dt: f64,
+    temperature: [f64; 3],
+) -> Result<Evaluation> {
+    let sides = [
+        side_properties(shell, temperature[0])?,
+        side_properties(tube, temperature[1])?,
+    ];
+    let mut residual = [0.0; 3];
+    let mut jacobian = [[0.0; 3]; 3];
+    residual[2] = wall_capacity / dt * (temperature[2] - start.temperature[2]);
+    jacobian[2][2] = wall_capacity / dt;
+    for side in 0..2 {
+        let properties = &sides[side];
+        let transfer = conductance[side] * (temperature[side] - temperature[2]);
+        residual[side] = start.mass[side] / dt * (properties.h_mass - start.enthalpy[side])
+            + mass_flow[side] * (properties.h_mass - inlet_enthalpy[side])
+            + transfer;
+        jacobian[side][side] =
+            (start.mass[side] / dt + mass_flow[side]) * properties.cp_mass + conductance[side];
+        jacobian[side][2] = -conductance[side];
+        residual[2] -= transfer;
+        jacobian[2][side] = -conductance[side];
+        jacobian[2][2] += conductance[side];
+    }
+    let maximum_residual = residual
+        .iter()
+        .fold(0.0f64, |largest, value| largest.max(value.abs()));
+    Ok(Evaluation {
+        temperature,
+        enthalpy: [sides[0].h_mass, sides[1].h_mass],
+        residual,
+        jacobian,
+        maximum_residual,
+    })
+}
+
+fn solve3(matrix: [[f64; 3]; 3], rhs: [f64; 3]) -> Option<[f64; 3]> {
+    let mut matrix = matrix;
+    let mut rhs = rhs;
+    for column in 0..3 {
+        let mut pivot = column;
+        for row in column + 1..3 {
+            if matrix[row][column].abs() > matrix[pivot][column].abs() {
+                pivot = row;
+            }
+        }
+        if !matrix[pivot][column].is_finite() || matrix[pivot][column].abs() < 1.0e-300 {
+            return None;
+        }
+        matrix.swap(column, pivot);
+        rhs.swap(column, pivot);
+        let diagonal = matrix[column][column];
+        for row in column + 1..3 {
+            let factor = matrix[row][column] / diagonal;
+            for k in column..3 {
+                matrix[row][k] -= factor * matrix[column][k];
+            }
+            rhs[row] -= factor * rhs[column];
+        }
+    }
+    let mut solution = [0.0; 3];
+    for row in (0..3).rev() {
+        let mut value = rhs[row];
+        for column in row + 1..3 {
+            value -= matrix[row][column] * solution[column];
+        }
+        solution[row] = value / matrix[row][row];
+    }
+    Some(solution)
 }
 
 /// `HeatExchanger.runThermalHydraulicRating`: a fixed geometry, correlated UA and pressure

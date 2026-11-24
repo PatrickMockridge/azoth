@@ -6890,7 +6890,7 @@ class DynamicPsvSizingResult(_HasWarnings):
     #: the steady-to-dynamic oversizing; absent only at a zero dynamic area.
     oversizing_ratio: float | None
 
-    #: the allowable accumulated pressure `set_pressure (1 + overpressure_fraction)`.
+    #: the allowable accumulated pressure `set_pressure + (set_pressure - atm) overpressure_fraction`.
     allowable_pressure: Q
 
     #: the peak vessel pressure at the dynamically required area.
@@ -8142,11 +8142,20 @@ class HeatExchangerResult(_HasWarnings):
     #: the post-step metal-wall temperature. Present on the dynamic branch, echoed from the stated state on a steady fallback, and absent when the class's field is NaN.
     wall_temperature: Q | None
 
-    #: the post-step shell-side CSTR temperature; present only with a positive `shell_holdup_volume` (or echoed on a fallback), absent where the class's field stays NaN.
+    #: the shell-side fluid temperature the step solved; absent on a steady fallback.
     shell_fluid_temperature: Q | None
 
-    #: the post-step tube-side CSTR temperature, on the same terms.
+    #: the tube-side fluid temperature the step solved, on the same terms.
     tube_fluid_temperature: Q | None
+
+    #: the post-step fluid-plus-wall thermal inventory, `sum_i m_i h_i + m_wall cp_wall T_wall`; absent on a steady fallback.
+    thermal_inventory_energy: Q | None
+
+    #: the interval's inventory change, `E_end - E_start`; absent on a steady fallback.
+    balance_accumulation: Q | None
+
+    #: the interval's boundary energy, `dt sum_i mdot_i (h_in,i - h_out,i)`; absent on a steady fallback.
+    balance_boundary_energy: Q | None
 
     #: the selected configuration's spelling; present only with `mechanical_design`.
     mechanical_selected_type: str | None
@@ -9106,7 +9115,7 @@ class OverpressureAcceptanceResult(_HasWarnings):
     #: 1.21 fire, 1.16 multiple non-fire, 1.10 single non-fire.
     accumulation_factor: float
 
-    #: `mawp accumulation_factor`.
+    #: `mawp + (mawp - atm) (accumulation_factor - 1)`.
     allowable_pressure: Q
 
     #: `allowable_pressure - peak_pressure`.
@@ -9158,7 +9167,7 @@ class OverpressureProtectionStudyResult(_HasWarnings):
     #: the peak pressure the acceptance compared; absent when no credible scenario exists.
     acceptance_peak_pressure: Q | None
 
-    #: `mawp accumulation_factor`.
+    #: `mawp + (mawp - atm) (accumulation_factor - 1)`.
     acceptance_allowable_pressure: Q | None
 
     #: 1.21 fire, 1.16 multiple non-fire, 1.10 single non-fire.
@@ -9891,7 +9900,7 @@ class PsvSizingResult(_HasWarnings):
 
     CALC_ID: ClassVar[str] = "process.psv_sizing"
 
-    #: `set_pressure (1 + overpressure_fraction)`.
+    #: `set_pressure + (set_pressure - atm) overpressure_fraction`.
     relieving_pressure: Q
 
     #: `back_pressure / relieving_pressure`.
@@ -11279,7 +11288,7 @@ class SplitterResult(_HasWarnings):
     #: each outlet's temperature, which is `feed_t`.
     products_t: tuple[Q, ...]
 
-    #: each outlet's molar enthalpy, which is the feed's. A splitter adds no heat and no work and does not flash, so this is the one field an oracle cannot be asked for - see the assumptions.
+    #: each outlet's molar enthalpy, which is the feed's. A splitter adds no heat and no work and does not flash, so the branch states and the fraction-weighted balance are the capture's own evidence.
     products_h: tuple[Q, ...]
 
     #: the `pressureDrop` constraint's current value: `0.0` by construction, the class's "ideal splitter". Present only when the constraint is in the map.
@@ -12285,7 +12294,7 @@ class ConstantMassExpansionResult(_HasWarnings):
     #: the untranslated saturation volume.
     saturation_volume: Q
 
-    #: the mole-fraction-weighted compressibility at the saturation state.
+    #: the corrected compressibility `P V / (R T)` of the whole cell at the saturation state.
     z_saturation: float
 
     #: the saturation state's isothermal compressibility, in 1/Pa; the vocabulary has no inverse-pressure unit.
