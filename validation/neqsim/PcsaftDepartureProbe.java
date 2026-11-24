@@ -23,8 +23,8 @@ import neqsim.thermo.system.SystemPCSAFT;
  * an ordinary state and nothing about the number says which it is.
  *
  * <pre>
- * javac -proc:none -cp neqsim-118d9af.jar PcsaftDepartureProbe.java
- * java -cp .:neqsim-118d9af.jar PcsaftDepartureProbe [T_K P_bara name z ...]
+ * javac -proc:none -cp neqsim-b40bb11.jar PcsaftDepartureProbe.java
+ * java -cp .:neqsim-b40bb11.jar PcsaftDepartureProbe [T_K P_bara name z ...]
  * </pre>
  */
 public final class PcsaftDepartureProbe {

@@ -27,9 +27,9 @@ def _spec() -> dict[str, Any]:
     return model(MODEL_ID)
 
 
-def _fire_heat_input(area_m2: float, has_drainage: bool) -> float:
+def _fire_heat_input(area_m2: float, has_drainage: bool, has_fire_fighting: bool) -> float:
     area_ft2 = area_m2 * 10.7639
-    coefficient = 21_000.0 if has_drainage else 34_500.0
+    coefficient = 21_000.0 if has_drainage and has_fire_fighting else 34_500.0
     heat_input: float = coefficient * area_ft2**0.82 * 0.29307107
     return heat_input
 
@@ -52,7 +52,6 @@ def fire_case_relief(
     spec = _spec()
     checks = checks_for(spec)
     warnings: list[Warning] = []
-    _ = has_fire_fighting
 
     area_si = None if wetted_area is None else input_to_si(spec, "wetted_area", wetted_area)
     diameter_si = (
@@ -84,7 +83,7 @@ def fire_case_relief(
         area = math.pi * diameter_si * height_si
     else:
         area = 0.0
-    heat_input = _fire_heat_input(area, has_drainage) if area > 0.0 else 0.0
+    heat_input = _fire_heat_input(area, has_drainage, has_fire_fighting) if area > 0.0 else 0.0
     latent = 350_000.0 if latent_heat is None or latent_heat <= 0.0 else latent_heat
     relief_rate = heat_input / latent
     return FireCaseReliefResult(

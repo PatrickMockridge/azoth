@@ -33,8 +33,6 @@ const DEFAULT_PFP_CONDUCTIVITY: f64 = 0.2;
 const LONG_DURATION_S: f64 = 3600.0;
 /// The boundary's epsilon, s: exactly 3600 s is short.
 const LONG_DURATION_EPSILON_S: f64 = 1.0e-6;
-/// The floor on the fire-to-steel driving temperature, K.
-const MIN_DRIVING_TEMPERATURE_K: f64 = 1.0;
 
 /// The class's two rating families.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -163,6 +161,13 @@ pub fn pfp_demand(
              publishes a zero or negative bare-steel time with an infinite or negative thickness",
         ));
     }
+    if fire <= 0.5 * (initial + critical) {
+        return Err(AzothError::invalid_input(
+            "fire_temperature",
+            "the fire temperature must exceed the mean steel temperature; at or below it the \
+             class refuses the demand rather than publishing a cooled-steel thickness",
+        ));
+    }
 
     // The class's operation order, to the letter.
     let mass_per_area = STEEL_DENSITY * steel_thickness.value;
@@ -174,7 +179,7 @@ pub fn pfp_demand(
     let thickness = if pfp_required {
         let q_allow = mass_per_area * STEEL_CP * delta_t / survival;
         let steel_average = 0.5 * (initial + critical);
-        let driving = (fire - steel_average).max(MIN_DRIVING_TEMPERATURE_K);
+        let driving = fire - steel_average;
         conductivity * driving / q_allow
     } else {
         0.0

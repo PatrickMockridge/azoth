@@ -1,7 +1,7 @@
 //! `thermal.tema_standard` - TEMA configuration, class limits and layout rules.
 //!
 //! Transcribed from `process/mechanicaldesign/heatexchanger/TEMAStandard.java` at NeqSim
-//! `118d9aff`: the configuration cost and head predicates, the construction-class limits,
+//! `b40bb113`: the configuration cost and head predicates, the construction-class limits,
 //! the tube-size, pitch and baffle tables, and the six numeric rules the design calculator
 //! reads.
 //!

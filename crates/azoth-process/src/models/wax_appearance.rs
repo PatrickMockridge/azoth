@@ -176,14 +176,14 @@ mod tests {
             &[0.7, 0.1, 0.1, 0.1],
             5.0e5,
             320.0,
-            269.267272949219,
+            269.150924682617,
         );
         check(
             &["methane", "n-heptane", "nc14", "nc20", "nc24"],
             &[0.4, 0.1, 0.1, 0.2, 0.2],
             1.0e5,
             320.0,
-            271.307144165039,
+            270.185699462891,
         );
         // The lean feed is the probe's own "calcWAT refuses rather than answers" state. The
         // capture's 132.072 K is that marginal answer; the port's wax flash brackets a

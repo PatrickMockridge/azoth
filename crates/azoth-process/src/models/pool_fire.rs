@@ -96,7 +96,9 @@ fn incident_heat_flux(diameter: f64, burn_rate: f64, air_density: f64, distance:
 fn distance_to_flux(diameter: f64, burn_rate: f64, air_density: f64, target: f64) -> Option<f64> {
     let mut lo = diameter / 2.0 + NEAR_CLEARANCE;
     let mut hi = SEARCH_MAX;
-    if incident_heat_flux(diameter, burn_rate, air_density, lo) < target {
+    if incident_heat_flux(diameter, burn_rate, air_density, lo) < target
+        || incident_heat_flux(diameter, burn_rate, air_density, hi) > target
+    {
         return None;
     }
     for _ in 0..BISECTION_STEPS {

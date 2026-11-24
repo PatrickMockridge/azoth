@@ -17,14 +17,14 @@ from azoth.core.errors import InvalidInputError
 from azoth.core.range import apply_checks, checks_for
 from azoth.core.result import DynamicPsvSizingResult
 from azoth.core.units import Q, from_si, input_to_si, quantity
-from azoth.core.warnings import Warning
+from azoth.core.warnings import Warning, WarningCode
 from azoth.eos import components as _components
 from azoth.eos.reference._entropy_state import molar_mass_of
 from azoth.eos.reference._heat_capacity import phase_capacity
 from azoth.eos.reference._mixture_state import phase_state, reduced_parameters
 from azoth.eos.reference.pr_molar_volume import MOLAR_GAS_CONSTANT
 from azoth.eos.reference.pt_flash import check_composition, pt_flash
-from azoth.process.reference.psv_sizing import _gas_area
+from azoth.process.reference.psv_sizing import _gas_area, _relieving_pressure
 
 MODEL_ID = "process.dynamic_psv_sizing"
 
@@ -181,8 +181,8 @@ def _peak_pressure(
     compressibility: float,
     time_step: float,
     max_time: float,
-) -> float:
-    """The peak vessel pressure over the class's ideal-gas PSV-cycling march."""
+) -> tuple[float, bool]:
+    """The peak vessel pressure and whether the full horizon completed."""
     cv_mass = (GAS_CONSTANT / molar_mass) / (gamma - 1.0)
     cp_mass = gamma * cv_mass
     temperature = initial_temperature
@@ -193,7 +193,11 @@ def _peak_pressure(
     time = 0.0
     is_open = False
     cycles = 0.0
-    while time < max_time and mass > 1.0e-6:
+    complete = True
+    while time < max_time:
+        if mass <= 1.0e-6 or time + time_step <= time:
+            complete = False
+            break
         pressure = moles * compressibility * GAS_CONSTANT * temperature / vessel_volume
         if pressure > peak:
             peak = pressure
@@ -216,14 +220,16 @@ def _peak_pressure(
         u_new = u_old + fire_heat_input * time_step - cp_mass * temperature * dm
         mass_new = mass - dm
         if mass_new <= 1.0e-9:
+            complete = False
             break
         temperature = u_new / (mass_new * cv_mass)
         if temperature <= 0.0 or not math.isfinite(temperature):
+            complete = False
             break
         mass = mass_new
         moles = mass / molar_mass
         time += time_step
-    return peak
+    return peak, complete
 
 
 def _spec() -> dict[str, Any]:
@@ -338,7 +344,7 @@ def _evaluate(
     if compressibility <= 0.0 or not math.isfinite(compressibility):
         compressibility = 1.0
 
-    allowable = set_si * (1.0 + overpressure)
+    allowable = _relieving_pressure(set_si, overpressure)
     relief_rate = fire / latent
     steady_area = float(
         _gas_area(
@@ -355,7 +361,7 @@ def _evaluate(
         )["required_area"]
     )
 
-    def peak(area: float) -> float:
+    def peak(area: float) -> tuple[float, bool]:
         return _peak_pressure(
             area,
             set_si,
@@ -373,23 +379,53 @@ def _evaluate(
             span,
         )
 
+    def no_feasible(peak_value: float) -> tuple[_Solution, list[Warning]]:
+        warnings.append(
+            Warning(
+                WarningCode.OUT_OF_VALID_RANGE,
+                "no feasible area was found in the dynamic search; the class answers no "
+                "dynamic area",
+            )
+        )
+        return (
+            _Solution(
+                steady_required_area=steady_area,
+                dynamic_required_area=math.nan,
+                oversizing_ratio=None,
+                allowable_pressure=allowable,
+                peak_dynamic_pressure=peak_value,
+                steady_relief_rate=relief_rate,
+            ),
+            warnings,
+        )
+
+    maximum = steady_area * 10.0
     low = steady_area * 1.0e-3
-    high = steady_area * 3.0
-    peak_high = peak(high)
-    if peak_high > allowable:
-        high = steady_area * 10.0
-        peak_high = peak(high)
+    high = low
+    peak_high, complete_high = peak(high)
+    incomplete: float | None = None
+    while not (complete_high and peak_high <= allowable):
+        if peak_high > allowable:
+            low = high
+        else:
+            incomplete = peak_high
+        if high >= maximum:
+            return no_feasible(peak_high if incomplete is None else incomplete)
+        high = min(2.0 * high, maximum)
+        peak_high, complete_high = peak(high)
     dynamic_area = high
     peak_dynamic = peak_high
     for _ in range(BISECTION_STEPS):
         mid = 0.5 * (low + high)
-        candidate = peak(mid)
-        if candidate <= allowable:
+        candidate, complete = peak(mid)
+        if complete and candidate <= allowable:
             high = mid
             dynamic_area = mid
             peak_dynamic = candidate
-        else:
+        elif candidate > allowable:
             low = mid
+        else:
+            return no_feasible(candidate)
         if (high - low) <= 1.0e-9 * steady_area:
             break
 

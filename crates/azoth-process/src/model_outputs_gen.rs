@@ -7024,7 +7024,7 @@ static ALL: &[ModelOutputs] = &[
                 unit: Some("J/mol"),
                 dimension: Some("molar_energy"),
                 values: &[],
-                description: "each outlet's molar enthalpy, which is the feed's. A splitter adds no heat and no work and does not flash, so this is the one field an oracle cannot be asked for - see the assumptions.\n",
+                description: "each outlet's molar enthalpy, which is the feed's. A splitter adds no heat and no work and does not flash, so the branch states and the fraction-weighted balance are the capture's own evidence.\n",
                 optional: false,
             },
             ModelOutput {

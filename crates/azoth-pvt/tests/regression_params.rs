@@ -73,9 +73,9 @@ fn the_cce_base_state_is_the_capture() {
     let cce = constant_mass_expansion_of(&built.fluid, kelvins(373.15), &[2.5e7, 2.0e7, 1.5e7])
         .expect("the base CCE runs");
     let expected = [
-        0.996_053_650_580_541_4,
-        1.095_285_410_451_278_6,
-        1.293_585_208_286_591_3,
+        0.995_484_371_961_769,
+        1.109_059_551_955_941_6,
+        1.336_022_524_912_297_7,
     ];
     for (index, point) in cce.points.iter().enumerate() {
         assert_close(
@@ -110,9 +110,9 @@ fn the_tc_multiplier_reproduces_the_capture_observation() {
     let cce = constant_mass_expansion_of(&built.fluid, kelvins(373.15), &[2.5e7, 2.0e7, 1.5e7])
         .expect("the tuned CCE runs");
     let expected = [
-        0.998_031_797_063_637_8,
-        1.102_821_596_061_994_3,
-        1.300_910_800_403_610_5,
+        0.997_746_749_422_079_3,
+        1.117_772_354_405_601_7,
+        1.344_662_536_647_291,
     ];
     for (index, point) in cce.points.iter().enumerate() {
         assert_close(
@@ -307,9 +307,9 @@ fn the_co2_bip_reproduces_the_capture_observation() {
     let dle = differential_liberation_of(&built.fluid, kelvins(323.15), &[2.5e7, 1.5e7, 8.0e6])
         .expect("the DLE runs");
     let rs = [
-        124.113_237_435_896_83,
-        117.874_064_538_772_71,
-        54.857_243_478_268_62,
+        124.468_224_413_603_51,
+        118.190_000_001_358_56,
+        54.982_405_436_250_79,
     ];
     let bo = [
         1.297_774_285_932_201,

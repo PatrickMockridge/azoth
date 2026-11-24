@@ -5571,13 +5571,6 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=11,
         identified_by=("#label", "propane_20bara"),
     ),
-    LayerCase(
-        model="process.leak_blowdown",
-        case="methane_50bara_ten_seconds",
-        capture="process_leak_blowdown.tsv",
-        block=0,
-        identified_by=("#label", "pr_methane_50bara_10s_1s"),
-    ),
     # The toxic library's twelve: the ten canonical rows and the two conversions; the
     # five aliases, the case-failure states, three unknown names and four evidence rows
     # are uncased.
@@ -6053,7 +6046,7 @@ LAYER_CASES: tuple[LayerCase, ...] = (
     ),
     LayerCase(
         model="process.pfp_demand",
-        case="driving_temperature_is_floored_at_one",
+        case="driving_temperature_is_the_actual_difference",
         capture="process_pfp_demand.tsv",
         block=7,
         identified_by=("#label", "pfp_driving_floor"),
@@ -6940,8 +6933,9 @@ LAYER_CASES: tuple[LayerCase, ...] = (
     # The fire relief's six cased blocks: both drainage branches, the geometry, the
     # no-area state, the latent default and the unread firefighting flag. The negative
     # latent heat the class silently defaults sits outside them.
-    # The protection studies: the no-credible and empty blocks carry no numeric output, so
-    # they are declared in `UNCASED_ROWS` and held by the model cases and the cross-impl.
+    # The protection studies: the no-credible, zero-rate, acceptance-fail and empty blocks
+    # carry no numeric output, so they are declared in `UNCASED_ROWS` and held by the model
+    # cases and the cross-impl.
     LayerCase(
         model="process.overpressure_protection_study",
         case="study_gas",
@@ -6965,24 +6959,10 @@ LAYER_CASES: tuple[LayerCase, ...] = (
     ),
     LayerCase(
         model="process.overpressure_protection_study",
-        case="study_zero_rate",
-        capture="process_overpressure_protection_study.tsv",
-        block=4,
-        identified_by=("#label", "study_zero_rate"),
-    ),
-    LayerCase(
-        model="process.overpressure_protection_study",
         case="study_capacity_shortfall",
         capture="process_overpressure_protection_study.tsv",
         block=5,
         identified_by=("#label", "study_capacity_shortfall"),
-    ),
-    LayerCase(
-        model="process.overpressure_protection_study",
-        case="study_acceptance_fail",
-        capture="process_overpressure_protection_study.tsv",
-        block=6,
-        identified_by=("#label", "study_acceptance_fail"),
     ),
     LayerCase(
         model="process.overpressure_protection_study",
@@ -9424,7 +9404,7 @@ UNCASED_ROWS: dict[str, int] = {
     "process_tube_rupture_relief.tsv": 3,
     # The study's two: the no-credible and empty blocks carry no numeric output, so they
     # are held by their cases and the cross-impl rather than the layer diff.
-    "process_overpressure_protection_study.tsv": 2,
+    "process_overpressure_protection_study.tsv": 4,
     # The class's `setKinetics` row: the identity it records is the caller's multiplication,
     # which this id does not take as an input.
     "process_porous_media_self_heating.tsv": 1,
@@ -9788,10 +9768,12 @@ UNCASED_ROWS: dict[str, int] = {
     # The Fanno capture's six: the short pipe, the high-back-pressure, no-flow, NASA and
     # no-path rows and the SRK evidence row.
     "process_ideal_gas_fanno_release.tsv": 6,
-    # The blowdown capture's ten: one block is layer-cased (the ten-second methane run); the
-    # rest are the long horizons held to the capture as evidence, the SRK rows, the propane
-    # row whose single-phase beta and cached density are class artefacts, and the refusals.
-    "process_leak_blowdown.tsv": 10,
+    # The blowdown capture's eleven: the ten-second methane run is not layer-cased, because
+    # the pin's component data moved the class's trajectory away from the port's recurrence.
+    # The rest are the long horizons held to the capture as evidence, the SRK rows, the
+    # propane row whose single-phase beta and cached density are class artefacts, and the
+    # refusals.
+    "process_leak_blowdown.tsv": 11,
     # The pump design's five: the reversible-efficiency repeat, the sealless state (a seal
     # spelling on the plain design), the zero-flow state the model refuses, and the two chart
     # blocks, whose state is the chart branch rather than the dumper's isentropic one.

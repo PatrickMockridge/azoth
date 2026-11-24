@@ -13,6 +13,7 @@ use serde::Serialize;
 
 use crate::executor::json::{optional_scalar, scalar, warnings as wire_warnings};
 use crate::model_gen;
+use crate::models::psv_sizing::relieving_pressure;
 
 /// The standard API 520 orifice ladder, D to T.
 const ORIFICES: [(&str, f64); 14] = [
@@ -84,7 +85,7 @@ fn gas_area(
     has_rupture_disk: bool,
 ) -> (f64, f64, String, f64, f64, f64, f64) {
     let k = specific_heat_ratio;
-    let relieving_pressure = set_pressure * (1.0 + overpressure_fraction);
+    let relieving_pressure = relieving_pressure(set_pressure, overpressure_fraction);
     let back_pressure_fraction = back_pressure / relieving_pressure;
     let kd = 0.975;
     let kc = if has_rupture_disk { 0.9 } else { 1.0 };
@@ -137,7 +138,7 @@ pub struct PsvFireSizingResult {
     pub recommended_orifice: String,
     /// The selected ladder area in in².
     pub selected_area_in2: f64,
-    /// `101325 / (set_pressure 1.21)`.
+    /// `back_pressure / (set_pressure + (set_pressure - atm) 0.21)`.
     pub back_pressure_fraction: f64,
     /// The gas `Kd`.
     pub discharge_coefficient: f64,

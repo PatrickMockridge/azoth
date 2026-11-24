@@ -87,6 +87,10 @@ def _distance_to_flux(
     if (
         _incident_heat_flux(mass, heat_of_combustion, radiative_fraction, relative_humidity, lo)
         < target
+        or _incident_heat_flux(
+            mass, heat_of_combustion, radiative_fraction, relative_humidity, hi
+        )
+        > target
     ):
         return None
     for _ in range(_BISECTION_STEPS):

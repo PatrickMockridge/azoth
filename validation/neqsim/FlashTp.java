@@ -1,7 +1,7 @@
 // Reproduces the numbers in validation/eos/*_against_neqsim.json.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar FlashTp.java
-//     java -cp .:neqsim-118d9af.jar FlashTp
+//     javac -proc:none -cp neqsim-b40bb11.jar FlashTp.java
+//     java -cp .:neqsim-b40bb11.jar FlashTp
 //
 // This is the only file in the repository that is not part of either
 // implementation, and it is here on purpose: it is the ground truth the port is

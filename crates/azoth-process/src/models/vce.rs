@@ -88,7 +88,9 @@ fn distance_to_overpressure(
 ) -> Option<f64> {
     let mut lo = SEARCH_MIN;
     let mut hi = SEARCH_MAX;
-    if overpressure(lo, energy, ambient_pressure, strength_class) < target {
+    if overpressure(lo, energy, ambient_pressure, strength_class) < target
+        || overpressure(hi, energy, ambient_pressure, strength_class) > target
+    {
         return None;
     }
     for _ in 0..BISECTION_STEPS {

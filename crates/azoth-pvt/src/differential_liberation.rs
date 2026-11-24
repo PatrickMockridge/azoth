@@ -19,8 +19,8 @@ use crate::flash::{Flash, FlashMode, Phase};
 use crate::fluid::{Fluid, cubic_named, kij_named};
 use crate::ledger;
 use crate::standard::{
-    NEQSIM_AIR_MOLAR_MASS_KG_PER_MOL, SATURATION_BISECTION_LIMIT, SATURATION_PRESSURE_MAX_BAR,
-    SATURATION_PRESSURE_TOLERANCE_BAR, STANDARD_PRESSURE_BAR, STANDARD_PRESSURE_PA,
+    NEQSIM_AIR_MOLAR_MASS_KG_PER_MOL, NEQSIM_GAS_CONSTANT, SATURATION_BISECTION_LIMIT,
+    SATURATION_PRESSURE_MAX_BAR, SATURATION_PRESSURE_TOLERANCE_BAR, STANDARD_PRESSURE_PA,
     STANDARD_TEMPERATURE_K, bar_to_pa,
 };
 
@@ -148,9 +148,9 @@ pub fn differential_liberation_of(
                     "a two-phase DLE point has no gas phase, and there is nothing to remove",
                 )
             })?;
-            let gas_standard = gas_standard_volume(gas, flash.total_moles, *pressure, t);
+            let gas_standard = gas_standard_volume(gas, flash.total_moles);
             total_gas_standard += gas_standard;
-            row.z_gas = Some(gas.z_factor);
+            row.z_gas = Some(corrected_z(gas, *pressure, t));
             row.relative_gas_gravity = Some(gas.molar_mass / NEQSIM_AIR_MOLAR_MASS_KG_PER_MOL);
             if let Some(oil) = flash.oil() {
                 row.oil_density = oil.density();
@@ -182,7 +182,7 @@ pub fn differential_liberation_of(
     )?;
     let voil_std = standard.oil().map(|oil| oil.volume(standard.total_moles));
     if let Some(gas) = standard.gas() {
-        total_gas_standard += gas.volume(standard.total_moles);
+        total_gas_standard += standard_volume_of_moles(gas.moles(standard.total_moles));
     } else {
         warnings.push(Warning::new(
             WarningCode::OutOfValidRange,
@@ -257,11 +257,20 @@ struct Row {
     relative_gas_gravity: Option<f64>,
 }
 
-/// The class's standard volume for a removed gas, in m3.
-fn gas_standard_volume(gas: &Phase, total_moles: f64, pressure: f64, t: f64) -> f64 {
-    gas.volume(total_moles) * (pressure / 1.0e5) / STANDARD_PRESSURE_BAR / gas.z_factor
-        * STANDARD_TEMPERATURE_K
-        / t
+/// The class's standard volume for a removed gas, in m3: Z = 1 at 288.15 K and 1.01325 bar,
+/// with liquid that would drop out at standard conditions counted as equivalent gas.
+fn gas_standard_volume(gas: &Phase, total_moles: f64) -> f64 {
+    standard_volume_of_moles(gas.moles(total_moles))
+}
+
+/// The Z = 1 standard volume of a molar amount, in m3.
+fn standard_volume_of_moles(moles: f64) -> f64 {
+    moles * NEQSIM_GAS_CONSTANT * STANDARD_TEMPERATURE_K / STANDARD_PRESSURE_PA
+}
+
+/// The corrected compressibility, `P V / (R T)`, from the translated molar volume.
+fn corrected_z(gas: &Phase, pressure: f64, t: f64) -> f64 {
+    pressure * gas.molar_volume / (NEQSIM_GAS_CONSTANT * t)
 }
 
 /// The class's dead-first-loop scan, left at the last midpoint.

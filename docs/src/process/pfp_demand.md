@@ -33,7 +33,7 @@ not an equation, and both implementations read it from here.
 | `absorptivity` | dimensionless | *Optional.* the steel surface absorptivity in `(0, 1]`. **Absent is 0.9.** |
 | `initial_temperature` | K | *Optional.* the wall's initial temperature, above zero. **Absent is 288.15 K.** It must be below `critical_temperature`. |
 | `critical_temperature` | K | *Optional.* the critical steel temperature, above zero. **Absent is 673.15 K**, about 400 C. It must be above `initial_temperature`. |
-| `fire_temperature` | K | *Optional.* the effective fire temperature, above zero. **Absent is 1173.15 K**, about 900 C; a value below the steel mean is floored to a 1 K driving difference. |
+| `fire_temperature` | K | *Optional.* the effective fire temperature, above zero. **Absent is 1173.15 K**, about 900 C. It must exceed the mean steel temperature `(initial_temperature + critical_temperature)/2`. |
 | `pfp_conductivity` | W/(m*K) | *Optional.* the passive protection's thermal conductivity, above zero. **Absent is 0.2 W/(m K)**, a representative intumescent epoxy. |
 | `fire_type` | pool / jet | *Optional.* which rating family applies: `pool` is H-class (UL 1709), `jet` is J-class (ISO 22899). **Absent is `pool`.** |
 
@@ -67,9 +67,9 @@ not an equation, and both implementations read it from here.
 - **the protection is conduction-limited and steady**: `thickness = k (T_fire - T_steel,avg) / q_allow`, `q_allow = m'' c (T_crit - T_0) / t_req` and `T_steel,avg = (T_0 + T_crit) / 2`. The slab's own heat capacity does not enter.
 - **the demand test is strict**: `t_bare < t_req`. An equal survival time needs no protection, and the thickness is then exactly zero with the rating `none`.
 - **the rating is the class's mapping**: a `pool` wall is `h60` or `h120`, a `jet` wall `j60` or `j120`; long duration is `t_req > 3600 + 1e-6` s, so exactly 3600 s is short.
-- **the driving temperature is floored at 1 K**: `max(1, T_fire - T_steel,avg)` publishes a finite positive thickness when the fire is at or below the steel mean. The port reproduces the floor rather than refusing (NeqSim `#5005`).
+- **the fire must exceed the mean steel temperature**: the class refuses `T_fire <= (T_0 + T_crit)/2` and, above it, uses the actual difference `T_fire - T_steel,avg` (NeqSim `#5005`, fixed by the pin).
 - **the class's defaults are carried**: absorptivity 0.9, initial 288.15 K, critical 673.15 K, fire 1173.15 K, PFP conductivity 0.2 W/(m K) and fire type `pool`.
-- **a non-physical temperature pair is refused**: `critical_temperature <= initial_temperature` makes the class publish a zero time and an infinite thickness at equality, and a negative time and thickness below it. Its setters do not guard this (NeqSim `#5004`).
+- **a non-physical temperature pair is refused**: `critical_temperature <= initial_temperature` is rejected by the class's `bareSteelTimeToCriticalS` and `evaluate`, and the port refuses it too (NeqSim `#5004`, fixed by the pin).
 - **the incident flux is the caller's**: it is not computed here. `process.jet_fire` and `process.pool_fire` produce it; the class's examples are about 100 kW/m2 for a pool and up to about 350 kW/m2 for a jet.
 - **steel mass per area is dimensionless `kg/m2`**, because the vocabulary carries no areal mass unit. The thickness is published in metres and in millimetres, the class's two getters.
 - **the required survival time is echoed**: the class's result carries it, and it is the stated input unaltered.
@@ -85,7 +85,7 @@ not an equation, and both implementations read it from here.
 | `pool_fire_at_the_rating_threshold` | incident_heat_flux = 100000.0, steel_thickness = 0.012, required_survival_time = 3600.000001 | steel_mass_per_area = 94.2, bare_steel_time_to_critical = 197.45366666666666, required_survival_time = 3600.000001, pfp_required = True, required_pfp_thickness = 0.028057215118174, required_pfp_thickness_mm = 28.057215118174, rating = h60 |
 | `pool_fire_just_past_the_rating_threshold` | incident_heat_flux = 100000.0, steel_thickness = 0.012, required_survival_time = 3600.0000010000003 | steel_mass_per_area = 94.2, bare_steel_time_to_critical = 197.45366666666666, required_survival_time = 3600.0000010000003, pfp_required = True, required_pfp_thickness = 0.028057215118174005, required_pfp_thickness_mm = 28.057215118174007, rating = h120 |
 | `jet_fire_short_duration_selects_j60` | incident_heat_flux = 250000.0, steel_thickness = 0.012, required_survival_time = 3600.0, fire_type = jet | steel_mass_per_area = 94.2, bare_steel_time_to_critical = 78.98146666666666, required_survival_time = 3600.0, pfp_required = True, required_pfp_thickness = 0.028057215110380333, required_pfp_thickness_mm = 28.057215110380334, rating = j60 |
-| `driving_temperature_is_floored_at_one` | incident_heat_flux = 100000.0, steel_thickness = 0.012, required_survival_time = 3600.0, fire_temperature = 481.0 | steel_mass_per_area = 94.2, bare_steel_time_to_critical = 197.45366666666666, required_survival_time = 3600.0, pfp_required = True, required_pfp_thickness = 4.051583409441203e-05, required_pfp_thickness_mm = 0.04051583409441203, rating = h60 |
+| `driving_temperature_is_the_actual_difference` | incident_heat_flux = 100000.0, steel_thickness = 0.012, required_survival_time = 3600.0, fire_temperature = 481.0 | steel_mass_per_area = 94.2, bare_steel_time_to_critical = 197.45366666666666, required_survival_time = 3600.0, pfp_required = True, required_pfp_thickness = 1.418054193304513e-05, required_pfp_thickness_mm = 0.014180541933045129, rating = h60 |
 | `overrides_move_the_bare_time_and_thickness` | incident_heat_flux = 100000.0, steel_thickness = 0.012, required_survival_time = 3600.0, absorptivity = 0.5, initial_temperature = 293.15, critical_temperature = 573.15, fire_temperature = 973.15, pfp_conductivity = 0.4 | steel_mass_per_area = 94.2, bare_steel_time_to_critical = 258.4848, required_survival_time = 3600.0, pfp_required = True, required_pfp_thickness = 0.06016601363020185, required_pfp_thickness_mm = 60.16601363020185, rating = h60 |
 
 ## How far this is checked
@@ -105,4 +105,4 @@ declared checks *that call* could not evaluate.
 - UL 1709 (2017). Rapid Rise Fire Tests of Protection Materials for Structural Steel.
 - ISO 22899-1 (2007). Determination of the Resistance to Jet Fires of Passive Fire Protection Materials.
 - NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/fire/PfpDemandCalculator.java` is the port source.
-- `validation/neqsim/captures/process_pfp_demand.tsv` - the class's three tests, the strict equality, both sides of the rating threshold, the J60 branch, the 1 K floor, the overrides, the non-physical temperature states and the refusals.
+- `validation/neqsim/captures/process_pfp_demand.tsv` - the class's three tests, the strict equality, both sides of the rating threshold, the J60 branch, the fire-temperature refusal, the overrides, the non-physical temperature states and the refusals.

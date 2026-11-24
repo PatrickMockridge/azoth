@@ -11,7 +11,7 @@ assumptions = [
     "each mixture is `eos.scale_prediction`'s own state; the class's Gson report is not a calculation.\n",
 ]
 references = [
-    "NeqSim master, `pvtsimulation/flowassurance/WaterCompatibilityScreener.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.",
+    "NeqSim master, `pvtsimulation/flowassurance/WaterCompatibilityScreener.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.",
     "`validation/neqsim/captures/scale_family_probe.tsv` - the `water_compatibility` rows: an eleven-ratio seawater flood, the single ratio, the inert pH argument at 4 and 11, and a five-ratio grid whose worst case moves to 75 percent.",
 ]
 [source]

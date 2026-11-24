@@ -101,5 +101,5 @@ declared checks *that call* could not evaluate.
 
 ## References
 
-- NeqSim master, `pvtsimulation/flowassurance/FlowlineScaleProfile.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.
+- NeqSim master, `pvtsimulation/flowassurance/FlowlineScaleProfile.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.
 - `validation/neqsim/captures/scale_family_probe.tsv` - the `flowline_scale_profile` rows: an 11-point produced-water profile, the one-segment clamp, the inert pH argument and a high-sulphate water whose barite and celestite ions are absent.

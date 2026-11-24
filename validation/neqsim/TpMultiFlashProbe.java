@@ -1,7 +1,7 @@
 // What `TPmultiflash` does that `TPflash` does not, on a cubic system.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar TpMultiFlashProbe.java
-//     java -cp .:neqsim-118d9af.jar TpMultiFlashProbe
+//     javac -proc:none -cp neqsim-b40bb11.jar TpMultiFlashProbe.java
+//     java -cp .:neqsim-b40bb11.jar TpMultiFlashProbe
 //
 // Reached the way a user reaches it: `ThermodynamicOperations.TPflash()` ->
 // `TPflash.run()` -> `runInternal()`, which constructs a `TPmultiflash` only under

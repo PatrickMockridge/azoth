@@ -193,6 +193,8 @@ A **direct** model: a computation over vectors, with no iteration and therefore 
 
 - **the shell is `inStream[0]` and the tube `inStream[1]`, the reverse of the thermal-hydraulic rating.** `transient_tube_side` states the mapping; `rating_tube_side` does not apply, because the rating's stream 0 is the tube and the transient's is the shell.
 
+- **the pin's `runTransient` is a nonlinear fluid-plus-wall solve, not the CSTR ODE this id carries.** It solves the two fluid enthalpies and wall temperature together and publishes a balance receipt; the port's forward-Euler CSTR is the previous pin's scheme, a recorded divergence.
+
 - **the wall is forward Euler.** `T_wall += (h_shell*A*(T_shell - T_wall) - h_tube*A*(T_wall - T_tube))/(m_wall*cp_wall) * dt`, where `T_shell`/`T_tube` are the CSTR temperatures with a positive holdup and the inlet temperatures otherwise. The wall update reads the pre-step wall.
 
 - **the two CSTR holdups are the class's ODEs.** `dT_shell/dt = (mdot*cp*(T_in - T_shell) - h_shell*A*(T_shell - T_wall))/(rho*V*cp)`, and the tube's `+ h_tube*A*(T_wall - T_tube)`. Density and mass Cp are the inlet's; a non-positive fluid mass or Cp skips the ODE and keeps the seeded state.
@@ -261,4 +263,4 @@ declared checks *that call* could not evaluate.
 ## References
 
 - NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/equipment/heatexchanger/HeatExchanger.java` is the port source, through its `run` and `runTransient`.
-- `validation/neqsim/captures/process_heat_exchanger_transient.tsv` - the gate's fallback, the first-step seed, the ten-step wall trajectory, the holdup CSTRs against the zero-holdup control, the `dt` quirk, the hot-tube mapping and the degenerate evidence rows.
+- `validation/neqsim/captures/process_heat_exchanger_transient.tsv` - the gate's fallback and refusals, the wall trajectory, the thermal inventory and the energy-balance receipt at the pin; the CSTR rows are the previous pin's evidence.

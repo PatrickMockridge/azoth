@@ -98,6 +98,6 @@ declared checks *that call* could not evaluate.
 
 ## References
 
-- NeqSim master, `physicalproperties/interfaceproperties/surfacetension/GTSurfaceTensionFullGT.java` and `GTSurfaceTensionUtils.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.
+- NeqSim master, `physicalproperties/interfaceproperties/surfacetension/GTSurfaceTensionFullGT.java` and `GTSurfaceTensionUtils.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.
 - `validation/neqsim/captures/full_gt_probe.tsv` - four states and the class's answers; `gt_simple_initial_probe.tsv` records the T,V potentials the derivative is built from.
 

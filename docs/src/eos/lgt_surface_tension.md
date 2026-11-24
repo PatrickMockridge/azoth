@@ -87,6 +87,6 @@ declared checks *that call* could not evaluate.
 
 ## References
 
-- NeqSim master, `physicalproperties/interfaceproperties/surfacetension/LGTSurfaceTension.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.
+- NeqSim master, `physicalproperties/interfaceproperties/surfacetension/LGTSurfaceTension.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.
 - `validation/neqsim/captures/lgt_profile_probe.tsv` - the 200-step density path, its pressures (negative from step 53 to 198) and `z`; `lgt_local_probe.tsv` - the local system's chemical potentials where the pressure is negative.
 

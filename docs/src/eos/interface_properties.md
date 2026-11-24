@@ -92,6 +92,6 @@ declared checks *that call* could not evaluate.
 
 ## References
 
-- NeqSim master, `physicalproperties/interfaceproperties/InterfaceProperties.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669. The dispatch, its six integer arms and the string selector.
+- NeqSim master, `physicalproperties/interfaceproperties/InterfaceProperties.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a. The dispatch, its six integer arms and the string selector.
 - `validation/neqsim/captures/surface_tension_probe.tsv` - model 0 on a gas-oil, a gas-aqueous and an oil-water pair, and the two calculators called directly. `surface_tension_solvers_probe.tsv` records models 1, 2 and 4 on the same pairs.
 

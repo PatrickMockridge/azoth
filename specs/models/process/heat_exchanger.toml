@@ -27,6 +27,7 @@ assumptions = [
     "**`runTransient`'s enabled branch is one step here.** Absent `time_step` is the steady `run`; a stated one is a call, **including zero**, because the class applies its outlet enthalpy shifts at `dt = 0` too. The session loop and the clock are outside the id.\n",
     "**the enabled branch needs the class's three gates.** `dynamic_model_enabled`, a positive `wall_mass` and a positive `heat_transfer_area`; otherwise `runTransient` delegates to `Heater.runTransient`, the steady `run`. The fallback keeps every steady mode.\n",
     "**the shell is `inStream[0]` and the tube `inStream[1]`, the reverse of the thermal-hydraulic rating.** `transient_tube_side` states the mapping; `rating_tube_side` does not apply, because the rating's stream 0 is the tube and the transient's is the shell.\n",
+    "**the pin's `runTransient` is a nonlinear fluid-plus-wall solve, not the CSTR ODE this id carries.** It solves the two fluid enthalpies and wall temperature together and publishes a balance receipt; the port's forward-Euler CSTR is the previous pin's scheme, a recorded divergence.\n",
     "**the wall is forward Euler.** `T_wall += (h_shell*A*(T_shell - T_wall) - h_tube*A*(T_wall - T_tube))/(m_wall*cp_wall) * dt`, where `T_shell`/`T_tube` are the CSTR temperatures with a positive holdup and the inlet temperatures otherwise. The wall update reads the pre-step wall.\n",
     "**the two CSTR holdups are the class's ODEs.** `dT_shell/dt = (mdot*cp*(T_in - T_shell) - h_shell*A*(T_shell - T_wall))/(rho*V*cp)`, and the tube's `+ h_tube*A*(T_wall - T_tube)`. Density and mass Cp are the inlet's; a non-positive fluid mass or Cp skips the ODE and keeps the seeded state.\n",
     "**the outlet enthalpy shift is a measured quirk.** The class applies the two duties (W) to the **total** inlet enthalpy as if they were J: `h_out = h_in - q`, each PH-flashed at the inlet pressure; the source's `* dt_effective` comment is not the code. The temperatures do integrate by `dt`.\n",
@@ -40,7 +41,7 @@ assumptions = [
 ]
 references = [
     "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/equipment/heatexchanger/HeatExchanger.java` is the port source, through its `run` and `runTransient`.",
-    "`validation/neqsim/captures/process_heat_exchanger_transient.tsv` - the gate's fallback, the first-step seed, the ten-step wall trajectory, the holdup CSTRs against the zero-holdup control, the `dt` quirk, the hot-tube mapping and the degenerate evidence rows.",
+    "`validation/neqsim/captures/process_heat_exchanger_transient.tsv` - the gate's fallback and refusals, the wall trajectory, the thermal inventory and the energy-balance receipt at the pin; the CSTR rows are the previous pin's evidence.",
 ]
 [source]
 standard = "NeqSim process/equipment/heatexchanger/HeatExchanger.java"

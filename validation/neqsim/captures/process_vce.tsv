@@ -27,8 +27,8 @@ strength_class=4
 distance_m=
 target_overpressure_pa=20700.0
 combustion_energy_j=4.6E10
-distance_to_overpressure_m=0.1
-overpressure_at_distance_pa=10132.5
+distance_to_overpressure_m=NaN
+overpressure_at_distance_pa=NaN
 
 vce_distance_5000
 cloud_fuel_mass_kg=1000.0
@@ -37,8 +37,8 @@ strength_class=4
 distance_m=
 target_overpressure_pa=5000.0
 combustion_energy_j=4.6E10
-distance_to_overpressure_m=155.74962672973703
-overpressure_at_distance_pa=5000.000000000002
+distance_to_overpressure_m=155.74962672973706
+overpressure_at_distance_pa=5000.0
 
 vce_class_1
 cloud_fuel_mass_kg=1000.0
@@ -157,8 +157,8 @@ strength_class=1
 distance_m=
 target_overpressure_pa=1000000.0
 combustion_energy_j=4.6E10
-distance_to_overpressure_m=0.1
-overpressure_at_distance_pa=1013.25
+distance_to_overpressure_m=NaN
+overpressure_at_distance_pa=NaN
 
 vce_zero_target_evidence
 cloud_fuel_mass_kg=1000.0
@@ -167,5 +167,5 @@ strength_class=4
 distance_m=
 target_overpressure_pa=0.0
 combustion_energy_j=4.6E10
-refusal=IllegalArgumentException: targetDp must be positive
+refusal=IllegalArgumentException: Contour target must be positive and finite
 

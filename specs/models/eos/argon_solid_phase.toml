@@ -9,7 +9,7 @@ assumptions = [
 ]
 references = [
     "Maltby, V.; Hammer, M.; Wilhelmsen, O. (2024). \"Equation of State for Solid Argon.\" Journal of Physical and Chemical Reference Data 53(4), 043102.",
-    "NeqSim master, `thermo/util/solid/ArgonSolidHelmholtzEquation.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.",
+    "NeqSim master, `thermo/util/solid/ArgonSolidHelmholtzEquation.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.",
 ]
 [source]
 standard = "Maltby, V.; Hammer, M.; Wilhelmsen, O. (2024)"

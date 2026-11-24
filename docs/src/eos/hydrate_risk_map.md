@@ -87,5 +87,5 @@ declared checks *that call* could not evaluate.
 
 ## References
 
-- NeqSim master, `pvtsimulation/flowassurance/HydrateRiskMapper.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.
+- NeqSim master, `pvtsimulation/flowassurance/HydrateRiskMapper.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.
 - `validation/neqsim/captures/flow_assurance_remainder_probe.tsv` - the six profiles: four wet-gas points across the bands, a profile chosen for one point per band, tightened thresholds, a single point, a dry fluid and a zero-water fluid.

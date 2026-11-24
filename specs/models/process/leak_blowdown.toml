@@ -3,6 +3,7 @@ name = "Vessel leak blowdown"
 kind = "procedure"
 assumptions = [
     "**the legacy `LeakModel.calculateSourceTerm` path**, not the modern `calculateReleaseFlow` (which is `process.hem_release`). `calculateMassFlowRate`, `calculateJetVelocity`, `calculateJetMomentum` and `calculateDropletSMD` are this calculation's internal arithmetic and are not separate ids.",
+    "**the pin's component data moves the ten-second trajectory**: the class's `total_mass_released` is `4.0343 kg` where the port's recurrence answers `3.6649 kg`. The port retains the previous pin's recurrence, and the divergence is recorded rather than smoothed.",
     "**the inventory is the corrected total density times `vessel_volume`**; the fluid's amount sets only the composition. The vessel is one homogeneous, adiabatic, rigid control volume.",
     "**each step records then updates**: `mass -= mdot dt`, `total += mdot dt`, and above 1% of the initial mass `P2 = P1 (mass/initialMass)^gamma` - the **initial** mass denominator, as the code has it - floored at `back_pressure`, with `T2 = T1 (P2/P1)^((gamma-1)/gamma)` and a TP flash.",
     "**the rate is the class's simplified orifice**: choked `Cd A P sqrt(gamma MW/(8314 T)) (2/(gamma+1))^((gamma+1)/(2(gamma-1)))` with `MW` in kg/kmol, else subsonic `Cd A sqrt(2 rho (P-back))`; zero when `P <= back`. `R = 8314` is the class's number.",

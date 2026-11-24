@@ -133,7 +133,7 @@ declared checks *that call* could not evaluate.
 ## References
 
 - Firoozabadi, A.; Ramey, H. J. (1988). "Surface tension of water-hydrocarbon systems at reservoir conditions." Journal of Canadian Petroleum Technology 27(3), 41-48. DOI 10.2118/88-03-03. The NeqSim class spells the second author "Ramley".
-- NeqSim master, `physicalproperties/interfaceproperties/surfacetension/FirozabadiRamleyInterfaceTension.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.
+- NeqSim master, `physicalproperties/interfaceproperties/surfacetension/FirozabadiRamleyInterfaceTension.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.
 
 
 ---

@@ -9,8 +9,8 @@
 // `CavettModel`'s API correction applies only below API 30 (SG above ~0.876). A port that
 // picked the wrong side of any of them would still be right at a single cut.
 //
-//   javac -proc:none -cp neqsim-118d9af.jar CharacterizationProbe.java
-//   java -cp .:neqsim-118d9af.jar CharacterizationProbe > captures/characterization_probe.tsv
+//   javac -proc:none -cp neqsim-b40bb11.jar CharacterizationProbe.java
+//   java -cp .:neqsim-b40bb11.jar CharacterizationProbe > captures/characterization_probe.tsv
 
 import neqsim.thermo.characterization.TBPfractionModel;
 import neqsim.thermo.characterization.TBPModelInterface;

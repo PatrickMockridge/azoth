@@ -16,7 +16,7 @@ import neqsim.thermodynamicoperations.ThermodynamicOperations;
  * the second.
  *
  * <p>
- * Usage: {@code java -cp .:neqsim-118d9af.jar CpaProbe [T_K] [P_bara] [n_water]}
+ * Usage: {@code java -cp .:neqsim-b40bb11.jar CpaProbe [T_K] [P_bara] [n_water]}
  */
 public final class CpaProbe {
 

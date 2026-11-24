@@ -57,16 +57,16 @@ fn the_first_points_match_the_capture() {
     assert!(close(point.gas_volume.unwrap(), 1.622_611_856_681_117_8e-5));
     assert!(close(
         point.gas_standard_volume.unwrap(),
-        0.003_852_325_356_897_129_7
+        0.003_897_553_363_742_691_6
     ));
-    assert!(close(point.z_gas.unwrap(), 0.926_679_478_732_143_6));
+    assert!(close(point.z_gas.unwrap(), 0.915_926_100_421_117_1));
     assert!(close(
         point.relative_gas_gravity.unwrap(),
-        0.619_342_264_529_475_5
+        0.598_698_705_521_173
     ));
     assert!(close(point.bo.unwrap(), 1.579_178_398_844_724_6));
-    assert!(close(point.bg.unwrap(), 0.004_212_032_230_808_398_5));
-    assert!(close(point.rs.unwrap(), 225.437_298_348_850_08));
+    assert!(close(point.bg.unwrap(), 0.004_163_154_946_833_049));
+    assert!(close(point.rs.unwrap(), 226.424_429_346_130_9));
 }
 
 #[test]
@@ -87,15 +87,15 @@ fn the_last_point_matches_the_capture() {
     assert!(close(point.gas_volume.unwrap(), 3.225_221_264_856_099_6e-4));
     assert!(close(
         point.gas_standard_volume.unwrap(),
-        2.842_327_533_906_884e-4
+        2.842_442_004_938_507_5e-4
     ));
-    assert!(close(point.z_gas.unwrap(), 0.998_580_873_997_892_5));
+    assert!(close(point.z_gas.unwrap(), 0.998_540_659_076_143_3));
     assert!(close(
         point.relative_gas_gravity.unwrap(),
-        0.611_973_124_975_397_1
+        0.591_575_189_874_806_7
     ));
     assert!(close(point.bo.unwrap(), 1.033_225_469_461_639_8));
-    assert!(close(point.bg.unwrap(), 1.134_711_333_011_967_8));
+    assert!(close(point.bg.unwrap(), 1.134_665_635_834_449_8));
     assert!(close(point.rs.unwrap(), 0.0));
 }
 
@@ -129,7 +129,7 @@ fn a_schedule_that_starts_above_saturation_matches_its_capture_block() {
     assert!(point.bg.is_none());
     assert!(point.liquid_volume_relative_to_vsat.is_none());
     assert!(close(point.bo.unwrap(), 1.471_640_842_906_178));
-    assert!(close(point.rs.unwrap(), 187.266_891_174_643_26));
+    assert!(close(point.rs.unwrap(), 187.943_969_215_828_64));
 
     let point = &row.points[6];
     assert!(close(point.liquid_volume, 7.826_949_904_123_92e-5));
@@ -139,8 +139,8 @@ fn a_schedule_that_starts_above_saturation_matches_its_capture_block() {
         0.698_717_677_608_349_8
     ));
     assert!(close(point.gas_volume.unwrap(), 1.463_628_852_503_51e-4));
-    assert!(close(point.z_gas.unwrap(), 0.993_735_206_614_313));
-    assert!(close(point.bg.unwrap(), 0.225_841_017_051_289_92));
+    assert!(close(point.z_gas.unwrap(), 0.993_591_624_985_005_1));
+    assert!(close(point.bg.unwrap(), 0.225_808_386_003_323_7));
 }
 
 #[test]

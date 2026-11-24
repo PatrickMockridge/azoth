@@ -13,8 +13,8 @@
 // probe is about is never reached - which is why the fluid is carbonated water rather than
 // methane/water.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar TraceIonProbe.java
-//     java -cp .:neqsim-118d9af.jar TraceIonProbe > captures/trace_ion_probe.tsv
+//     javac -proc:none -cp neqsim-b40bb11.jar TraceIonProbe.java
+//     java -cp .:neqsim-b40bb11.jar TraceIonProbe > captures/trace_ion_probe.tsv
 
 import neqsim.thermo.component.ComponentInterface;
 import neqsim.thermo.phase.PhaseInterface;

@@ -119,8 +119,8 @@ fn the_geometry_and_defaults_reproduce_the_capture() {
 }
 
 #[test]
-fn the_unread_firefighting_flag_changes_nothing() {
-    let stated = relief(
+fn the_firefighting_flag_selects_the_coefficient() {
+    let credited = relief(
         true,
         true,
         Some(100.0),
@@ -129,7 +129,7 @@ fn the_unread_firefighting_flag_changes_nothing() {
         Some(300_000.0),
         Some(350.0),
     );
-    let unread = relief(
+    let uncredited = relief(
         true,
         false,
         Some(100.0),
@@ -139,9 +139,9 @@ fn the_unread_firefighting_flag_changes_nothing() {
         Some(350.0),
     );
     close(
-        unread.relief_rate.value,
-        stated.relief_rate.value,
-        "has_fire_fighting is read by no formula",
+        uncredited.relief_rate.value / credited.relief_rate.value,
+        34_500.0 / 21_000.0,
+        "the uncredited rate is 34500/21000 of the credited one",
     );
 }
 

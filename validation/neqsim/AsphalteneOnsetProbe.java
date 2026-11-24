@@ -13,8 +13,8 @@
 // method can return, and its fluid carries no asphaltene component at all - so the numbers
 // below are the first external check the class has had.
 //
-//   javac -proc:none -cp neqsim-118d9af.jar AsphalteneOnsetProbe.java
-//   java -cp .:neqsim-118d9af.jar AsphalteneOnsetProbe > captures/asphaltene_onset_probe.tsv
+//   javac -proc:none -cp neqsim-b40bb11.jar AsphalteneOnsetProbe.java
+//   java -cp .:neqsim-b40bb11.jar AsphalteneOnsetProbe > captures/asphaltene_onset_probe.tsv
 
 import neqsim.thermo.phase.PhaseInterface;
 import neqsim.thermo.system.SystemInterface;

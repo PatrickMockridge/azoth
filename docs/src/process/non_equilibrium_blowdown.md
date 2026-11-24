@@ -73,6 +73,7 @@ checked against one.
 ## Assumptions
 
 - **the class's `run`**: the initial two-phase feed is charged to the vessel volume, split into vapour and liquid zones, and marched with each zone flashed at its own temperature and the shared pressure.
+- **the pin's common-temperature solve moves the fire-exposed state**: the class's final vapour zone is `277.5975 K` where the port's previous-pin solve answers `280.0960 K`. The divergence is recorded rather than smoothed.
 - **the pressure is set by a TV flash of the vapour zone at `V - v_liquid`**, floored at the back pressure.
 - **the wall area is split by the wetted fraction `v_liquid / V`**; the wetted wall drives Rohsenow nucleate boiling capped at `critical_heat_flux`, and an interfacial term couples the zones.
 - **the boil-off is `min(max(q_wetted, 0) dt / latent_heat, 0.5 m_liquid)`**, transferred from the liquid zone to the vapour zone with the liquid's composition.

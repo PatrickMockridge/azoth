@@ -1,10 +1,10 @@
 ################ a one-component GE phase ################
   SystemNRTL      RuntimeException: neqsim.util.exception.InvalidInputException: PhaseGENRTL:addComponent - Input name component with same name already exists in phase. Use addMoles or addMolesChemreac.
-      at neqsim.thermo.phase.Phase.addComponent(Phase.java:197)
+      at neqsim.thermo.phase.Phase.addComponent(Phase.java:209)
   SystemGEWilson  RuntimeException: neqsim.util.exception.InvalidInputException: PhaseGEWilson:addComponent - Input name component with same name already exists in phase. Use addMoles or addMolesChemreac.
-      at neqsim.thermo.phase.Phase.addComponent(Phase.java:197)
+      at neqsim.thermo.phase.Phase.addComponent(Phase.java:209)
   SystemDuanSun   RuntimeException: neqsim.util.exception.InvalidInputException: PhaseDuanSun:addComponent - Input name component with same name already exists in phase. Use addMoles or addMolesChemreac.
-      at neqsim.thermo.phase.Phase.addComponent(Phase.java:197)
+      at neqsim.thermo.phase.Phase.addComponent(Phase.java:209)
   (a one-component phase holding water, or a two-component one,
    takes the solvent branch and is unaffected)
   SystemNRTL water ok, gamma = 1.00000000000

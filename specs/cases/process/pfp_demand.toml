@@ -122,9 +122,9 @@ required_pfp_thickness_mm = 28.057215110380334
 rating = "j60"
 
 [[cases]]
-id = "driving_temperature_is_floored_at_one"
+id = "driving_temperature_is_the_actual_difference"
 tolerance = 1.0e-12
-source = "A fire temperature of 481 K is 0.35 K above the steel mean of 480.65 K, so the driving difference is floored to 1 K. From `validation/neqsim/captures/process_pfp_demand.tsv` (`pfp_driving_floor`), whose `driving_temperature_k=1.0`."
+source = "A fire temperature of 481 K is 0.35 K above the steel mean of 480.65 K, and the class uses that difference rather than flooring it. From `validation/neqsim/captures/process_pfp_demand.tsv` (`pfp_driving_floor`), whose `driving_temperature_k=0.35`."
 [cases.inputs]
 incident_heat_flux = 100000.0
 steel_thickness = 0.012
@@ -135,8 +135,8 @@ steel_mass_per_area = 94.2
 bare_steel_time_to_critical = 197.45366666666666
 required_survival_time = 3600.0
 pfp_required = true
-required_pfp_thickness = 4.051583409441203e-05
-required_pfp_thickness_mm = 0.04051583409441203
+required_pfp_thickness = 1.418054193304513e-05
+required_pfp_thickness_mm = 0.014180541933045129
 rating = "h60"
 
 [[cases]]

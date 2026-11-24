@@ -98,5 +98,5 @@ declared checks *that call* could not evaluate.
 ## References
 
 - Havlena, D. & Odeh, A. S. (1963). "The Material Balance as an Equation of a Straight Line." Journal of Petroleum Technology 15(8), 896-900. DOI 10.2118/559-PA.
-- NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/reservoirproperties/materialbalance/GeneralizedMaterialBalance.java` at commit 118d9af is the port source.
+- NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/reservoirproperties/materialbalance/GeneralizedMaterialBalance.java` at commit b40bb113 is the port source.
 - `validation/neqsim/captures/pvt_generalized_material_balance.tsv` - the class's four-observation synthetic history for all four fits, the inventory scaling, the conventional Rv = 0 limit and the refusal rows.

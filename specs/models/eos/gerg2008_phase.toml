@@ -9,7 +9,7 @@ assumptions = [
 ]
 references = [
     "Kunz, O.; Wagner, W. (2012). \"The GERG-2008 wide-range equation of state for natural gases and other mixtures: An expansion of GERG-2004.\" Journal of Chemical & Engineering Data 57(11), 3032-3091.",
-    "NeqSim master, `thermo/util/gerg/GERG2008.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.",
+    "NeqSim master, `thermo/util/gerg/GERG2008.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.",
 ]
 [source]
 standard = "Kunz, O.; Wagner, W. (2012)"

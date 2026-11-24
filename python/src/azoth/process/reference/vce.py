@@ -71,7 +71,10 @@ def _distance_to_overpressure(
     """The class's bisection, absent when the cloud never reaches the target."""
     lo = _SEARCH_MIN
     hi = _SEARCH_MAX
-    if _overpressure(lo, energy, ambient_pressure, strength_class) < target:
+    if (
+        _overpressure(lo, energy, ambient_pressure, strength_class) < target
+        or _overpressure(hi, energy, ambient_pressure, strength_class) > target
+    ):
         return None
     for _ in range(_BISECTION_STEPS):
         mid = 0.5 * (lo + hi)

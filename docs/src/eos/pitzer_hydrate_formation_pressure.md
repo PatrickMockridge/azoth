@@ -95,6 +95,6 @@ declared checks *that call* could not evaluate.
 
 ## References
 
-- NeqSim master, `thermodynamicoperations/flashops/saturationops/PitzerHydrateFlash.java` and `thermo/component/ComponentHydratePitzer.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.
+- NeqSim master, `thermodynamicoperations/flashops/saturationops/PitzerHydrateFlash.java` and `thermo/component/ComponentHydratePitzer.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.
 - `validation/neqsim/captures/pitzer_hydrate_probe.tsv` - the pressure solve at four temperatures on CO2/water and at one on a 5 wt% NaCl brine, and the public-operations round trip.
 - Burgass, R.; Chapoy, A.; Tohidi, B. (2023). The salinity's effect on CO2 hydrate dissociation, the upstream validation's reference.

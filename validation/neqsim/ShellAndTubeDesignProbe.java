@@ -2,8 +2,8 @@
 //
 // Compile and run from this directory:
 //
-//     javac -proc:none -cp neqsim-118d9af.jar ShellAndTubeDesignProbe.java
-//     java -cp .:neqsim-118d9af.jar ShellAndTubeDesignProbe \
+//     javac -proc:none -cp neqsim-b40bb11.jar ShellAndTubeDesignProbe.java
+//     java -cp .:neqsim-b40bb11.jar ShellAndTubeDesignProbe \
 //         > captures/shell_and_tube_design_probe.tsv
 //
 // The calculator is a single-pass pipeline: TEMA configuration, material lookup from the H2

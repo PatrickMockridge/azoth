@@ -40,6 +40,14 @@ _ORIFICES: tuple[tuple[str, float], ...] = (
 
 _SERVICES = ("gas", "liquid", "two_phase")
 
+_ATMOSPHERE_PA = 101_325.0
+_GAS_CONSTANT = 8.314_462_1
+
+
+def _relieving_pressure(set_pressure: float, overpressure_fraction: float) -> float:
+    """API 520 relieving pressure: the set pressure plus the gauge accumulation."""
+    return set_pressure + (set_pressure - _ATMOSPHERE_PA) * overpressure_fraction
+
 
 def _spec() -> dict[str, Any]:
     """The generated spec, imported here so the module has no import-time cycle."""
@@ -84,7 +92,7 @@ def _gas_area(
     has_rupture_disk: bool,
 ) -> dict[str, float | str]:
     k = specific_heat_ratio
-    relieving_pressure = set_pressure * (1.0 + overpressure_fraction)
+    relieving_pressure = _relieving_pressure(set_pressure, overpressure_fraction)
     back_pressure_fraction = back_pressure / relieving_pressure
     kd = 0.975
     kc = 0.9 if has_rupture_disk else 1.0
@@ -130,7 +138,7 @@ def _liquid_area(
     viscosity: float,
     balanced_bellows: bool,
 ) -> dict[str, float | str]:
-    relieving_pressure = set_pressure * (1.0 + overpressure_fraction)
+    relieving_pressure = _relieving_pressure(set_pressure, overpressure_fraction)
     specific_gravity = liquid_density / 999.0
     flow_gpm = volume_flow * 15850.3
     p1_psig = (relieving_pressure - 101_325.0) / 6894.76
@@ -180,7 +188,7 @@ def _two_phase_area(
     latent_heat: float,
     liquid_heat_capacity: float,
 ) -> float:
-    p0 = set_pressure * (1.0 + overpressure_fraction)
+    p0 = _relieving_pressure(set_pressure, overpressure_fraction)
     v_g = 1.0 / gas_density
     v_l = 1.0 / liquid_density
     mix = gas_fraction * v_g + (1.0 - gas_fraction) * v_l
@@ -208,7 +216,7 @@ def _capacity(
     discharge_coefficient: float,
 ) -> float:
     k = specific_heat_ratio
-    relieving_pressure = set_pressure * (1.0 + overpressure_fraction)
+    relieving_pressure = _relieving_pressure(set_pressure, overpressure_fraction)
     critical_ratio = (2.0 / (k + 1.0)) ** (k / (k - 1.0))
     pressure_ratio = back_pressure / relieving_pressure
     if pressure_ratio <= critical_ratio:
@@ -228,7 +236,7 @@ def _capacity(
         * area
         * relieving_pressure
         * c
-        * math.sqrt(molar_mass / (compressibility * 8314.0 * temperature))
+        * math.sqrt(molar_mass / (compressibility * _GAS_CONSTANT * temperature))
     )
 
 
@@ -320,7 +328,7 @@ def psv_sizing(
         raise InvalidInputError(
             "set_pressure", "a finite non-negative value is required for each pressure input"
         )
-    relieving_pressure = set_pressure_si * (1.0 + overpressure_fraction)
+    relieving_pressure = _relieving_pressure(set_pressure_si, overpressure_fraction)
     if back_pressure_si >= relieving_pressure:
         raise InvalidInputError(
             "back_pressure",

@@ -83,9 +83,9 @@ fn the_state_balances() {
 
 /// **The wax amount rises as the temperature falls, and only the oil feeds it.**
 ///
-/// The captured states give the shape: at 265, 255 and 245 K the wax fraction is `0.0707`,
-/// `0.1320` and `0.1542` while the gas holds at `0.6914`, `0.6931` and `0.6932` and the oil
-/// falls from `0.2379` to `0.1526`. A model that precipitated out of the gas would move the
+/// The captured states give the shape: at 265, 255 and 245 K the wax fraction is `0.0690`,
+/// `0.1310` and `0.1532` while the gas holds at `0.6915`, `0.6932` and `0.6933` and the oil
+/// falls from `0.2394` to `0.1535`. A model that precipitated out of the gas would move the
 /// wrong phase, and one that had the sign of the fusion term backwards would rise with the
 /// temperature instead.
 #[test]
@@ -96,9 +96,9 @@ fn the_wax_takes_from_the_oil_and_rises_as_it_cools() {
 
     let mut previous = -1.0;
     for (t_k, expected) in [
-        (265.0, 0.070_673_392_486_494_9),
-        (255.0, 0.132_007_556_310_333),
-        (245.0, 0.154_193_075_421_103),
+        (265.0, 0.069_043_378_014_237_3),
+        (255.0, 0.131_014_429_499_445),
+        (245.0, 0.153_204_549_426_707),
     ] {
         let result = tp_multiflash_wax(&mixture, kelvins(t_k), pascals(5.0e5), &z).expect("runs");
         assert!(

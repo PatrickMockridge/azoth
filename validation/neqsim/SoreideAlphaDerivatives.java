@@ -1,7 +1,7 @@
 // The two temperature derivatives of the Soreide-Whitson water alpha.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar SoreideAlphaDerivatives.java
-//     java -cp .:neqsim-118d9af.jar SoreideAlphaDerivatives
+//     javac -proc:none -cp neqsim-b40bb11.jar SoreideAlphaDerivatives.java
+//     java -cp .:neqsim-b40bb11.jar SoreideAlphaDerivatives
 //
 // `AttractiveTermSoreideWhitson` provides `alpha`, `diffalphaT` and `diffdiffalphaT`, which
 // are `d(alpha)/dT` and `d2(alpha)/dT2` **in kelvin, not in reduced temperature** - both

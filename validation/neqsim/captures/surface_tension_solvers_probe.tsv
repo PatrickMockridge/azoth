@@ -20,11 +20,11 @@ model_0_sigma_N_per_m=0.009424889197268286
 parachor_direct_sigma_N_per_m=0.009424889197268286
 firozabadi_direct_sigma_N_per_m=0.03622765708367235
 model_1_sigma_N_per_m=0.009424889197268286
-model_1_milliseconds=149
+model_1_milliseconds=1552
 model_2_sigma_N_per_m=0.010011889708138912
-model_2_milliseconds=6
+model_2_milliseconds=10
 model_4_sigma_N_per_m=0.009519731859031853
-model_4_milliseconds=30
+model_4_milliseconds=32
 
 co2_water_313K_50bara
 components=CO2 water

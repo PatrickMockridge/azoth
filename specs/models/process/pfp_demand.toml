@@ -6,9 +6,9 @@ assumptions = [
     "**the protection is conduction-limited and steady**: `thickness = k (T_fire - T_steel,avg) / q_allow`, `q_allow = m'' c (T_crit - T_0) / t_req` and `T_steel,avg = (T_0 + T_crit) / 2`. The slab's own heat capacity does not enter.",
     "**the demand test is strict**: `t_bare < t_req`. An equal survival time needs no protection, and the thickness is then exactly zero with the rating `none`.",
     "**the rating is the class's mapping**: a `pool` wall is `h60` or `h120`, a `jet` wall `j60` or `j120`; long duration is `t_req > 3600 + 1e-6` s, so exactly 3600 s is short.",
-    "**the driving temperature is floored at 1 K**: `max(1, T_fire - T_steel,avg)` publishes a finite positive thickness when the fire is at or below the steel mean. The port reproduces the floor rather than refusing (NeqSim `#5005`).",
+    "**the fire must exceed the mean steel temperature**: the class refuses `T_fire <= (T_0 + T_crit)/2` and, above it, uses the actual difference `T_fire - T_steel,avg` (NeqSim `#5005`, fixed by the pin).",
     "**the class's defaults are carried**: absorptivity 0.9, initial 288.15 K, critical 673.15 K, fire 1173.15 K, PFP conductivity 0.2 W/(m K) and fire type `pool`.",
-    "**a non-physical temperature pair is refused**: `critical_temperature <= initial_temperature` makes the class publish a zero time and an infinite thickness at equality, and a negative time and thickness below it. Its setters do not guard this (NeqSim `#5004`).",
+    "**a non-physical temperature pair is refused**: `critical_temperature <= initial_temperature` is rejected by the class's `bareSteelTimeToCriticalS` and `evaluate`, and the port refuses it too (NeqSim `#5004`, fixed by the pin).",
     "**the incident flux is the caller's**: it is not computed here. `process.jet_fire` and `process.pool_fire` produce it; the class's examples are about 100 kW/m2 for a pool and up to about 350 kW/m2 for a jet.",
     "**steel mass per area is dimensionless `kg/m2`**, because the vocabulary carries no areal mass unit. The thickness is published in metres and in millimetres, the class's two getters.",
     "**the required survival time is echoed**: the class's result carries it, and it is the stated input unaltered.",
@@ -19,7 +19,7 @@ references = [
     "UL 1709 (2017). Rapid Rise Fire Tests of Protection Materials for Structural Steel.",
     "ISO 22899-1 (2007). Determination of the Resistance to Jet Fires of Passive Fire Protection Materials.",
     "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/fire/PfpDemandCalculator.java` is the port source.",
-    "`validation/neqsim/captures/process_pfp_demand.tsv` - the class's three tests, the strict equality, both sides of the rating threshold, the J60 branch, the 1 K floor, the overrides, the non-physical temperature states and the refusals.",
+    "`validation/neqsim/captures/process_pfp_demand.tsv` - the class's three tests, the strict equality, both sides of the rating threshold, the J60 branch, the fire-temperature refusal, the overrides, the non-physical temperature states and the refusals.",
 ]
 [source]
 standard = "NeqSim process/safety/fire/PfpDemandCalculator.java"
@@ -54,7 +54,7 @@ description = "the critical steel temperature, above zero. **Absent is 673.15 K*
 [inputs.fire_temperature]
 unit = "K"
 optional = true
-description = "the effective fire temperature, above zero. **Absent is 1173.15 K**, about 900 C; a value below the steel mean is floored to a 1 K driving difference.\n"
+description = "the effective fire temperature, above zero. **Absent is 1173.15 K**, about 900 C. It must exceed the mean steel temperature `(initial_temperature + critical_temperature)/2`.\n"
 [inputs.pfp_conductivity]
 unit = "W/(m*K)"
 optional = true

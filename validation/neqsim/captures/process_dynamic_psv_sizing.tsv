@@ -13,11 +13,11 @@ latent_heat_j_kg=350000.0
 time_step_s=0.5
 max_time_s=1200.0
 initial_pressure_fraction=0.9
-steady_required_area_m2=1.3484834741989848E-4
-dynamic_required_area_m2=5.401978650632388E-5
-oversizing_ratio=2.496276941118831
-allowable_pressure_pa=6050000.0
-peak_dynamic_pressure_pa=6049999.996251063
+steady_required_area_m2=1.3532429190157695E-4
+dynamic_required_area_m2=5.44015269712034E-5
+oversizing_ratio=2.487509072552481
+allowable_pressure_pa=6028721.75
+peak_dynamic_pressure_pa=6028721.746112543
 steady_relief_rate_kg_s=1.4285714285714286
 
 dpsv_11bara_small_vessel
@@ -35,15 +35,15 @@ latent_heat_j_kg=350000.0
 time_step_s=0.5
 max_time_s=1200.0
 initial_pressure_fraction=0.9
-steady_required_area_m2=1.9424246655211374E-4
-dynamic_required_area_m2=6.094593000614838E-5
-oversizing_ratio=3.1871277792055692
-allowable_pressure_pa=1331000.0
-peak_dynamic_pressure_pa=1330999.9986886573
+steady_required_area_m2=1.9739820536756255E-4
+dynamic_required_area_m2=NaN
+oversizing_ratio=NaN
+allowable_pressure_pa=1309721.75
+peak_dynamic_pressure_pa=1116540.7362168035
 steady_relief_rate_kg_s=0.42857142857142855
 
 dpsv_negative_volume_refusal
-refusal=IllegalArgumentException: dimensions, fire heat, pressures and overpressure must be positive
+refusal=IllegalArgumentException: Expected finite positive inputs and back pressure below set pressure
 
 dpsv_blowdown_refusal
 refusal=IllegalArgumentException: blowdownFraction must be between 0 and 1

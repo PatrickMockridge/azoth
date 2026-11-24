@@ -8,8 +8,8 @@
 // that bounds it - `withBoilingRangeKelvin` keeps all three, so the range is not lost to the
 // average.
 //
-//   javac -proc:none -cp /path/to/neqsim-118d9af.jar TbpCutBoundariesProbe.java
-//   java -cp .:/path/to/neqsim-118d9af.jar TbpCutBoundariesProbe > captures/tbp_cut_boundaries_probe.tsv
+//   javac -proc:none -cp /path/to/neqsim-b40bb11.jar TbpCutBoundariesProbe.java
+//   java -cp .:/path/to/neqsim-b40bb11.jar TbpCutBoundariesProbe > captures/tbp_cut_boundaries_probe.tsv
 
 import java.util.List;
 import neqsim.thermo.characterization.OilAssayCharacterisation;

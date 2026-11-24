@@ -28,7 +28,7 @@ not an equation, and both implementations read it from here.
 | Name | Unit | Description |
 |---|---|---|
 | `has_drainage` | - | whether adequate drainage exists; it selects 21000 or 34500 BTU/hr ft2. |
-| `has_fire_fighting` | - | whether firefighting is credited. **Read by no formula**, the class's unread flag; retained because the class takes it. |
+| `has_fire_fighting` | - | whether prompt firefighting is credited. Together with `has_drainage` it selects the 21000 or 34500 BTU/hr ft2 coefficient. |
 | `wetted_area` | m**2 | *Optional.* the fire-exposed wetted area, at least zero. **Absent or zero falls back to the geometry**, the class's order. |
 | `vessel_diameter` | m | *Optional.* the vessel shell diameter, at least zero; with `wetted_height` it derives `pi D h`. |
 | `wetted_height` | m | *Optional.* the liquid-wetted shell height, at least zero; with `vessel_diameter` it derives `pi D h`. |
@@ -57,7 +57,7 @@ not an equation, and both implementations read it from here.
 
 - **the wetted area is the supplied area, else `pi D h` when both geometry values are positive, else zero**, the class's fallback order.
 - **the heat input is API 521 Table 4**: `Q = C1 A_ft2^0.82` with `C1 = 21000` BTU/hr ft2 with adequate drainage and `34500` without, converted through 10.7639 ft2 per m2 and 0.29307107 W per BTU/hr.
-- **`has_fire_fighting` is read by no formula**: the environment factor is 1.0 on both branches, so only drainage selects the coefficient and two rows differing only in the flag answer identically.
+- **the 21 000 BTU/hr ft2 coefficient is credited only with both drainage and prompt firefighting**; otherwise the fire heat input uses 34 500. The environment factor is 1.0 on both branches.
 - **the latent heat defaults to 350000 J/kg when absent**, the class's light-hydrocarbon value; the port treats a zero as the default and refuses a negative value.
 - **the relief rate is `Q / latent_heat`**, and the hourly rate is that times 3600.
 - **the fluid-enriched property path is the thermo seam**: `ReliefFluidState` flashes a `SystemInterface` for k, M, Z and phase, and `process.blocked_outlet_relief` and its three siblings carry it; this id carries the no-fluid path only.
@@ -71,7 +71,7 @@ not an equation, and both implementations read it from here.
 | `fc_geometry` | has_drainage = True, has_fire_fighting = True, vessel_diameter = 2.0, wetted_height = 5.0 | latent_heat = 350000.0, relief_rate = 2.0845015025699842, relief_rate_kg_per_hr = 7504.205409251943 |
 | `fc_no_area` | has_drainage = True, has_fire_fighting = True | latent_heat = 350000.0, relief_rate = 0.0, relief_rate_kg_per_hr = 0.0 |
 | `fc_latent_default` | has_drainage = True, has_fire_fighting = True, wetted_area = 100.0 | latent_heat = 350000.0, relief_rate = 5.386905002862764, relief_rate_kg_per_hr = 19392.85801030595 |
-| `fc_firefighting_unread` | has_drainage = True, has_fire_fighting = False, wetted_area = 100.0, latent_heat = 300000.0, relieving_temperature = 350.0 | latent_heat = 300000.0, relief_rate = 6.284722503339891, relief_rate_kg_per_hr = 22625.001012023607, relieving_temperature = 350.0 |
+| `fc_firefighting_unread` | has_drainage = True, has_fire_fighting = False, wetted_area = 100.0, latent_heat = 300000.0, relieving_temperature = 350.0 | latent_heat = 300000.0, relief_rate = 10.324901255486964, relief_rate_kg_per_hr = 37169.64451975307, relieving_temperature = 350.0 |
 
 ## How far this is checked
 **`partially_verified`** — exercised against expectations pinned in its own spec, with no independent oracle recorded for it - **the normal case rather than a defect**.

@@ -69,6 +69,6 @@ declared checks *that call* could not evaluate.
 
 ## References
 
-- NeqSim master, `process/chemistry/scale/ScaleRemediationAdvisor.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.
+- NeqSim master, `process/chemistry/scale/ScaleRemediationAdvisor.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.
 - NeqSim master, `src/main/resources/data/scale_remediation.csv` at the same commit, vendored as `data/scale/scale_remediation.csv`.
 - `validation/neqsim/captures/process_scale_probe.tsv` - the `remediation` rows: every canonical deposit, the aliases, the unknown fallback, the multi-mineral call and the effectiveness order.

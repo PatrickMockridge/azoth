@@ -77,4 +77,4 @@ declared checks *that call* could not evaluate.
 ## References
 
 - Sannerhaugen, A. (2026). "Equation of State for Solid Para-hydrogen." (thesis).
-- NeqSim master, `thermo/util/solid/ParaHydrogenSolidHelmholtzEquation.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.
+- NeqSim master, `thermo/util/solid/ParaHydrogenSolidHelmholtzEquation.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.

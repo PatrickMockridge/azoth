@@ -46,7 +46,7 @@ time_to_empty = 199.99999999999997
 [[cases]]
 id = "methane_50bara_ten_seconds"
 tolerance = 5.0e-3
-source = "The `LeakModelTest` source-term state re-cased on PR (`pr_methane_50bara_10s_1s`): methane at 300 K and 50 bar, a 1 m3 vessel and a 1 cm opening with `Cd = 0.62`, for ten one-second steps. **Tolerance**: the totals agree to `4.4e-4` and the initial rate to `1.1e-5`; the worst layer is the tenth pressure at `3.3e-3`, because the two `getGamma` routes differ by `3e-5` at the first state and the isentropic recurrence multiplies it.\n"
+source = "The `LeakModelTest` source-term state re-cased on PR (`pr_methane_50bara_10s_1s`): methane at 300 K and 50 bar, a 1 m3 vessel and a 1 cm opening with `Cd = 0.62`, for ten one-second steps. **At the pin the class's ten-second total is `4.0343 kg` where the port's recurrence answers `3.6649 kg`**, a 9.2% divergence recorded rather than smoothed; the port's recurrence has not adopted the pin's trajectory.\n"
 [cases.inputs]
 components = ["methane"]
 initial_z = [1.0]

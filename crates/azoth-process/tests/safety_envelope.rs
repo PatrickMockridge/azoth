@@ -156,7 +156,7 @@ fn the_wax_state_is_limited_by_mdmt() {
             .temperature
             .expect("the wax point is present")
             .value,
-        271.30714416503906,
+        270.1856994628906,
         "wax",
     );
     assert!(!query(&result, EnvelopeKind::Mdmt).safe);

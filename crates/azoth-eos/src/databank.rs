@@ -57,6 +57,12 @@ const UNIFAC_B_UMRMC_CSV: &str =
 const UNIFAC_C_UMR_CSV: &str = include_str!("../../../data/components/UNIFACInterParamC_UMR.csv");
 const UNIFAC_C_UMRMC_CSV: &str =
     include_str!("../../../data/components/UNIFACInterParamC_UMRMC.csv");
+const UNIFAC_A_UMRCPA_CSV: &str =
+    include_str!("../../../data/components/UNIFACInterParamA_UMRCPA.csv");
+const UNIFAC_B_UMRCPA_CSV: &str =
+    include_str!("../../../data/components/UNIFACInterParamB_UMRCPA.csv");
+const UNIFAC_C_UMRCPA_CSV: &str =
+    include_str!("../../../data/components/UNIFACInterParamC_UMRCPA.csv");
 
 /// The compiled MBWR-32 coefficient table, generated from NeqSim's `MBWR32param.csv`.
 const MBWR32_CSV: &str = include_str!("../../../data/components/mbwr32.csv");
@@ -163,10 +169,13 @@ pub fn embedded_unifac_umrpru_matrix(set: UmrpruSet, term: UmrpruTerm) -> &'stat
     match (set, term) {
         (UmrpruSet::Umr, UmrpruTerm::A) => UNIFAC_A_UMR_CSV,
         (UmrpruSet::Umrmc, UmrpruTerm::A) => UNIFAC_A_UMRMC_CSV,
+        (UmrpruSet::Umrcpa, UmrpruTerm::A) => UNIFAC_A_UMRCPA_CSV,
         (UmrpruSet::Umr, UmrpruTerm::B) => UNIFAC_B_UMR_CSV,
         (UmrpruSet::Umrmc, UmrpruTerm::B) => UNIFAC_B_UMRMC_CSV,
+        (UmrpruSet::Umrcpa, UmrpruTerm::B) => UNIFAC_B_UMRCPA_CSV,
         (UmrpruSet::Umr, UmrpruTerm::C) => UNIFAC_C_UMR_CSV,
         (UmrpruSet::Umrmc, UmrpruTerm::C) => UNIFAC_C_UMRMC_CSV,
+        (UmrpruSet::Umrcpa, UmrpruTerm::C) => UNIFAC_C_UMRCPA_CSV,
     }
 }
 
@@ -3201,7 +3210,7 @@ pub fn umr_cpa_mixture_of(names: &[&str]) -> Result<(Mixture, IdealGasModel)> {
         }
         components[i] = components[i].clone().with_alpha_params(mc.to_vec());
     }
-    let unifac = unifac_umrpru_parameters(names, UmrpruSet::Umrmc)?;
+    let unifac = unifac_umrpru_parameters(names, UmrpruSet::Umrcpa)?;
     let mixture = Mixture::new(components, vec![0.0; n * n])?
         .with_cubic(Cubic::Pr)
         .with_alpha(Alpha::MatCop5PrUmr)
@@ -3807,8 +3816,10 @@ pub struct UnifacParameters {
 pub enum UmrpruSet {
     /// The original UMR tables.
     Umr,
-    /// The tables the Mathias-Copeman UMR-PRU variants share.
+    /// The tables the Mathias-Copeman UMR-PRU-MC variant uses.
     Umrmc,
+    /// The tables the Mathias-Copeman UMR-CPA variant uses.
+    Umrcpa,
 }
 
 /// One of the three terms of UNIFAC-UMR-PRU's interaction,
@@ -3889,9 +3900,10 @@ struct UmrpruTables {
     group: HashMap<i64, (f64, f64, i64)>,
     /// Lower-cased name -> `[(subgroup, count)]`, from `UNIFACcompUMRPRU.csv`.
     members: HashMap<String, Vec<(i64, i64)>>,
-    /// The six interaction tables, `[a, b, c]` for each of the two sets.
+    /// The nine interaction tables, `[a, b, c]` for each of the three sets.
     umr: [HashMap<(i64, i64), f64>; 3],
     umrmc: [HashMap<(i64, i64), f64>; 3],
+    umrcpa: [HashMap<(i64, i64), f64>; 3],
 }
 
 impl UmrpruTables {
@@ -3900,6 +3912,7 @@ impl UmrpruTables {
         match set {
             UmrpruSet::Umr => &self.umr,
             UmrpruSet::Umrmc => &self.umrmc,
+            UmrpruSet::Umrcpa => &self.umrcpa,
         }
     }
 }
@@ -3926,6 +3939,11 @@ fn parse_umrpru() -> Result<UmrpruTables> {
             parse_interaction_table(UNIFAC_A_UMRMC_CSV)?,
             parse_interaction_table(UNIFAC_B_UMRMC_CSV)?,
             parse_interaction_table(UNIFAC_C_UMRMC_CSV)?,
+        ],
+        umrcpa: [
+            parse_interaction_table(UNIFAC_A_UMRCPA_CSV)?,
+            parse_interaction_table(UNIFAC_B_UMRCPA_CSV)?,
+            parse_interaction_table(UNIFAC_C_UMRCPA_CSV)?,
         ],
     })
 }

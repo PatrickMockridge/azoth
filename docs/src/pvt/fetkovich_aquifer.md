@@ -94,5 +94,5 @@ declared checks *that call* could not evaluate.
 ## References
 
 - Fetkovich, M. J. (1971). "A Simplified Approach to Water Influx Calculations - Finite Aquifer Systems." Journal of Petroleum Technology 23(7), 814-828. DOI 10.2118/2603-PA.
-- NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/reservoirproperties/materialbalance/FetkovichAquifer.java` at commit 118d9af is the port source.
+- NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/reservoirproperties/materialbalance/FetkovichAquifer.java` at commit b40bb113 is the port source.
 - `validation/neqsim/captures/pvt_fetkovich_aquifer.tsv` - the constant-pressure identity, the linear ramps, the small-exposure boundary, the infinite-capacity and zero-productivity limits, the recharge replay and the inventory refusals.

@@ -2,8 +2,8 @@
 // `eos.water_dew_point_multiphase`, `eos.water_dew_point_line` and
 // `eos.wax_appearance_temperature`.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar WaterDewPointProbe.java
-//     java -cp .:neqsim-118d9af.jar WaterDewPointProbe > captures/water_dew_point_probe.tsv
+//     javac -proc:none -cp neqsim-b40bb11.jar WaterDewPointProbe.java
+//     java -cp .:neqsim-b40bb11.jar WaterDewPointProbe > captures/water_dew_point_probe.tsv
 //
 // # What it drives
 //

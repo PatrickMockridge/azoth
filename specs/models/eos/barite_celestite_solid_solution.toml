@@ -11,7 +11,7 @@ assumptions = [
     "the class's lazy `calculated` flag and its Gson report are not a calculation; a stateless port recomputes.\n",
 ]
 references = [
-    "NeqSim master, `pvtsimulation/flowassurance/BariteCelestiteSolidSolution.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.",
+    "NeqSim master, `pvtsimulation/flowassurance/BariteCelestiteSolidSolution.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.",
     "`validation/neqsim/captures/scale_family_probe.tsv` - both pure end members, the both-zero state, a trace cation, and the mixed state at three Margules parameters and two Ksp pairs.",
     "Prieto, M.; Putnis, A.; Fernandez-Diaz, L. (1993). The (Ba,Sr)SO4 solid solution. Geochim. Cosmochim. Acta. The Margules parameter's typical range is 2.1-2.5.",
 ]

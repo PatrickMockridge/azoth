@@ -97,5 +97,5 @@ declared checks *that call* could not evaluate.
 
 ## References
 
-- NeqSim master, `process/equipment/pipeline/PipeBeggsAndBrills.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.
+- NeqSim master, `process/equipment/pipeline/PipeBeggsAndBrills.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.
 - `validation/neqsim/captures/pipe_beggs_and_brills_probe.tsv` - the twelve line states with their pressure, regime, holdup, velocity and drop profiles; the refused high-flow state pins the negative-outlet refusal.

@@ -3,7 +3,7 @@ name = "Constant mass expansion"
 kind = "direct"
 assumptions = [
     "**the saturation state is the class's own**: an upward 10-bar scan in both phase regimes, then a bisection whose final state is the last midpoint, not the refined single-phase edge the saturation id returns.",
-    "**the saturation and total volumes are untranslated**, while the phase density and the class's gas volume are volume-corrected; `volume_correction` turns the translation off as `useVolumeCorrection(false)` does.",
+    "**the saturation and total volumes are the Peneloux-corrected volumes**, as are the phase density, gas volume, Z and relative volumes; `volume_correction` turns the translation off as `useVolumeCorrection(false)` does (NeqSim `#5195`, fixed by the pin).",
     "**the class's `Bg` carries a `1e5`** because NeqSim's standard volume is its `1e5`-scaled internal volume; in SI the factor cancels and the id publishes the physical ratio.",
     "**the isothermal compressibility is per bar in the class** (pressure is internal bar and volume internal `1e-5 m3`); the id publishes 1/Pa, the class value over `1e5`.",
     "**the Y-factor and the liquid relative volume are only defined in the two-phase region**, and the class's percent is published as a fraction.",
@@ -12,10 +12,10 @@ assumptions = [
     "**the two-phase flash's boundary differs from NeqSim's `TPflash` by about `5e-6` relative**, measured; the saturation-dependent fields are held at `1e-4`, the per-point fields at `1e-6`.",
 ]
 references = [
-    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/ConstantMassExpansion.java` at commit 118d9af is the port source.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/ConstantMassExpansion.java` at commit b40bb113 is the port source.",
     "`validation/neqsim/captures/pvt_constant_mass_expansion.tsv` - two seven-point CCEs and a single-phase schedule.",
-    "NeqSim #5209 - the class takes phase 0's volume as the saturation volume, which is a trace phase when the midpoint flash is two-phase.",
-    "NeqSim #5195 (closed) - the relative volume ignores the Peneloux shift; the pin predates the fix.",
+    "NeqSim #5209 - the class takes the whole-cell corrected saturation volume at the single-phase side of the bracket (fixed by the pin).",
+    "NeqSim #5195 (closed) - the relative volume, gas Z and Bg use the Peneloux-corrected volumes (fixed by the pin).",
 ]
 [source]
 standard = "NeqSim pvtsimulation/simulation/ConstantMassExpansion.java"
@@ -144,7 +144,7 @@ unit = "m**3"
 description = "the untranslated saturation volume.\n"
 [outputs.z_saturation]
 unit = "dimensionless"
-description = "the mole-fraction-weighted compressibility at the saturation state.\n"
+description = "the corrected compressibility `P V / (R T)` of the whole cell at the saturation state.\n"
 [outputs.saturation_isothermal_compressibility]
 unit = "dimensionless"
 description = "the saturation state's isothermal compressibility, in 1/Pa; the vocabulary has no inverse-pressure unit.\n"
@@ -157,7 +157,7 @@ unit = "Pa"
 description = "the absolute pressure.\n"
 [outputs.points.fields.total_volume]
 unit = "m**3"
-description = "the untranslated total volume.\n"
+description = "the Peneloux-corrected total volume.\n"
 [outputs.points.fields.relative_volume]
 unit = "dimensionless"
 description = "the total volume over the saturation volume.\n"
@@ -175,7 +175,7 @@ unit = "dimensionless"
 description = "the gas volume over the standard volume.\n"
 [outputs.points.fields.z_gas]
 unit = "dimensionless"
-description = "phase 0's cubic compressibility.\n"
+description = "phase 0's corrected compressibility `P V / (R T)`.\n"
 [outputs.points.fields.oil_density]
 unit = "kg/m**3"
 optional = true

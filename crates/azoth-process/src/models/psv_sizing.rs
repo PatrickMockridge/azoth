@@ -87,6 +87,12 @@ pub(crate) struct GasArea {
     pub(crate) combination_correction: f64,
 }
 
+/// API 520 relieving pressure: the set pressure plus the accumulation on the gauge set
+/// pressure, `P_set + (P_set - atm) * overpressure_fraction`, in absolute Pa.
+pub(crate) fn relieving_pressure(set_pressure: f64, overpressure_fraction: f64) -> f64 {
+    set_pressure + (set_pressure - 101_325.0) * overpressure_fraction
+}
+
 #[allow(clippy::too_many_arguments)] // one parameter per quantity the class method reads
 pub(crate) fn gas_area(
     mass_flow: f64,
@@ -101,7 +107,7 @@ pub(crate) fn gas_area(
     has_rupture_disk: bool,
 ) -> GasArea {
     let k = specific_heat_ratio;
-    let relieving_pressure = set_pressure * (1.0 + overpressure_fraction);
+    let relieving_pressure = relieving_pressure(set_pressure, overpressure_fraction);
     let back_pressure_fraction = back_pressure / relieving_pressure;
     let kd = 0.975;
     let kc = if has_rupture_disk { 0.9 } else { 1.0 };
@@ -162,7 +168,7 @@ pub(crate) fn liquid_area(
     viscosity: f64,
     balanced_bellows: bool,
 ) -> LiquidArea {
-    let relieving_pressure = set_pressure * (1.0 + overpressure_fraction);
+    let relieving_pressure = relieving_pressure(set_pressure, overpressure_fraction);
     let specific_gravity = liquid_density / 999.0;
     let flow_gpm = volume_flow * 15850.3;
     let p1_psig = (relieving_pressure - 101_325.0) / 6894.76;
@@ -221,7 +227,7 @@ pub(crate) fn two_phase_area(
     latent_heat: f64,
     liquid_heat_capacity: f64,
 ) -> f64 {
-    let p0 = set_pressure * (1.0 + overpressure_fraction);
+    let p0 = relieving_pressure(set_pressure, overpressure_fraction);
     let v_g = 1.0 / gas_density;
     let v_l = 1.0 / liquid_density;
     let mix = gas_fraction * v_g + (1.0 - gas_fraction) * v_l;
@@ -257,7 +263,7 @@ fn capacity(
     discharge_coefficient: f64,
 ) -> f64 {
     let k = specific_heat_ratio;
-    let relieving_pressure = set_pressure * (1.0 + overpressure_fraction);
+    let relieving_pressure = relieving_pressure(set_pressure, overpressure_fraction);
     let critical_ratio = (2.0 / (k + 1.0)).powf(k / (k - 1.0));
     let pressure_ratio = back_pressure / relieving_pressure;
     let c = if pressure_ratio <= critical_ratio {
@@ -271,7 +277,7 @@ fn capacity(
         * area
         * relieving_pressure
         * c
-        * (molar_mass / (compressibility * 8314.0 * temperature)).sqrt()
+        * (molar_mass / (compressibility * 8.314_462_1 * temperature)).sqrt()
 }
 
 /// Result of `process.psv_sizing`.
@@ -382,7 +388,7 @@ pub fn psv_sizing(
     )?;
 
     let branch = Service::parse(service)?;
-    let relieving_pressure = set_pressure.value * (1.0 + overpressure_fraction);
+    let relieving_pressure = relieving_pressure(set_pressure.value, overpressure_fraction);
     for (name, value) in [
         ("set_pressure", set_pressure.value),
         ("overpressure_fraction", overpressure_fraction),

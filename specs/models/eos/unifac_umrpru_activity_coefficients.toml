@@ -5,7 +5,7 @@ assumptions = [
     "UNIFAC with the UMR-PRU interaction parameters: `a_mn(T) = a_mn + b_mn (T - 298.15) + c_mn (T - 298.15)^2`, NeqSim's `ComponentGEUnifacUMRPRU.calcaij`. The offset from 298.15 K is the one place this differs from `eos.unifac_psrk_activity_coefficients` besides the tables.\n",
     "the group decomposition is NeqSim's `UNIFACcompUMRPRU`: 139 subgroups rather than the 133 of `UNIFACcomp`. The group constants are the shared `UNIFACGroupParam` table.\n",
     "**the combinatorial term is `ComponentGEUnifacUMRPRU`'s Flory-Huggins one, not `ComponentGEUnifac`'s Staverman-Guggenheim one.** The two differ by `6.9e-06` and `1.9e-02` in `ln gamma` at 298.15 K on methane/water 0.98/0.02.\n",
-    "which parameter set is read is a **named input**, not something inferred. NeqSim decides it in `useMcInteractionParameters()`, reading `getComponent(0).getAttractiveTermNumber()` and choosing `_umrmc` when it is 13, 19 or 22.\n",
+    "which parameter set is read is a **named input**, not something inferred. NeqSim's `useMcInteractionParameters()` chooses `_umrcpa` for the UMR-CPA attractive terms 13, 19 and 22, and the UMR-PRU-MC variant reads `_umrmc`.\n",
     "this library's component model carries no attractive-term number, so the caller states which equation of state they are pairing the model with rather than a field being invented to carry it.\n",
     "a pair the interaction tables do not carry is zero in all three terms, which makes `a_mn(T)` zero and the pair ideal.\n",
     "the differential oracle is `SystemUMRCPAEoS`, which forms a `PhaseGEUnifacUMRPRU` and reads it through the UMR mixing rule; recorded in `validation/neqsim/UmrCpaProbe.java`. `SystemUMRPRUMCEosNew` forms no GE phase.\n",
@@ -27,8 +27,8 @@ length = "one entry per component"
 description = "the substances the mixture is made of, by name, resolved against NeqSim's `UNIFACcompUMRPRU.csv` group decomposition and the `UNIFACGroupParam` group constants\n"
 [inputs.parameters]
 type = "enum"
-values = ["umr", "umrmc"]
-description = "which interaction set to read: `umr` for the original tables, or `umrmc` for the ones the Mathias-Copeman UMR-PRU variants share.\n"
+values = ["umr", "umrmc", "umrcpa"]
+description = "which interaction set to read: `umr` for the original tables, `umrmc` for the Mathias-Copeman UMR-PRU-MC variant, or `umrcpa` for the UMR-CPA variant.\n"
 [inputs.T]
 unit = "K"
 description = "absolute temperature\n"

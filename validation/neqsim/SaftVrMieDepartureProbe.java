@@ -48,8 +48,8 @@ import neqsim.thermo.system.SystemSAFTVRMie;
  * {@code ~/Desktop/neqsim-saft-vr-mie-chain-contact-value-temperature.md}.
  *
  * <pre>
- * javac -proc:none -cp neqsim-118d9af.jar SaftVrMieDepartureProbe.java
- * java -cp .:neqsim-118d9af.jar SaftVrMieDepartureProbe [T_K P_bara name z ...]
+ * javac -proc:none -cp neqsim-b40bb11.jar SaftVrMieDepartureProbe.java
+ * java -cp .:neqsim-b40bb11.jar SaftVrMieDepartureProbe [T_K P_bara name z ...]
  * </pre>
  */
 public final class SaftVrMieDepartureProbe {

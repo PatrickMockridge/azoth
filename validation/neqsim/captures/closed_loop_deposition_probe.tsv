@@ -1,4 +1,4 @@
-ClosedLoopDepositionSolver at 118d9aff - 80 mol/sec, 100 bara, 60 C, 1000 m, 0.1 m, 10 increments
+ClosedLoopDepositionSolver at b40bb113 - 80 mol/sec, 100 bara, 60 C, 1000 m, 0.1 m, 10 increments
 state=base_1yr iterations=1 converged=true final_diameter_m=0.09998794649351135 tolerance_m=1.0E-4 max_iterations=10 last_max_thickness_mm=0.006026753244324614 last_time_to_blockage_years=4148.170496866197
   diameter_history_m=[0.1] thickness_history_mm=[0.006026753244324614] velocity_history_m_s=[2.3476491732359817]
   restored_diameter_m=0.1 profile_size=1 velocity_profile_entries=11 segment0_pressure_bara=100.0 segment0_temperature_k=333.15

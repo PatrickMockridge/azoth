@@ -82,4 +82,4 @@ declared checks *that call* could not evaluate.
 ## References
 
 - Leachman, J. W.; Jacobsen, R. T.; Penoncello, S. G.; Lemmon, E. W. (2009). "Fundamental Equations of State for Parahydrogen, Normal Hydrogen, and Orthohydrogen." Journal of Physical and Chemical Reference Data 38(3), 721-748.
-- NeqSim master, `thermo/util/leachman/Leachman.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.
+- NeqSim master, `thermo/util/leachman/Leachman.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.

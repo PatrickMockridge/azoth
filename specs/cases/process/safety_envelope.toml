@@ -48,7 +48,7 @@ envelopes = [
 ]
 queries = [
   { envelope = "hydrate", safe = true },
-  { envelope = "wax", temperature = 270.4277881823088, safe_temperature = 265.4277881823088, margin = -0.42778818230880233, safe = true },
+  { envelope = "wax", temperature = 269.3570990311472, safe_temperature = 264.3570990311472, margin = 0.642900968852814, safe = true },
   { envelope = "co2_freezing", temperature = 211.36615023369686, safe_temperature = 208.36615023369686, margin = 58.63384976630314, safe = true },
   { envelope = "mdmt", temperature = 299.9999931606415, safe_temperature = 289.9999931606415, margin = -29.99999316064151, safe = false },
 ]

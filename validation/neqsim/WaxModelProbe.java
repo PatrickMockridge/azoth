@@ -27,8 +27,8 @@
 // components are printed too.
 //
 // A capture, not a test: run it against the pinned jar and commit what it prints.
-//   javac -proc:none -cp neqsim-118d9af.jar WaxModelProbe.java
-//   java -cp .:neqsim-118d9af.jar WaxModelProbe > captures/wax_model_probe.tsv
+//   javac -proc:none -cp neqsim-b40bb11.jar WaxModelProbe.java
+//   java -cp .:neqsim-b40bb11.jar WaxModelProbe > captures/wax_model_probe.tsv
 
 import neqsim.thermo.component.ComponentInterface;
 import neqsim.thermo.component.ComponentWonWax;

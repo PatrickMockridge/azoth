@@ -4,7 +4,7 @@ kind = "procedure"
 assumptions = [
     "**the wetted area is the supplied area, else `pi D h` when both geometry values are positive, else zero**, the class's fallback order.",
     "**the heat input is API 521 Table 4**: `Q = C1 A_ft2^0.82` with `C1 = 21000` BTU/hr ft2 with adequate drainage and `34500` without, converted through 10.7639 ft2 per m2 and 0.29307107 W per BTU/hr.",
-    "**`has_fire_fighting` is read by no formula**: the environment factor is 1.0 on both branches, so only drainage selects the coefficient and two rows differing only in the flag answer identically.",
+    "**the 21 000 BTU/hr ft2 coefficient is credited only with both drainage and prompt firefighting**; otherwise the fire heat input uses 34 500. The environment factor is 1.0 on both branches.",
     "**the latent heat defaults to 350000 J/kg when absent**, the class's light-hydrocarbon value; the port treats a zero as the default and refuses a negative value.",
     "**the relief rate is `Q / latent_heat`**, and the hourly rate is that times 3600.",
     "**the fluid-enriched property path is the thermo seam**: `ReliefFluidState` flashes a `SystemInterface` for k, M, Z and phase, and `process.blocked_outlet_relief` and its three siblings carry it; this id carries the no-fluid path only.",
@@ -29,7 +29,7 @@ type = "boolean"
 description = "whether adequate drainage exists; it selects 21000 or 34500 BTU/hr ft2.\n"
 [inputs.has_fire_fighting]
 type = "boolean"
-description = "whether firefighting is credited. **Read by no formula**, the class's unread flag; retained because the class takes it.\n"
+description = "whether prompt firefighting is credited. Together with `has_drainage` it selects the 21000 or 34500 BTU/hr ft2 coefficient.\n"
 [inputs.wetted_area]
 unit = "m**2"
 optional = true

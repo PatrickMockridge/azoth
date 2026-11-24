@@ -31,7 +31,7 @@ not an equation, and both implementations read it from here.
 | `mass_flow` | kg/s | the fuel mass flow burning at the jet, at least zero. |
 | `heat_of_combustion` | dimensionless | the lower heating value in J/kg, above zero. Declared dimensionless because no vocabulary unit expresses a mass-specific energy. |
 | `radiative_fraction` | dimensionless | the fraction of the combustion heat radiated, in `[0, 1]`; 0.20 is the class's natural-gas example. |
-| `relative_humidity` | dimensionless | *Optional.* the ambient relative humidity in `(0, 1]`, which the transmissivity reads. **Absent is `0.5`.** A stated zero is refused: the class clamps it to zero and answers `NaN`. |
+| `relative_humidity` | dimensionless | *Optional.* the ambient relative humidity in `[0, 1]`, which the transmissivity reads. **Absent is `0.5`.** Zero is unit transmissivity. |
 | `distance` | m | *Optional.* the distance from the flame centre at which the flux is asked. **Absent leaves `transmissivity` and `incident_heat_flux` absent**; a non-positive value is refused. |
 | `target_flux` | W/m**2 | *Optional.* the flux whose distance is solved for, e.g. 4000, 12500 or 37500. **Absent leaves `distance_to_flux` absent**; a non-positive target is refused. |
 
@@ -50,7 +50,7 @@ not an equation, and both implementations read it from here.
 | `mass_flow >= 0` | raises | the class's constructor refuses a negative mass flow; a zero flow radiates nothing |
 | `heat_of_combustion > 0` | raises | the class's constructor refuses a non-positive heating value |
 | `radiative_fraction >= 0 and radiative_fraction <= 1` | raises | the class's constructor refuses a fraction outside [0, 1] |
-| `relative_humidity > 0 and relative_humidity <= 1` | raises | the class clamps to [0, 1] and answers NaN at zero, so the port refuses both the clamp and the NaN |
+| `relative_humidity >= 0 and relative_humidity <= 1` | raises | the class clamps to [0, 1]; zero humidity is unit transmissivity |
 | `distance > 0` | raises | the class answers an infinite flux at zero distance, which is not a published number |
 | `target_flux > 0` | raises | the class throws IllegalArgumentException for a non-positive target |
 
@@ -62,7 +62,7 @@ not an equation, and both implementations read it from here.
 - **a distance below one metre evaluates the transmissivity at one metre**, the correlation's own `max(d, 1)`; the flux's `1/d^2` still applies at the stated distance.
 - **heat of combustion is in J/kg and crosses unconverted.** Neither the vocabulary nor `uom` carries a mass-specific energy unit, so it is declared dimensionless here, as the thermal calculations declare latent heat.
 - **a non-positive distance is refused**: the class answers `Infinity` there. **A non-positive target flux is refused**: the class throws `IllegalArgumentException`.
-- **relative humidity is the class's setter, which clamps to `[0, 1]`.** The port refuses a stated value outside `(0, 1]`: the clamp's zero makes the correlation `NaN`, which the class admits and the port does not publish. Absent is `0.5`.
+- **relative humidity is the class's setter, clamped to `[0, 1]`.** Zero humidity is unit transmissivity (NeqSim `#4978`, fixed by the pin), so the port accepts it and publishes `tau = 1`. Absent is `0.5`.
 - **the constructor's guards are the ranges**: mass flow at least zero, heat of combustion above zero, and the radiative fraction in `[0, 1]`.
 
 ## Cases

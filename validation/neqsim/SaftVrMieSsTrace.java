@@ -16,8 +16,8 @@ import neqsim.thermo.system.SystemSAFTVRMie;
  * inside it.
  *
  * <pre>
- * javac -proc:none -cp neqsim-118d9af.jar SaftVrMieSsTrace.java
- * java -cp .:neqsim-118d9af.jar SaftVrMieSsTrace
+ * javac -proc:none -cp neqsim-b40bb11.jar SaftVrMieSsTrace.java
+ * java -cp .:neqsim-b40bb11.jar SaftVrMieSsTrace
  * </pre>
  */
 public final class SaftVrMieSsTrace {

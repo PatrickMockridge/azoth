@@ -4,19 +4,19 @@ kind = "direct"
 assumptions = [
     "**the ledger removes the gas phase after every two-phase step**, as the class's `removePhase(0)` does; each step is a fresh flash of the retained composition.",
     "**the class's saturation scan is entered from a two-phase state**, so its first loop - which increments the pressure without flashing - exits at 11 bar and has no effect beyond that; the port carries the same entry.",
-    "**the saturation volume is the phase carrying the material at the last bisection midpoint.** At 350 K the class's phase 0 there is a trace phase and its volume is 7e-10 m3, which makes its relative volumes 2e5; the id publishes the material phase's volume and names that block evidence, not a case.",
-    "**the standard state is 288.15 K and 1.01325 bar**: the final flash of the retained liquid gives the stock-tank oil volume, and its gas phase's corrected volume is added to the produced gas.",
+    "**the saturation volume is the whole cell's corrected volume at the single-phase side of the bracket** (NeqSim `#5209`, fixed by the pin). The 350 K trace-phase block is old-defect evidence, not a case.",
+    "**the standard state is 288.15 K and 1.01325 bar with Z = 1**: a removed gas's standard volume is its molar amount at the ideal-gas standard volume; the final flash of the retained liquid adds its gas phase's amount (Pedersen Eq. 3.7, NeqSim `#5195`).",
     "**Rs is remaining solution gas**: the total produced gas less the gas removed through the point, over the stock-tank oil volume. Bg is absent where the gas compressibility is below 1e-10.",
     "**a single-phase point's gas fields and its liquid relative volume are absent**, not the class's uninitialised zeros.",
-    "**the gas gravity is the gas molar mass over 0.028**, the class's air constant; the class's pressure index is the gas phase, which the ordered flash makes phase 0.",
+    "**the gas gravity is the gas molar mass over air's 28.96546 g/mol**, and the gas Z and Bg use the Peneloux-corrected volume (NeqSim `#5195`, fixed by the pin). The class's pressure index is the gas phase, which the ordered flash makes phase 0.",
     "**inputs are SI** and the fluid is the characterization row list; SRK and the databank kij are the defaults.",
     "**the two-phase flash's boundary differs from NeqSim's `TPflash` by about `5e-6` relative**, measured on the CCE; the saturation-dependent fields are held at `1e-4`, the ledger-driven fields at `1e-6`.",
 ]
 references = [
-    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/DifferentialLiberation.java` at commit 118d9af is the port source.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/DifferentialLiberation.java` at commit b40bb113 is the port source.",
     "`validation/neqsim/captures/pvt_differential_liberation.tsv` - a ten-point schedule, a 350 K evidence block, and a seven-point schedule whose first point is single phase.",
-    "NeqSim #5209 - the saturation volume is phase 0 at the last bisection midpoint; at 350 K that is a trace gas and the relative volumes reach 2e5.",
-    "NeqSim #5195 (closed) - the relative gas gravity divides by 28.0 g/mol rather than air's, and the gas Z is not volume-corrected; the pin predates the fix.",
+    "NeqSim #5209 - the saturation volume is the whole cell's corrected volume at the single-phase side of the bracket (fixed by the pin); the old phase-0 trace-gas defect is the 350 K evidence block.",
+    "NeqSim #5195 (closed) - the gas gravity is relative to air's 28.96546 g/mol, and the gas Z, Bg and standard volumes use the corrected volume with Z = 1 at standard conditions (fixed by the pin).",
 ]
 [source]
 standard = "NeqSim pvtsimulation/simulation/DifferentialLiberation.java"
@@ -180,15 +180,15 @@ description = "the removed gas's translated volume; absent in a single phase.\n"
 [outputs.points.fields.gas_standard_volume]
 unit = "m**3"
 optional = true
-description = "the removed gas at 288.15 K and 1.01325 bar; absent in a single phase.\n"
+description = "the removed gas at 288.15 K and 1.01325 bar with Z = 1, its liquid dropout counted as equivalent gas; absent in a single phase.\n"
 [outputs.points.fields.z_gas]
 unit = "dimensionless"
 optional = true
-description = "the gas phase's cubic compressibility.\n"
+description = "the gas phase's corrected compressibility `P V / (R T)`.\n"
 [outputs.points.fields.relative_gas_gravity]
 unit = "dimensionless"
 optional = true
-description = "the gas molar mass over the class's 0.028 kg/mol air constant.\n"
+description = "the gas molar mass over air's 28.96546 g/mol.\n"
 [outputs.points.fields.bo]
 unit = "dimensionless"
 optional = true

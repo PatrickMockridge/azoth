@@ -74,7 +74,7 @@ relief_rate_kg_per_hr = 19392.85801030595
 [[cases]]
 id = "fc_firefighting_unread"
 tolerance = 1.0e-12
-source = "The drainage row with firefighting false: identical, because the flag is read by no formula. From (`fc_firefighting_unread`)."
+source = "The drainage row with firefighting false: the 34500 BTU/hr ft2 coefficient, 34500/21000 of the credited rate. From (`fc_firefighting_unread`)."
 [cases.inputs]
 has_drainage = true
 has_fire_fighting = false
@@ -83,6 +83,6 @@ latent_heat = 300000.0
 relieving_temperature = 350.0
 [cases.expected]
 latent_heat = 300000.0
-relief_rate = 6.284722503339891
-relief_rate_kg_per_hr = 22625.001012023607
+relief_rate = 10.324901255486964
+relief_rate_kg_per_hr = 37169.64451975307
 relieving_temperature = 350.0

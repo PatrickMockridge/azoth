@@ -918,15 +918,15 @@ a claim nothing holds.
   **`process.jet_fire` is `JetFireModel`**: the API 521 / Mudan-Croce point source, Wayne's
   transmissivity, and its 25-iteration fixed-point inverse. **`process.pool_fire` is
   `PoolFireModel`**: Thomas's flame height, Mudan's smoke-corrected SEP and vertical-cylinder
-  view factor, and the bisection contour — whose constructor's heat of combustion, liquid
-  density and radiative fraction are stored and read by nothing (NeqSim `#4976`), which the
-  port states rather than declares. **`process.vce` is `VCEModel`**: the Sachs-scaled distance
-  and the class's plateau-plus-power-law **fit** to the TNO curves, not the curves themselves.
-  **`process.bleve` is `BLEVECalculator`**: the CCPS diameter, duration and SEP, sharing
-  Wayne's transmissivity with `jet_fire`. All four publish **no distance for a target the fire
-  cannot produce**, where the classes answer their near bound (`#4975`); `bleve` refuses a
-  negative radiative fraction its class accepts (`#4977`), and both radiation models refuse
-  the zero-humidity `NaN` their clamps admit (`#4978`). Held to the four captures.
+  view factor, and the bisection contour — whose two-argument constructor reads only the
+  diameter and the burn rate (`#4976`, fixed by the pin). **`process.vce` is `VCEModel`**: the
+  Sachs-scaled distance and the class's plateau-plus-power-law **fit** to the TNO curves, not
+  the curves themselves. **`process.bleve` is `BLEVECalculator`**: the CCPS diameter, duration
+  and SEP, sharing Wayne's transmissivity with `jet_fire`. All four publish **no distance for
+  an unbracketed target**, which is the class's `NaN` (`#4975`, fixed by the pin); `bleve`
+  refuses a radiative fraction outside `[0, 1]`, as the class now does (`#4977`), and both
+  radiation models publish unit transmissivity at zero humidity (`#4978`). Held to the four
+  captures.
 - **The QRA capstone** — `process.consequence_analysis` and `process.event_tree`.
   **`process.consequence_analysis` is `ConsequenceAnalysisEngine`**: its four convenience
   branches (`addJetFire`, `addPoolFire`, `addVCE`, `addToxicDispersion`) as one flat
@@ -941,13 +941,13 @@ a claim nothing holds.
   `process_event_tree.tsv`.
 - **The passive fire protection demand** — **`process.pfp_demand` is
   `PfpDemandCalculator`**: the lumped bare-steel time to critical temperature (7850 kg/m3,
-  490 J/(kg K)), the **strict** `t_bare < t_req` test, the conduction-limited thickness with
-  the class's 1 K driving-temperature floor, and the H60/H120/J60/J120 rating at the class's
+  490 J/(kg K)), the **strict** `t_bare < t_req` test, the conduction-limited thickness from
+  the actual `T_fire - T_steel,avg` difference, and the H60/H120/J60/J120 rating at the class's
   `3600 + 1e-6` s long-duration boundary, held to `process_pfp_demand.tsv`. It takes the
   incident flux as an input; `process.jet_fire` and `process.pool_fire` produce it. The port
-  refuses a critical temperature at or below the initial one, where NeqSim publishes a zero
-  time and infinite thickness at equality and a negative time and thickness below it
-  (`#5004`), and it reproduces the 1 K floor the class substitutes (`#5005`). **It has no
+  refuses a critical temperature at or below the initial one and a fire temperature at or
+  below the mean steel temperature, both of which the class now rejects (`#5004`, `#5005`,
+  fixed by the pin). **It has no
   executable caller**: `ActiveFireProtectionScreening.setBareSteelTimeToCriticalS` is the
   hand-off its javadoc names and `HazopConsequenceAutoPopulator` names the class in a
   recommendation string; the old "(2 callers)" counted the class's two tests.
@@ -961,15 +961,16 @@ a claim nothing holds.
   densities, the wind drift, the coverage fraction, the compliance flow (absent where the
   class answers `+Infinity`) and its four-way verdict. **`process.fire_water_coverage_assessment`
   is `FireWaterCoverageAssessment`**: the coverage, flow and pressure questions and the
-  five-way verdict, with the spare flow and pressure margin required because the class's
-  NaN defaults read as feasible (`#5017`). **`process.active_fire_protection_screening` is
+  five-way verdict, with the spare flow and pressure margin required as inputs; the class's
+  unavailable-data state is `supply_data_incomplete` (`#5017`, fixed by the pin).
+  **`process.active_fire_protection_screening` is
   `ActiveFireProtectionScreening`'s arithmetic**: the extinguishing classification, the
   strict blowdown-versus-steel test, the margin and the selective saving; the class's flux,
   inventory, presentation flags and prose are not carried. **`process.api537_flare_flame_model`
   is `Api537FlareFlameModel`**: Kent's flame length, the `atan2` tilt, the point-source
   ground flux, one sterile radius per target flux, the two sound levels and the equivalent
-  flame temperature, with the class's clamps mirrored and a negative stack height, which its
-  setter accepts, refused (`#5018`). Held to six captures. **All six have no executable caller**: the
+  flame temperature, with the setters' guards on stack height, wind speed and transmissivity
+  mirrored (`#5018`, fixed by the pin). Held to six captures. **All six have no executable caller**: the
   cross-references inside `FireWaterDemandCalculator` are javadoc links, and each class's
   only reader is its own test.
 - **The risk and SIS arithmetic** — the static core of `process/safety/risk/`, seven ids.

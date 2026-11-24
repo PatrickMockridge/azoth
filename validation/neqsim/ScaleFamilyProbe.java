@@ -3,8 +3,8 @@
 // profile (with its inert pH argument) and the water-compatibility screener (with its two
 // inert pH fields).
 //
-//     javac -proc:none -cp neqsim-118d9af.jar ScaleFamilyProbe.java
-//     java -cp .:neqsim-118d9af.jar ScaleFamilyProbe > captures/scale_family_probe.tsv
+//     javac -proc:none -cp neqsim-b40bb11.jar ScaleFamilyProbe.java
+//     java -cp .:neqsim-b40bb11.jar ScaleFamilyProbe > captures/scale_family_probe.tsv
 
 import java.util.Map;
 import neqsim.pvtsimulation.flowassurance.BariteCelestiteSolidSolution;

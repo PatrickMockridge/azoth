@@ -84,7 +84,7 @@ equipment = [
 ]
 [cases.expected]
 equipment = [
-  { name = "InletSeparator", equipment_type = "vessel", purchased_equipment_cost = 4185.028871129008, bare_module_cost = 17231.85637687369, total_module_cost = 21539.820471092113, grass_roots_cost = 32309.73070663817, total_cost = 21539.820471092113, installation_man_hours = 99.47819038665551, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+  { name = "InletSeparator", equipment_type = "vessel", purchased_equipment_cost = 4823.880926503424, bare_module_cost = 19862.329714877847, total_module_cost = 24827.91214359731, grass_roots_cost = 37241.86821539597, total_cost = 24827.91214359731, installation_man_hours = 99.47819038665551, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
 ]
 material_take_off = [
   { equipment_index = 0.0, item = "Vessel Shell", material = "Carbon Steel", quantity = 0.0, has_quantity = false, unit = "kg", weight_kg = 2098.6959997184704, has_weight = true, cost_usd = 16789.567997747763, source = "" },

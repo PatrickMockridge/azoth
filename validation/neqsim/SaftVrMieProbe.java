@@ -27,8 +27,8 @@ import neqsim.thermo.system.SystemSAFTVRMie;
  * what a caller running the model the same way would get.
  *
  * <pre>
- * javac -proc:none -cp neqsim-118d9af.jar SaftVrMieProbe.java
- * java -cp .:neqsim-118d9af.jar SaftVrMieProbe [T_K P_bara name z ...]
+ * javac -proc:none -cp neqsim-b40bb11.jar SaftVrMieProbe.java
+ * java -cp .:neqsim-b40bb11.jar SaftVrMieProbe [T_K P_bara name z ...]
  * </pre>
  */
 public final class SaftVrMieProbe {

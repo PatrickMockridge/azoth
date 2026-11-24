@@ -25,8 +25,8 @@ import neqsim.thermo.system.SystemSrkEos;
  *
  * <pre>
  * cd validation/neqsim
- * javac -proc:none -cp neqsim-118d9af.jar WaterCpSentinel.java
- * java -cp .:neqsim-118d9af.jar WaterCpSentinel &gt; captures/water_cp_sentinel.tsv
+ * javac -proc:none -cp neqsim-b40bb11.jar WaterCpSentinel.java
+ * java -cp .:neqsim-b40bb11.jar WaterCpSentinel &gt; captures/water_cp_sentinel.tsv
  * </pre>
  *
  * <p>The table path defaults to the vendored copy and may be given as the first argument.

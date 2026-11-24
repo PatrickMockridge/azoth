@@ -45,7 +45,7 @@ A **direct** model: a computation over vectors, with no iteration and therefore 
 ## Assumptions
 
 - **the attraction is mixed by a universal rule, not by an interaction matrix.** `alpha_mix = sum_i x_i (a_i^T/(b_i R T) + hwfc ln gamma_i)` with `hwfc = -1/0.53`, and `A = n B R T alpha_mix` with the co-volume at the linear sum. No `kij` column is read.
-- the `ln gamma_i` are UNIFAC-UMR-PRU's on the `_umrmc` tables, which is what `SystemUMRCPAEoS` pairs the rule with; that model's combinatorial term is Flory-Huggins, not plain UNIFAC's.
+- the `ln gamma_i` are UNIFAC-UMR-PRU's on the `_umrcpa` tables, which is what `SystemUMRCPAEoS` pairs the rule with; that model's combinatorial term is Flory-Huggins, not plain UNIFAC's.
 - `a` and `b` are the `UMRCPA_a0`/`UMRCPA_b` columns for a component that carries them - a third fitted set beside the SRK and PR families - and the bounding volume and energy are `UMRCPA_assocVolume`/`UMRCPA_assocEnergy`. Water's `kappa_AB` is 0.125 here against the PR family's.
 - the attractive term is the five-parameter Mathias-Copeman form seeded with `UMRCPA_MC1..5`. A component without that set is **refused**, because NeqSim's per-component fallback is not expressible as one mixture-level alpha.
 - the association is Wertheim first-order perturbation theory with a Carnahan-Starling radial distribution function: site schemes whose sites bond on a charge-sign product, an Elliott cross rule, and a successive-substitution site-fraction solve refined by Newton.
@@ -76,4 +76,4 @@ declared checks *that call* could not evaluate.
 - Voutsas, E.; Magoulas, K.; Tassios, D. (2004). "Universal mixing rule for cubic equations of state applicable to symmetric and asymmetric systems: results and simple, predictive scheme for parameters." Industrial & Engineering Chemistry Research 43(19), 6238-6246.
 - Kontogeorgis, G. M.; Voutsas, E. C.; Yakoumis, I. V.; Tassios, D. P. (1996). "An Equation of State for Associating Fluids." Industrial & Engineering Chemistry Research 35(11), 4310-4318. DOI 10.1021/ie9600203
 - Tasios, I.; et al. (2025). "UMR-CPA for natural gas dehydration." Fluid Phase Equilibria. DOI 10.1016/j.fluid.2024.114241
-- NeqSim master, `PhaseUMRCPA.java` / `ComponentUMRCPA.java` / `SystemUMRCPAEoS.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.
+- NeqSim master, `PhaseUMRCPA.java` / `ComponentUMRCPA.java` / `SystemUMRCPAEoS.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.

@@ -54,9 +54,9 @@ fn the_cce_fit_recovers_the_capture_parameter() {
             temperature: 373.15,
             pressures: vec![2.5e7, 2.0e7, 1.5e7],
             relative_volumes: vec![
-                0.998_031_797_063_637_8,
-                1.102_821_596_061_994_3,
-                1.300_910_800_403_610_5,
+                0.997_746_749_422_079_3,
+                1.117_772_354_405_601_7,
+                1.344_662_536_647_291,
             ],
         }],
         cvd: Vec::new(),
@@ -74,9 +74,9 @@ fn the_cce_fit_recovers_the_capture_parameter() {
         6,
     )
     .expect("the CCE fit runs");
-    // The class's own fit answered 1.029994778729241; the TBP CCE is 1.4e-6 from it.
+    // The class's own fit answered 1.029999988314205; the TBP CCE is 1.4e-6 from it.
     assert!(
-        (result.values[0] - 1.029_994_778_729_241).abs() < 1e-4,
+        (result.values[0] - 1.029_999_988_314_205).abs() < 1e-4,
         "{result:?}"
     );
     assert!(result.chi_square.is_finite() && result.chi_square >= 0.0);
@@ -100,9 +100,9 @@ fn the_dle_fit_recovers_the_capture_parameter() {
             temperature: 323.15,
             pressures: vec![2.5e7, 1.5e7, 8.0e6],
             rs: vec![
-                124.113_237_435_896_83,
-                117.874_064_538_772_71,
-                54.857_243_478_268_62,
+                124.468_224_413_603_51,
+                118.190_000_001_358_56,
+                54.982_405_436_250_79,
             ],
             bo: vec![
                 1.297_774_285_932_201,
@@ -128,9 +128,9 @@ fn the_dle_fit_recovers_the_capture_parameter() {
         6,
     )
     .expect("the DLE fit runs");
-    // The class's own fit answered 0.14999999104346481.
+    // The class's own fit answered 0.149999991032325.
     assert!(
-        (result.values[0] - 0.149_999_991_043_464_81).abs() < 1e-6,
+        (result.values[0] - 0.149_999_991_032_325).abs() < 1e-6,
         "{result:?}"
     );
 }
@@ -149,19 +149,19 @@ fn the_model_surface_matches_the_fit() {
             experiment: 0.0,
             temperature: 373.15,
             pressure: 2.5e7,
-            relative_volume: 0.998_031_797_063_637_8,
+            relative_volume: 0.997_746_749_422_079_3,
         },
         CceRow {
             experiment: 0.0,
             temperature: 373.15,
             pressure: 2.0e7,
-            relative_volume: 1.102_821_596_061_994_3,
+            relative_volume: 1.117_772_354_405_601_7,
         },
         CceRow {
             experiment: 0.0,
             temperature: 373.15,
             pressure: 1.5e7,
-            relative_volume: 1.300_910_800_403_610_5,
+            relative_volume: 1.344_662_536_647_291,
         },
     ];
     let result = regression(
@@ -181,7 +181,7 @@ fn the_model_surface_matches_the_fit() {
         Some(6),
     )
     .expect("the model surface runs");
-    assert!((result.fitted_parameters[0].value - 1.029_994_778_729_241).abs() < 1e-4);
+    assert!((result.fitted_parameters[0].value - 1.029_999_988_314_205).abs() < 1e-4);
     assert_eq!(
         result.fitted_parameters[0].parameter,
         "tc_multiplier_c7plus"

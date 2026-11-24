@@ -208,26 +208,7 @@ acoustic_efficiency=3.0E-6
 ground_distance_m=60.0
 sound_distance_m=100.0
 target_flux_count=4
-heat_release_w=2.5E9
-radiative_power_w=5.0E8
-flame_length_m=101.25883447888855
-flame_tilt_rad=0.0
-flame_center_horizontal_m=0.0
-flame_center_height_m=90.62941723944428
-flame_tip_horizontal_m=0.0
-flame_tip_height_m=141.25883447888856
-heat_flux_at_ground_distance_w_m2=3368.0189253666404
-target_flux_0_w_m2=1580.0
-sterile_radius_0_m=130.26531729876814
-target_flux_1_w_m2=4730.0
-sterile_radius_1_m=14.082031417585814
-target_flux_2_w_m2=6300.0
-sterile_radius_2_m=0.0
-target_flux_3_w_m2=9460.0
-sterile_radius_3_m=0.0
-sound_power_level_db=158.750612633917
-sound_pressure_level_db=107.750612633917
-equivalent_flame_temperature_k=1228.9672934218445
+refusal=IllegalArgumentException: windSpeedMPerS must be finite and >= 0, got -1.0
 
 api537_transmissivity_clamped
 mass_flow_kg_s=50.0
@@ -241,26 +222,7 @@ acoustic_efficiency=3.0E-6
 ground_distance_m=60.0
 sound_distance_m=100.0
 target_flux_count=4
-heat_release_w=2.5E9
-radiative_power_w=5.0E8
-flame_length_m=101.25883447888855
-flame_tilt_rad=0.0
-flame_center_horizontal_m=0.0
-flame_center_height_m=90.62941723944428
-flame_tip_horizontal_m=0.0
-flame_tip_height_m=141.25883447888856
-heat_flux_at_ground_distance_w_m2=3368.0189253666404
-target_flux_0_w_m2=1580.0
-sterile_radius_0_m=130.26531729876814
-target_flux_1_w_m2=4730.0
-sterile_radius_1_m=14.082031417585814
-target_flux_2_w_m2=6300.0
-sterile_radius_2_m=0.0
-target_flux_3_w_m2=9460.0
-sterile_radius_3_m=0.0
-sound_power_level_db=158.750612633917
-sound_pressure_level_db=107.750612633917
-equivalent_flame_temperature_k=1228.9672934218445
+refusal=IllegalArgumentException: transmissivity must be finite and in [0, 1], got 2.0
 
 api537_efficiency_clamped
 mass_flow_kg_s=50.0
@@ -307,26 +269,7 @@ acoustic_efficiency=3.0E-6
 ground_distance_m=60.0
 sound_distance_m=100.0
 target_flux_count=4
-heat_release_w=2.5E9
-radiative_power_w=5.0E8
-flame_length_m=101.25883447888855
-flame_tilt_rad=0.0
-flame_center_horizontal_m=0.0
-flame_center_height_m=49.62941723944427
-flame_tip_horizontal_m=0.0
-flame_tip_height_m=100.25883447888855
-heat_flux_at_ground_distance_w_m2=6562.463627569575
-target_flux_0_w_m2=1580.0
-sterile_radius_0_m=150.73043854704056
-target_flux_1_w_m2=4730.0
-sterile_radius_1_m=77.12921510348919
-target_flux_2_w_m2=6300.0
-sterile_radius_2_m=62.06926203355115
-target_flux_3_w_m2=9460.0
-sterile_radius_3_m=41.7482740179367
-sound_power_level_db=158.750612633917
-sound_pressure_level_db=107.750612633917
-equivalent_flame_temperature_k=1228.9672934218445
+refusal=IllegalArgumentException: stackHeightM must be finite and >= 0, got -1.0
 
 api537_refuse_mass_flow
 mass_flow_kg_s=-1.0

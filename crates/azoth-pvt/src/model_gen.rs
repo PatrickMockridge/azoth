@@ -1142,8 +1142,8 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
         matrices: &[],
         expected: &[
             ("saturation_pressure", 28955063.438415527),
-            ("saturation_volume", 0.00011262213155362104),
-            ("z_saturation", 1.2136960689968699),
+            ("saturation_volume", 9.813810850855022e-05),
+            ("z_saturation", 1.057605950735409),
             (
                 "saturation_isothermal_compressibility",
                 3.6950566080912616e-09,
@@ -1202,11 +1202,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "total_volume",
-                        value: FieldValue::Number(0.00011219550140053193),
+                        value: FieldValue::Number(9.771147835546112e-05),
                     },
                     RecordField {
                         name: "relative_volume",
-                        value: FieldValue::Number(0.9962118444465242),
+                        value: FieldValue::Number(0.9956527575314748),
                     },
                     RecordField {
                         name: "density",
@@ -1226,7 +1226,7 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(1.2527326027772276),
+                        value: FieldValue::Number(1.091009470731482),
                     },
                     RecordField {
                         name: "oil_density",
@@ -1252,11 +1252,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "total_volume",
-                        value: FieldValue::Number(0.0001192865772340575),
+                        value: FieldValue::Number(0.0001048025541889867),
                     },
                     RecordField {
                         name: "relative_volume",
-                        value: FieldValue::Number(1.059175275662967),
+                        value: FieldValue::Number(1.067908845826755),
                     },
                     RecordField {
                         name: "density",
@@ -1276,7 +1276,7 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9266794787321436),
+                        value: FieldValue::Number(0.9159261004211171),
                     },
                     RecordField {
                         name: "oil_density",
@@ -1288,11 +1288,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "liquid_relative_volume",
-                        value: FieldValue::Number(0.9134080080494633),
+                        value: FieldValue::Number(0.9025692156524329),
                     },
                     RecordField {
                         name: "y_factor",
-                        value: FieldValue::Number(2.6734567057644845),
+                        value: FieldValue::Number(2.329630780947422),
                     },
                 ],
                 &[
@@ -1302,11 +1302,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "total_volume",
-                        value: FieldValue::Number(0.0001327743866689804),
+                        value: FieldValue::Number(0.00011829036362390961),
                     },
                     RecordField {
                         name: "relative_volume",
-                        value: FieldValue::Number(1.1789369002109906),
+                        value: FieldValue::Number(1.2053458684054792),
                     },
                     RecordField {
                         name: "density",
@@ -1326,7 +1326,7 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9005856911213472),
+                        value: FieldValue::Number(0.8936072167178845),
                     },
                     RecordField {
                         name: "oil_density",
@@ -1338,11 +1338,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "liquid_relative_volume",
-                        value: FieldValue::Number(0.8343538408192831),
+                        value: FieldValue::Number(0.8129706168196449),
                     },
                     RecordField {
                         name: "y_factor",
-                        value: FieldValue::Number(2.5022964597733353),
+                        value: FieldValue::Number(2.180482984135995),
                     },
                 ],
                 &[
@@ -1352,11 +1352,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "total_volume",
-                        value: FieldValue::Number(0.00015800799655793925),
+                        value: FieldValue::Number(0.00014352397351286846),
                     },
                     RecordField {
                         name: "relative_volume",
-                        value: FieldValue::Number(1.402992417016271),
+                        value: FieldValue::Number(1.462469327094928),
                     },
                     RecordField {
                         name: "density",
@@ -1376,7 +1376,7 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.8935197565199752),
+                        value: FieldValue::Number(0.8890094672935521),
                     },
                     RecordField {
                         name: "oil_density",
@@ -1388,11 +1388,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "liquid_relative_volume",
-                        value: FieldValue::Number(0.7733706014490473),
+                        value: FieldValue::Number(0.7435700395121332),
                     },
                     RecordField {
                         name: "y_factor",
-                        value: FieldValue::Number(2.308573370807303),
+                        value: FieldValue::Number(2.0116740896203718),
                     },
                 ],
                 &[
@@ -1402,11 +1402,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "total_volume",
-                        value: FieldValue::Number(0.00021414982910459394),
+                        value: FieldValue::Number(0.00019966580605939232),
                     },
                     RecordField {
                         name: "relative_volume",
-                        value: FieldValue::Number(1.9014897529499704),
+                        value: FieldValue::Number(2.034538968539388),
                     },
                     RecordField {
                         name: "density",
@@ -1426,7 +1426,7 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9083504006837736),
+                        value: FieldValue::Number(0.9055935272631982),
                     },
                     RecordField {
                         name: "oil_density",
@@ -1438,11 +1438,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "liquid_relative_volume",
-                        value: FieldValue::Number(0.7229506510064138),
+                        value: FieldValue::Number(0.6861662607160729),
                     },
                     RecordField {
                         name: "y_factor",
-                        value: FieldValue::Number(2.1026377034667716),
+                        value: FieldValue::Number(1.8322232428979641),
                     },
                 ],
                 &[
@@ -1452,11 +1452,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "total_volume",
-                        value: FieldValue::Number(0.00039593509127016133),
+                        value: FieldValue::Number(0.0003814510682250893),
                     },
                     RecordField {
                         name: "relative_volume",
-                        value: FieldValue::Number(3.5156064426080484),
+                        value: FieldValue::Number(3.8868801734838367),
                     },
                     RecordField {
                         name: "density",
@@ -1476,7 +1476,7 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9452192528498883),
+                        value: FieldValue::Number(0.9438911816113298),
                     },
                     RecordField {
                         name: "oil_density",
@@ -1488,11 +1488,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "liquid_relative_volume",
-                        value: FieldValue::Number(0.6799156309929039),
+                        value: FieldValue::Number(0.6372472571144188),
                     },
                     RecordField {
                         name: "y_factor",
-                        value: FieldValue::Number(1.9045159872925255),
+                        value: FieldValue::Number(1.6595814165370757),
                     },
                 ],
                 &[
@@ -1502,11 +1502,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "total_volume",
-                        value: FieldValue::Number(0.0018976001859869905),
+                        value: FieldValue::Number(0.00188311616294192),
                     },
                     RecordField {
                         name: "relative_volume",
-                        value: FieldValue::Number(16.849265413552533),
+                        value: FieldValue::Number(19.18842936307311),
                     },
                     RecordField {
                         name: "density",
@@ -1526,7 +1526,7 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9877796022997254),
+                        value: FieldValue::Number(0.9875065159694266),
                     },
                     RecordField {
                         name: "oil_density",
@@ -1538,11 +1538,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "liquid_relative_volume",
-                        value: FieldValue::Number(0.6491484957223057),
+                        value: FieldValue::Number(0.6025067422153411),
                     },
                     RecordField {
                         name: "y_factor",
-                        value: FieldValue::Number(1.763808145613579),
+                        value: FieldValue::Number(1.5369696239506552),
                     },
                 ],
             ],
@@ -1566,8 +1566,8 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
         matrices: &[],
         expected: &[
             ("saturation_pressure", 28955063.438415527),
-            ("saturation_volume", 0.00011262213155362104),
-            ("z_saturation", 1.2136960689968699),
+            ("saturation_volume", 9.813810850855022e-05),
+            ("z_saturation", 1.057605950735409),
             (
                 "saturation_isothermal_compressibility",
                 3.6950566080912616e-09,
@@ -1626,11 +1626,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "total_volume",
-                        value: FieldValue::Number(0.0001087875804261633),
+                        value: FieldValue::Number(9.430355738109247e-05),
                     },
                     RecordField {
                         name: "relative_volume",
-                        value: FieldValue::Number(0.9659520639987882),
+                        value: FieldValue::Number(0.9609269917085913),
                     },
                     RecordField {
                         name: "density",
@@ -1650,7 +1650,7 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(1.619574725378528),
+                        value: FieldValue::Number(1.4039438826508663),
                     },
                     RecordField {
                         name: "oil_density",
@@ -1676,11 +1676,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "total_volume",
-                        value: FieldValue::Number(0.0001103557651456593),
+                        value: FieldValue::Number(9.587174210058852e-05),
                     },
                     RecordField {
                         name: "relative_volume",
-                        value: FieldValue::Number(0.9798763673116709),
+                        value: FieldValue::Number(0.9769063573528702),
                     },
                     RecordField {
                         name: "density",
@@ -1700,7 +1700,7 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(1.4375559361957506),
+                        value: FieldValue::Number(1.248878948809047),
                     },
                     RecordField {
                         name: "oil_density",
@@ -1726,11 +1726,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "total_volume",
-                        value: FieldValue::Number(0.00011219550140053193),
+                        value: FieldValue::Number(9.771147835546112e-05),
                     },
                     RecordField {
                         name: "relative_volume",
-                        value: FieldValue::Number(0.9962118444465242),
+                        value: FieldValue::Number(0.9956527575314748),
                     },
                     RecordField {
                         name: "density",
@@ -1750,7 +1750,7 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(1.2527326027772276),
+                        value: FieldValue::Number(1.091009470731482),
                     },
                     RecordField {
                         name: "oil_density",
@@ -1776,11 +1776,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "total_volume",
-                        value: FieldValue::Number(0.0001192865772340575),
+                        value: FieldValue::Number(0.0001048025541889867),
                     },
                     RecordField {
                         name: "relative_volume",
-                        value: FieldValue::Number(1.059175275662967),
+                        value: FieldValue::Number(1.067908845826755),
                     },
                     RecordField {
                         name: "density",
@@ -1800,7 +1800,7 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9266794787321436),
+                        value: FieldValue::Number(0.9159261004211171),
                     },
                     RecordField {
                         name: "oil_density",
@@ -1812,11 +1812,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "liquid_relative_volume",
-                        value: FieldValue::Number(0.9134080080494633),
+                        value: FieldValue::Number(0.9025692156524329),
                     },
                     RecordField {
                         name: "y_factor",
-                        value: FieldValue::Number(2.6734567057644845),
+                        value: FieldValue::Number(2.329630780947422),
                     },
                 ],
             ],
@@ -1839,12 +1839,12 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
         )],
         matrices: &[],
         expected: &[
-            ("saturation_pressure", 7495916.938781738),
-            ("saturation_volume", 0.00023938815419697593),
-            ("z_saturation", 0.7848028469853778),
+            ("saturation_pressure", 7495917.892456055),
+            ("saturation_volume", 0.00023833324568305834),
+            ("z_saturation", 0.7813445663912464),
             (
                 "saturation_isothermal_compressibility",
-                1.6400357390266412e-07,
+                1.6400358520953358e-07,
             ),
         ],
         expected_vectors: &[],
@@ -1900,11 +1900,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "total_volume",
-                        value: FieldValue::Number(0.00016800354597410087),
+                        value: FieldValue::Number(0.00016694868786045681),
                     },
                     RecordField {
                         name: "relative_volume",
-                        value: FieldValue::Number(0.7018039239981039),
+                        value: FieldValue::Number(0.7004842626213779),
                     },
                     RecordField {
                         name: "density",
@@ -1924,7 +1924,7 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.7347703050572169),
+                        value: FieldValue::Number(0.7301568404219301),
                     },
                     RecordField {
                         name: "viscosity",
@@ -1942,11 +1942,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "total_volume",
-                        value: FieldValue::Number(0.00038910848701511014),
+                        value: FieldValue::Number(0.000388053628901466),
                     },
                     RecordField {
                         name: "relative_volume",
-                        value: FieldValue::Number(1.6254291626098578),
+                        value: FieldValue::Number(1.628197643133303),
                     },
                     RecordField {
                         name: "density",
@@ -1966,7 +1966,7 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.8531162886809556),
+                        value: FieldValue::Number(0.8508462500453658),
                     },
                     RecordField {
                         name: "oil_density",
@@ -1978,11 +1978,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "liquid_relative_volume",
-                        value: FieldValue::Number(0.001310324416635025),
+                        value: FieldValue::Number(0.0012308551899727002),
                     },
                     RecordField {
                         name: "y_factor",
-                        value: FieldValue::Number(0.7981453657730023),
+                        value: FieldValue::Number(0.7946282256033308),
                     },
                 ],
                 &[
@@ -1992,11 +1992,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "total_volume",
-                        value: FieldValue::Number(0.001074438739779325),
+                        value: FieldValue::Number(0.0010733838816656808),
                     },
                     RecordField {
                         name: "relative_volume",
-                        value: FieldValue::Number(4.488270287991125),
+                        value: FieldValue::Number(4.503710250701214),
                     },
                     RecordField {
                         name: "density",
@@ -2016,7 +2016,7 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9398202591683974),
+                        value: FieldValue::Number(0.93889756624134),
                     },
                     RecordField {
                         name: "viscosity",
@@ -2034,11 +2034,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "total_volume",
-                        value: FieldValue::Number(0.0022177214759797354),
+                        value: FieldValue::Number(0.002216666617866091),
                     },
                     RecordField {
                         name: "relative_volume",
-                        value: FieldValue::Number(9.264123713301728),
+                        value: FieldValue::Number(9.300702516399543),
                     },
                     RecordField {
                         name: "density",
@@ -2058,7 +2058,7 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9699294595179405),
+                        value: FieldValue::Number(0.9694681130544119),
                     },
                     RecordField {
                         name: "viscosity",
@@ -2076,11 +2076,11 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "total_volume",
-                        value: FieldValue::Number(0.004504255705897865),
+                        value: FieldValue::Number(0.004503200847784221),
                     },
                     RecordField {
                         name: "relative_volume",
-                        value: FieldValue::Number(18.81570005419577),
+                        value: FieldValue::Number(18.894555960408027),
                     },
                     RecordField {
                         name: "density",
@@ -2100,7 +2100,7 @@ static CONSTANT_MASS_EXPANSION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9849772276796125),
+                        value: FieldValue::Number(0.9847465544478481),
                     },
                     RecordField {
                         name: "viscosity",
@@ -3852,15 +3852,15 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "gas_standard_volume",
-                        value: FieldValue::Number(0.0038523253568971297),
+                        value: FieldValue::Number(0.0038975533637426916),
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9266794787321436),
+                        value: FieldValue::Number(0.9159261004211171),
                     },
                     RecordField {
                         name: "relative_gas_gravity",
-                        value: FieldValue::Number(0.6193422645294755),
+                        value: FieldValue::Number(0.598698705521173),
                     },
                     RecordField {
                         name: "bo",
@@ -3868,11 +3868,11 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "bg",
-                        value: FieldValue::Number(0.0042120322308083985),
+                        value: FieldValue::Number(0.004163154946833049),
                     },
                     RecordField {
                         name: "rs",
-                        value: FieldValue::Number(225.43729834885008),
+                        value: FieldValue::Number(226.4244293461309),
                     },
                 ],
                 &[
@@ -3906,15 +3906,15 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "gas_standard_volume",
-                        value: FieldValue::Number(0.003700576655317602),
+                        value: FieldValue::Number(0.003729475682747164),
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9005856911213473),
+                        value: FieldValue::Number(0.8936072167178847),
                     },
                     RecordField {
                         name: "relative_gas_gravity",
-                        value: FieldValue::Number(0.5979579992118204),
+                        value: FieldValue::Number(0.5780272081966235),
                     },
                     RecordField {
                         name: "bo",
@@ -3922,11 +3922,11 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "bg",
-                        value: FieldValue::Number(0.0051167853134044955),
+                        value: FieldValue::Number(0.005077136276461497),
                     },
                     RecordField {
                         name: "rs",
-                        value: FieldValue::Number(159.4618425033049),
+                        value: FieldValue::Number(159.93374933804378),
                     },
                 ],
                 &[
@@ -3960,15 +3960,15 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "gas_standard_volume",
-                        value: FieldValue::Number(0.0029089334278921183),
+                        value: FieldValue::Number(0.002923691573426998),
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.8935197565199742),
+                        value: FieldValue::Number(0.8890094672935509),
                     },
                     RecordField {
                         name: "relative_gas_gravity",
-                        value: FieldValue::Number(0.5852562214626231),
+                        value: FieldValue::Number(0.5657487987745905),
                     },
                     RecordField {
                         name: "bo",
@@ -3976,11 +3976,11 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "bg",
-                        value: FieldValue::Number(0.0067688524811825345),
+                        value: FieldValue::Number(0.006734684817626856),
                     },
                     RecordField {
                         name: "rs",
-                        value: FieldValue::Number(107.60013909722981),
+                        value: FieldValue::Number(107.80893143123286),
                     },
                 ],
                 &[
@@ -4014,15 +4014,15 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "gas_standard_volume",
-                        value: FieldValue::Number(0.00238572197150561),
+                        value: FieldValue::Number(0.002392984759162693),
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9083504006837094),
+                        value: FieldValue::Number(0.9055935272631278),
                     },
                     RecordField {
                         name: "relative_gas_gravity",
-                        value: FieldValue::Number(0.578673688093728),
+                        value: FieldValue::Number(0.5593856706099052),
                     },
                     RecordField {
                         name: "bo",
@@ -4030,11 +4030,11 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "bg",
-                        value: FieldValue::Number(0.010321802878871703),
+                        value: FieldValue::Number(0.010290475866754106),
                     },
                     RecordField {
                         name: "rs",
-                        value: FieldValue::Number(65.06647225245896),
+                        value: FieldValue::Number(65.14578051654091),
                     },
                 ],
                 &[
@@ -4068,15 +4068,15 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "gas_standard_volume",
-                        value: FieldValue::Number(0.0012398570733530747),
+                        value: FieldValue::Number(0.0012423708228928344),
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9280167615818097),
+                        value: FieldValue::Number(0.926139059961384),
                     },
                     RecordField {
                         name: "relative_gas_gravity",
-                        value: FieldValue::Number(0.5767134969591805),
+                        value: FieldValue::Number(0.5574908154352479),
                     },
                     RecordField {
                         name: "bo",
@@ -4084,11 +4084,11 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "bg",
-                        value: FieldValue::Number(0.015064680631310834),
+                        value: FieldValue::Number(0.015034199527516551),
                     },
                     RecordField {
                         name: "rs",
-                        value: FieldValue::Number(42.961772575383335),
+                        value: FieldValue::Number(42.99626464263581),
                     },
                 ],
                 &[
@@ -4122,15 +4122,15 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "gas_standard_volume",
-                        value: FieldValue::Number(0.0007580353114958128),
+                        value: FieldValue::Number(0.0007591018803065234),
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9452192528498541),
+                        value: FieldValue::Number(0.9438911816112929),
                     },
                     RecordField {
                         name: "relative_gas_gravity",
-                        value: FieldValue::Number(0.5760212810483708),
+                        value: FieldValue::Number(0.556821672065777),
                     },
                     RecordField {
                         name: "bo",
@@ -4138,11 +4138,11 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "bg",
-                        value: FieldValue::Number(0.021481504930007257),
+                        value: FieldValue::Number(0.02145132254769486),
                     },
                     RecordField {
                         name: "rs",
-                        value: FieldValue::Number(29.447196367080526),
+                        value: FieldValue::Number(29.462673191566388),
                     },
                 ],
                 &[
@@ -4176,15 +4176,15 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "gas_standard_volume",
-                        value: FieldValue::Number(0.0007075408878927927),
+                        value: FieldValue::Number(0.0007081244007379969),
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9652796414031344),
+                        value: FieldValue::Number(0.9644842259798192),
                     },
                     RecordField {
                         name: "relative_gas_gravity",
-                        value: FieldValue::Number(0.5758960023266332),
+                        value: FieldValue::Number(0.5567005690621081),
                     },
                     RecordField {
                         name: "bo",
@@ -4192,11 +4192,11 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "bg",
-                        value: FieldValue::Number(0.03656234486182026),
+                        value: FieldValue::Number(0.03653221654276301),
                     },
                     RecordField {
                         name: "rs",
-                        value: FieldValue::Number(16.832856236871145),
+                        value: FieldValue::Number(16.83792994596724),
                     },
                 ],
                 &[
@@ -4230,15 +4230,15 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "gas_standard_volume",
-                        value: FieldValue::Number(0.00033570910474259644),
+                        value: FieldValue::Number(0.00033589258377122636),
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.976251544846045),
+                        value: FieldValue::Number(0.9757182741106937),
                     },
                     RecordField {
                         name: "relative_gas_gravity",
-                        value: FieldValue::Number(0.5762901582863171),
+                        value: FieldValue::Number(0.557081587242767),
                     },
                     RecordField {
                         name: "bo",
@@ -4246,11 +4246,11 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "bg",
-                        value: FieldValue::Number(0.05546689910914449),
+                        value: FieldValue::Number(0.05543660069452813),
                     },
                     RecordField {
                         name: "rs",
-                        value: FieldValue::Number(10.847691415311253),
+                        value: FieldValue::Number(10.849493982182912),
                     },
                 ],
                 &[
@@ -4284,15 +4284,15 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "gas_standard_volume",
-                        value: FieldValue::Number(0.00032421645095536046),
+                        value: FieldValue::Number(0.0003243061101924208),
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9877796022997254),
+                        value: FieldValue::Number(0.9875065159694266),
                     },
                     RecordField {
                         name: "relative_gas_gravity",
-                        value: FieldValue::Number(0.5779888000465708),
+                        value: FieldValue::Number(0.5587236108559638),
                     },
                     RecordField {
                         name: "bo",
@@ -4300,11 +4300,11 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "bg",
-                        value: FieldValue::Number(0.11224375896167206),
+                        value: FieldValue::Number(0.11221272750874225),
                     },
                     RecordField {
                         name: "rs",
-                        value: FieldValue::Number(5.0674225175794145),
+                        value: FieldValue::Number(5.067626601407292),
                     },
                 ],
                 &[
@@ -4338,15 +4338,15 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "gas_standard_volume",
-                        value: FieldValue::Number(0.0002842327533906884),
+                        value: FieldValue::Number(0.00028424420049385075),
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9985808739978925),
+                        value: FieldValue::Number(0.9985406590761433),
                     },
                     RecordField {
                         name: "relative_gas_gravity",
-                        value: FieldValue::Number(0.6119731249753971),
+                        value: FieldValue::Number(0.5915751898748067),
                     },
                     RecordField {
                         name: "bo",
@@ -4354,7 +4354,7 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "bg",
-                        value: FieldValue::Number(1.1347113330119678),
+                        value: FieldValue::Number(1.1346656358344498),
                     },
                     RecordField {
                         name: "rs",
@@ -4460,7 +4460,7 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "rs",
-                        value: FieldValue::Number(187.26689117464326),
+                        value: FieldValue::Number(187.94396921582864),
                     },
                 ],
                 &[
@@ -4494,15 +4494,15 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "gas_standard_volume",
-                        value: FieldValue::Number(0.0021136142451989256),
+                        value: FieldValue::Number(0.0021301201581246164),
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9005856911213463),
+                        value: FieldValue::Number(0.8936072167178838),
                     },
                     RecordField {
                         name: "relative_gas_gravity",
-                        value: FieldValue::Number(0.5979579992118221),
+                        value: FieldValue::Number(0.5780272081966252),
                     },
                     RecordField {
                         name: "bo",
@@ -4510,11 +4510,11 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "bg",
-                        value: FieldValue::Number(0.005116785313404489),
+                        value: FieldValue::Number(0.005077136276461491),
                     },
                     RecordField {
                         name: "rs",
-                        value: FieldValue::Number(159.22824415361308),
+                        value: FieldValue::Number(159.68635912368242),
                     },
                 ],
                 &[
@@ -4548,15 +4548,15 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "gas_standard_volume",
-                        value: FieldValue::Number(0.0039072067549642394),
+                        value: FieldValue::Number(0.003927029527590017),
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.8935197565199743),
+                        value: FieldValue::Number(0.8890094672935509),
                     },
                     RecordField {
                         name: "relative_gas_gravity",
-                        value: FieldValue::Number(0.5852562214626233),
+                        value: FieldValue::Number(0.5657487987745906),
                     },
                     RecordField {
                         name: "bo",
@@ -4564,11 +4564,11 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "bg",
-                        value: FieldValue::Number(0.006768852481182535),
+                        value: FieldValue::Number(0.006734684817626856),
                     },
                     RecordField {
                         name: "rs",
-                        value: FieldValue::Number(107.39627373163265),
+                        value: FieldValue::Number(107.59142504790623),
                     },
                 ],
                 &[
@@ -4602,15 +4602,15 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "gas_standard_volume",
-                        value: FieldValue::Number(0.0032044421894154317),
+                        value: FieldValue::Number(0.003214197384471307),
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9083504006837094),
+                        value: FieldValue::Number(0.9055935272631279),
                     },
                     RecordField {
                         name: "relative_gas_gravity",
-                        value: FieldValue::Number(0.5786736880937282),
+                        value: FieldValue::Number(0.5593856706099054),
                     },
                     RecordField {
                         name: "bo",
@@ -4618,11 +4618,11 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "bg",
-                        value: FieldValue::Number(0.010321802878871706),
+                        value: FieldValue::Number(0.010290475866754106),
                     },
                     RecordField {
                         name: "rs",
-                        value: FieldValue::Number(64.88699198714842),
+                        value: FieldValue::Number(64.95273346838975),
                     },
                 ],
                 &[
@@ -4656,15 +4656,15 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "gas_standard_volume",
-                        value: FieldValue::Number(0.0026842336407685847),
+                        value: FieldValue::Number(0.002688010403985919),
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9452192528498881),
+                        value: FieldValue::Number(0.9438911816113296),
                     },
                     RecordField {
                         name: "relative_gas_gravity",
-                        value: FieldValue::Number(0.5760212810482258),
+                        value: FieldValue::Number(0.5568216720656369),
                     },
                     RecordField {
                         name: "bo",
@@ -4672,11 +4672,11 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "bg",
-                        value: FieldValue::Number(0.02148150493000803),
+                        value: FieldValue::Number(0.021451322547695693),
                     },
                     RecordField {
                         name: "rs",
-                        value: FieldValue::Number(29.27865912960669),
+                        value: FieldValue::Number(29.294299069862777),
                     },
                 ],
                 &[
@@ -4710,15 +4710,15 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "gas_standard_volume",
-                        value: FieldValue::Number(0.0014016603784297922),
+                        value: FieldValue::Number(0.0014024264442917846),
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.9762515448460417),
+                        value: FieldValue::Number(0.9757182741106901),
                     },
                     RecordField {
                         name: "relative_gas_gravity",
-                        value: FieldValue::Number(0.576290158286353),
+                        value: FieldValue::Number(0.5570815872428017),
                     },
                     RecordField {
                         name: "bo",
@@ -4726,11 +4726,11 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "bg",
-                        value: FieldValue::Number(0.05546689910914429),
+                        value: FieldValue::Number(0.05543660069452794),
                     },
                     RecordField {
                         name: "rs",
-                        value: FieldValue::Number(10.68460362329659),
+                        value: FieldValue::Number(10.690081136634873),
                     },
                 ],
                 &[
@@ -4764,15 +4764,15 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "gas_standard_volume",
-                        value: FieldValue::Number(0.0006480792867537922),
+                        value: FieldValue::Number(0.0006481729391936607),
                     },
                     RecordField {
                         name: "z_gas",
-                        value: FieldValue::Number(0.993735206614313),
+                        value: FieldValue::Number(0.9935916249850051),
                     },
                     RecordField {
                         name: "relative_gas_gravity",
-                        value: FieldValue::Number(0.581695480691377),
+                        value: FieldValue::Number(0.5623067425602271),
                     },
                     RecordField {
                         name: "bo",
@@ -4780,11 +4780,11 @@ static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "bg",
-                        value: FieldValue::Number(0.22584101705128992),
+                        value: FieldValue::Number(0.2258083860033237),
                     },
                     RecordField {
                         name: "rs",
-                        value: FieldValue::Number(2.0873553769779356),
+                        value: FieldValue::Number(2.091590521842354),
                     },
                 ],
             ],
@@ -10172,7 +10172,7 @@ static REGRESSION_CASES: &[TestCase] = &[
                         },
                         RecordField {
                             name: "relative_volume",
-                            value: FieldValue::Number(0.9980317970636378),
+                            value: FieldValue::Number(0.9977467494220793),
                         },
                     ],
                     &[
@@ -10190,7 +10190,7 @@ static REGRESSION_CASES: &[TestCase] = &[
                         },
                         RecordField {
                             name: "relative_volume",
-                            value: FieldValue::Number(1.1028215960619943),
+                            value: FieldValue::Number(1.1177723544056017),
                         },
                     ],
                     &[
@@ -10208,7 +10208,7 @@ static REGRESSION_CASES: &[TestCase] = &[
                         },
                         RecordField {
                             name: "relative_volume",
-                            value: FieldValue::Number(1.3009108004036105),
+                            value: FieldValue::Number(1.344662536647291),
                         },
                     ],
                 ],
@@ -10223,7 +10223,7 @@ static REGRESSION_CASES: &[TestCase] = &[
                 },
                 RecordField {
                     name: "value",
-                    value: FieldValue::Number(1.029994778729241),
+                    value: FieldValue::Number(1.029999988314205),
                 },
                 RecordField {
                     name: "lower",
@@ -10351,7 +10351,7 @@ static REGRESSION_CASES: &[TestCase] = &[
                         },
                         RecordField {
                             name: "rs",
-                            value: FieldValue::Number(124.11323743589683),
+                            value: FieldValue::Number(124.46822441360351),
                         },
                         RecordField {
                             name: "bo",
@@ -10377,7 +10377,7 @@ static REGRESSION_CASES: &[TestCase] = &[
                         },
                         RecordField {
                             name: "rs",
-                            value: FieldValue::Number(117.87406453877271),
+                            value: FieldValue::Number(118.19000000135856),
                         },
                         RecordField {
                             name: "bo",
@@ -10403,7 +10403,7 @@ static REGRESSION_CASES: &[TestCase] = &[
                         },
                         RecordField {
                             name: "rs",
-                            value: FieldValue::Number(54.85724347826862),
+                            value: FieldValue::Number(54.98240543625079),
                         },
                         RecordField {
                             name: "bo",
@@ -10426,7 +10426,7 @@ static REGRESSION_CASES: &[TestCase] = &[
                 },
                 RecordField {
                     name: "value",
-                    value: FieldValue::Number(0.14999999104346481),
+                    value: FieldValue::Number(0.149999991032325),
                 },
                 RecordField {
                     name: "lower",

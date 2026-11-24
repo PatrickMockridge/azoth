@@ -2,8 +2,8 @@
 // against. LGT's capture gave the linear path; this one adds the inner solve, which is the
 // only new machinery between the two ports.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar GtSimpleProfileProbe.java
-//     java -cp .:neqsim-118d9af.jar GtSimpleProfileProbe > captures/gt_simple_profile_probe.tsv
+//     javac -proc:none -cp neqsim-b40bb11.jar GtSimpleProfileProbe.java
+//     java -cp .:neqsim-b40bb11.jar GtSimpleProfileProbe > captures/gt_simple_profile_probe.tsv
 //
 // The class's stored densities are mol/m³, its pressures Pa, and its `getDmudn2` holds the
 // last step's matrix. The interaction rule in this class assigns 0.0 in both arms of its

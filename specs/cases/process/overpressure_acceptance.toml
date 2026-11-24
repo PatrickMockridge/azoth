@@ -11,14 +11,14 @@ cause = "fire"
 multiple_devices = false
 [cases.expected]
 accumulation_factor = 1.21
-allowable_pressure = 1210000.0
-margin = 159999.99999999997
+allowable_pressure = 1188721.75
+margin = 138721.75000000003
 accepted = true
 
 [[cases]]
 id = "oa_single_at_limit"
 tolerance = 1.0e-12
-source = "A single non-fire device at exactly its 1.10 allowable: accepted on the equality. From (`oa_single_at_limit`)."
+source = "A single non-fire device at 11.0 bara against the gauge-MAWP allowable 10.8987 bara: rejected. From (`oa_single_at_limit`)."
 [cases.inputs]
 peak_pressure = 1100000.0
 mawp = 1000000.0
@@ -26,9 +26,9 @@ cause = "blocked_outlet"
 multiple_devices = false
 [cases.expected]
 accumulation_factor = 1.1
-allowable_pressure = 1100000.0
-margin = 0.0
-accepted = true
+allowable_pressure = 1089867.5
+margin = -10132.5
+accepted = false
 
 [[cases]]
 id = "oa_multiple"
@@ -41,9 +41,9 @@ cause = "blocked_outlet"
 multiple_devices = true
 [cases.expected]
 accumulation_factor = 1.16
-allowable_pressure = 1160000.0
-margin = 9999.999999999964
-accepted = true
+allowable_pressure = 1143788.0
+margin = -6212.000000000017
+accepted = false
 
 [[cases]]
 id = "oa_fire_multiple_ignored"
@@ -56,14 +56,14 @@ cause = "fire"
 multiple_devices = true
 [cases.expected]
 accumulation_factor = 1.21
-allowable_pressure = 1210000.0
-margin = 9999.999999999964
-accepted = true
+allowable_pressure = 1188721.75
+margin = -11278.249999999978
+accepted = false
 
 [[cases]]
 id = "oa_exceeded"
 tolerance = 1.0e-12
-source = "A 12.2 bara peak on a fire against the 12.1 allowable: rejected, with a negative margin. From (`oa_exceeded`)."
+source = "A 12.2 bara peak on a fire against the 11.887 bara gauge-MAWP allowable: rejected, with a negative margin. From (`oa_exceeded`)."
 [cases.inputs]
 peak_pressure = 1220000.0
 mawp = 1000000.0
@@ -71,8 +71,8 @@ cause = "fire"
 multiple_devices = false
 [cases.expected]
 accumulation_factor = 1.21
-allowable_pressure = 1210000.0
-margin = -9999.999999999964
+allowable_pressure = 1188721.75
+margin = -31278.24999999991
 accepted = false
 
 [[cases]]
@@ -86,6 +86,6 @@ cause = "blocked_outlet"
 multiple_devices = false
 [cases.expected]
 accumulation_factor = 1.1
-allowable_pressure = 1100000.0
-margin = -9999.999999999964
+allowable_pressure = 1089867.5
+margin = -20132.499999999887
 accepted = false

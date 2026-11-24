@@ -123,8 +123,9 @@ pub fn constant_mass_expansion_of(
     }
 
     let (saturation_pressure, saturation, warnings) = saturation_state(fluid, t)?;
-    let saturation_volume = saturation.volume_uncorrected();
-    let z_saturation = saturation.z_mix();
+    let saturation_volume = saturation.volume();
+    let z_saturation = saturation_pressure * saturation_volume
+        / (saturation.total_moles * NEQSIM_GAS_CONSTANT * t);
     // **The saturation state's phase 0 is the phase carrying the material.** NeqSim's flash
     // at the class's midpoint is single-phase there, and its phase 0 is the liquid; our flash
     // can leave a trace incipient gas at the same pressure, whose compressibility is not the
@@ -153,7 +154,7 @@ pub fn constant_mass_expansion_of(
         let phase = flash.phases.first().ok_or_else(|| {
             AzothError::invalid_input("flash", "the point's flash answered no phase")
         })?;
-        let total_volume = flash.volume_uncorrected();
+        let total_volume = flash.volume();
         let relative_volume = total_volume / saturation_volume;
         let gas_volume = phase.volume(flash.total_moles);
         let gas_standard_volume =
@@ -169,7 +170,7 @@ pub fn constant_mass_expansion_of(
                         "a two-phase CCE point has no oil phase, so its liquid volume is absent",
                     )
                 })?;
-                let liquid = oil.volume_uncorrected(flash.total_moles) / saturation_volume;
+                let liquid = oil.volume(flash.total_moles) / saturation_volume;
                 let y = ((saturation_pressure - pressure) / pressure)
                     / ((total_volume - saturation_volume) / saturation_volume);
                 (None, None, Some(liquid), Some(y))
@@ -217,7 +218,7 @@ pub fn constant_mass_expansion_of(
             gas_volume,
             gas_standard_volume,
             bg: gas_volume / gas_standard_volume,
-            z_gas: phase.z_factor,
+            z_gas: *pressure * phase.molar_volume / (NEQSIM_GAS_CONSTANT * t),
             oil_density,
             oil_viscosity,
             liquid_relative_volume,

@@ -42,14 +42,14 @@ NeqSim is Apache-2.0; the attribution is in [`NOTICE`](../NOTICE).
 ## `manifest.toml` is the record of what was taken
 
 Every resource file NeqSim ships is declared once, and every column of every one of
-them whose columns are enumerated — 35 files, 1,567 columns — is listed with what was
+them whose columns are enumerated — 38 files, 1,780 columns — is listed with what was
 done with it and a reason; the other five are vendored whole, three of them because
 they are not tabular at all. `tools/check_manifest.py` prints the tally:
 
 ```
-check_manifest: OK (40 vendored file(s), 1567 column(s), 1520 carried of which 1212 read, 0 not-vendored entr(ies))
+check_manifest: OK (43 vendored file(s), 1780 column(s), 1733 carried of which 1425 read, 0 not-vendored entr(ies))
   308  carried, nothing reads it yet
-  1095  carried with no unit NeqSim states (neqsim-internal)
+  1308  carried with no unit NeqSim states (neqsim-internal)
   279  not-ported
    20  not-a-value
    10  empty-upstream
@@ -132,12 +132,12 @@ generated into the wrong tree.
 ## What none of this can tell you
 
 **Whether the vendored slice is current.** `manifest.toml` records the NeqSim commit it
-was last checked against (`118d9aff9206504c136a08e1348b86cdd6cff669`, master), and
+was last checked against (`b40bb1134508faa24b07aed9a23c4d52865e5c2a`, master), and
 nothing here can tell you a newer NeqSim exists. The `not_vendored` list was built by
 expanding NeqSim's resource directory by hand, at that commit.
 
 **The `version` field does not identify the revision.** It names the `revision` property in
-NeqSim's own `pom.xml`, which reads `3.28.0` both at the `v3.28.0` tag and on master — 84
+NeqSim's own `pom.xml`, which reads `3.29.0` both at the `v3.29.0` tag and on master — 210
 commits apart — so the same version names two different trees. **The `commit` is the pin**,
 and a document wanting a readable name for it says `NeqSim master`, because that is the only
 name that resolves to the bytes vendored here.
@@ -171,7 +171,7 @@ files stayed on the previous revision through the last refresh.
 where it is. That is how a post-pin data fix is reflected without dragging five hundred
 commits of code with it - and a capture taken against such a file states the ingredients it
 actually used, in `validation/neqsim/captures/README.md`. **A full sweep removes those
-overrides and re-vendors every file at the pin**, which is what the 3.28.0 refresh did.
+overrides and re-vendors every file at the pin**, which is what the 3.29.0 refresh did.
 
 **The models with no probe are the residual gap.** `crates/*/tests/` holds reference-equation
 tests - ammonia, Vega, Span-Wagner, Leachman, argon and para-hydrogen solid - whose NeqSim

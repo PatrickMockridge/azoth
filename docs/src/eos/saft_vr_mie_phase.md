@@ -75,4 +75,4 @@ declared checks *that call* could not evaluate.
 ## References
 
 - Lafitte, T.; Apostolakou, A.; Avendano, C.; Galindo, A.; Adjiman, C. S.; Muller, E. A.; Jackson, G. (2013). "Accurate statistical associating fluid theory for chain molecules formed from Mie segments." The Journal of Chemical Physics 139(15), 154504. DOI 10.1063/1.4819786
-- NeqSim master, `PhaseSAFTVRMie.java` / `ComponentSAFTVRMie.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.
+- NeqSim master, `PhaseSAFTVRMie.java` / `ComponentSAFTVRMie.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.

@@ -63,19 +63,19 @@ fn the_peak_and_average_flows_reproduce_the_capture() {
     close(peak.overpressure_fraction, 0.21, "the overpressure");
     close(
         peak.required_area.value,
-        0.026_034_670_628_401_386,
+        0.026_500_694_094_615_227,
         "the peak area",
     );
     close(
         peak.required_area_in2,
-        40.353_820_181_662_51,
+        41.076_157_998_969_6,
         "the peak area in in2",
     );
     assert_eq!(peak.recommended_orifice, "T");
     close(peak.selected_area_in2, 26.0, "the exhausted ladder");
     close(
         peak.back_pressure_fraction,
-        0.083_739_669_421_487_6,
+        0.085_238_618_709_550_82,
         "the ratio",
     );
     close(peak.discharge_coefficient, 0.975, "Kd");
@@ -89,12 +89,12 @@ fn the_peak_and_average_flows_reproduce_the_capture() {
     );
     close(
         average.required_area.value,
-        0.002_364_274_017_247_606_5,
+        0.002_406_594_782_058_630_3,
         "the average area",
     );
     close(
         average.required_area_in2,
-        3.664_632_055_997_902_4,
+        3.730_229_372_649_622_3,
         "the average area in in2",
     );
     assert_eq!(average.recommended_orifice, "N");

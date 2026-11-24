@@ -1,7 +1,7 @@
 // What a Furst electrolyte phase actually uses for a TEG pair, against what its own fit says.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar FurstTegBranch.java
-//     java -cp .:neqsim-118d9af.jar FurstTegBranch
+//     javac -proc:none -cp neqsim-b40bb11.jar FurstTegBranch.java
+//     java -cp .:neqsim-b40bb11.jar FurstTegBranch
 //
 // `EosMixingRuleHandler.ElectrolyteMixRule.calcWij` builds the short-range `Wij` table from
 // a chain of `if/else if` tests on the *other* component's name. `TEG` is tested twice:

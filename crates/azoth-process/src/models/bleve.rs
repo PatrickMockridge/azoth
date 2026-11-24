@@ -99,14 +99,21 @@ fn distance_to_flux(
 ) -> Option<f64> {
     let mut lo = fireball_diameter(mass) / 2.0 + NEAR_CLEARANCE;
     let mut hi = SEARCH_MAX;
-    if incident_heat_flux(
+    let near = incident_heat_flux(
         mass,
         heat_of_combustion,
         radiative_fraction,
         relative_humidity,
         lo,
-    ) < target
-    {
+    );
+    let far = incident_heat_flux(
+        mass,
+        heat_of_combustion,
+        radiative_fraction,
+        relative_humidity,
+        hi,
+    );
+    if near < target || far > target {
         return None;
     }
     for _ in 0..BISECTION_STEPS {

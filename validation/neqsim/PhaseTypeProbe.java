@@ -16,8 +16,8 @@
 // two-phase one whose two phases differ.
 //
 // A capture, not a test: run it against the pinned jar and commit what it prints.
-//   javac -proc:none -cp neqsim-118d9af.jar PhaseTypeProbe.java
-//   java -cp .:neqsim-118d9af.jar PhaseTypeProbe > captures/phase_type_probe.tsv
+//   javac -proc:none -cp neqsim-b40bb11.jar PhaseTypeProbe.java
+//   java -cp .:neqsim-b40bb11.jar PhaseTypeProbe > captures/phase_type_probe.tsv
 
 import neqsim.thermo.phase.PhaseInterface;
 import neqsim.thermo.system.SystemInterface;

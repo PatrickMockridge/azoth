@@ -192,7 +192,7 @@ fn a_composition_that_does_not_sum_to_one_is_refused() {
 /// The differential oracle, from `validation/neqsim/UmrCpaProbe.java`.
 ///
 /// NeqSim's `SystemUMRCPAEoS` at 298.15 K and 70 bara, methane/water 0.98/0.02, on the
-/// `_umrmc` tables: the GE phase the UMR mixing rule reads. `TPflashUMRCPADehydration`
+/// `_umrcpa` tables: the GE phase the UMR mixing rule reads. `TPflashUMRCPADehydration`
 /// `LifecycleTest` pins its water-in-gas envelope at that state, so this is the one
 /// state the model's own component can be driven to.
 ///
@@ -203,7 +203,7 @@ fn a_composition_that_does_not_sum_to_one_is_refused() {
 /// as rounding, and it is not rounding.
 #[test]
 fn neqsims_umr_cpa_is_a_differential_oracle() {
-    let params = unifac_umrpru_parameters(&["methane", "water"], UmrpruSet::Umrmc).unwrap();
+    let params = unifac_umrpru_parameters(&["methane", "water"], UmrpruSet::Umrcpa).unwrap();
     let result = unifac_umrpru_activity_coefficients(&params, 298.15, &[0.98, 0.02]).unwrap();
 
     // The probe's `lnGamma[0]`/`lnGamma[1]`.

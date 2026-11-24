@@ -1,7 +1,7 @@
 // The electrolyte-CPA brine: the phase's own layers, and the four operations that gate on it.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar BrineProbe.java
-//     java -cp .:neqsim-118d9af.jar BrineProbe
+//     javac -proc:none -cp neqsim-b40bb11.jar BrineProbe.java
+//     java -cp .:neqsim-b40bb11.jar BrineProbe
 //
 // `SystemElectrolyteCPAstatoil` is `SystemFurstElectrolyteEos` with `PhaseElectrolyteCPAstatoil`
 // swapped into the phase array, and `PhaseElectrolyteCPA` is `PhaseModifiedFurstElectrolyteEos`

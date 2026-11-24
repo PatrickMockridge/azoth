@@ -79,8 +79,8 @@ pub const SATURATION_TEMPERATURE_STEP_K: f64 = 10.0;
 /// `SaturationTemperature`'s bisection tolerance, in K.
 pub const SATURATION_TEMPERATURE_TOLERANCE_K: f64 = 1.0e-5;
 
-/// `DifferentialLiberation`'s air molar mass divisor for the relative gas gravity, kg/mol.
-pub const NEQSIM_AIR_MOLAR_MASS_KG_PER_MOL: f64 = 0.028;
+/// Air's molar mass, kg/mol, the divisor for the relative gas gravity.
+pub const NEQSIM_AIR_MOLAR_MASS_KG_PER_MOL: f64 = 0.028_965_46;
 
 /// The `1e5` `ConstantMassExpansion` puts in its `Bg` and `DifferentialLiberation` does not.
 pub const CCE_BG_INTERNAL_FACTOR: f64 = 1.0e5;
@@ -355,7 +355,7 @@ mod tests {
 
     #[test]
     fn the_laboratory_literals_are_the_class_ones() {
-        assert_eq!(NEQSIM_AIR_MOLAR_MASS_KG_PER_MOL, 0.028);
+        assert_eq!(NEQSIM_AIR_MOLAR_MASS_KG_PER_MOL, 0.028_965_46);
         assert_eq!(CCE_BG_INTERNAL_FACTOR, 1.0e5);
         assert_eq!(CVD_CELL_VOLUME_RELATIVE_TOLERANCE, 1.0e-8);
         assert_eq!(CVD_MAX_CELL_VOLUME_ITERATIONS, 100);

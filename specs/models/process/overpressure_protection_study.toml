@@ -2,12 +2,12 @@ id = "process.overpressure_protection_study"
 name = "Overpressure protection study"
 kind = "procedure"
 assumptions = [
-    "**the governing case is the first credible scenario with the largest relief rate**; the comparison is strict, so a tie goes to the earlier row, and a zero-rate credible row governs.",
-    "**the fire basis is 21% overpressure and every other cause 10%**, the class's two constants; the peak is `set_pressure (1 + fraction)`.",
+    "**the governing case is the first credible scenario with the largest positive relief rate**; the comparison is strict, so a tie goes to the earlier row. A zero-rate or unfit row leaves the study unsized with the class's two messages.",
+    "**the fire basis is 21% overpressure and every other cause 10%**, the class's two constants; the peak is `set_pressure + (set_pressure - atm) fraction`.",
     "**gas, liquid and two-phase sizing reuse the ported API 520 arithmetic** (`process.psv_sizing`'s area methods and orifice ladder), with `false, false` for the balanced-bellows and rupture-disk flags; the selected capacity is `rate selected_area / required_area`, not the class's capacity helper.",
     "**a liquid case with no stated density falls back to 700 kg/m3** with the class's message, and its viscosity to 5e-4; the four relief loads publish no density, so a caller composing a liquid study states one.",
     "**a two-phase case missing any omega input skips the sizing** with the class's message and still runs the accumulated-pressure acceptance.",
-    "**a gas governing case with no molar mass is refused** rather than passed as a NaN into the sizing; the two-phase omega method does not read one.",
+    "**a gas case with no molar mass leaves the study unsized** with the class's missing-basis message rather than passing a NaN into the sizing; the two-phase omega method does not read one.",
     "**the accumulated-pressure check is the ported `process.overpressure_acceptance`**, and its failure message carries the basis prose the class formats; the item name is read only by logging and sits outside this id.",
 ]
 references = [
@@ -60,7 +60,7 @@ values = ["vapour", "liquid", "two_phase"]
 description = "the relieving phase, which selects the sizing branch.\n"
 [inputs.scenarios.fields.relief_rate]
 unit = "kg/s"
-description = "the required relief rate, at least zero; a zero-rate credible row governs and is not sized.\n"
+description = "the required relief rate, at least zero; a zero-rate row is not a credible positive demand.\n"
 [inputs.scenarios.fields.relief_temperature]
 unit = "K"
 optional = true
@@ -168,7 +168,7 @@ description = "the peak pressure the acceptance compared; absent when no credibl
 [outputs.acceptance_allowable_pressure]
 unit = "Pa"
 optional = true
-description = "`mawp accumulation_factor`.\n"
+description = "`mawp + (mawp - atm) (accumulation_factor - 1)`.\n"
 [outputs.acceptance_accumulation_factor]
 unit = "dimensionless"
 optional = true

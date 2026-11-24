@@ -71,4 +71,4 @@ declared checks *that call* could not evaluate.
 
 - Wagner, W.; Kretzschmar, H.-J. (2008). "International Steam Tables: Properties of Water and Steam Based on the Industrial Formulation IAPWS-IF97." Springer, 2nd edition.
 - IAPWS (2007). "Revised Release on the IAPWS Industrial Formulation 1997 for the Thermodynamic Properties of Water and Steam." International Association for the Properties of Water and Steam, Lucerne.
-- NeqSim master, `thermo/util/steam/Iapws_if97.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.
+- NeqSim master, `thermo/util/steam/Iapws_if97.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.
