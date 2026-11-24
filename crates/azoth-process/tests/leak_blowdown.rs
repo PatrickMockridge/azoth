@@ -78,8 +78,12 @@ fn the_substeps_land_on_the_captured_second_state() {
     );
     // The captured one-second state: the VU flash at `U - removed h`, 1% substeps.
     let second = &result.points[1];
-    assert!((second.pressure.value - 4_918_856.095_330_249_5).abs() / 4_918_856.095_330_249_5 <= 1.0e-6);
-    assert!((second.temperature.value - 298.759_028_771_403_9).abs() / 298.759_028_771_403_9 <= 1.0e-6);
+    assert!(
+        (second.pressure.value - 4_918_856.095_330_249_5).abs() / 4_918_856.095_330_249_5 <= 1.0e-6
+    );
+    assert!(
+        (second.temperature.value - 298.759_028_771_403_9).abs() / 298.759_028_771_403_9 <= 1.0e-6
+    );
     assert!(
         (second.mass_flow_rate.value - 0.424_401_558_884_396_35).abs() / 0.424_401_558_884_396_35
             <= 1.0e-6
@@ -106,7 +110,9 @@ fn a_long_horizon_lands_on_the_captured_end_state() {
     assert!((total - 17.708_274_360_596_057).abs() / 17.708_274_360_596_057 <= 1.0e-6);
     let last = &result.points[60];
     assert!((last.pressure.value - 1_997_215.737_462_847).abs() / 1_997_215.737_462_847 <= 1.0e-6);
-    assert!((last.temperature.value - 236.326_329_588_963_4).abs() / 236.326_329_588_963_4 <= 1.0e-6);
+    assert!(
+        (last.temperature.value - 236.326_329_588_963_4).abs() / 236.326_329_588_963_4 <= 1.0e-6
+    );
     assert!(last.mass_flow_rate.value > 0.0);
 }
 
@@ -128,7 +134,10 @@ fn a_hundred_second_sample_stops_where_the_capture_does() {
     assert_eq!(result.recorded_points, 2);
     let total = result.total_mass_released.expect("a total").value;
     assert!((total - 23.850_934_475_836_42).abs() / 23.850_934_475_836_42 <= 1.0e-6);
-    assert!((result.points[1].temperature.value - 203.727_033_879_957_9).abs() / 203.727_033_879_957_9 <= 1.0e-6);
+    assert!(
+        (result.points[1].temperature.value - 203.727_033_879_957_9).abs() / 203.727_033_879_957_9
+            <= 1.0e-6
+    );
 }
 
 #[test]

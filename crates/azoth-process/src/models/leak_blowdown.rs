@@ -646,10 +646,7 @@ fn record_point(
         let raw = rate / (state.density * area * coefficient);
         let sound = (state.gamma * R * state.temperature / molar_mass_kmol).sqrt();
         let velocity = raw.min(VELOCITY_CAP * sound);
-        (
-            velocity,
-            rate * velocity + (state.pressure - back) * area,
-        )
+        (velocity, rate * velocity + (state.pressure - back) * area)
     };
     LeakBlowdownPoint {
         time: seconds(time),

@@ -399,8 +399,7 @@ pub fn non_equilibrium_blowdown(
     // that volume fills the vessel.
     let eos_molar_volume = beta * flash.z_vapour * MOLAR_GAS_CONSTANT * initial_t.value
         / initial_p.value
-        + (1.0 - beta) * flash.z_liquid * MOLAR_GAS_CONSTANT * initial_t.value
-            / initial_p.value;
+        + (1.0 - beta) * flash.z_liquid * MOLAR_GAS_CONSTANT * initial_t.value / initial_p.value;
     if !eos_molar_volume.is_finite() || eos_molar_volume <= 0.0 {
         return Err(AzothError::invalid_input(
             "initial_p",
@@ -472,8 +471,7 @@ pub fn non_equilibrium_blowdown(
         // The class reads the compressibility from the physical-properties density at the
         // pressure the step started from, and uses it in both the rate and the flow work.
         let z_gas = if gas.density > 0.0 && gas.molar_mass > 0.0 {
-            let value =
-                pressure * gas.molar_mass / (gas.density * GAS_CONSTANT * gas_temperature);
+            let value = pressure * gas.molar_mass / (gas.density * GAS_CONSTANT * gas_temperature);
             if value.is_finite() && value > 0.0 {
                 value
             } else {
@@ -664,12 +662,12 @@ pub fn non_equilibrium_blowdown(
                         let split = solution.vapour_fraction.unwrap_or(0.0);
                         let moved_moles = split * liquid_moles;
                         let vapour_mass = moved_moles * molar_mass_of(&mixture, &solution.y)?;
-                        let gas_mass_before = gas_moles * molar_mass_of(&mixture, &gas_composition)?;
+                        let gas_mass_before =
+                            gas_moles * molar_mass_of(&mixture, &gas_composition)?;
                         let gas_total = gas_moles + moved_moles;
                         if gas_total > 0.0 {
                             for (index, value) in gas_composition.iter_mut().enumerate() {
-                                *value = (gas_moles * *value
-                                    + moved_moles * solution.y[index])
+                                *value = (gas_moles * *value + moved_moles * solution.y[index])
                                     / gas_total;
                             }
                         }
