@@ -91,7 +91,7 @@ not an equation, and both implementations read it from here.
 ## How far this is checked
 **`partially_verified`** — exercised against expectations pinned in its own spec, with no independent oracle recorded for it - **the normal case rather than a defect**.
 
-- Tests: 2 declared, every one run
+- Tests: 1 declared, every one run
 - External check: no external validation case names it
 
 The same account travels with every result this returns: `result.provenance`
