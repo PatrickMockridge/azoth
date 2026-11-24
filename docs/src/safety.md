@@ -87,7 +87,8 @@ caught, and each is filed upstream rather than written up here — the issue is 
 | A no-op that reports success is the hardest of these to see | `ComponentEos.setAttractiveTerm` logs an error, then logs success, and keeps the previous alpha function | [#3995](https://github.com/equinor/neqsim/issues/3995) |
 | A property read before the object that computes it is initialised is not a measurement | `DistillationColumnMechanicalDesign.calcDesign` takes tray 0's outlet densities with `getFluid().getDensity()` without initialising the fluid, so an absorber's weir loading is `Infinity` and its tray pressure drop silently drops its liquid head | [#4140](https://github.com/equinor/neqsim/issues/4140) |
 
-None of these is a claim about the people who wrote them. The left column is the point:
+**Every row but `#3994` is closed at the pin**, so the fixes are carried by the jar the
+captures come from; `#3994` remains open. None of these is a claim about the people who wrote them. The left column is the point:
 each defect is a *shape*, and the shape is what the checks are for. A table like this is
 evidence that a reader can re-derive — every row names a file, a function and an
 observation, and the issue carries the measurement.

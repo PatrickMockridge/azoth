@@ -443,17 +443,17 @@ The specialist physics.
   flash it drives is `eos.tp_multiflash_wax`'s. **It is constructed, not dead** —
   `neqsim/mcp/runners/FlowAssuranceRunner.java:192` builds it, fully qualified, which is why a
   bare `new WaxCurveCalculator(` grep misses it. `process/chemistry/wax/` is carried with the
-  process tier. **Filed upstream as NeqSim `#3914`**, under this finding's own title; the
-  solid-vapour-pressure route below is `#3913`.
+  process tier. **Filed upstream as NeqSim `#3914`, closed and carried by the pin**: the three
+  models' defects are fixed, so the family is an ordinary not-ported slice rather than a
+  blocked one. The solid-vapour-pressure route is `#3913`, also closed.
   **`WATcalc` belongs here and not in Tier 2's water bullet, where it was filed.** Its own
   javadoc says *"Wax appearance temperature from a bracket of independent multiphase TP
   flashes"*, its threshold is a **wax** mass fraction of `1e-8` and its predicate is `hasWax`.
-  **Not ported, and the blocker is measured rather than assumed**: it answers only on a fluid
-  whose wax came from `addTBPWax()` on a *characterized plus fraction*, which is
-  `WaxCharacterise` above. On every fluid of the databank's named wax formers it throws
-  `Invalid wax mass fraction`, because `getPhaseFraction("wax", "mass")` returns
-  `-1.6e-52` for a wax phase whose mole fraction is `0.0707` - **filed upstream as NeqSim
-  `#4309`**, with the reproduction in `captures/water_dew_point_probe.tsv`.
+  **Not ported**: it answers only on a fluid whose wax came from `addTBPWax()` on a
+  *characterized plus fraction*, which is `WaxCharacterise` above. The named-wax-former
+  failure it once showed (`getPhaseFraction("wax", "mass")` returning `-1.6e-52`) is fixed at
+  the pin by NeqSim `#4309`, and the reproduction stays in
+  `captures/water_dew_point_probe.tsv`.
 - **Asphaltene, carried on a defect upstream rather than for want of a port.**
   `AsphalteneCharacterization`, `PedersenAsphalteneCharacterization`,
   `AsphalteneOnsetPressureFlash`, `AsphalteneOnsetTemperatureFlash`, the
@@ -470,9 +470,9 @@ The specialist physics.
   check, and one phase at `x = z` with it. So the sweep the onset is found along is not a
   sequence of states, and only its endpoint — reached where a solid forms and `SolidFlash`
   re-derives the phases — is a state at all. The coefficient the family's solid is built on is
-  ported (`eos.solid_fugacity`, `eos.tp_solid_flash`); this family is revisited when upstream
-  closes the defect, which is **filed upstream as NeqSim `#3913`**; the wax family's three
-  models above are `#3914`.
+  ported (`eos.solid_fugacity`, `eos.tp_solid_flash`); the solid-check defect is **filed
+  upstream as NeqSim `#3913` and closed at the pin**, so this family is an ordinary not-ported
+  slice, not a blocked one. The wax family's three models above are `#3914`.
 - **Hydrogen and cryogenic.** Ported, each with the id that carries it:
   `thermo/util/leachman/` as `eos.hydrogen_phase`, the Leachman equation of state for the two
   spin isomers with both the dilute and the dense root selectable;
