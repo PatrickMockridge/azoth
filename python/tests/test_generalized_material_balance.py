@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import pytest
 
 from azoth.core.errors import InvalidInputError
 from azoth.core.units import quantity
 from azoth.pvt import generalized_material_balance
 
-INITIAL = {
+INITIAL: dict[str, Any] = {
     "initial_pressure": quantity(3.0e7, "Pa"),
     "initial_rs": 100.0,
     "initial_bo": 1.6,
@@ -18,7 +20,7 @@ INITIAL = {
 }
 
 
-def column(name: str, value: float):
+def column(name: str, value: float) -> Any:
     if name == "pressure":
         return quantity(value, "Pa")
     if name in ("net_oil_produced", "net_gas_produced", "net_water_produced", "water_influx"):
@@ -68,12 +70,8 @@ def test_the_oil_and_gas_fit_is_the_capture() -> None:
     result = generalized_material_balance(
         "oil_and_gas", observations=history(1.0e7, 2.0e9, False), **INITIAL
     )
-    assert result.free_oil.to("m**3").magnitude == pytest.approx(
-        9999999.999999976, rel=1.0e-9
-    )
-    assert result.free_gas.to("m**3").magnitude == pytest.approx(
-        2000000000.0000012, rel=1.0e-9
-    )
+    assert result.free_oil.to("m**3").magnitude == pytest.approx(9999999.999999976, rel=1.0e-9)
+    assert result.free_gas.to("m**3").magnitude == pytest.approx(2000000000.0000012, rel=1.0e-9)
     assert result.gas_cap_ratio == pytest.approx(0.5000000000000014, rel=1.0e-9)
     assert result.condition_number == pytest.approx(10.34514772279802, rel=1.0e-9)
 

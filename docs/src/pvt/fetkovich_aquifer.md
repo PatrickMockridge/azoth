@@ -28,11 +28,11 @@ not an equation, and both implementations read it from here.
 
 | Name | Unit | Description |
 |---|---|---|
-| `initial_water_volume` | m**3 | *Optional.* the initial aquifer water volume. **Absent is the class's explicit infinite storage**; a present zero is zero capacity rather than infinity. |
 | `total_compressibility` | dimensionless | the total water/rock compressibility, in 1/Pa. |
 | `productivity` | dimensionless | the water productivity, in reservoir m3 per second per Pa. |
 | `initial_pressure` | Pa | the initial average aquifer pressure. |
 | `intervals` | - | the prescribed linear-pressure intervals, in caller order; an empty schedule answers the initial state alone. |
+| `initial_water_volume` | m**3 | *Optional.* the initial aquifer water volume. **Absent is the class's explicit infinite storage**; a present zero is zero capacity rather than infinity. |
 
 
 ## Outputs

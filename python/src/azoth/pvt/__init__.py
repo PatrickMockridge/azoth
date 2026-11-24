@@ -845,7 +845,6 @@ def fetkovich_aquifer(
     productivity: float,
     initial_pressure: Any,
     intervals: Sequence[Mapping[str, Any]],
-    *,
     initial_water_volume: Any = None,
 ) -> FetkovichAquiferResult:
     """The finite, constant-property water aquifer over a prescribed interval schedule.
@@ -884,7 +883,6 @@ def generalized_material_balance(
     initial_bw: float,
     initial_rv: float,
     observations: Sequence[Mapping[str, Any]],
-    *,
     gas_cap_ratio: float | None = None,
 ) -> GeneralizedMaterialBalanceResult:
     """The generalized oil and gas material balance over a stated history.

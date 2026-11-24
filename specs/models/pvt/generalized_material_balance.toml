@@ -30,10 +30,6 @@ max_iterations = 1
 type = "enum"
 values = ["initially_oil", "initially_gas", "known_gas_cap", "oil_and_gas"]
 description = "the reservoir state the fit constrains.\n"
-[inputs.gas_cap_ratio]
-unit = "dimensionless"
-optional = true
-description = "the initial gas-cap volume ratio for `known_gas_cap`; required there and ignored by the other fits.\n"
 [inputs.initial_pressure]
 unit = "Pa"
 description = "the initial average reservoir pressure; read only by the positivity guard.\n"
@@ -89,6 +85,10 @@ description = "cumulative aquifer influx, reservoir m3, excluding injected water
 [inputs.observations.fields.expansion_fraction]
 unit = "dimensionless"
 description = "rock and connate-water expansion per initial hydrocarbon reservoir volume.\n"
+[inputs.gas_cap_ratio]
+unit = "dimensionless"
+optional = true
+description = "the initial gas-cap volume ratio for `known_gas_cap`; required there and ignored by the other fits.\n"
 [outputs]
 [outputs.free_oil]
 unit = "m**3"

@@ -98,7 +98,9 @@ def _fit(
     history: list[list[float]],
     mode: int,
     gas_per_oil: float,
-) -> tuple[float, float, float, float, float | None, list[float], float, float, tuple[Warning, ...]]:
+) -> tuple[
+    float, float, float, float, float | None, list[float], float, float, tuple[Warning, ...]
+]:
     columns = 2 if mode == 2 else 1
     count = len(history)
     if count < max(2, columns):
@@ -170,9 +172,7 @@ def _fit(
             )
         residual = row[2] - oil * row[0] - gas * row[1]
         if not math.isfinite(residual):
-            raise InvalidInputError(
-                f"observations[{index}]", "the balance residual is not finite"
-            )
+            raise InvalidInputError(f"observations[{index}]", "the balance residual is not finite")
         residuals.append(residual)
     norm = 0.0
     for value in residuals:
@@ -221,8 +221,6 @@ def _row(record: dict[str, Any], spec: dict[str, Any], name: str) -> dict[str, f
 
 def generalized_material_balance(
     fit: str,
-    *,
-    gas_cap_ratio: float | None = None,
     initial_pressure: Any = None,
     initial_rs: float | None = None,
     initial_bo: float | None = None,
@@ -230,6 +228,7 @@ def generalized_material_balance(
     initial_bw: float | None = None,
     initial_rv: float | None = None,
     observations: Any = None,
+    gas_cap_ratio: float | None = None,
 ) -> GeneralizedMaterialBalanceResult:
     """The generalized material balance over a stated initial PVT and history.
 
@@ -260,9 +259,7 @@ def generalized_material_balance(
         mode, gas_per_oil = 1, 0.0
     elif fit == "known_gas_cap":
         if gas_cap_ratio is None:
-            raise InvalidInputError(
-                "gas_cap_ratio", "the known-gas-cap fit needs the stated ratio"
-            )
+            raise InvalidInputError("gas_cap_ratio", "the known-gas-cap fit needs the stated ratio")
         ratio = float(gas_cap_ratio)
         if not math.isfinite(ratio) or ratio < 0.0:
             raise InvalidInputError(
@@ -288,7 +285,7 @@ def generalized_material_balance(
         gas,
         ooip,
         ogip,
-        ratio,
+        cap_ratio,
         residuals,
         rms_residual,
         condition,
@@ -299,7 +296,7 @@ def generalized_material_balance(
         free_gas=quantity(gas, "m**3"),
         ooip=quantity(ooip, "m**3"),
         ogip=quantity(ogip, "m**3"),
-        gas_cap_ratio=ratio,
+        gas_cap_ratio=cap_ratio,
         residuals=tuple(quantity(value, "m**3") for value in residuals),
         rms_residual=quantity(rms_residual, "m**3"),
         condition_number=condition,

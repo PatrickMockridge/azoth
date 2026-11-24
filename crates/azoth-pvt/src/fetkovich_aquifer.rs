@@ -77,11 +77,11 @@ struct State {
 ///   non-positive interval duration or pressure, an interval that exhausts the finite
 ///   inventory (naming the interval), or non-finite evidence.
 pub fn fetkovich_aquifer(
-    initial_water_volume: Option<Volume>,
     total_compressibility: f64,
     productivity: f64,
     initial_pressure: Pressure,
     intervals: &[FetkovichInterval],
+    initial_water_volume: Option<Volume>,
 ) -> Result<FetkovichAquiferResult> {
     let volume = initial_water_volume.map_or(f64::INFINITY, |quantity| quantity.value);
     let aquifer = Aquifer::new(
@@ -403,11 +403,11 @@ mod tests {
     #[test]
     fn the_constant_pressure_interval_is_the_exponential_identity() {
         let result = fetkovich_aquifer(
-            Some(cubic_meters(1.0e6)),
             1.0e-9,
             2.0e-7,
             pascals(3.0e7),
             &[interval(12000.0, 2.5e7, 2.5e7)],
+            Some(cubic_meters(1.0e6)),
         )
         .unwrap();
         let state = &result.states[1];
@@ -418,11 +418,11 @@ mod tests {
     #[test]
     fn the_interior_extrema_are_sampled() {
         let result = fetkovich_aquifer(
-            Some(cubic_meters(1.0e6)),
             1.0e-9,
             2.0e-7,
             pascals(3.0e7),
             &[interval(10000.0, 2.5e7, 4.0e7)],
+            Some(cubic_meters(1.0e6)),
         )
         .unwrap();
         let state = &result.states[1];
@@ -435,11 +435,11 @@ mod tests {
     #[test]
     fn infinite_storage_has_no_capacity_and_a_linear_rate() {
         let result = fetkovich_aquifer(
-            None,
             1.0e-9,
             2.0e-7,
             pascals(3.0e7),
             &[interval(1000.0, 3.0e7, 1.0e7)],
+            None,
         )
         .unwrap();
         assert!(result.capacity.is_none());
@@ -450,11 +450,11 @@ mod tests {
     #[test]
     fn an_exhausting_interval_is_refused() {
         let error = fetkovich_aquifer(
-            Some(cubic_meters(1.0)),
             1.0e-6,
             1.0e-5,
             pascals(3.0e7),
             &[interval(100.0, 2.5e7, 2.5e7)],
+            Some(cubic_meters(1.0)),
         )
         .unwrap_err();
         assert!(error.to_string().contains("intervals[0]"));

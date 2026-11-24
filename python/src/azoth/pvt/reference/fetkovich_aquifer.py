@@ -29,11 +29,11 @@ class _Aquifer:
     """The fixed aquifer parameters."""
 
     __slots__ = (
-        "initial_water_volume",
-        "total_compressibility",
-        "productivity",
-        "initial_pressure",
         "capacity",
+        "initial_pressure",
+        "initial_water_volume",
+        "productivity",
+        "total_compressibility",
     )
 
     def __init__(
@@ -62,9 +62,7 @@ class _Aquifer:
                 "initial_pressure", "the initial aquifer pressure must be finite and positive"
             )
         capacity = (
-            0.0
-            if total_compressibility == 0.0
-            else initial_water_volume * total_compressibility
+            0.0 if total_compressibility == 0.0 else initial_water_volume * total_compressibility
         )
         if (
             math.isfinite(initial_water_volume)
@@ -90,17 +88,13 @@ class _Aquifer:
         end: float,
     ) -> tuple[float, float, float, float, float, float]:
         if not math.isfinite(duration) or duration <= 0.0:
-            raise InvalidInputError(
-                "duration", "the interval duration must be finite and positive"
-            )
+            raise InvalidInputError("duration", "the interval duration must be finite and positive")
         for name, value in (
             ("reservoir_pressure_start", start),
             ("reservoir_pressure_end", end),
         ):
             if not math.isfinite(value) or value <= 0.0:
-                raise InvalidInputError(
-                    name, "the reservoir pressure must be finite and positive"
-                )
+                raise InvalidInputError(name, "the reservoir pressure must be finite and positive")
         (
             state_time,
             state_cumulative,
@@ -142,12 +136,15 @@ class _Aquifer:
                         + exposure * (1.0 / 24.0 + exposure * (-1.0 / 120.0 + exposure / 720.0))
                     )
                     decay_per_exposure = 1.0 - exposure * (
-                        0.5
-                        - exposure * (1.0 / 6.0 - exposure * (1.0 / 24.0 - exposure / 120.0))
+                        0.5 - exposure * (1.0 / 6.0 - exposure * (1.0 / 24.0 - exposure / 120.0))
                     )
-                    influx = self.productivity * duration * (
-                        (pressure - start) * decay_per_exposure
-                        - pressure_change * ramp_per_exposure
+                    influx = (
+                        self.productivity
+                        * duration
+                        * (
+                            (pressure - start) * decay_per_exposure
+                            - pressure_change * ramp_per_exposure
+                        )
                     )
                     ramp_weight = exposure * ramp_per_exposure
                 else:
@@ -199,9 +196,7 @@ class _Aquifer:
         ratio = self.productivity / self.capacity
         if math.isfinite(ratio):
             return ratio * duration
-        return math.exp(
-            math.log(self.productivity) + math.log(duration) - math.log(self.capacity)
-        )
+        return math.exp(math.log(self.productivity) + math.log(duration) - math.log(self.capacity))
 
     def finite_influx_at_fraction(
         self,
@@ -218,18 +213,12 @@ class _Aquifer:
             ramp = 0.5 + fractional_exposure * (
                 -1.0 / 6.0
                 + fractional_exposure
-                * (
-                    1.0 / 24.0
-                    + fractional_exposure * (-1.0 / 120.0 + fractional_exposure / 720.0)
-                )
+                * (1.0 / 24.0 + fractional_exposure * (-1.0 / 120.0 + fractional_exposure / 720.0))
             )
             decay = 1.0 - fractional_exposure * (
                 0.5
                 - fractional_exposure
-                * (
-                    1.0 / 6.0
-                    - fractional_exposure * (1.0 / 24.0 - fractional_exposure / 120.0)
-                )
+                * (1.0 / 6.0 - fractional_exposure * (1.0 / 24.0 - fractional_exposure / 120.0))
             )
             return (
                 self.productivity
@@ -254,9 +243,7 @@ def _crossing_fraction(exposure: float, initial_difference: float, pressure_chan
     if math.isinf(exposure):
         return 0.0
     log_ratio = (
-        math.log(exposure)
-        + math.log(abs(initial_difference))
-        - math.log(abs(pressure_change))
+        math.log(exposure) + math.log(abs(initial_difference)) - math.log(abs(pressure_change))
     )
     if log_ratio < -40.0:
         return initial_difference / pressure_change
@@ -277,11 +264,11 @@ def _state(row: tuple[float, float, float, float, float, float]) -> FetkovichSta
 
 
 def fetkovich_aquifer(
-    initial_water_volume: Any = None,
     total_compressibility: float | None = None,
     productivity: float | None = None,
     initial_pressure: Any = None,
     intervals: Any = None,
+    initial_water_volume: Any = None,
 ) -> FetkovichAquiferResult:
     """The finite aquifer over a prescribed interval schedule.
 
@@ -307,9 +294,7 @@ def fetkovich_aquifer(
     pressure = input_to_si(spec, "initial_pressure", initial_pressure)
     aquifer = _Aquifer(volume, ct, productivity_value, pressure)
     if intervals is None:
-        raise InvalidInputError(
-            "intervals", "the calculation needs the interval schedule"
-        )
+        raise InvalidInputError("intervals", "the calculation needs the interval schedule")
     state = (0.0, 0.0, aquifer.initial_pressure, 0.0, 0.0, 0.0)
     states = [_state(state)]
     for index, interval in enumerate(intervals):
@@ -317,9 +302,7 @@ def fetkovich_aquifer(
         start = _interval_field(
             spec, "reservoir_pressure_start", interval["reservoir_pressure_start"]
         )
-        end = _interval_field(
-            spec, "reservoir_pressure_end", interval["reservoir_pressure_end"]
-        )
+        end = _interval_field(spec, "reservoir_pressure_end", interval["reservoir_pressure_end"])
         try:
             state = aquifer.advance(state, duration, start, end)
         except InvalidInputError as error:

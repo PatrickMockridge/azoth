@@ -25,10 +25,6 @@ convergence = "absolute"
 tolerance = 1.0e-12
 max_iterations = 1
 [inputs]
-[inputs.initial_water_volume]
-unit = "m**3"
-optional = true
-description = "the initial aquifer water volume. **Absent is the class's explicit infinite storage**; a present zero is zero capacity rather than infinity.\n"
 [inputs.total_compressibility]
 unit = "dimensionless"
 description = "the total water/rock compressibility, in 1/Pa.\n"
@@ -51,6 +47,10 @@ description = "the reservoir pressure at the interval start.\n"
 [inputs.intervals.fields.reservoir_pressure_end]
 unit = "Pa"
 description = "the reservoir pressure at the interval end.\n"
+[inputs.initial_water_volume]
+unit = "m**3"
+optional = true
+description = "the initial aquifer water volume. **Absent is the class's explicit infinite storage**; a present zero is zero capacity rather than infinity.\n"
 [outputs]
 [outputs.capacity]
 unit = "dimensionless"

@@ -177,8 +177,8 @@ process model needs.
   `pvt.gas_correlations` and `pvt.water_correlations` are the three scalar tables,
   `pvt.decline_curve` the Arps and Duong arithmetic, and `pvt.gas_material_balance` and
   `pvt.oil_material_balance` the two material balances. **The laboratory experiments, the
-  evidence/history layer and the regression/tuning are owed**, with their classes named in the
-  specs and in the paragraph below.
+  regression/tuning and the reservoir properties are ported; the evidence/history layer is
+  owed**, with its classes named in the specs and in the paragraph below.
 
 ### Tier 2 — water and gas-water
 
@@ -674,7 +674,7 @@ a claim nothing holds.
   currency dimension is added; the JSON adapters, the reports and the serialization remain
   session surface. Held to four captures and the class's own tests.
 
-- **The PVT simulation package's core is ported, as sixteen ids.** The six correlation and
+- **The PVT simulation package's core is ported, as twenty ids.** The six correlation and
   reservoir ids are `pvt.black_oil_correlations` (the `BlackOilCorrelations`/
   `SaturationPressureCorrelation` table with the two classes' conversion literals kept apart
   and the `_p_sat` clamp), `pvt.gas_correlations` (the Z-factor, pseudo-critical and
@@ -691,7 +691,16 @@ a claim nothing holds.
   viscosity sweeps), `pvt.regression` (`PVTRegression`'s twelve parameters, the four
   experiment targets, the two ledgers and the simplified uncertainty) and
   `pvt.tune_to_saturation` (`TuneToSaturation`'s sign-flipping plus-molar-mass search over
-  the saturation scan). **The classes' own contradictions travel with the arithmetic**: the
+  the saturation scan). **The four reservoir-property ids are
+  `pvt.van_everdingen_hurst_aquifer`** (the positive spectral influence functions, the
+  legacy bounded policy, the Carter-Tracy recurrence and the influence table -
+  `RadialInfiniteInfluence` is that calculation's kernel, not an id),
+  **`pvt.fetkovich_aquifer`** (the exact prescribed-pressure march, the within-interval
+  extrema and the finite-inventory refusal), **`pvt.generalized_material_balance`** (the
+  four fits over the column-scaled least squares with the condition gate and the published
+  residuals) and **`pvt.relative_permeability`** (the Corey and LET tables in the four
+  Eclipse forms). The AQUTAB and Eclipse-keyword texts are session surface, not results.
+  **The classes' own contradictions travel with the arithmetic**: the
   `_p_sat` Vasquez-Beggs exponent's opposite sign, the BlackOil Glaso's specific-gravity
   divisor, the gas-FVF standard state's 288.71 K, the CCE's midpoint saturation state and
   `1e5` Bg, the separator train's one-stage-lagged stage density, and the MMP's Celsius
@@ -702,8 +711,6 @@ a claim nothing holds.
   the five regression parameters this port does not carry (the plus-molar-mass multiplier,
   the gamma shape and minimum molecular weight, and the LBC and Pedersen viscosity
   parameters), the regression's separator experiment, `pvtsimulation/util/parameterfitting/`,
-  the reservoir properties (`VanEverdingenHurstAquifer`, `FetkovichAquifer`,
-  `GeneralizedMaterialBalance`, `RadialInfiniteInfluence`, `RelativePermeabilityGenerator`),
   `BlackOilTableValidator.validate`, `SlimTubeSim`, the reports (`PVTReportGenerator`,
   `generateQCReport`, `toEclipseKeyword`, `toJson`/`toMap`), the **TBP wax model**
   (`wax_tbp_model`: `WaxFractionSim` and `ViscosityWaxOilSim` need

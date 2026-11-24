@@ -104,9 +104,7 @@ def test_the_influence_table_answers_pressures() -> None:
 
 def test_a_refused_state_is_named() -> None:
     with pytest.raises(InvalidInputError, match="dimensionless_time"):
-        van_everdingen_hurst_aquifer(
-            "dimensionless_pressure", dimensionless_time_value=-1.0
-        )
+        van_everdingen_hurst_aquifer("dimensionless_pressure", dimensionless_time_value=-1.0)
     with pytest.raises(InvalidInputError, match="NaN"):
         van_everdingen_hurst_aquifer(
             "dimensionless_pressure",

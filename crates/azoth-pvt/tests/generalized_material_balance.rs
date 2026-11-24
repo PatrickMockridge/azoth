@@ -77,7 +77,6 @@ fn fit_oil_and_gas(
 ) -> Result<GeneralizedMaterialBalanceResult, azoth_core::AzothError> {
     generalized_material_balance(
         "oil_and_gas",
-        None,
         pascals(3.0e7),
         100.0,
         1.6,
@@ -85,6 +84,7 @@ fn fit_oil_and_gas(
         1.02,
         0.0002,
         observations,
+        None,
     )
 }
 
@@ -104,7 +104,6 @@ fn the_oil_and_gas_fit_is_the_capture() {
 fn the_known_gas_cap_folds_the_ratio_into_one_predictor() {
     let result = generalized_material_balance(
         "known_gas_cap",
-        Some(0.5),
         pascals(3.0e7),
         100.0,
         1.6,
@@ -112,6 +111,7 @@ fn the_known_gas_cap_folds_the_ratio_into_one_predictor() {
         1.02,
         0.0002,
         &history(1.0e7, 2.0e9, true),
+        Some(0.5),
     )
     .unwrap();
     assert!((result.free_oil / 1.0e7 - 1.0).abs() < 1.0e-9);
@@ -124,7 +124,6 @@ fn the_known_gas_cap_folds_the_ratio_into_one_predictor() {
 fn the_initially_gas_fit_leaves_the_gas_cap_ratio_absent_with_a_warning() {
     let result = generalized_material_balance(
         "initially_gas",
-        None,
         pascals(3.0e7),
         100.0,
         1.6,
@@ -132,6 +131,7 @@ fn the_initially_gas_fit_leaves_the_gas_cap_ratio_absent_with_a_warning() {
         1.02,
         0.0002,
         &history(0.0, 2.0e9, false),
+        None,
     )
     .unwrap();
     assert_eq!(result.free_oil, 0.0);
@@ -147,7 +147,6 @@ fn a_refused_state_is_named() {
 
     let near_critical = generalized_material_balance(
         "oil_and_gas",
-        None,
         pascals(3.0e7),
         100.0,
         1.6,
@@ -155,6 +154,7 @@ fn a_refused_state_is_named() {
         1.02,
         0.01,
         &history(1.0e7, 2.0e9, false),
+        None,
     )
     .unwrap_err();
     assert!(near_critical.to_string().contains("Rs*Rv"));
@@ -167,7 +167,6 @@ fn a_refused_state_is_named() {
     second.net_gas_produced = 2.0e6;
     let collinear = generalized_material_balance(
         "oil_and_gas",
-        None,
         pascals(3.0e7),
         0.0,
         1.0,
@@ -175,6 +174,7 @@ fn a_refused_state_is_named() {
         1.02,
         0.0,
         &[first, second],
+        None,
     )
     .unwrap_err();
     assert!(collinear.to_string().contains("condition"));

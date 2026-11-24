@@ -450,9 +450,7 @@ NON_UNIT_MODELS = {
     "pvt.generalized_material_balance": (
         "the generalized material balance over a PVT and production history, not a unit"
     ),
-    "pvt.relative_permeability": (
-        "the Corey and LET saturation tables over scalars, not a unit"
-    ),
+    "pvt.relative_permeability": ("the Corey and LET saturation tables over scalars, not a unit"),
     "process.bleve": "the fireball radiation over scalars, not a unit",
     "process.consequence_analysis": "the QRA composition over scalars and records, not a unit",
     "process.event_tree": "the event-tree enumeration over scalars, not a unit",

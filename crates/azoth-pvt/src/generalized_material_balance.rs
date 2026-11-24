@@ -97,7 +97,6 @@ struct Observation {
 #[allow(clippy::too_many_arguments)]
 pub fn generalized_material_balance(
     fit: &str,
-    gas_cap_ratio: Option<f64>,
     initial_pressure: Pressure,
     initial_rs: f64,
     initial_bo: f64,
@@ -105,6 +104,7 @@ pub fn generalized_material_balance(
     initial_bw: f64,
     initial_rv: f64,
     observations: &[MaterialBalanceObservation],
+    gas_cap_ratio: Option<f64>,
 ) -> Result<GeneralizedMaterialBalanceResult> {
     let initial = Record {
         pressure: initial_pressure.value,
@@ -474,7 +474,6 @@ mod tests {
     fn the_oil_and_gas_fit_recovers_the_history() {
         let result = generalized_material_balance(
             "oil_and_gas",
-            None,
             pascals(3.0e7),
             100.0,
             1.6,
@@ -482,6 +481,7 @@ mod tests {
             1.02,
             0.0002,
             &history(1.0e7, 2.0e9, false),
+            None,
         )
         .unwrap();
         assert!((result.free_oil / 1.0e7 - 1.0).abs() < 1.0e-9);
@@ -500,7 +500,6 @@ mod tests {
         second.net_gas_produced = 2.0e6;
         let error = generalized_material_balance(
             "oil_and_gas",
-            None,
             pascals(3.0e7),
             0.0,
             1.0,
@@ -508,6 +507,7 @@ mod tests {
             1.02,
             0.0,
             &[first, second],
+            None,
         )
         .unwrap_err();
         assert!(error.to_string().contains("condition"));

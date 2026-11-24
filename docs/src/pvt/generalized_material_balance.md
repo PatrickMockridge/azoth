@@ -29,7 +29,6 @@ not an equation, and both implementations read it from here.
 | Name | Unit | Description |
 |---|---|---|
 | `fit` | initially_oil / initially_gas / known_gas_cap / oil_and_gas | the reservoir state the fit constrains. |
-| `gas_cap_ratio` | dimensionless | *Optional.* the initial gas-cap volume ratio for `known_gas_cap`; required there and ignored by the other fits. |
 | `initial_pressure` | Pa | the initial average reservoir pressure; read only by the positivity guard. |
 | `initial_rs` | dimensionless | the initial solution gas-oil ratio, Sm3/Sm3. |
 | `initial_bo` | dimensionless | the initial oil formation volume factor, reservoir m3/Sm3. |
@@ -37,6 +36,7 @@ not an equation, and both implementations read it from here.
 | `initial_bw` | dimensionless | the initial water formation volume factor, reservoir m3/Sm3. |
 | `initial_rv` | dimensionless | the initial vaporized oil ratio, Sm3/Sm3. |
 | `observations` | - | the aligned pressure, PVT and cumulative-production history, in caller order. |
+| `gas_cap_ratio` | dimensionless | *Optional.* the initial gas-cap volume ratio for `known_gas_cap`; required there and ignored by the other fits. |
 
 
 ## Outputs

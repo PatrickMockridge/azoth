@@ -10282,17 +10282,17 @@ pub fn differential_liberation(
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
 #[pyfunction]
-#[pyo3(signature = (initial_water_volume, total_compressibility, productivity, initial_pressure, intervals))]
+#[pyo3(signature = (total_compressibility, productivity, initial_pressure, intervals, initial_water_volume))]
 #[pyo3(
-    text_signature = "(initial_water_volume, total_compressibility, productivity, initial_pressure, intervals)"
+    text_signature = "(total_compressibility, productivity, initial_pressure, intervals, initial_water_volume)"
 )]
 pub fn fetkovich_aquifer(
     py: Python<'_>,
-    initial_water_volume: Option<f64>,
     total_compressibility: f64,
     productivity: f64,
     initial_pressure: f64,
     intervals: Vec<crate::records_gen::FetkovichInterval>,
+    initial_water_volume: Option<f64>,
 ) -> PyResult<crate::transport_gen::PyFetkovichAquiferResult> {
     let intervals_records: Vec<azoth_pvt::fetkovich_aquifer::FetkovichInterval> = intervals
         .into_iter()
@@ -10303,11 +10303,11 @@ pub fn fetkovich_aquifer(
         })
         .collect();
     azoth_pvt::fetkovich_aquifer::fetkovich_aquifer(
-        initial_water_volume.map(cubic_meters),
         total_compressibility,
         productivity,
         pascals(initial_pressure),
         &intervals_records,
+        initial_water_volume.map(cubic_meters),
     )
     .map(|r| crate::transport_gen::PyFetkovichAquiferResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
@@ -10386,15 +10386,14 @@ pub fn gas_material_balance(
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
 #[pyfunction]
-#[pyo3(signature = (fit, gas_cap_ratio, initial_pressure, initial_rs, initial_bo, initial_bg, initial_bw, initial_rv, observations))]
+#[pyo3(signature = (fit, initial_pressure, initial_rs, initial_bo, initial_bg, initial_bw, initial_rv, observations, gas_cap_ratio))]
 #[pyo3(
-    text_signature = "(fit, gas_cap_ratio, initial_pressure, initial_rs, initial_bo, initial_bg, initial_bw, initial_rv, observations)"
+    text_signature = "(fit, initial_pressure, initial_rs, initial_bo, initial_bg, initial_bw, initial_rv, observations, gas_cap_ratio)"
 )]
 #[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
 pub fn generalized_material_balance(
     py: Python<'_>,
     fit: &str,
-    gas_cap_ratio: Option<f64>,
     initial_pressure: f64,
     initial_rs: f64,
     initial_bo: f64,
@@ -10402,6 +10401,7 @@ pub fn generalized_material_balance(
     initial_bw: f64,
     initial_rv: f64,
     observations: Vec<crate::records_gen::MaterialBalanceObservation>,
+    gas_cap_ratio: Option<f64>,
 ) -> PyResult<crate::transport_gen::PyGeneralizedMaterialBalanceResult> {
     let observations_records: Vec<
         azoth_pvt::generalized_material_balance::MaterialBalanceObservation,
@@ -10425,7 +10425,6 @@ pub fn generalized_material_balance(
         .collect();
     azoth_pvt::generalized_material_balance::generalized_material_balance(
         fit,
-        gas_cap_ratio,
         pascals(initial_pressure),
         initial_rs,
         initial_bo,
@@ -10433,6 +10432,7 @@ pub fn generalized_material_balance(
         initial_bw,
         initial_rv,
         &observations_records,
+        gas_cap_ratio,
     )
     .map(|r| crate::transport_gen::PyGeneralizedMaterialBalanceResult::from(&r))
     .map_err(|e| to_pyerr(py, e))

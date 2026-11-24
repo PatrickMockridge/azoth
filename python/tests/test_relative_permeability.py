@@ -53,7 +53,10 @@ def test_the_let_table_is_the_capture() -> None:
 
 def test_a_descending_grid_is_published() -> None:
     result = relative_permeability(rows=5, swc=0.9, sorw=0.2)
-    assert result.table[0].sw > result.table[4].sw
+    first = result.table[0].sw
+    last = result.table[4].sw
+    assert first is not None and last is not None
+    assert first > last
     assert result.table[0].krw == 0.0
     assert result.table[4].krow == 0.0
 

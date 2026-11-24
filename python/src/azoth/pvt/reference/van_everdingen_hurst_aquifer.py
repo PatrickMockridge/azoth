@@ -134,9 +134,9 @@ def _tail_quadrature(panels_to_build: int) -> tuple[list[float], list[float], li
         frequencies.append(u)
         weights.append((2.0 / _PI) * ordinary[index] / u * polynomial)
         suffix.append(0.0)
-    boundary = math.log(_UPPER) + (
-        _TAIL_UPPER_LOG - math.log(_UPPER)
-    ) / _tail_panels() * panels_to_build
+    boundary = (
+        math.log(_UPPER) + (_TAIL_UPPER_LOG - math.log(_UPPER)) / _tail_panels() * panels_to_build
+    )
     maximum = 0.0 if panels_to_build == _tail_panels() else math.exp(-boundary)
     for index in range(len(weights) - 1, -1, -1):
         maximum = max(maximum, weights[index])
@@ -147,7 +147,7 @@ def _tail_quadrature(panels_to_build: int) -> tuple[list[float], list[float], li
 class _Tables:
     """The kernel's fixed grids, built once."""
 
-    __slots__ = ("low_quadrature", "ein_at_fifty", "quadrature", "tail_prefix")
+    __slots__ = ("ein_at_fifty", "low_quadrature", "quadrature", "tail_prefix")
 
     def __init__(self) -> None:
         self.low_quadrature = _gauss_panels(0.0, 1.0, 16, 16)
@@ -219,9 +219,7 @@ def _evaluate(time: float) -> tuple[float, float]:
         low = (low[0] * 0.5, low[1] * 0.5 * _LOWER_SQUARED)
     pressure = low[0]
     derivative = low[1]
-    for frequency_squared, weight in zip(
-        tables.quadrature[0], tables.quadrature[1], strict=True
-    ):
+    for frequency_squared, weight in zip(tables.quadrature[0], tables.quadrature[1], strict=True):
         argument = time * frequency_squared
         loss, slope = _loss_and_slope(argument)
         pressure += weight * loss
@@ -480,9 +478,7 @@ def cumulative_influx_carter_tracy(
             "dimensionless_outer_radius",
             "the aquifer outer-radius argument must not be NaN",
         )
-    for index, (time, drop) in enumerate(
-        zip(dimensionless_times, pressure_drops, strict=True)
-    ):
+    for index, (time, drop) in enumerate(zip(dimensionless_times, pressure_drops, strict=True)):
         if (
             not math.isfinite(time)
             or time < 0.0
@@ -504,7 +500,9 @@ def cumulative_influx_carter_tracy(
                 "the Carter-Tracy influence is not finite and positive at this index",
             )
         elasticity = dimensionless_times[index] * pd_prime / pd
-        denominator = 1.0 - (dimensionless_times[index - 1] / dimensionless_times[index]) * elasticity
+        denominator = (
+            1.0 - (dimensionless_times[index - 1] / dimensionless_times[index]) * elasticity
+        )
         retained = (1.0 - elasticity) / denominator
         if denominator == 0.0 or not math.isfinite(retained):
             raise InvalidInputError(
@@ -587,9 +585,7 @@ def van_everdingen_hurst_aquifer(
     spec = _spec()
     if calculation == "dimensionless_pressure":
         td = _required("dimensionless_time_value", dimensionless_time_value)
-        return _row(
-            dimensionless_pressure=dimensionless_pressure(td, dimensionless_outer_radius)
-        )
+        return _row(dimensionless_pressure=dimensionless_pressure(td, dimensionless_outer_radius))
     if calculation == "dimensionless_pressure_derivative":
         td = _required("dimensionless_time_value", dimensionless_time_value)
         return _row(

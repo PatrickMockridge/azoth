@@ -151,7 +151,15 @@ src = ["python/src", "python/tests"]
 # signatures, so its line length is a property of the functions it describes rather
 # than of anyone's style. It is compared byte-for-byte against a regeneration by
 # `gen_stub.py --check` in the same `docs-drift` gate as the other generated files.
-extend-exclude = ["docs", "python/src/azoth/_core.pyi"]
+# `_rust_bridge_gen.py` is the same case one level out: `tools/gen_python_bridge.py`
+# emits one adapter per id with the id's own declared signature, and a model with
+# nine inputs is a long `def` line whatever style is applied. Its exact text is held
+# by `gen_python_bridge.py --check`, which is the stronger comparison.
+extend-exclude = [
+    "docs",
+    "python/src/azoth/_core.pyi",
+    "python/src/azoth/_rust_bridge_gen.py",
+]
 
 [tool.ruff.lint]
 select = [

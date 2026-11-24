@@ -30,9 +30,7 @@ def test_the_constant_pressure_identity() -> None:
     assert state.cumulative_influx.to("m**3").magnitude == pytest.approx(
         4546.410233552938, rel=1.0e-12
     )
-    assert state.pressure.to("Pa").magnitude == pytest.approx(
-        25453589.766447064, rel=1.0e-12
-    )
+    assert state.pressure.to("Pa").magnitude == pytest.approx(25453589.766447064, rel=1.0e-12)
 
 
 def test_the_interior_extrema_are_retained() -> None:

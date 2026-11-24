@@ -69,7 +69,7 @@ def _linspace(start: float, end: float, count: int) -> list[float]:
 
 
 def _corey(saturation: float, exponent: float) -> float:
-    return _clamp(saturation) ** exponent
+    return float(_clamp(saturation) ** exponent)
 
 
 def _let(saturation: float, l: float, e: float, t: float) -> float:
@@ -82,7 +82,7 @@ def _let(saturation: float, l: float, e: float, t: float) -> float:
     denominator = numerator + e * (1.0 - s) ** t
     if denominator <= 0.0:
         return 0.0
-    return numerator / denominator
+    return float(numerator / denominator)
 
 
 def _normalize_water_for_krw(sw: float, swcr: float, sorw: float) -> float:
@@ -106,7 +106,7 @@ def _normalize_gas_for_krg(sg: float, sgcr: float, swc: float, sorg: float) -> f
     return _clamp((sg - sgcr) / denominator)
 
 
-def _normalize_gas_for_krog(sg: float, sgcr: float, swc: float, sorg: float) -> float:
+def _normalize_gas_for_krog(sg: float, _sgcr: float, swc: float, sorg: float) -> float:
     denominator = 1.0 - swc - sorg
     if denominator <= 0.0:
         return 0.0
@@ -123,9 +123,7 @@ def _parameters(values: dict[str, Any]) -> dict[str, Any]:
         value = values.get(name)
         out[name] = default if value is None else float(value)
         if not math.isfinite(out[name]):
-            raise InvalidInputError(
-                name, "a relative-permeability parameter must be finite"
-            )
+            raise InvalidInputError(name, "a relative-permeability parameter must be finite")
     return out
 
 
@@ -145,9 +143,9 @@ def _row(**values: Any) -> RelativePermeabilityRow:
 
 
 def _swof(p: dict[str, Any], rows: int) -> list[RelativePermeabilityRow]:
-    effective_swcr = p["swc"] if p["critical_water_saturation"] < 0.0 else p[
-        "critical_water_saturation"
-    ]
+    effective_swcr = (
+        p["swc"] if p["critical_water_saturation"] < 0.0 else p["critical_water_saturation"]
+    )
     max_sw = 1.0 - p["sorw"]
     sw = _linspace(p["swc"], max_sw, rows)
     krw: list[float] = []
@@ -165,9 +163,7 @@ def _swof(p: dict[str, Any], rows: int) -> list[RelativePermeabilityRow]:
     krow[0] = p["kro_max"]
     krw[rows - 1] = p["krw_max"]
     krow[rows - 1] = 0.0
-    return [
-        _row(sw=sw[i], krw=krw[i], krow=krow[i], pcow=0.0) for i in range(rows)
-    ]
+    return [_row(sw=sw[i], krw=krw[i], krow=krow[i], pcow=0.0) for i in range(rows)]
 
 
 def _gas_curves(p: dict[str, Any], sg: list[float]) -> tuple[list[float], list[float]]:
@@ -192,9 +188,7 @@ def _sgof(p: dict[str, Any], rows: int) -> list[RelativePermeabilityRow]:
     krog[0] = p["kro_max"]
     krg[rows - 1] = p["krg_max"]
     krog[rows - 1] = 0.0
-    return [
-        _row(sg=sg[i], krg=krg[i], krog=krog[i], pcog=0.0) for i in range(rows)
-    ]
+    return [_row(sg=sg[i], krg=krg[i], krog=krog[i], pcog=0.0) for i in range(rows)]
 
 
 def _sof3(p: dict[str, Any], rows: int) -> list[RelativePermeabilityRow]:
@@ -225,9 +219,7 @@ def _slgof(p: dict[str, Any], rows: int) -> list[RelativePermeabilityRow]:
     krog[0] = 0.0
     krg[rows - 1] = 0.0
     krog[rows - 1] = p["kro_max"]
-    return [
-        _row(sl=sl[i], krg=krg[i], krog=krog[i], pcog=0.0) for i in range(rows)
-    ]
+    return [_row(sl=sl[i], krg=krg[i], krog=krog[i], pcog=0.0) for i in range(rows)]
 
 
 def relative_permeability(

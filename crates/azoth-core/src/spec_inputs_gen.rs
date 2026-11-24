@@ -6886,7 +6886,6 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "thermodynamic_temperature",
     ),
     ("pvt.differential_liberation", "pressures", "pressure"),
-    ("pvt.fetkovich_aquifer", "initial_water_volume", "volume"),
     (
         "pvt.fetkovich_aquifer",
         "total_compressibility",
@@ -6894,6 +6893,7 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ),
     ("pvt.fetkovich_aquifer", "productivity", "dimensionless"),
     ("pvt.fetkovich_aquifer", "initial_pressure", "pressure"),
+    ("pvt.fetkovich_aquifer", "initial_water_volume", "volume"),
     ("pvt.gas_material_balance", "pressure", "pressure"),
     ("pvt.gas_material_balance", "z", "dimensionless"),
     ("pvt.gas_material_balance", "gp", "dimensionless"),
@@ -6906,11 +6906,6 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "thermodynamic_temperature",
     ),
     ("pvt.gas_material_balance", "gas_gravity", "dimensionless"),
-    (
-        "pvt.generalized_material_balance",
-        "gas_cap_ratio",
-        "dimensionless",
-    ),
     (
         "pvt.generalized_material_balance",
         "initial_pressure",
@@ -6939,6 +6934,11 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     (
         "pvt.generalized_material_balance",
         "initial_rv",
+        "dimensionless",
+    ),
+    (
+        "pvt.generalized_material_balance",
+        "gas_cap_ratio",
         "dimensionless",
     ),
     ("pvt.mmp", "temperature", "thermodynamic_temperature"),

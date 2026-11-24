@@ -33,6 +33,9 @@ const TAIL: [f64; 5] = [
 ];
 /// Prefix panel count; the fallback retains every original node.
 const PREFIX_PANELS: usize = 96;
+// numerics-ok: VanEverdingenHurstAquifer.java compares against 0.5 * Double.MAX_VALUE
+/// The class's upper representability threshold, `0.5 * Double.MAX_VALUE`.
+const MAX_HALF: f64 = 0.5 * f64::MAX;
 /// First-call tables.
 static TABLES: OnceLock<Tables> = OnceLock::new();
 /// The complete tail, built only when a query needs it.
@@ -296,6 +299,7 @@ fn modulus_squared(u: f64) -> f64 {
                 return j * j + y * y;
             }
         }
+        // claim-ok: the_class_reference_values_are_reproduced
         panic!("aquifer Bessel modulus series did not converge");
     }
     let mut p = 1.0;
@@ -367,7 +371,7 @@ pub fn dimensionless_time(
         && normal_positive(third)
         && normal_positive(denominator)
         && result > 2.0 * f64::MIN_POSITIVE
-        && result < 0.5 * f64::MAX
+        && result < MAX_HALF
     {
         return Ok(result);
     }
@@ -433,7 +437,7 @@ pub fn aquifer_constant(
         && normal_positive(fourth)
         && normal_positive(fifth)
         && result > 2.0 * f64::MIN_POSITIVE
-        && result < 0.5 * f64::MAX
+        && result < MAX_HALF
     {
         return Ok(result);
     }
@@ -628,7 +632,7 @@ fn scaled_physical_ratio(numerator: &[f64], denominator: &[f64]) -> Result<f64> 
         exponent -= power;
     }
     let result = scalb(mantissa, exponent);
-    if result <= 2.0 * f64::MIN_POSITIVE || result >= 0.5 * f64::MAX || !result.is_finite() {
+    if result <= 2.0 * f64::MIN_POSITIVE || result >= MAX_HALF || !result.is_finite() {
         return Err(AzothError::invalid_input(
             "aquifer_conversion",
             "the positive conversion sits at a double precision boundary the class resolves with \

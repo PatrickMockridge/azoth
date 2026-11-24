@@ -16,11 +16,11 @@ fn interval(duration: f64, start: f64, end: f64) -> FetkovichInterval {
 #[test]
 fn the_constant_pressure_identity_and_the_linear_ramp() {
     let constant = fetkovich_aquifer(
-        Some(cubic_meters(1.0e6)),
         1.0e-9,
         2.0e-7,
         pascals(3.0e7),
         &[interval(12000.0, 2.5e7, 2.5e7)],
+        Some(cubic_meters(1.0e6)),
     )
     .unwrap();
     assert_eq!(constant.states.len(), 2);
@@ -28,11 +28,11 @@ fn the_constant_pressure_identity_and_the_linear_ramp() {
     assert!((constant.states[1].pressure / 2.5453589766447064e7 - 1.0).abs() < 1.0e-12);
 
     let ramp = fetkovich_aquifer(
-        Some(cubic_meters(1.0e6)),
         1.0e-9,
         2.0e-7,
         pascals(3.0e7),
         &[interval(20000.0, 3.0e7, 1.8e7)],
+        Some(cubic_meters(1.0e6)),
     )
     .unwrap();
     assert!((ramp.states[1].cumulative_influx / 9054.946916666202 - 1.0).abs() < 1.0e-12);
@@ -42,11 +42,11 @@ fn the_constant_pressure_identity_and_the_linear_ramp() {
 #[test]
 fn the_interval_extrema_are_both_retained() {
     let up = fetkovich_aquifer(
-        Some(cubic_meters(1.0e6)),
         1.0e-9,
         2.0e-7,
         pascals(3.0e7),
         &[interval(10000.0, 2.5e7, 4.0e7)],
+        Some(cubic_meters(1.0e6)),
     )
     .unwrap();
     assert!(
@@ -58,11 +58,11 @@ fn the_interval_extrema_are_both_retained() {
     );
 
     let down = fetkovich_aquifer(
-        Some(cubic_meters(1.0e6)),
         1.0e-9,
         2.0e-7,
         pascals(3.0e7),
         &[interval(10000.0, 3.5e7, 2.0e7)],
+        Some(cubic_meters(1.0e6)),
     )
     .unwrap();
     assert!(
@@ -78,11 +78,11 @@ fn the_interval_extrema_are_both_retained() {
 #[test]
 fn infinite_storage_is_the_absent_volume_and_has_no_capacity() {
     let result = fetkovich_aquifer(
-        None,
         1.0e-9,
         2.0e-7,
         pascals(3.0e7),
         &[interval(1000.0, 2.5e7, 4.0e7)],
+        None,
     )
     .unwrap();
     assert!(result.capacity.is_none());
@@ -93,7 +93,6 @@ fn infinite_storage_is_the_absent_volume_and_has_no_capacity() {
 #[test]
 fn a_multi_interval_schedule_keeps_the_signed_influx() {
     let result = fetkovich_aquifer(
-        Some(cubic_meters(1.0e6)),
         1.0e-9,
         2.0e-7,
         pascals(3.0e7),
@@ -101,6 +100,7 @@ fn a_multi_interval_schedule_keeps_the_signed_influx() {
             interval(100000.0, 3.5e7, 3.5e7),
             interval(100000.0, 3.0e7, 3.0e7),
         ],
+        Some(cubic_meters(1.0e6)),
     )
     .unwrap();
     assert_eq!(result.states.len(), 3);
@@ -116,11 +116,11 @@ fn the_small_exposure_boundary_is_bracketed() {
         (0.01000001, 7.499757505749892e-6),
     ] {
         let result = fetkovich_aquifer(
-            Some(cubic_meters(1000.0)),
             1.0e-11,
             1.0e-10,
             pascals(3.0e7),
             &[interval(duration, 3.0e7, 1.5e7)],
+            Some(cubic_meters(1000.0)),
         )
         .unwrap();
         assert!((result.states[1].cumulative_influx / expected - 1.0).abs() < 1.0e-12);
@@ -130,41 +130,41 @@ fn the_small_exposure_boundary_is_bracketed() {
 #[test]
 fn a_refused_state_is_named() {
     let exhausted = fetkovich_aquifer(
-        Some(cubic_meters(1.0)),
         1.0e-6,
         1.0e-5,
         pascals(3.0e7),
         &[interval(100.0, 2.5e7, 2.5e7)],
+        Some(cubic_meters(1.0)),
     )
     .unwrap_err();
     assert!(exhausted.to_string().contains("intervals[0]"));
 
     let negative = fetkovich_aquifer(
-        Some(cubic_meters(-1.0)),
         1.0e-9,
         2.0e-7,
         pascals(3.0e7),
         &[],
+        Some(cubic_meters(-1.0)),
     )
     .unwrap_err();
     assert!(negative.to_string().contains("initial_water_volume"));
 
     let zero_duration = fetkovich_aquifer(
-        Some(cubic_meters(1.0e6)),
         1.0e-9,
         2.0e-7,
         pascals(3.0e7),
         &[interval(0.0, 3.0e7, 2.0e7)],
+        Some(cubic_meters(1.0e6)),
     )
     .unwrap_err();
     assert!(zero_duration.to_string().contains("duration"));
 
     let unrepresentable = fetkovich_aquifer(
-        Some(cubic_meters(f64::MAX)),
         2.0,
         2.0e-7,
         pascals(3.0e7),
         &[],
+        Some(cubic_meters(f64::MAX)),
     )
     .unwrap_err();
     assert!(unrepresentable.to_string().contains("representable"));

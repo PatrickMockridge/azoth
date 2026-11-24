@@ -10628,15 +10628,15 @@ def differential_liberation(components: Sequence[Mapping[str, Any]], *, pressure
     )
 
 
-def fetkovich_aquifer(total_compressibility: float, productivity: float, initial_pressure: Any, intervals: Sequence[Mapping[str, Any]], *, initial_water_volume: Any=None) -> FetkovichAquiferResult:
+def fetkovich_aquifer(total_compressibility: float, productivity: float, initial_pressure: Any, intervals: Sequence[Mapping[str, Any]], initial_water_volume: Any=None) -> FetkovichAquiferResult:
     """``pvt.fetkovich_aquifer``, computed in Rust."""
     spec = _models_gen.model("pvt.fetkovich_aquifer")
     result = _core.fetkovich_aquifer(
-        None if initial_water_volume is None else _si(spec, "initial_water_volume", initial_water_volume),
         total_compressibility,
         productivity,
         _si(spec, "initial_pressure", initial_pressure),
         input_records_to_si(spec, "intervals", intervals),
+        None if initial_water_volume is None else _si(spec, "initial_water_volume", initial_water_volume),
     )
     return FetkovichAquiferResult(
         capacity=result.capacity,
@@ -10683,12 +10683,11 @@ def gas_material_balance(calculation: str, *, pressure: Sequence[Any] | None=Non
     )
 
 
-def generalized_material_balance(fit: str, initial_pressure: Any, initial_rs: float, initial_bo: float, initial_bg: float, initial_bw: float, initial_rv: float, observations: Sequence[Mapping[str, Any]], *, gas_cap_ratio: float | None=None) -> GeneralizedMaterialBalanceResult:
+def generalized_material_balance(fit: str, initial_pressure: Any, initial_rs: float, initial_bo: float, initial_bg: float, initial_bw: float, initial_rv: float, observations: Sequence[Mapping[str, Any]], gas_cap_ratio: float | None=None) -> GeneralizedMaterialBalanceResult:
     """``pvt.generalized_material_balance``, computed in Rust."""
     spec = _models_gen.model("pvt.generalized_material_balance")
     result = _core.generalized_material_balance(
         fit,
-        None if gas_cap_ratio is None else gas_cap_ratio,
         _si(spec, "initial_pressure", initial_pressure),
         initial_rs,
         initial_bo,
@@ -10696,6 +10695,7 @@ def generalized_material_balance(fit: str, initial_pressure: Any, initial_rs: fl
         initial_bw,
         initial_rv,
         input_records_to_si(spec, "observations", observations),
+        None if gas_cap_ratio is None else gas_cap_ratio,
     )
     return GeneralizedMaterialBalanceResult(
         free_oil=from_si(result.free_oil.magnitude_si, result.free_oil.unit),
