@@ -1303,6 +1303,11 @@ def main(argv: list[str] | None = None) -> int:
         args.mode = "headless"
     if args.web:
         args.mode = "web"
+    if args.study == "hazop" and args.mode == "headless":
+        raise SystemExit(
+            "launch_dsh: --study hazop needs the web profile; the headless one-shot "
+            "composes no preset roster"
+        )
     if args.host and not args.allow_remote and args.host not in ("127.0.0.1", "localhost"):
         raise SystemExit("launch_dsh: --host needs --allow-remote; the default is loopback")
     args.root = str(Path(args.root).resolve())

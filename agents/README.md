@@ -42,8 +42,9 @@ for that path.
 python tools/launch_dsh.py web --permission-mode read-only --study hazop --flowsheet F
 ```
 
-`--study hazop` enables Agent Teams and the four role presets in
+`--study hazop` (web profile) enables Agent Teams and the four role presets in
 [`agents/deepseek/`](deepseek/README.md); the `azoth-hazop` skill carries the procedure.
+The headless one-shot composes no preset roster and refuses the study.
 The agent definition is [`agents/hazop/README.md`](hazop/README.md); the formal spec is
 [`docs/src/agentic/orchestration.md`](../docs/src/agentic/orchestration.md).
 

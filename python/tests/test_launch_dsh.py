@@ -223,15 +223,12 @@ def test_study_overlay_wires_the_team_and_four_presets(tmp_path: Path) -> None:
         assert _find(rows, f"preset-{preset}") is not None
 
 
-def test_headless_study_inserts_the_registry(tmp_path: Path) -> None:
-    rows = _rows(_root(tmp_path), "--headless", "--study", "hazop", "--flowsheet", "case.toml")
-    inserted = [
-        entry
-        for row in rows
-        for entry in row.get("insert", [])
-        if entry.get("id") == "agent-preset-registry"
-    ]
-    assert inserted, "headless has no shipped registry, so it must be inserted"
+def test_headless_study_is_refused(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    with pytest.raises(SystemExit, match="web profile"):
+        launch_dsh.main(
+            ["--headless", "--study", "hazop", "--flowsheet", "case.toml", "--root", str(root)]
+        )
 
 
 def test_a_gateway_replaces_the_hosted_provider(tmp_path: Path) -> None:

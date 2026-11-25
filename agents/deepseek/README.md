@@ -10,7 +10,7 @@ DeepSeek AI, built on Cordis; this directory holds the azoth side of it.
 python tools/launch_dsh.py --check
 python tools/launch_dsh.py web --permission-mode read-only
 python tools/launch_dsh.py headless --permission-mode read-only "Size a pump for 100 m³/h"
-python tools/launch_dsh.py web --study hazop --flowsheet F
+python tools/launch_dsh.py web --permission-mode read-only --study hazop --flowsheet F
 ```
 
 `--check` is read-only. It probes the Python bridge, the `azoth` CLI and the flowsheet MCP
@@ -79,10 +79,11 @@ the curated subset in [`harness.toml`](harness.toml) instead.
 [`skills/azoth-hazop.md`](skills/azoth-hazop.md) is a harness-only procedure, not a catalog
 skill: it is what `/azoth-hazop` loads.
 
-`--study hazop` enables Agent Teams and sets the root preset to `azoth-hazop-chair`. The
-chair creates one Team task per node × guideword, spawns the `azoth-process`,
-`azoth-safety` and `azoth-scribe` presets through the `subagent` tool, and the scribe
-renders the worksheet. The formal statement of a team as a composition of role-processes
+`--study hazop` (web only) enables Agent Teams and sets the root preset to
+`azoth-hazop-chair`. The chair creates one Team task per node × guideword, spawns the
+`azoth-process`, `azoth-safety` and `azoth-scribe` presets through the `subagent` tool, and
+the scribe renders the worksheet. The headless one-shot composes no preset roster, so it
+refuses the study. The formal statement of a team as a composition of role-processes
 is [`docs/src/agentic/orchestration.md`](../../docs/src/agentic/orchestration.md); this is
 its execution mapping, not a proof.
 

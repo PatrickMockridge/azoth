@@ -27,8 +27,9 @@ python tools/launch_dsh.py web --permission-mode read-only
 
 The launcher exports the skills to `.dsh/skills/`, pins the checkout as the DSH workspace,
 generates the overlay, and mounts the engineering preset, the welcome card, the calculation
-plugin and the demo flowsheet. `--check` is the read-only probe; `--study hazop` enables
-the four role presets and Agent Teams; `--persona software` uses DSH's coding preset.
+plugin and the demo flowsheet. `--check` is the read-only probe; `--study hazop` (web
+profile) enables the four role presets and Agent Teams; `--persona software` uses DSH's
+coding preset.
 [DeepSeek Harness](./harness.md) is the interface reference — modes, flags, the tools the
 model is handed, the bridge's JSON envelopes and the check report — and
 [`agents/deepseek/README.md`](../../../agents/deepseek/README.md) is the setup page.

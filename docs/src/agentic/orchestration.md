@@ -52,9 +52,10 @@ checking the orchestration layer wants the instance, not the general statement.*
 
 [`agents/hazop/`](../../../agents/hazop/README.md) is the first agent: the roles
 above, the skills each chains, and the pipeline, in the terms this page fixes. It
-is runnable through `tools/launch_dsh.py --study hazop`, which mounts the chair as the
-root preset and the process, safety and scribe roles as subagent presets over the
-DeepSeek Harness Team board. The tool schema a model is handed — `@tool` and `*tool`, the
+is runnable through `tools/launch_dsh.py web --permission-mode read-only --study hazop`,
+which mounts the chair as the root preset and the process, safety and scribe roles as
+subagent presets over the DeepSeek Harness Team board. The web profile is required: the
+headless one-shot composes no preset roster. The tool schema a model is handed — `@tool` and `*tool`, the
 same reflection surface a GUI side panel or a notebook offers — is
 [the middleware](../architecture/middleware.md), served by `azoth mcp`.
 
