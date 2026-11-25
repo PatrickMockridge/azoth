@@ -1,6 +1,6 @@
 # Worked notebooks
 
-Seven Jupyter notebooks using the published `azoth-engine` package. They read no repository
+Eight Jupyter notebooks using the published `azoth-engine` package. They read no repository
 file: each one installs, imports `azoth`, and runs. Their outputs are committed so GitHub
 renders the tables and figures, and CI re-executes them so they cannot stop running quietly.
 
@@ -13,6 +13,7 @@ renders the tables and figures, and CI re-executes them so they cannot stop runn
 | [`05-data-science.ipynb`](05-data-science.ipynb) | the batch API over arrays, pandas tables, a compressibility sweep, a conduction sweep, and ISO 6976 over three gas blends. |
 | [`06-field-development-screening.ipynb`](06-field-development-screening.ipynb) | a drilling report, a PT flash map, a well-deliverability forecast, the host-capacity gate, the separation-stage study that decides NUI against manned, and the tieback hydraulics. |
 | [`07-field-development-design.ipynb`](07-field-development-design.ipynb) | the selected three-stage platform, its export-line hydraulics on both routes, CAPEX and OPEX, a production DCF and the sensitivity behind the recommendation. |
+| [`08-offshore-debottlenecking.ipynb`](08-offshore-debottlenecking.ipynb) | ten years of production, the capacity chain that binds, the relief and flare checks, the fix packages and their ten-year incremental DCF, and the shutdown schedule. |
 
 ## Run them
 
@@ -27,7 +28,7 @@ jupyter lab
 
 The `notebook` extra in `pyproject.toml` names the same tools; it ships with the next release.
 
-To execute all seven headlessly and check the committed shape:
+To execute all eight headlessly and check the committed shape:
 
 ```bash
 python tools/check_notebooks.py
