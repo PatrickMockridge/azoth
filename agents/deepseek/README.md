@@ -40,6 +40,25 @@ The plugin imports nothing from `@deepseek-ai/*`: DeepSeek Harness accepts a pla
 definition, so it mounts by absolute path without a package install. `plugin/bridge.js` is
 pure Node and is tested with `node --test`; the engineering logic is Python.
 
+### The bridge
+
+The plugin is a shell around `python -m azoth.harness`:
+
+```bash
+python -m azoth.harness catalogue --query darcy
+python -m azoth.harness spec hydraulics.darcy_weisbach
+python -m azoth.harness run hydraulics.reynolds_number \
+  --inputs-json '{"rho":998,"v":1.5,"D":0.1,"mu":0.001002}'
+python -m azoth.harness version
+```
+
+It writes one JSON envelope on stdout, schema `azoth.harness/1`, with `kind` of
+`catalogue`, `spec`, `result` or `error`; a result is the library's `to_dict()`, the
+provenance block included. The exit status is `0` for success, `2` for an unknown id, `3`
+for an invalid input, `4` for a calculation error and `5` for an internal failure. Inputs
+cap at 1 MB and the CLI's output at 8 MB. [The harness
+chapter](../../docs/src/agentic/harness.md) states the full contract.
+
 ## Skills and the HAZOP team
 
 `tools/export_skills.py` writes the 90 catalog skills to `.dsh/skills/`, the project root

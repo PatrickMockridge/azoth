@@ -19,8 +19,10 @@ python tools/launch_dsh.py headless --study hazop --flowsheet F "Run a HAZOP on 
 ```
 
 The launcher exports the skills, writes the DSH overlay, and mounts the calculation plugin
-and the flowsheet MCP server. See [`agents/deepseek/README.md`](agents/deepseek/README.md)
-for the modes and caveats.
+and the flowsheet MCP server. The
+[DeepSeek Harness chapter](docs/src/agentic/harness.md) is the interface reference — modes,
+flags, the tools the model is handed, the bridge's JSON envelopes and the check report —
+and [`agents/deepseek/README.md`](agents/deepseek/README.md) has the setup and caveats.
 
 ## The NeqSim oracle
 

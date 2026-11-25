@@ -28,8 +28,9 @@ python tools/launch_dsh.py web --flowsheet specs/flowsheets/demo.toml
 The launcher exports the skills to `.dsh/skills/`, generates the DeepSeek Harness overlay,
 and mounts the calculation plugin and the flowsheet MCP server. `--check` is the read-only
 probe; `--study hazop` enables the four role presets and Agent Teams.
-[`agents/deepseek/README.md`](../../../agents/deepseek/README.md) has the modes, the two
-tool surfaces and the caveats.
+[DeepSeek Harness](./harness.md) is the interface reference — modes, flags, the tools the
+model is handed, the bridge's JSON envelopes and the check report — and
+[`agents/deepseek/README.md`](../../../agents/deepseek/README.md) is the setup page.
 
 The distribution name `azoth-engine` is on PyPI; the launcher and the skills are
 repository features, because `tools/launch_dsh.py` is a repository tool. The
