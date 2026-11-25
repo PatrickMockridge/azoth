@@ -2,7 +2,7 @@
 
 The library is a Python package with a Rust core. A script and a notebook use the same
 surface: `import azoth`, pass `pint` quantities in, and read a frozen result out. This page is
-the route for both, and the five worked notebooks under
+the route for both, and the seven worked notebooks under
 [`notebooks/`](https://github.com/PatrickMockridge/azoth/tree/main/notebooks) are the long form.
 
 ## Install and import
@@ -196,6 +196,12 @@ figures without running anything:
   hand.
 - [`05-data-science.ipynb`](https://github.com/PatrickMockridge/azoth/blob/main/notebooks/05-data-science.ipynb)
   — the batch API, pandas tables, compressibility and conduction sweeps, and ISO 6976.
+- [`06-field-development-screening.ipynb`](https://github.com/PatrickMockridge/azoth/blob/main/notebooks/06-field-development-screening.ipynb)
+  — a drilling report and phase map, well deliverability, the host-capacity gate, and the
+  separation-stage study that decides NUI against manned.
+- [`07-field-development-design.ipynb`](https://github.com/PatrickMockridge/azoth/blob/main/notebooks/07-field-development-design.ipynb)
+  — the selected platform's equipment, both export routes, CAPEX and OPEX, the production DCF
+  and the sensitivity behind the recommendation.
 
 They read no repository file; the flowsheet in notebook 04 is embedded as text. CI executes
 them, so an example that stops running fails the push rather than the reader.
