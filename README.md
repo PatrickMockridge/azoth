@@ -87,6 +87,31 @@ them different.
   result, both implementations' agreement and the external cases as anchored evidence —
   with `python -m azoth.rgen`.
 
+## The DeepSeek Harness interface
+
+DeepSeek Harness (`dsh`) is the runtime the agentic layer executes on — MIT-licensed,
+plugin-first, and a `0.2` developer preview. The launcher exports the skills, renders the
+profile overlay, and starts it:
+
+```bash
+python tools/launch_dsh.py --check --flowsheet specs/flowsheets/demo.toml   # read-only probe
+python tools/launch_dsh.py web --flowsheet specs/flowsheets/demo.toml       # browser UI
+python tools/launch_dsh.py headless --study hazop --flowsheet F "Run a HAZOP on F"
+```
+
+Three surfaces are available:
+
+| Surface | Names | What it exposes |
+|---|---|---|
+| calculation plugin | `azoth_catalogue`, `azoth_spec`, `azoth_calc` | every registered id — 98 calculations and 300 models — through `python -m azoth.harness`; a result carries warnings and provenance |
+| flowsheet MCP | `mcp__azoth__*` | the 20 `azoth mcp --flowsheet F` edit commands, and the `azoth://document`, `azoth://diagnostics`, `azoth://report` and `azoth://catalogue` resources |
+| skills and team | `/azoth-hazop`, four presets | the 90 catalog skills, or the curated HAZOP subset, over the Agent Teams board |
+
+Hosted DeepSeek is the default (`DEEPSEEK_API_KEY`, `deepseek-v4-flash`); `--base-url`
+routes the same harness at any OpenAI-compatible endpoint serving open-weight weights.
+The full interface — modes, flags, the bridge's JSON envelopes and the check report — is
+[the DeepSeek Harness chapter](docs/src/agentic/harness.md).
+
 ## Inherent safety
 
 The worst thing this library can do is not crash. It is **return a wrong number that looks
@@ -217,8 +242,10 @@ spec files as the code.
 ## Entry points
 
 - **Use the library** — [the book front door](docs/src/index.md).
-- **Build on the agentic layer** — [`CLAUDE.md`](CLAUDE.md) and [`AGENTS.md`](AGENTS.md),
-  and [`agents/README.md`](agents/README.md) for the HAZOP team and its runtime.
+- **Run the agentic layer** — `python tools/launch_dsh.py --check`, then
+  [the DeepSeek Harness chapter](docs/src/agentic/harness.md); [`agents/README.md`](agents/README.md)
+  and [`agents/deepseek/README.md`](agents/deepseek/README.md) hold the setup and the HAZOP team.
+- **Build on the agentic layer** — [`CLAUDE.md`](CLAUDE.md) and [`AGENTS.md`](AGENTS.md).
 
 ## Licence
 
