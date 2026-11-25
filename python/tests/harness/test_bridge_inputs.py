@@ -104,3 +104,16 @@ def test_the_bridge_conversion_agrees_with_the_spec_helper() -> None:
     assert bridge["T"] == helper["T"]
     assert bridge["P"] == helper["P"]
     assert bridge["z"] == helper["z"]
+
+
+def test_a_vector_string_model_keeps_its_names_as_strings() -> None:
+    from azoth._models_gen import MODELS
+
+    model = next(
+        entry for entry in MODELS if entry["id"] == "characterization.set_heavy_tbp_to_plus"
+    )
+    case = model["cases"][0]["inputs"]
+    bridge = model_kwargs(model, case)
+    helper = _helpers.model_kwargs(model, case)
+    assert bridge["names"] == helper["names"]
+    assert all(isinstance(name, str) for name in bridge["names"])
