@@ -69,9 +69,9 @@ not an equation, and both implementations read it from here.
 |---|---|---|
 | `the_names_feed_at_290_k` | components = ['methane', 'n-heptane', 'nc14', 'nc20'], eos = srk, T = 290.0, P = 500000.0, z = [0.7, 0.1, 0.1, 0.1] | wax_fraction = 0.0, phase_count = 2 |
 | `the_names_feed_at_275_k` | components = ['methane', 'n-heptane', 'nc14', 'nc20'], eos = srk, T = 275.0, P = 500000.0, z = [0.7, 0.1, 0.1, 0.1] | wax_fraction = 0.0, phase_count = 2 |
-| `the_names_feed_at_265_k` | components = ['methane', 'n-heptane', 'nc14', 'nc20'], eos = srk, T = 265.0, P = 500000.0, z = [0.7, 0.1, 0.1, 0.1] | wax_fraction = 0.0706733924864949, phase_count = 3 |
-| `the_names_feed_at_255_k` | components = ['methane', 'n-heptane', 'nc14', 'nc20'], eos = srk, T = 255.0, P = 500000.0, z = [0.7, 0.1, 0.1, 0.1] | wax_fraction = 0.132007556310333, phase_count = 3 |
-| `the_names_feed_at_245_k` | components = ['methane', 'n-heptane', 'nc14', 'nc20'], eos = srk, T = 245.0, P = 500000.0, z = [0.7, 0.1, 0.1, 0.1] | wax_fraction = 0.154193075421103, phase_count = 3 |
+| `the_names_feed_at_265_k` | components = ['methane', 'n-heptane', 'nc14', 'nc20'], eos = srk, T = 265.0, P = 500000.0, z = [0.7, 0.1, 0.1, 0.1] | wax_fraction = 0.0690433780142373, phase_count = 3 |
+| `the_names_feed_at_255_k` | components = ['methane', 'n-heptane', 'nc14', 'nc20'], eos = srk, T = 255.0, P = 500000.0, z = [0.7, 0.1, 0.1, 0.1] | wax_fraction = 0.131014429499445, phase_count = 3 |
+| `the_names_feed_at_245_k` | components = ['methane', 'n-heptane', 'nc14', 'nc20'], eos = srk, T = 245.0, P = 500000.0, z = [0.7, 0.1, 0.1, 0.1] | wax_fraction = 0.153204549426707, phase_count = 3 |
 
 ## How far this is checked
 **`partially_verified`** — exercised against expectations pinned in its own spec, with no independent oracle recorded for it - **the normal case rather than a defect**.

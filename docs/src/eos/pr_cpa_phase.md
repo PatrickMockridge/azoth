@@ -72,4 +72,4 @@ declared checks *that call* could not evaluate.
 
 - Kontogeorgis, G. M.; Voutsas, E. C.; Yakoumis, I. V.; Tassios, D. P. (1996). "An Equation of State for Associating Fluids." Industrial & Engineering Chemistry Research 35(11), 4310-4318. DOI 10.1021/ie9600203
 - Michelsen, M. L.; Hendriks, E. M. (2001). "Physical properties from association models." Fluid Phase Equilibria 180(1-2), 165-174. DOI 10.1016/S0378-3812(01)00355-7
-- NeqSim master, `PhasePrCPA.java` / `ComponentPrCPA.java` / `SystemPrCPA.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669. **The classes are read for their structure, not their answers** - see the case's source for why there is no reading to take.
+- NeqSim master, `PhasePrCPA.java` / `ComponentPrCPA.java` / `SystemPrCPA.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a. **The classes are read for their structure, not their answers** - see the case's source for why there is no reading to take.

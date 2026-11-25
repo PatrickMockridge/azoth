@@ -79,7 +79,7 @@ NeqSim
 --------------------------------------------------------------------------------
 
   Project:   NeqSim - https://github.com/equinor/neqsim
-  Version:   master (commit 118d9aff9206504c136a08e1348b86cdd6cff669)
+  Version:   master (commit b40bb1134508faa24b07aed9a23c4d52865e5c2a)
   Licence:   Apache License, Version 2.0
              http://www.apache.org/licenses/LICENSE-2.0
   Copyright: Copyright 2018 neqsim

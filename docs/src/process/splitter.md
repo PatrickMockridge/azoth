@@ -45,7 +45,7 @@ A **direct** model: a computation over vectors, with no iteration and therefore 
 | `products_z` | dimensionless | each outlet's composition, which is the feed's written out once per outlet. |
 | `products_p` | Pa | each outlet's pressure, which is `feed_p`. |
 | `products_t` | K | each outlet's temperature, which is `feed_t`. |
-| `products_h` | J/mol | each outlet's molar enthalpy, which is the feed's. A splitter adds no heat and no work and does not flash, so this is the one field an oracle cannot be asked for - see the assumptions. |
+| `products_h` | J/mol | each outlet's molar enthalpy, which is the feed's. A splitter adds no heat and no work and does not flash, so the branch states and the fraction-weighted balance are the capture's own evidence. |
 | `pressure_drop_value` | Pa | *Optional.* the `pressureDrop` constraint's current value: `0.0` by construction, the class's "ideal splitter". Present only when the constraint is in the map. |
 | `pressure_drop_design` | Pa | *Optional.* the `pressureDrop` constraint's design value: `design_pressure_drop`, or the class's 5000 Pa when the map was initialized by the enable flag. Present only with the constraint. |
 | `pressure_drop_utilization` | dimensionless | *Optional.* the `pressureDrop` constraint's `min(value/design, 9.99)`, which is 0 because its value is 0. Present only with the constraint. |
@@ -75,7 +75,7 @@ A **direct** model: a computation over vectors, with no iteration and therefore 
 - **the factors are normalised, so only their ratios mean anything.** `[0.3, 0.7]` and `[3.0, 7.0]` are the same split, which the capture's two rows show as one set of numbers. A caller who wants absolute outlet flows is asking for `process.component_splitter`'s question, not this one.
 - **nothing changes but the flow.** The outlets carry the feed's composition, pressure, temperature and molar enthalpy, so the fractions are the whole arithmetic. The split is flash-free; the capacity read below is the one place this id flashes the feed.
 - **an outlet's enthalpy is the feed's because `h` is a state function**, and the state did not move. That is the whole of the enthalpy balance here and it is why it holds at any fraction.
-- **NeqSim's `Splitter.run` does not conserve enthalpy, and this diverges deliberately.** Its branch enthalpies do not match the states they report, so reproducing them would mean reproducing a broken balance. The capture carries the numbers and the case's `source` states the case they make.
+- **the class conserves enthalpy for flowing branches and gives a closed one zero enthalpy and entropy rates** (NeqSim `#4073`, fixed by the pin). The port's outlets carry the feed's molar enthalpy, and a zero-flow branch carries no material.
 - **a factor may not be negative and the total may not be zero or less.** NeqSim clamps a negative factor to zero and falls back to putting everything down the first branch when the total is not positive; this refuses both, because a splitter asked for a split it cannot make has no answer to report.
 - **the fluid is PR with the classic mixing rule**, because `Stream::mixture()` resolves `databank::mixture_of(names, Cubic::Pr, None)` and has no other route.
 - **the capacity map is lazy, and presence is the setter.** The constructor makes the design but no constraints; each limit setter initializes it, and enabling analysis initializes it only when empty. Absent is an uncalled setter; a non-positive one initializes but suppresses only its constraint.

@@ -1,7 +1,7 @@
 // The Furst electrolyte layers, printed one at a time so each can be ported and checked.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar FurstProbe.java
-//     java -cp .:neqsim-118d9af.jar FurstProbe
+//     javac -proc:none -cp neqsim-b40bb11.jar FurstProbe.java
+//     java -cp .:neqsim-b40bb11.jar FurstProbe
 //
 // `PhaseModifiedFurstElectrolyteEos` is `PhaseSrkEos` plus three additive Helmholtz terms:
 //

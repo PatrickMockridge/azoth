@@ -1,8 +1,8 @@
 process_cost_summary
-total_purchased_equipment_cost=293683.07900098007
-total_bare_module_cost=1209240.0777865353
-total_module_cost=1511550.0972331692
-total_grass_roots_cost=1738282.6118181446
+total_purchased_equipment_cost=293544.1623148176
+total_bare_module_cost=1208668.0883312614
+total_module_cost=1510835.1104140768
+total_grass_roots_cost=1737460.3769761883
 total_installation_man_hours=36104.73644733804
 unit_count=5
 unit_0_name=Feed
@@ -18,13 +18,13 @@ unit_0_power_kw=0.0
 unit_0_duty_kw=0.0
 unit_1_name=InletSeparator
 unit_1_type=Vessels
-unit_1_purchased_equipment_cost=2710.0997797401924
-unit_1_bare_module_cost=11158.835843080242
-unit_1_total_module_cost=13948.544803850302
-unit_1_grass_roots_cost=20922.817205775453
+unit_1_purchased_equipment_cost=2571.1830935777334
+unit_1_bare_module_cost=10586.846387806316
+unit_1_total_module_cost=13233.557984757896
+unit_1_grass_roots_cost=19850.336977136845
 unit_1_installation_man_hours=10.761660837894372
 unit_1_weight_kg=358.7220279298124
-unit_1_located_purchased_equipment_cost=2710.0997797401924
+unit_1_located_purchased_equipment_cost=2571.1830935777334
 unit_1_power_kw=0.0
 unit_1_duty_kw=0.0
 unit_2_name=MainCompressor
@@ -63,42 +63,42 @@ unit_4_duty_kw=0.0
 
 cost_by_equipment_type
 type_Streams=0.0
-type_Vessels=2710.0997797401924
+type_Vessels=2571.1830935777334
 type_Compressors=236944.74435086618
 type_Heat Exchangers=1056.0
 type_Valves=52972.234870373686
 
 cost_by_discipline
-discipline_Process Equipment=293683.07900098007
-discipline_Piping & Valves=1007700.0648221128
-discipline_Electrical & Instrumentation=604620.0388932676
-discipline_Civil & Structural=403080.0259288451
-discipline_Other (HVAC, Paint, Insulation)=806160.0518576902
+discipline_Process Equipment=293544.1623148176
+discipline_Piping & Valves=1007223.4069427178
+discipline_Electrical & Instrumentation=604334.0441656307
+discipline_Civil & Structural=402889.3627770872
+discipline_Other (HVAC, Paint, Insulation)=805778.7255541744
 
 project_costs
-project_directInstalledCost=1511550.0972331692
-project_indirectCost=226732.51458497532
-project_projectContingency=173828.26118181448
-project_ownerCost=260742.39177272166
-project_totalProjectCost=2172853.2647726806
-total_project_cost=2172853.2647726806
+project_directInstalledCost=1510835.1104140768
+project_indirectCost=226625.26656211144
+project_projectContingency=173746.03769761883
+project_ownerCost=260619.05654642824
+project_totalProjectCost=2171825.4712202353
+total_project_cost=2171825.4712202353
 
 operating_costs
 opex_Electricity=155772.858323871
 opex_Steam=0.0
 opex_Cooling Water=11696.78243740985
-opex_Maintenance=60462.00388932677
+opex_Maintenance=60433.40441656308
 opex_Operating Labor=800000.0
 opex_Supervision=144000.0
-opex_Operating Supplies=7255.440466719212
+opex_Operating Supplies=7252.008529987569
 opex_Laboratory=120000.0
-opex_Overhead=552454.1021391298
-total_annual_operating_cost=1851641.1872564566
+opex_Overhead=552438.3724291098
+total_annual_operating_cost=1851593.4261369412
 
 economics
-payback_period_years=0.5521234126117187
-roi_percent=181.118926884423
-npv=1.7607019385921277E7
+payback_period_years=0.5518538778949201
+roi_percent=181.20738841494784
+npv=1.7608135092167135E7
 system_total_weight_kg=601995.8012041049
 weight_based_capex=6.019958012041049E8
 

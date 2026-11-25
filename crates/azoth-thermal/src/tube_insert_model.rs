@@ -1,7 +1,7 @@
 //! `thermal.tube_insert_model` - twisted tape, wire matrix and coiled wire enhancement.
 //!
 //! Transcribed from `process/mechanicaldesign/heatexchanger/TubeInsertModel.java` at NeqSim
-//! `118d9aff`: the enhancement and friction ratios of the three inserts, the performance
+//! `b40bb113`: the enhancement and friction ratios of the three inserts, the performance
 //! evaluation criterion, and the enhancement applied to a plain-tube state.
 //!
 //! Spec: `specs/calcs/thermal/tube_insert_model.toml`.

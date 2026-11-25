@@ -1,4 +1,4 @@
-pvtsimulation/flowassurance remainder at 118d9aff
+pvtsimulation/flowassurance remainder at b40bb113
 # --- DeWaardMilliamsCorrosion ---
 state=default baseline_mmyr=7.393788858112505 ph_factor=0.5303605358080379 scale_factor=1.0 glycol_factor=1.0 flow_factor=1.7411011265922482 corrected_mmyr=6.827508376557518 sulfur_rate_mmyr=0.0 fes_rate_mmyr=0.0 feco3_si=0.6276653867033487 feco3_scale_forming=false sour=false severity=Very High morphology=No FeS formation expected (no H2S or S8) allowance_mm=170.68770941393797
 state=co2_zero baseline_mmyr=0.0 ph_factor=1.0 scale_factor=1.0 glycol_factor=1.0 flow_factor=1.0 corrected_mmyr=0.0 sulfur_rate_mmyr=0.0 fes_rate_mmyr=0.0 feco3_si=6.193941947623216E-8 feco3_scale_forming=false sour=false severity=Low morphology=No FeS formation expected (no H2S or S8) allowance_mm=0.0

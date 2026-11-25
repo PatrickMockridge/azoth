@@ -2,9 +2,9 @@
 //
 // Compile and run from this directory:
 //
-//     javac -proc:none -cp neqsim-118d9af.jar SurfaceTensionProbe.java
-//     java -cp .:neqsim-118d9af.jar SurfaceTensionProbe > captures/surface_tension_probe.tsv
-//     java -cp .:neqsim-118d9af.jar SurfaceTensionProbe solvers > captures/surface_tension_solvers_probe.tsv
+//     javac -proc:none -cp neqsim-b40bb11.jar SurfaceTensionProbe.java
+//     java -cp .:neqsim-b40bb11.jar SurfaceTensionProbe > captures/surface_tension_probe.tsv
+//     java -cp .:neqsim-b40bb11.jar SurfaceTensionProbe solvers > captures/surface_tension_solvers_probe.tsv
 //
 // With no argument the probe records model 0 - the field's initial value and the only default -
 // and the two calculators it installs, Parachor and Firozabadi-Ramley, called directly. Model 0
@@ -109,7 +109,6 @@ public class SurfaceTensionProbe {
 
     if (solvers) {
       for (int model : new int[] { 1, 2, 4 }) {
-        long started = System.currentTimeMillis();
         try {
           system.getInterphaseProperties().setInterfacialTensionModel(model);
           System.out.println("model_" + model + "_sigma_N_per_m="
@@ -118,8 +117,6 @@ public class SurfaceTensionProbe {
           System.out.println("model_" + model + "_error=" + ex.getClass().getSimpleName() + ":"
               + ex.getMessage());
         }
-        System.out.println("model_" + model + "_milliseconds="
-            + (System.currentTimeMillis() - started));
       }
     }
     System.out.println();

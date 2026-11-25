@@ -44,27 +44,27 @@ fn the_steady_and_dynamic_areas_are_the_captured_states() {
     let fifty = sizing(5.0e6, 5.0, 5.0e5, 5.0e6);
     close(
         fifty.steady_required_area.value,
-        1.3484834741989848e-4,
+        1.3532429190157695e-4,
         "steady 50 bara",
     );
     close(
         fifty.dynamic_required_area.value,
-        5.401978650632388e-5,
+        5.44015269712034e-5,
         "dynamic 50 bara",
     );
     close(
         fifty.oversizing_ratio.expect("a positive dynamic area"),
-        2.496276941118831,
+        2.487509072552481,
         "oversizing 50 bara",
     );
     close(
         fifty.allowable_pressure.value,
-        6_050_000.0,
+        6_028_721.75,
         "allowable 50 bara",
     );
     close(
         fifty.peak_dynamic_pressure.value,
-        6_049_999.996_251_063,
+        6_028_721.746_112_543,
         "peak 50 bara",
     );
     close(
@@ -76,27 +76,22 @@ fn the_steady_and_dynamic_areas_are_the_captured_states() {
     let low = sizing(1.1e6, 1.0, 1.5e5, 1.1e6);
     close(
         low.steady_required_area.value,
-        1.9424246655211374e-4,
+        1.9739820536756255e-4,
         "steady 11 bara",
     );
-    close(
-        low.dynamic_required_area.value,
-        6.094593000614838e-5,
-        "dynamic 11 bara",
+    assert!(
+        low.dynamic_required_area.value.is_nan(),
+        "the peak cannot be held at 11 bara, so the class answers no dynamic area"
     );
-    close(
-        low.oversizing_ratio.expect("a positive dynamic area"),
-        3.1871277792055692,
-        "oversizing 11 bara",
-    );
+    assert!(low.oversizing_ratio.is_none() || low.oversizing_ratio.unwrap().is_nan());
     close(
         low.allowable_pressure.value,
-        1_331_000.0,
+        1_309_721.75,
         "allowable 11 bara",
     );
     close(
         low.peak_dynamic_pressure.value,
-        1_330_999.998_688_657_3,
+        1_116_540.736_216_803_5,
         "peak 11 bara",
     );
     close(

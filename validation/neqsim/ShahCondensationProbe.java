@@ -2,8 +2,8 @@
 //
 // Compile and run from this directory:
 //
-//     javac -proc:none -cp neqsim-118d9af.jar ShahCondensationProbe.java
-//     java -cp .:neqsim-118d9af.jar ShahCondensationProbe > captures/shah_condensation_probe.tsv
+//     javac -proc:none -cp neqsim-b40bb11.jar ShahCondensationProbe.java
+//     java -cp .:neqsim-b40bb11.jar ShahCondensationProbe > captures/shah_condensation_probe.tsv
 //
 // **The composed screen is the zone analysis's pair**: `calcLiquidOnlyHTC` feeds
 // `calcAverageHTC`, and the local and vertical coefficients are the class's other two

@@ -10,8 +10,8 @@
 // wax too - and the same `TPmultiflashWAX` runs on it. That makes this the family's
 // representative: the amount-solve on a fluid both libraries can name.
 //
-//   javac -proc:none -cp neqsim-118d9af.jar WaxAmountProbe.java
-//   java -cp .:neqsim-118d9af.jar WaxAmountProbe > captures/wax_amount_probe.tsv
+//   javac -proc:none -cp neqsim-b40bb11.jar WaxAmountProbe.java
+//   java -cp .:neqsim-b40bb11.jar WaxAmountProbe > captures/wax_amount_probe.tsv
 
 import neqsim.thermo.component.ComponentInterface;
 import neqsim.thermo.phase.PhaseInterface;

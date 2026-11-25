@@ -721,7 +721,9 @@ fn separator_pec(spec: &SeparatorSpec, common: &Common) -> f64 {
     if volume <= 0.0 {
         return 0.0;
     }
-    vertical_vessel_by_volume(volume, common.ratio())
+    // The class prices by the separator's orientation, whose default is horizontal. These
+    // inputs carry no orientation, so the default is the one case they can express.
+    horizontal_vessel_by_volume(volume, common.ratio())
 }
 
 fn reactor_pec(spec: &ReactorSpec, common: &Common) -> f64 {

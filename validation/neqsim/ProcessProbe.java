@@ -27,148 +27,148 @@
 // what NeqSim's own `Ejector.run` relies on. A `ProcessSystem` is required for a recycle
 // alone, and that is P12's subject.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar ProcessProbe.java
-//     java -cp .:neqsim-118d9af.jar ProcessProbe pump > captures/process_pump.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe splitter > captures/process_splitter.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe splitter_capacity \
+//     javac -proc:none -cp neqsim-b40bb11.jar ProcessProbe.java
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe pump > captures/process_pump.tsv
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe splitter > captures/process_splitter.tsv
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe splitter_capacity \
 //       > captures/process_splitter_capacity.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe splitter_mechanical_design \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe splitter_mechanical_design \
 //       > captures/process_splitter_mechanical_design.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe mixer > captures/process_mixer.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe separator > captures/process_separator.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe separator_capacity \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe mixer > captures/process_mixer.tsv
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe separator > captures/process_separator.tsv
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe separator_capacity \
 //       > captures/process_separator_capacity.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe separator_capacity_assessment \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe separator_capacity_assessment \
 //       > captures/process_separator_capacity_assessment.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe separator_sizing \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe separator_sizing \
 //       > captures/process_separator_sizing.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe separator_mechanical \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe separator_mechanical \
 //       > captures/process_separator_mechanical_design.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe gas_scrubber_mechanical \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe gas_scrubber_mechanical \
 //       > captures/process_gas_scrubber_mechanical_design.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe three_phase_settling \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe three_phase_settling \
 //       > captures/process_three_phase_settling.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe separator_performance_enhanced \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe separator_performance_enhanced \
 //       > captures/process_separator_performance_enhanced.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe anti_surge_recycle \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe anti_surge_recycle \
 //       > captures/process_anti_surge_recycle.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe throttling_valve \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe throttling_valve \
 //       > captures/process_throttling_valve.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe heat_exchanger \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe heat_exchanger \
 //       > captures/process_heat_exchanger.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe heater > captures/process_heater.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe cooler > captures/process_cooler.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe filter > captures/process_filter.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe pipe > captures/process_pipe.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe manifold > captures/process_manifold.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe gas_scrubber \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe heater > captures/process_heater.tsv
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe cooler > captures/process_cooler.tsv
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe filter > captures/process_filter.tsv
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe pipe > captures/process_pipe.tsv
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe manifold > captures/process_manifold.tsv
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe gas_scrubber \
 //       > captures/process_gas_scrubber.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe component_splitter \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe component_splitter \
 //       > captures/process_component_splitter.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe tray > captures/process_column_tray.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe side_draw \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe tray > captures/process_column_tray.tsv
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe side_draw \
 //       > captures/process_side_draw.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe column_tear \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe column_tear \
 //       > captures/process_column_tear.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe rate_based \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe rate_based \
 //       > captures/process_rate_based_packed_column.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe rate_based_billet \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe rate_based_billet \
 //       > captures/process_rate_based_billet.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe rate_based_solvers \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe rate_based_solvers \
 //       > captures/process_rate_based_solvers.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe column_efficiency \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe column_efficiency \
 //       > captures/process_column_efficiency.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe absorber_efficiency \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe absorber_efficiency \
 //       > captures/process_absorber_efficiency.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe capacity \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe capacity \
 //       > captures/process_column_capacity.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe designer \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe designer \
 //       > captures/process_internals_designer.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe coupling \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe coupling \
 //       > captures/process_hydraulic_coupling.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe mechanical \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe mechanical \
 //       > captures/process_column_mechanical_design.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe column > captures/process_column.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe condenser \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe column > captures/process_column.tsv
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe condenser \
 //       > captures/process_column_condenser.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe reboiler \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe reboiler \
 //       > captures/process_column_reboiler.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe shortcut_column \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe shortcut_column \
 //       > captures/process_shortcut_distillation_column.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe ejector \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe ejector \
 //       > captures/process_ejector.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe stream \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe stream \
 //       > captures/process_stream_properties.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe gibbs_reactor \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe gibbs_reactor \
 //       > captures/process_gibbs_reactor.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe gibbs_steps \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe gibbs_steps \
 //       > captures/process_gibbs_reactor_steps.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe flowsheet \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe flowsheet \
 //       > captures/process_flowsheet.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe flowsheet_accelerated \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe flowsheet_accelerated \
 //       > captures/process_flowsheet_accelerated.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe gas_dispersion \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe gas_dispersion \
 //       > captures/process_gas_dispersion.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe gaussian_plume \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe gaussian_plume \
 //       > captures/process_gaussian_plume.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe probit > captures/process_probit.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe jet_fire \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe probit > captures/process_probit.tsv
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe jet_fire \
 //       > captures/process_jet_fire.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe pool_fire \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe pool_fire \
 //       > captures/process_pool_fire.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe vce > captures/process_vce.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe bleve > captures/process_bleve.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe event_tree \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe vce > captures/process_vce.tsv
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe bleve > captures/process_bleve.tsv
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe event_tree \
 //       > captures/process_event_tree.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe consequence_analysis \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe consequence_analysis \
 //       > captures/process_consequence_analysis.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe pfp_demand \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe pfp_demand \
 //       > captures/process_pfp_demand.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe fire_water_demand \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe fire_water_demand \
 //       > captures/process_fire_water_demand.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe deluge_nozzle_layout \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe deluge_nozzle_layout \
 //       > captures/process_deluge_nozzle_layout.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe fire_monitor_coverage \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe fire_monitor_coverage \
 //       > captures/process_fire_monitor_coverage.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe fire_water_coverage_assessment \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe fire_water_coverage_assessment \
 //       > captures/process_fire_water_coverage_assessment.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe active_fire_protection_screening \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe active_fire_protection_screening \
 //       > captures/process_active_fire_protection_screening.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe api537_flare_flame \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe api537_flare_flame \
 //       > captures/process_api537_flare_flame.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe hazop_template \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe hazop_template \
 //       > captures/process_hazop_template.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe fmea_worksheet \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe fmea_worksheet \
 //       > captures/process_fmea_worksheet.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe hazop_consequence_population \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe hazop_consequence_population \
 //       > captures/process_hazop_consequence_population.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe mah_bow_tie_skeleton \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe mah_bow_tie_skeleton \
 //       > captures/process_mah_bow_tie_skeleton.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe api14c_safe_chart \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe api14c_safe_chart \
 //       > captures/process_api14c_safe_chart.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe barrier_register_validation \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe barrier_register_validation \
 //       > captures/process_barrier_register_validation.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe s001_secondary_pressure_protection \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe s001_secondary_pressure_protection \
 //       > captures/process_s001_secondary_pressure_protection.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe s001_clause10_review \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe s001_clause10_review \
 //       > captures/process_s001_clause10_review.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe piping_fiv_gas \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe piping_fiv_gas \
 //       > captures/process_piping_fiv_gas.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe piping_fiv_liquid \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe piping_fiv_liquid \
 //       > captures/process_piping_fiv_liquid.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe aiv \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe aiv \
 //       > captures/process_acoustic_induced_vibration_screening.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe pulsation \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe pulsation \
 //       > captures/process_flow_induced_pulsation_screening.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe norsok_p002 \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe norsok_p002 \
 //       > captures/process_norsok_p002_compliance.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe sts0131 \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe sts0131 \
 //       > captures/process_sts0131_gate.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe inherent \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe inherent \
 //       > captures/process_inherent_safety.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe alarp \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe alarp \
 //       > captures/process_alarp_audit.tsv
-//     java -cp .:neqsim-118d9af.jar ProcessProbe escalation \
+//     java -cp .:neqsim-b40bb11.jar ProcessProbe escalation \
 //       > captures/process_escalation_graph.tsv
 
 import neqsim.process.equipment.stream.Stream;
@@ -3989,14 +3989,19 @@ public class ProcessProbe {
           new neqsim.process.equipment.expander.Expander("solve", inlet);
       expander.setOutletPressure(30.0);
       expander.setIsentropicEfficiency(0.80);
-      double solved = expander.solveEfficiency(target);
-      expander.run();
       System.out.println("solve_target_t_k=" + target);
-      System.out.println("solved_efficiency=" + solved);
-      System.out.println("power_w=" + expander.getPower());
-      System.out.println("outlet_t_k=" + expander.getOutletStream().getTemperature("K"));
-      print("inlet", inlet);
-      print("outlet", expander.getOutletStream());
+      try {
+        double solved = expander.solveEfficiency(target);
+        expander.run();
+        System.out.println("solved_efficiency=" + solved);
+        System.out.println("power_w=" + expander.getPower());
+        System.out.println("outlet_t_k=" + expander.getOutletStream().getTemperature("K"));
+        print("inlet", inlet);
+        print("outlet", expander.getOutletStream());
+      } catch (RuntimeException ex) {
+        System.out.println("solve_refusal=" + ex.getClass().getSimpleName() + ": "
+            + ex.getMessage());
+      }
       System.out.println();
     }
   }
@@ -9630,16 +9635,24 @@ public class ProcessProbe {
     System.out.println(label);
     System.out.println("time_step_s=" + dt);
     System.out.println("in_wall_temperature_K=" + hx.getWallTemperature());
-    System.out.println(
-        "in_shell_fluid_temperature_K=" + privateDouble(hx, "shellFluidTemperature"));
-    System.out.println(
-        "in_tube_fluid_temperature_K=" + privateDouble(hx, "tubeFluidTemperature"));
-    hx.runTransient(dt, id);
+    System.out.println("in_thermal_inventory_energy_j=" + hx.getThermalInventoryEnergyJ());
+    try {
+      hx.runTransient(dt, id);
+    } catch (RuntimeException ex) {
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+      System.out.println();
+      return;
+    }
     System.out.println("out_wall_temperature_K=" + hx.getWallTemperature());
-    System.out.println(
-        "out_shell_fluid_temperature_K=" + privateDouble(hx, "shellFluidTemperature"));
-    System.out.println(
-        "out_tube_fluid_temperature_K=" + privateDouble(hx, "tubeFluidTemperature"));
+    System.out.println("out_thermal_inventory_energy_j=" + hx.getThermalInventoryEnergyJ());
+    neqsim.process.equipment.heatexchanger.HeatExchanger.Balance balance =
+        hx.getLastThermalBalance();
+    System.out.println("out_thermal_balance_accumulation_j="
+        + (balance == null ? Double.NaN : balance.getAccumulationJ()));
+    System.out.println("out_thermal_balance_boundary_energy_j="
+        + (balance == null ? Double.NaN : balance.getBoundaryEnergyJ()));
+    System.out.println("out_thermal_balance_residual_j="
+        + (balance == null ? Double.NaN : balance.getResidualJ()));
     print("shell_in", shellIn);
     print("tube_in", tubeIn);
     print("shell_out", hx.getOutStream(0));
@@ -13236,7 +13249,32 @@ public class ProcessProbe {
     SystemInterface fluid = leakFluid(srk, names, amounts, temperature, pressureBar);
     LeakModel leak = LeakModel.builder().fluid(fluid).holeDiameter(diameter).vesselVolume(volume)
         .dischargeCoefficient(coefficient).backPressure(back).scenarioName(label).build();
-    SourceTermResult result = leak.calculateSourceTerm(duration, step);
+    SourceTermResult result;
+    try {
+      result = leak.calculateSourceTerm(duration, step);
+    } catch (RuntimeException ex) {
+      System.out.println(label);
+      System.out.println("eos=" + (srk ? "srk" : "pr"));
+      System.out.println("input_t_k=" + fluid.getTemperature());
+      System.out.println("input_p_bara=" + fluid.getPressure());
+      double[] overallRefused = fluid.getMolarComposition();
+      StringBuilder zRefused = new StringBuilder();
+      for (int i = 0; i < overallRefused.length; i++) {
+        zRefused.append(i == 0 ? "" : ",")
+            .append(fluid.getPhase(0).getComponent(i).getName()).append(":")
+            .append(overallRefused[i]);
+      }
+      System.out.println("input_z=" + zRefused);
+      System.out.println("vessel_volume_m3=" + volume);
+      System.out.println("hole_diameter_m=" + diameter);
+      System.out.println("discharge_coefficient=" + coefficient);
+      System.out.println("back_pressure_pa=" + back);
+      System.out.println("duration_s=" + duration);
+      System.out.println("time_step_s=" + step);
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+      System.out.println();
+      return;
+    }
     System.out.println(label);
     System.out.println("eos=" + (srk ? "srk" : "pr"));
     System.out.println("input_t_k=" + fluid.getTemperature());
@@ -13837,9 +13875,14 @@ public class ProcessProbe {
       System.out.println("incident_heat_flux_w_m2=" + model.incidentHeatFlux(distance));
     }
     if (!Double.isNaN(targetFlux)) {
-      double solved = model.distanceToFlux(targetFlux);
-      System.out.println("distance_to_flux_m=" + solved);
-      System.out.println("flux_at_distance_w_m2=" + model.incidentHeatFlux(solved));
+      try {
+        double solved = model.distanceToFlux(targetFlux);
+        System.out.println("distance_to_flux_m=" + solved);
+        System.out.println("flux_at_distance_w_m2=" + model.incidentHeatFlux(solved));
+      } catch (RuntimeException ex) {
+        System.out.println("distance_to_flux_refusal=" + ex.getClass().getSimpleName() + ": "
+            + ex.getMessage());
+      }
     }
     System.out.println();
   }
@@ -13901,14 +13944,6 @@ public class ProcessProbe {
     pfpSettings(calc, alpha, initial, critical, fire, conductivity, type);
     System.out.println(label);
     pfpInputs(flux, thickness, survival, alpha, initial, critical, fire, conductivity, type);
-    PfpDemandResult result = calc.evaluate(survival);
-    System.out.println("steel_mass_per_area_kg_m2=" + calc.steelMassPerAreaKgPerM2());
-    System.out.println("bare_steel_time_to_critical_s=" + result.getBareSteelTimeToCriticalS());
-    System.out.println("required_survival_time_s=" + result.getRequiredSurvivalTimeS());
-    System.out.println("pfp_required=" + result.isPfpRequired());
-    System.out.println("required_pfp_thickness_m=" + result.getRequiredPfpThicknessM());
-    System.out.println("required_pfp_thickness_mm=" + result.getRequiredPfpThicknessMm());
-    System.out.println("rating=" + result.getRating());
     double alphaEff = Double.isNaN(alpha) ? 0.9 : alpha;
     double initialEff = Double.isNaN(initial) ? 288.15 : initial;
     double criticalEff = Double.isNaN(critical) ? 673.15 : critical;
@@ -13916,16 +13951,28 @@ public class ProcessProbe {
     double deltaT = criticalEff - initialEff;
     double mass = 7850.0 * thickness;
     System.out.println("q_abs_w_m2=" + alphaEff * flux);
-    if (result.isPfpRequired()) {
-      double qAllow = mass * 490.0 * deltaT / survival;
-      double steelAvg = 0.5 * (initialEff + criticalEff);
-      System.out.println("q_allow_w_m2=" + qAllow);
-      System.out.println("steel_avg_temperature_k=" + steelAvg);
-      System.out.println("driving_temperature_k=" + Math.max(1.0, fireEff - steelAvg));
-    } else {
-      System.out.println("q_allow_w_m2=");
-      System.out.println("steel_avg_temperature_k=");
-      System.out.println("driving_temperature_k=");
+    try {
+      PfpDemandResult result = calc.evaluate(survival);
+      System.out.println("steel_mass_per_area_kg_m2=" + calc.steelMassPerAreaKgPerM2());
+      System.out.println("bare_steel_time_to_critical_s=" + result.getBareSteelTimeToCriticalS());
+      System.out.println("required_survival_time_s=" + result.getRequiredSurvivalTimeS());
+      System.out.println("pfp_required=" + result.isPfpRequired());
+      System.out.println("required_pfp_thickness_m=" + result.getRequiredPfpThicknessM());
+      System.out.println("required_pfp_thickness_mm=" + result.getRequiredPfpThicknessMm());
+      System.out.println("rating=" + result.getRating());
+      if (result.isPfpRequired()) {
+        double qAllow = mass * 490.0 * deltaT / survival;
+        double steelAvg = 0.5 * (initialEff + criticalEff);
+        System.out.println("q_allow_w_m2=" + qAllow);
+        System.out.println("steel_avg_temperature_k=" + steelAvg);
+        System.out.println("driving_temperature_k=" + (fireEff - steelAvg));
+      } else {
+        System.out.println("q_allow_w_m2=");
+        System.out.println("steel_avg_temperature_k=");
+        System.out.println("driving_temperature_k=");
+      }
+    } catch (RuntimeException ex) {
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
     }
     System.out.println();
   }
@@ -14043,10 +14090,6 @@ public class ProcessProbe {
 
   static void bleveRow(String label, double mass, double hoc, double eta, double humidity,
       double distance, double targetFlux) {
-    BLEVECalculator model = new BLEVECalculator(mass, hoc, eta);
-    if (!Double.isNaN(humidity)) {
-      model.setHumidity(humidity);
-    }
     System.out.println(label);
     System.out.println("fuel_mass_kg=" + mass);
     System.out.println("heat_of_combustion_j_kg=" + hoc);
@@ -14054,17 +14097,30 @@ public class ProcessProbe {
     System.out.println("relative_humidity=" + (Double.isNaN(humidity) ? "default_0.5" : humidity));
     System.out.println("distance_m=" + (Double.isNaN(distance) ? "" : distance));
     System.out.println("target_flux_w_m2=" + (Double.isNaN(targetFlux) ? "" : targetFlux));
-    System.out.println("fireball_diameter_m=" + model.fireballDiameterM());
-    System.out.println("fireball_duration_s=" + model.fireballDurationS());
-    System.out.println("surface_emissive_power_w_m2=" + model.surfaceEmissivePowerWPerM2());
-    if (!Double.isNaN(distance)) {
-      System.out.println("transmissivity=" + model.transmissivity(distance));
-      System.out.println("incident_heat_flux_w_m2=" + model.incidentHeatFlux(distance));
-    }
-    if (!Double.isNaN(targetFlux)) {
-      double solved = model.distanceToFlux(targetFlux);
-      System.out.println("distance_to_flux_m=" + solved);
-      System.out.println("flux_at_distance_w_m2=" + model.incidentHeatFlux(solved));
+    try {
+      BLEVECalculator model = new BLEVECalculator(mass, hoc, eta);
+      if (!Double.isNaN(humidity)) {
+        model.setHumidity(humidity);
+      }
+      System.out.println("fireball_diameter_m=" + model.fireballDiameterM());
+      System.out.println("fireball_duration_s=" + model.fireballDurationS());
+      System.out.println("surface_emissive_power_w_m2=" + model.surfaceEmissivePowerWPerM2());
+      if (!Double.isNaN(distance)) {
+        System.out.println("transmissivity=" + model.transmissivity(distance));
+        System.out.println("incident_heat_flux_w_m2=" + model.incidentHeatFlux(distance));
+      }
+      if (!Double.isNaN(targetFlux)) {
+        try {
+          double solved = model.distanceToFlux(targetFlux);
+          System.out.println("distance_to_flux_m=" + solved);
+          System.out.println("flux_at_distance_w_m2=" + model.incidentHeatFlux(solved));
+        } catch (RuntimeException ex) {
+          System.out.println("distance_to_flux_refusal=" + ex.getClass().getSimpleName() + ": "
+              + ex.getMessage());
+        }
+      }
+    } catch (RuntimeException ex) {
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
     }
     System.out.println();
   }
@@ -14865,32 +14921,36 @@ public class ProcessProbe {
       double radiativeFraction, double exitVelocity, double stackHeight, double windSpeed,
       double transmissivity, double acousticEfficiency, double groundDistance,
       double soundDistance, double[] targets) {
-    Api537FlareFlameModel model =
-        new Api537FlareFlameModel(massFlow, heatOfCombustion, radiativeFraction, exitVelocity);
-    model.setStackHeightM(stackHeight);
-    model.setWindSpeedMPerS(windSpeed);
-    model.setTransmissivity(transmissivity);
-    model.setAcousticEfficiency(acousticEfficiency);
     System.out.println(label);
     api537FlareInputs(massFlow, heatOfCombustion, radiativeFraction, exitVelocity, stackHeight,
         windSpeed, transmissivity, acousticEfficiency, groundDistance, soundDistance, targets);
-    System.out.println("heat_release_w=" + model.totalHeatReleaseW());
-    System.out.println("radiative_power_w=" + model.totalRadiativePowerW());
-    System.out.println("flame_length_m=" + model.flameLengthM());
-    System.out.println("flame_tilt_rad=" + model.flameTiltRad());
-    System.out.println("flame_center_horizontal_m=" + model.flameCenterHorizontalM());
-    System.out.println("flame_center_height_m=" + model.flameCenterHeightM());
-    System.out.println("flame_tip_horizontal_m=" + model.flameTipHorizontalM());
-    System.out.println("flame_tip_height_m=" + model.flameTipHeightM());
-    System.out.println(
-        "heat_flux_at_ground_distance_w_m2=" + model.heatFluxAtGroundDistance(groundDistance));
-    for (int i = 0; i < targets.length; i++) {
-      System.out.println("target_flux_" + i + "_w_m2=" + targets[i]);
-      System.out.println("sterile_radius_" + i + "_m=" + model.sterileZoneRadiusM(targets[i]));
+    try {
+      Api537FlareFlameModel model =
+          new Api537FlareFlameModel(massFlow, heatOfCombustion, radiativeFraction, exitVelocity);
+      model.setStackHeightM(stackHeight);
+      model.setWindSpeedMPerS(windSpeed);
+      model.setTransmissivity(transmissivity);
+      model.setAcousticEfficiency(acousticEfficiency);
+      System.out.println("heat_release_w=" + model.totalHeatReleaseW());
+      System.out.println("radiative_power_w=" + model.totalRadiativePowerW());
+      System.out.println("flame_length_m=" + model.flameLengthM());
+      System.out.println("flame_tilt_rad=" + model.flameTiltRad());
+      System.out.println("flame_center_horizontal_m=" + model.flameCenterHorizontalM());
+      System.out.println("flame_center_height_m=" + model.flameCenterHeightM());
+      System.out.println("flame_tip_horizontal_m=" + model.flameTipHorizontalM());
+      System.out.println("flame_tip_height_m=" + model.flameTipHeightM());
+      System.out.println(
+          "heat_flux_at_ground_distance_w_m2=" + model.heatFluxAtGroundDistance(groundDistance));
+      for (int i = 0; i < targets.length; i++) {
+        System.out.println("target_flux_" + i + "_w_m2=" + targets[i]);
+        System.out.println("sterile_radius_" + i + "_m=" + model.sterileZoneRadiusM(targets[i]));
+      }
+      System.out.println("sound_power_level_db=" + model.soundPowerLevelDb());
+      System.out.println("sound_pressure_level_db=" + model.soundPressureLevelDb(soundDistance));
+      System.out.println("equivalent_flame_temperature_k=" + model.equivalentFlameTemperatureK());
+    } catch (RuntimeException ex) {
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
     }
-    System.out.println("sound_power_level_db=" + model.soundPowerLevelDb());
-    System.out.println("sound_pressure_level_db=" + model.soundPressureLevelDb(soundDistance));
-    System.out.println("equivalent_flame_temperature_k=" + model.equivalentFlameTemperatureK());
     System.out.println();
   }
 
@@ -15613,7 +15673,7 @@ public class ProcessProbe {
       ReliefValveSizing.PSVSizingResult result = ReliefValveSizing.calculateRequiredArea(
           massFlow, setPressure, overpressure, backPressure, temperature, molarMass,
           compressibility, specificHeatRatio, balancedBellows, ruptureDisk);
-      System.out.println("relieving_pressure=" + (setPressure * (1.0 + overpressure)));
+      System.out.println("relieving_pressure=" + (ReliefValveSizing.relievingPressurePa(setPressure, overpressure)));
       System.out.println("back_pressure_fraction=" + result.getBackPressureFraction());
       System.out.println("discharge_coefficient=" + result.getDischargeCoefficient());
       System.out.println("required_area=" + result.getRequiredArea());
@@ -15651,7 +15711,7 @@ public class ProcessProbe {
       ReliefValveSizing.LiquidPSVSizingResult result =
           ReliefValveSizing.calculateLiquidReliefArea(volumeFlow, density, setPressure,
               overpressure, backPressure, viscosity, balancedBellows);
-      double relieving = setPressure * (1.0 + overpressure);
+      double relieving = ReliefValveSizing.relievingPressurePa(setPressure, overpressure);
       System.out.println("relieving_pressure=" + relieving);
       System.out.println("back_pressure_fraction=" + (backPressure / relieving));
       System.out.println("discharge_coefficient=" + result.getDischargeCoefficient());
@@ -15687,7 +15747,7 @@ public class ProcessProbe {
       double area = ReliefValveSizing.calculateTwoPhaseReliefArea(massFlow, setPressure,
           overpressure, backPressure, temperature, gasFraction, gasDensity, liquidDensity,
           latentHeat, liquidHeatCapacity);
-      double relieving = setPressure * (1.0 + overpressure);
+      double relieving = ReliefValveSizing.relievingPressurePa(setPressure, overpressure);
       System.out.println("relieving_pressure=" + relieving);
       System.out.println("back_pressure_fraction=" + (backPressure / relieving));
       System.out.println("discharge_coefficient=0.85");

@@ -29,9 +29,10 @@ _DEFAULT_HUMIDITY = 0.5
 
 def _wayne_transmissivity(distance: float, relative_humidity: float) -> float:
     """Wayne's simplified atmospheric transmissivity; shared with ``process.bleve``."""
-    water = relative_humidity * 1700.0
-    xpw = water * max(distance, 1.0)
-    log = math.log10(xpw)
+    if relative_humidity == 0.0:
+        return 1.0
+    xpw = relative_humidity * 1700.0 * max(distance, 1.0)
+    log = math.log10(max(1.0, xpw))
     return min(1.0, max(0.0, 1.006 - 0.01171 * log - 0.02368 * log * log))
 
 

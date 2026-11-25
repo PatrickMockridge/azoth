@@ -15,11 +15,11 @@ molar_mass = 0.020
 compressibility = 0.9
 specific_heat_ratio = 1.3
 [cases.expected]
-relieving_pressure = 1100000.0
-back_pressure_fraction = 0.09211363636363637
+relieving_pressure = 1089867.5
+back_pressure_fraction = 0.09297001699747905
 discharge_coefficient = 0.975
-required_area = 4.6765883018072297e-4
-required_area_in2 = 0.7248726365253937
+required_area = 4.7200665511981524e-4
+required_area_in2 = 0.731611778659271
 recommended_orifice = "H"
 selected_area_in2 = 0.785
 back_pressure_correction = 1.0
@@ -41,14 +41,14 @@ compressibility = 0.9
 specific_heat_ratio = 1.3
 is_balanced_bellows = true
 [cases.expected]
-relieving_pressure = 1100000.0
-back_pressure_fraction = 0.7272727272727273
+relieving_pressure = 1089867.5
+back_pressure_fraction = 0.7340341830543621
 discharge_coefficient = 0.975
-required_area = 7.267430890193706e-4
-required_area_in2 = 1.1264540408881063
+required_area = 7.38725268768311e-4
+required_area_in2 = 1.1450264566437953
 recommended_orifice = "J"
 selected_area_in2 = 1.287
-back_pressure_correction = 0.6434995216972169
+back_pressure_correction = 0.6389474884307125
 combination_correction = 1.0
 
 [[cases]]
@@ -66,14 +66,14 @@ molar_mass = 0.020
 compressibility = 0.9
 specific_heat_ratio = 1.3
 [cases.expected]
-relieving_pressure = 1100000.0
-back_pressure_fraction = 0.6
+relieving_pressure = 1089867.5
+back_pressure_fraction = 0.6055782010198487
 discharge_coefficient = 0.975
-required_area = 5.845735377259038e-4
-required_area_in2 = 0.9060907956567421
+required_area = 5.983526472678154e-4
+required_area_in2 = 0.9274484581620303
 recommended_orifice = "J"
 selected_area_in2 = 1.287
-back_pressure_correction = 0.8
+back_pressure_correction = 0.7888435979603026
 combination_correction = 1.0
 
 [[cases]]
@@ -91,14 +91,14 @@ molar_mass = 0.020
 compressibility = 0.9
 specific_heat_ratio = 1.3
 [cases.expected]
-relieving_pressure = 1100000.0
-back_pressure_fraction = 0.8636363636363636
+relieving_pressure = 1089867.5
+back_pressure_fraction = 0.871665592377055
 discharge_coefficient = 0.975
-required_area = 0.0017147490439959844
-required_area_in2 = 2.6578663339264437
+required_area = 0.0018389715738066212
+required_area_in2 = 2.8504116402235433
 recommended_orifice = "L"
 selected_area_in2 = 2.853
-back_pressure_correction = 0.2727272727272727
+back_pressure_correction = 0.25666881524589
 combination_correction = 1.0
 
 [[cases]]
@@ -117,11 +117,11 @@ compressibility = 0.9
 specific_heat_ratio = 1.3
 has_rupture_disk = true
 [cases.expected]
-relieving_pressure = 1100000.0
-back_pressure_fraction = 0.09211363636363637
+relieving_pressure = 1089867.5
+back_pressure_fraction = 0.09297001699747905
 discharge_coefficient = 0.975
-required_area = 5.196209224230255e-4
-required_area_in2 = 0.8054140405837706
+required_area = 5.24451839022017e-4
+required_area_in2 = 0.8129019762880789
 recommended_orifice = "J"
 selected_area_in2 = 1.287
 back_pressure_correction = 1.0
@@ -142,11 +142,11 @@ molar_mass = 0.020
 compressibility = 0.9
 specific_heat_ratio = 1.3
 [cases.expected]
-relieving_pressure = 1100000.0
-back_pressure_fraction = 0.09211363636363637
+relieving_pressure = 1089867.5
+back_pressure_fraction = 0.09297001699747905
 discharge_coefficient = 0.975
-required_area = 0.04676588301807229
-required_area_in2 = 72.48726365253935
+required_area = 0.04720066551198153
+required_area_in2 = 73.1611778659271
 recommended_orifice = "T"
 selected_area_in2 = 26.0
 back_pressure_correction = 1.0
@@ -155,7 +155,7 @@ combination_correction = 1.0
 [[cases]]
 id = "ps_gas_capacity_roundtrip"
 tolerance = 1.0e-12
-source = "The capacity helper on the selected H area: 0.0342 kg/s against a 1.0 kg/s sizing, sqrt(1000) low. From (`ps_gas_capacity_roundtrip`)."
+source = "The capacity helper on the selected H area: 1.0718 kg/s against a 1.0 kg/s sizing, the selected ladder area's forward rate. From (`ps_gas_capacity_roundtrip`)."
 [cases.inputs]
 service = "gas"
 set_pressure = 1000000.0
@@ -169,16 +169,16 @@ specific_heat_ratio = 1.3
 orifice_area = 5.064506e-4
 capacity_discharge_coefficient = 0.975
 [cases.expected]
-relieving_pressure = 1100000.0
-back_pressure_fraction = 0.09211363636363637
+relieving_pressure = 1089867.5
+back_pressure_fraction = 0.09297001699747905
 discharge_coefficient = 0.975
-required_area = 4.6765883018072297e-4
-required_area_in2 = 0.7248726365253937
+required_area = 4.7200665511981524e-4
+required_area_in2 = 0.731611778659271
 recommended_orifice = "H"
 selected_area_in2 = 0.785
 back_pressure_correction = 1.0
 combination_correction = 1.0
-mass_flow_capacity = 0.03421047608123555
+mass_flow_capacity = 1.0718353243994527
 
 [[cases]]
 id = "ps_liquid_low_viscosity"
@@ -193,11 +193,11 @@ volume_flow = 0.01
 liquid_density = 800.0
 viscosity = 0.001
 [cases.expected]
-relieving_pressure = 1100000.0
-back_pressure_fraction = 0.09211363636363637
+relieving_pressure = 1089867.5
+back_pressure_fraction = 0.09297001699747905
 discharge_coefficient = 0.65
-required_area = 3.078347923878862e-4
-required_area_in2 = 0.4771448824909886
+required_area = 3.0940841415811763e-4
+required_area_in2 = 0.4795840011130846
 recommended_orifice = "G"
 selected_area_in2 = 0.503
 back_pressure_correction = 1.0
@@ -207,7 +207,7 @@ mass_flow_rate = 8.0
 [[cases]]
 id = "ps_liquid_high_viscosity"
 tolerance = 1.0e-12
-source = "The same liquid at 1 Pa s: the Reynolds correction Kv = 0.8698. From (`ps_liquid_high_viscosity`)."
+source = "The same liquid at 1 Pa s: the Reynolds correction Kv = 0.8695. From (`ps_liquid_high_viscosity`)."
 [cases.inputs]
 service = "liquid"
 set_pressure = 1000000.0
@@ -217,15 +217,15 @@ volume_flow = 0.01
 liquid_density = 800.0
 viscosity = 1.0
 [cases.expected]
-relieving_pressure = 1100000.0
-back_pressure_fraction = 0.09211363636363637
+relieving_pressure = 1089867.5
+back_pressure_fraction = 0.09297001699747905
 discharge_coefficient = 0.65
-required_area = 3.539333390448297e-4
-required_area_in2 = 0.5485977727150315
+required_area = 3.558275046857393e-4
+required_area_in2 = 0.5515337353303665
 recommended_orifice = "H"
 selected_area_in2 = 0.785
 back_pressure_correction = 1.0
-viscosity_correction = 0.8697535903756594
+viscosity_correction = 0.8695460864706955
 mass_flow_rate = 8.0
 
 [[cases]]
@@ -241,11 +241,11 @@ volume_flow = 0.01
 liquid_density = 800.0
 viscosity = 0.001
 [cases.expected]
-relieving_pressure = 1050000.0
-back_pressure_fraction = 0.0965
+relieving_pressure = 1044933.75
+back_pressure_fraction = 0.09696786997261789
 discharge_coefficient = 0.65
-required_area = 3.948035759431012e-4
-required_area_in2 = 0.6119467666053401
+required_area = 3.9586201041551884e-4
+required_area_in2 = 0.6135873433187409
 recommended_orifice = "H"
 selected_area_in2 = 0.785
 back_pressure_correction = 1.0
@@ -266,14 +266,14 @@ liquid_density = 800.0
 viscosity = 0.001
 is_balanced_bellows = true
 [cases.expected]
-relieving_pressure = 1100000.0
-back_pressure_fraction = 0.7
+relieving_pressure = 1089867.5
+back_pressure_fraction = 0.7065079011898235
 discharge_coefficient = 0.65
-required_area = 5.9501828688816e-4
-required_area_in2 = 0.9222801892370266
+required_area = 6.065620886373999e-4
+required_area_in2 = 0.9401731177342053
 recommended_orifice = "J"
 selected_area_in2 = 1.287
-back_pressure_correction = 0.9
+back_pressure_correction = 0.8967460494050883
 viscosity_correction = 1.0
 mass_flow_rate = 8.0
 
@@ -290,11 +290,11 @@ volume_flow = 0.01
 liquid_density = 800.0
 viscosity = 0.001
 [cases.expected]
-relieving_pressure = 1100000.0
-back_pressure_fraction = 0.7
+relieving_pressure = 1089867.5
+back_pressure_fraction = 0.7065079011898235
 discharge_coefficient = 0.65
-required_area = 5.355164581993441e-4
-required_area_in2 = 0.830052170313324
+required_area = 5.439321567044874e-4
+required_area_in2 = 0.8430965290850136
 recommended_orifice = "J"
 selected_area_in2 = 1.287
 back_pressure_correction = 1.0
@@ -318,10 +318,10 @@ liquid_density = 600.0
 latent_heat = 200000.0
 liquid_heat_capacity = 2500.0
 [cases.expected]
-relieving_pressure = 1100000.0
-back_pressure_fraction = 0.09090909090909091
+relieving_pressure = 1089867.5
+back_pressure_fraction = 0.09175427288179526
 discharge_coefficient = 0.85
-required_area = 2.995876123738863e-5
+required_area = 3.0269858223054544e-5
 
 [[cases]]
 id = "ps_two_phase_omega_low"
@@ -340,7 +340,7 @@ liquid_density = 700.0
 latent_heat = 1000000.0
 liquid_heat_capacity = 2000.0
 [cases.expected]
-relieving_pressure = 1100000.0
-back_pressure_fraction = 0.09090909090909091
+relieving_pressure = 1089867.5
+back_pressure_fraction = 0.09175427288179526
 discharge_coefficient = 0.85
-required_area = 3.3633921275358553e-5
+required_area = 3.376960533581787e-5

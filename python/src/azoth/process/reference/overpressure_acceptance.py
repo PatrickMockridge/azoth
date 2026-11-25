@@ -9,6 +9,7 @@ three accumulation factors and the comparison in bara.
 
 from __future__ import annotations
 
+import math
 from typing import Any
 
 from azoth.core.errors import InvalidInputError
@@ -81,12 +82,14 @@ def overpressure_acceptance(
         factor = 1.16
     else:
         factor = 1.10
-    allowable_bara = mawp_bara * factor
+    # The accumulation is a fraction of the gauge MAWP, MAWP + (MAWP - atm) (factor - 1).
+    allowable_bara = mawp_bara + (mawp_bara - 1.01325) * (factor - 1.0)
     margin_bara = allowable_bara - peak_bara
+    next_up = math.nextafter(allowable_bara, math.inf)
     return OverpressureAcceptanceResult(
         accumulation_factor=factor,
         allowable_pressure=from_si(allowable_bara * 1.0e5, "Pa"),
         margin=from_si(margin_bara * 1.0e5, "Pa"),
-        accepted=peak_bara <= allowable_bara,
+        accepted=peak_bara <= next_up,
         warnings=tuple(warnings),
     )

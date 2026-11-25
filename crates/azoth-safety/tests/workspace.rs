@@ -115,12 +115,12 @@ fn the_demo_calculates_every_stale_item() {
     let area_in2 = psv["result"]["outputs"]["required_area_in2"]
         .as_f64()
         .expect("the required area");
-    assert!((area_in2 - 0.724_872_636_525_393_7).abs() < 1e-12);
+    assert!((area_in2 - 0.731_611_778_659_271).abs() < 1e-12);
     assert_eq!(psv["result"]["outputs"]["recommended_orifice"], "H");
     let relieving = psv["result"]["outputs"]["relieving_pressure"]["magnitude_si"]
         .as_f64()
         .expect("the relieving pressure");
-    assert!((relieving - 1_100_000.0).abs() < 1e-6);
+    assert!((relieving - 1_089_867.5).abs() < 1e-6);
 
     let sif = scenario(&value, "sif_1");
     let rrf = sif["result"]["outputs"]["risk_reduction_factor"]

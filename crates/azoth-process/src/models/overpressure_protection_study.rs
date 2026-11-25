@@ -16,7 +16,9 @@ use serde::Serialize;
 use crate::executor::json::{optional_scalar, warnings as wire_warnings};
 use crate::model_gen;
 use crate::models::overpressure_acceptance::overpressure_acceptance;
-use crate::models::psv_sizing::{gas_area, liquid_area, select_orifice, two_phase_area};
+use crate::models::psv_sizing::{
+    gas_area, liquid_area, relieving_pressure, select_orifice, two_phase_area,
+};
 use crate::models::relief_disposal_network::{ReliefCause, ReliefPhase};
 
 /// The class's default fire overpressure basis.
@@ -227,7 +229,7 @@ pub fn overpressure_protection_study(
     }
     let Some(governing) = governing else {
         return Ok(empty_result(
-            vec!["No credible relief scenario defined; nothing to size".to_string()],
+            vec!["No credible positive relief demand defined".to_string()],
             warnings,
         ));
     };
@@ -248,21 +250,48 @@ pub fn overpressure_protection_study(
     let mut capacity = None;
     let mut adequate = false;
 
+    if set_pressure.value > mawp.value {
+        return Ok(empty_result(
+            vec![
+                format!(
+                    "{}: Missing or invalid pressure, relief demand, cause or relieving-phase \
+                     property basis",
+                    governing.name
+                ),
+                "Resolve all credible relief demands before selecting an orifice".to_string(),
+            ],
+            warnings,
+        ));
+    }
     if rate <= 0.0 {
-        messages.push("Governing relief rate is zero; relief device cannot be sized".to_string());
+        return Ok(empty_result(
+            vec![
+                format!(
+                    "{}: Missing or invalid pressure, relief demand, cause or relieving-phase \
+                     property basis",
+                    governing.name
+                ),
+                "Resolve all credible relief demands before selecting an orifice".to_string(),
+            ],
+            warnings,
+        ));
     } else {
         match phase {
             ReliefPhase::Vapour => {
-                let molar_mass = governing.molar_mass.ok_or_else(|| {
-                    AzothError::invalid_input(
-                        "scenarios",
-                        format!(
-                            "the governing vapour scenario `{}` has no molar mass, and the gas \
-                             sizing needs one",
-                            governing.name
-                        ),
-                    )
-                })?;
+                let Some(molar_mass) = governing.molar_mass else {
+                    return Ok(empty_result(
+                        vec![
+                            format!(
+                                "{}: Missing or invalid pressure, relief demand, cause or \
+                                 relieving-phase property basis",
+                                governing.name
+                            ),
+                            "Resolve all credible relief demands before selecting an orifice"
+                                .to_string(),
+                        ],
+                        warnings,
+                    ));
+                };
                 let temperature = governing
                     .relief_temperature
                     .map_or(DEFAULT_TEMPERATURE, |value| value.value);
@@ -291,11 +320,10 @@ pub fn overpressure_protection_study(
                 };
                 adequate = sizing.selected_area_in2 >= sizing.required_area_in2;
                 if !adequate {
-                    messages.push(
-                        "Required relief area exceeds the largest standard orifice; multiple or \
-                         larger relief devices are required"
-                            .to_string(),
-                    );
+                    messages.push(format!(
+                        "{}: A single standard orifice cannot be selected for this relief demand",
+                        governing.name
+                    ));
                 }
             }
             ReliefPhase::Liquid => {
@@ -346,11 +374,10 @@ pub fn overpressure_protection_study(
                 };
                 adequate = sizing.selected_area_in2 >= sizing.required_area_in2;
                 if !adequate {
-                    messages.push(
-                        "Required liquid relief area exceeds the largest standard orifice; multiple \
-                         or larger relief devices are required"
-                            .to_string(),
-                    );
+                    messages.push(format!(
+                        "{}: A single standard orifice cannot be selected for this relief demand",
+                        governing.name
+                    ));
                 }
             }
             ReliefPhase::TwoPhase => {
@@ -394,18 +421,17 @@ pub fn overpressure_protection_study(
                     };
                     adequate = selected >= area_in2;
                     if !adequate {
-                        messages.push(
-                            "Required two-phase relief area exceeds the largest standard orifice; \
-                             multiple or larger relief devices are required"
-                                .to_string(),
-                        );
+                        messages.push(format!(
+                            "{}: A single standard orifice cannot be selected for this relief demand",
+                            governing.name
+                        ));
                     }
                 }
             }
         }
     }
 
-    let peak = pascals(set_pressure.value * (1.0 + overpressure));
+    let peak = pascals(relieving_pressure(set_pressure.value, overpressure));
     let acceptance = overpressure_acceptance(peak, mawp, cause.as_str(), multiple)?;
     if !acceptance.accepted {
         let suffix = if cause == ReliefCause::Fire {
@@ -416,10 +442,10 @@ pub fn overpressure_protection_study(
             ", single device"
         };
         messages.push(format!(
-            "Relieving pressure exceeds the allowable accumulated pressure: {:.0}% of MAWP \
-             ({:.2} bara x {:.2}) for {}{}",
+            "Relieving pressure exceeds the allowable accumulated pressure: {:.0}% of gauge MAWP \
+             ({:.2} barg x {:.2}, standard atmosphere) for {}{}",
             acceptance.accumulation_factor * 100.0,
-            mawp.value / 1.0e5,
+            mawp.value / 1.0e5 - 1.01325,
             acceptance.accumulation_factor,
             cause.label(),
             suffix

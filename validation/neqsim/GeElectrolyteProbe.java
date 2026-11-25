@@ -1,7 +1,7 @@
 // What the three smaller GE electrolyte models answer, before any of them is ported.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar GeElectrolyteProbe.java
-//     java -cp .:neqsim-118d9af.jar GeElectrolyteProbe
+//     javac -proc:none -cp neqsim-b40bb11.jar GeElectrolyteProbe.java
+//     java -cp .:neqsim-b40bb11.jar GeElectrolyteProbe
 //
 // `PhaseKentEisenberg`, `PhaseDesmukhMather` and `PhaseDuanSun` are a tranche each about
 // the size of one Pitzer branch, and they disagree with each other in ways the Pitzer work

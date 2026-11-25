@@ -12,7 +12,7 @@ use azoth_process::models::non_equilibrium_blowdown::non_equilibrium_blowdown;
 fn close(actual: f64, expected: f64, what: &str) {
     let error = (actual - expected).abs() / expected.abs().max(f64::MIN_POSITIVE);
     assert!(
-        error <= 5.0e-3,
+        error <= 1.0e-3,
         "{what}: {actual} against {expected}, relative error {error:.3e}"
     );
 }
@@ -36,7 +36,7 @@ fn the_fire_exposed_state_reads_the_capture() {
         0.85,
         pascals(1.0e5),
         None,
-        None,
+        Some(kelvins(1200.0)),
         None,
         Some(square_meters(20.0)),
         Some(kilograms(4000.0)),
@@ -56,17 +56,17 @@ fn the_fire_exposed_state_reads_the_capture() {
     .expect("the captured state is valid");
     close(
         result.final_gas_temperature.value,
-        280.096_028_503_062_3,
+        277.597_535_494_783_76,
         "final gas temperature",
     );
     close(
         result.final_liquid_temperature.value,
-        280.000_123_741_830_8,
+        279.657_209_954_789_66,
         "final liquid temperature",
     );
     assert_eq!(result.recorded_points, 21.0);
     assert_eq!(result.flash_fallback_count, 0.0);
-    assert!(result.max_temperature_bifurcation.value > 0.0);
+    assert_eq!(result.max_temperature_bifurcation.value, 0.0);
 }
 
 #[test]

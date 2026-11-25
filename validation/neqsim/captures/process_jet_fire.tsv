@@ -39,8 +39,8 @@ relative_humidity=0.0
 distance_m=50.0
 target_flux_w_m2=
 total_radiative_power_w=2.0E7
-transmissivity=NaN
-incident_heat_flux_w_m2=NaN
+transmissivity=1.0
+incident_heat_flux_w_m2=636.6197723675814
 
 jet_fire_humidity_05
 mass_flow_kg_s=2.0
@@ -61,8 +61,8 @@ relative_humidity=1.0
 distance_m=50.0
 target_flux_w_m2=
 total_radiative_power_w=2.0E7
-transmissivity=0.3728721363977805
-incident_heat_flux_w_m2=237.37777459576876
+transmissivity=0.3728721363977804
+incident_heat_flux_w_m2=237.3777745957687
 
 jet_fire_inside_one_metre
 mass_flow_kg_s=2.0
@@ -83,7 +83,7 @@ relative_humidity=default_0.5
 distance_m=
 target_flux_w_m2=10.0
 total_radiative_power_w=2.0E7
-distance_to_flux_m=214.477057488732
+distance_to_flux_m=214.47705748873202
 flux_at_distance_w_m2=9.99996296262835
 
 jet_fire_zero_distance_evidence

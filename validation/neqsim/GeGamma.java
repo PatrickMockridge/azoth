@@ -1,7 +1,7 @@
 // NeqSim's GE activity coefficients, read the only way that works.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar GeGamma.java
-//     java -cp .:neqsim-118d9af.jar GeGamma
+//     javac -proc:none -cp neqsim-b40bb11.jar GeGamma.java
+//     java -cp .:neqsim-b40bb11.jar GeGamma
 //
 // `PhaseGE.getActivityCoefficient` returns the component's **cached** `gamma` field, and
 // only a GE evaluation sets it - `ComponentGENRTLmodifiedHV` assigns `gamma =

@@ -79,4 +79,4 @@ declared checks *that call* could not evaluate.
 ## References
 
 - Younglove, B. A.; Ely, J. F. (1987). "Thermophysical Properties of Fluids. II. Methane, Ethane, Propane, Isobutane, and Normal Butane." Journal of Physical and Chemical Reference Data 16(4), 577-798. DOI 10.1063/1.555785
-- NeqSim master, `ComponentBWRS.java` / `PhaseBWRSEos.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.
+- NeqSim master, `ComponentBWRS.java` / `PhaseBWRSEos.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.

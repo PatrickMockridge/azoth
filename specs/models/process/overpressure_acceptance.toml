@@ -4,7 +4,7 @@ kind = "procedure"
 assumptions = [
     "**the accumulation factor is 1.21 for a fire, 1.16 for several non-fire devices and 1.10 for one**, the class's three constants.",
     "**fire ignores `multipleDevices`**: a fire always takes 1.21, whatever the device count.",
-    "**the allowable pressure is `MAWP factor`**, the margin is `allowable - peak`, and acceptance is `peak <= allowable`, so the equality is accepted.",
+    "**the allowable pressure is `MAWP + (MAWP - atm) (factor - 1)`**, the accumulation on the gauge MAWP; the margin is `allowable - peak`, and acceptance is `peak <= nextUp(allowable)`, so the equality is accepted.",
     "**the class works in bara**; this id carries Pa and converts through bara, so the comparison and the margin match the class's own arithmetic.",
     "**the basis string is prose** and sits outside this id; the factor, the allowable and the margin carry the decision.",
     "**the class validates nothing**: the port refuses a non-positive pressure or a non-finite value.",
@@ -58,7 +58,7 @@ unit = "dimensionless"
 description = "1.21 fire, 1.16 multiple non-fire, 1.10 single non-fire.\n"
 [outputs.allowable_pressure]
 unit = "Pa"
-description = "`mawp accumulation_factor`.\n"
+description = "`mawp + (mawp - atm) (accumulation_factor - 1)`.\n"
 [outputs.margin]
 unit = "Pa"
 description = "`allowable_pressure - peak_pressure`.\n"

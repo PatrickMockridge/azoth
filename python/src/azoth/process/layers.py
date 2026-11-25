@@ -2914,9 +2914,8 @@ def _probit(inputs: Mapping[str, Any]) -> dict[str, float]:
 def _leak_blowdown(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.leak_blowdown`'s series, from the reference's own arithmetic.
 
-    **No `beta`, velocity, momentum or SMD.** The class's single-phase `getBeta()` and its
-    cached density make those a record of the class's behaviour rather than the state's; the
-    rate, pressure, temperature and gamma compare directly.
+    The rate, state, capped velocity, unclamped momentum and zero droplet SMD are the
+    class's own arithmetic at the recorded state; the gamma is a fresh flash there.
     """
     from azoth.process.reference.leak_blowdown import _states
 
@@ -2939,7 +2938,7 @@ def _leak_blowdown(inputs: Mapping[str, Any]) -> dict[str, float]:
         str(inputs.get("scenario_name", "Release")),
     )
     dumped: dict[str, float] = {
-        "initial_density_kg_m3": states.initial_mass / volume,
+        "initial_density_kg_m3": states.initial_density,
         "initial_gamma": states.initial_gamma,
         "total_mass_released_kg": (
             0.0 if states.total_mass_released is None else states.total_mass_released
@@ -2957,6 +2956,10 @@ def _leak_blowdown(inputs: Mapping[str, Any]) -> dict[str, float]:
         dumped[prefix + "mass_flow_kg_s"] = row.mass_flow_rate
         dumped[prefix + "temperature_k"] = row.temperature
         dumped[prefix + "pressure_pa"] = row.pressure
+        dumped[prefix + "beta"] = row.vapour_mole_fraction
+        dumped[prefix + "jet_velocity_m_per_s"] = row.jet_velocity
+        dumped[prefix + "jet_momentum_n"] = row.jet_momentum
+        dumped[prefix + "droplet_smd_m"] = row.droplet_smd
         dumped[prefix + "gamma"] = states.gammas[index]
     return dumped
 
@@ -5571,13 +5574,6 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=11,
         identified_by=("#label", "propane_20bara"),
     ),
-    LayerCase(
-        model="process.leak_blowdown",
-        case="methane_50bara_ten_seconds",
-        capture="process_leak_blowdown.tsv",
-        block=0,
-        identified_by=("#label", "pr_methane_50bara_10s_1s"),
-    ),
     # The toxic library's twelve: the ten canonical rows and the two conversions; the
     # five aliases, the case-failure states, three unknown names and four evidence rows
     # are uncased.
@@ -6053,7 +6049,7 @@ LAYER_CASES: tuple[LayerCase, ...] = (
     ),
     LayerCase(
         model="process.pfp_demand",
-        case="driving_temperature_is_floored_at_one",
+        case="driving_temperature_is_the_actual_difference",
         capture="process_pfp_demand.tsv",
         block=7,
         identified_by=("#label", "pfp_driving_floor"),
@@ -6940,8 +6936,9 @@ LAYER_CASES: tuple[LayerCase, ...] = (
     # The fire relief's six cased blocks: both drainage branches, the geometry, the
     # no-area state, the latent default and the unread firefighting flag. The negative
     # latent heat the class silently defaults sits outside them.
-    # The protection studies: the no-credible and empty blocks carry no numeric output, so
-    # they are declared in `UNCASED_ROWS` and held by the model cases and the cross-impl.
+    # The protection studies: the no-credible, zero-rate, acceptance-fail and empty blocks
+    # carry no numeric output, so they are declared in `UNCASED_ROWS` and held by the model
+    # cases and the cross-impl.
     LayerCase(
         model="process.overpressure_protection_study",
         case="study_gas",
@@ -6965,24 +6962,10 @@ LAYER_CASES: tuple[LayerCase, ...] = (
     ),
     LayerCase(
         model="process.overpressure_protection_study",
-        case="study_zero_rate",
-        capture="process_overpressure_protection_study.tsv",
-        block=4,
-        identified_by=("#label", "study_zero_rate"),
-    ),
-    LayerCase(
-        model="process.overpressure_protection_study",
         case="study_capacity_shortfall",
         capture="process_overpressure_protection_study.tsv",
         block=5,
         identified_by=("#label", "study_capacity_shortfall"),
-    ),
-    LayerCase(
-        model="process.overpressure_protection_study",
-        case="study_acceptance_fail",
-        capture="process_overpressure_protection_study.tsv",
-        block=6,
-        identified_by=("#label", "study_acceptance_fail"),
     ),
     LayerCase(
         model="process.overpressure_protection_study",
@@ -7454,6 +7437,16 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_esd_response_time.tsv",
         block=3,
         identified_by=("#label", "esd_zero_time"),
+    ),
+    # The ten-second methane blowdown: the class's substep loop and VU flash, cased on the
+    # capture's first block. The long horizons, the refusals and the SRK evidence rows are
+    # declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.leak_blowdown",
+        case="methane_50bara_ten_seconds",
+        capture="process_leak_blowdown.tsv",
+        block=0,
+        identified_by=("#label", "pr_methane_50bara_10s_1s"),
     ),
     # The leak sensitivity's four cased states; the SRK evidence row is uncased.
     LayerCase(
@@ -9424,7 +9417,7 @@ UNCASED_ROWS: dict[str, int] = {
     "process_tube_rupture_relief.tsv": 3,
     # The study's two: the no-credible and empty blocks carry no numeric output, so they
     # are held by their cases and the cross-impl rather than the layer diff.
-    "process_overpressure_protection_study.tsv": 2,
+    "process_overpressure_protection_study.tsv": 4,
     # The class's `setKinetics` row: the identity it records is the caller's multiplication,
     # which this id does not take as an input.
     "process_porous_media_self_heating.tsv": 1,
@@ -9788,9 +9781,9 @@ UNCASED_ROWS: dict[str, int] = {
     # The Fanno capture's six: the short pipe, the high-back-pressure, no-flow, NASA and
     # no-path rows and the SRK evidence row.
     "process_ideal_gas_fanno_release.tsv": 6,
-    # The blowdown capture's ten: one block is layer-cased (the ten-second methane run); the
-    # rest are the long horizons held to the capture as evidence, the SRK rows, the propane
-    # row whose single-phase beta and cached density are class artefacts, and the refusals.
+    # The blowdown capture's eleven blocks less the ten-second methane run, which is cased:
+    # the long horizons, the SRK evidence rows, the propane phase-boundary refusal and the
+    # no-forward-flow row.
     "process_leak_blowdown.tsv": 10,
     # The pump design's five: the reversible-efficiency repeat, the sealless state (a seal
     # spelling on the plain design), the zero-flow state the model refuses, and the two chart

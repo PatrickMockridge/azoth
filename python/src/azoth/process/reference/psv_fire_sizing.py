@@ -17,6 +17,7 @@ from azoth.core.range import apply_checks, checks_for
 from azoth.core.result import PsvFireSizingResult
 from azoth.core.units import Q, from_si, input_to_si
 from azoth.core.warnings import Warning
+from azoth.process.reference.psv_sizing import _relieving_pressure
 
 MODEL_ID = "process.psv_fire_sizing"
 
@@ -68,7 +69,7 @@ def _gas_area(
     specific_heat_ratio: float,
 ) -> tuple[float, float, str, float, float, float, float]:
     k = specific_heat_ratio
-    relieving_pressure = set_pressure * (1.0 + overpressure_fraction)
+    relieving_pressure = _relieving_pressure(set_pressure, overpressure_fraction)
     back_pressure_fraction = back_pressure / relieving_pressure
     kd = 0.975
     kc = 1.0

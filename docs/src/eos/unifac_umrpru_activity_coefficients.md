@@ -22,7 +22,7 @@ A **direct** model: a computation over vectors, with no iteration and therefore 
 | Name | Unit | Description |
 |---|---|---|
 | `components` | - | the substances the mixture is made of, by name, resolved against NeqSim's `UNIFACcompUMRPRU.csv` group decomposition and the `UNIFACGroupParam` group constants |
-| `parameters` | umr / umrmc | which interaction set to read: `umr` for the original tables, or `umrmc` for the ones the Mathias-Copeman UMR-PRU variants share. |
+| `parameters` | umr / umrmc / umrcpa | which interaction set to read: `umr` for the original tables, `umrmc` for the Mathias-Copeman UMR-PRU-MC variant, or `umrcpa` for the UMR-CPA variant. |
 | `T` | K | absolute temperature |
 | `x` | dimensionless | mole fractions; non-negative and summing to one. |
 
@@ -46,7 +46,7 @@ A **direct** model: a computation over vectors, with no iteration and therefore 
 
 - **the combinatorial term is `ComponentGEUnifacUMRPRU`'s Flory-Huggins one, not `ComponentGEUnifac`'s Staverman-Guggenheim one.** The two differ by `6.9e-06` and `1.9e-02` in `ln gamma` at 298.15 K on methane/water 0.98/0.02.
 
-- which parameter set is read is a **named input**, not something inferred. NeqSim decides it in `useMcInteractionParameters()`, reading `getComponent(0).getAttractiveTermNumber()` and choosing `_umrmc` when it is 13, 19 or 22.
+- which parameter set is read is a **named input**, not something inferred. NeqSim's `useMcInteractionParameters()` chooses `_umrcpa` for the UMR-CPA attractive terms 13, 19 and 22, and the UMR-PRU-MC variant reads `_umrmc`.
 
 - this library's component model carries no attractive-term number, so the caller states which equation of state they are pairing the model with rather than a field being invented to carry it.
 

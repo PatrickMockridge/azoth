@@ -7,7 +7,8 @@
 
 use azoth_core::units::{
     Area, HeatTransfer, Length, Mass, Pressure, SpecificHeatCapacity, TemperatureInterval,
-    ThermodynamicTemperature, Time, Volume, kelvin_intervals, kelvins, kilograms, pascals, seconds,
+    ThermodynamicTemperature, Time, Volume, joules_per_mole, kelvin_intervals, kelvins, kilograms,
+    pascals, seconds,
 };
 use azoth_core::{AzothError, Result, Warning};
 use serde::Serialize;
@@ -17,7 +18,8 @@ use azoth_eos::databank;
 use azoth_eos::entropy_state::molar_mass_of;
 use azoth_eos::heat_capacity::phase_capacity;
 use azoth_eos::mixture::{Mixture, ReducedParameters, RootSide};
-use azoth_eos::molar_enthalpy_entropy::IdealGasModel;
+use azoth_eos::molar_enthalpy_entropy::{IdealGasModel, molar_enthalpy_entropy};
+use azoth_eos::ph_flash::ph_flash;
 use azoth_eos::pr_molar_volume::MOLAR_GAS_CONSTANT;
 use azoth_eos::pt_flash::pt_flash;
 use azoth_eos::results::Phase;
@@ -390,36 +392,21 @@ pub fn non_equilibrium_blowdown(
             ));
         }
     };
-    let gas_composition = flash.y.clone();
-    let liquid_composition = flash.x.clone();
-    let bulk_density = {
-        let reduced = mixture.reduced_parameters(initial_t, initial_p)?;
-        let vapour = phase_props(
-            &mixture,
-            &ideal_gas,
-            &reduced,
-            initial_t,
-            initial_p,
-            &gas_composition,
-            flash.z_vapour,
-        )?;
-        let liquid = phase_props(
-            &mixture,
-            &ideal_gas,
-            &reduced,
-            initial_t,
-            initial_p,
-            &liquid_composition,
-            flash.z_liquid,
-        )?;
-        let mass = beta * vapour.molar_mass + (1.0 - beta) * liquid.molar_mass;
-        let volume = beta * (vapour.molar_mass / vapour.density)
-            + (1.0 - beta) * (liquid.molar_mass / liquid.density);
-        mass / volume
-    };
-    let molar_mass_bulk = molar_mass_of(&mixture, initial_z)?;
-    let total_moles = bulk_density * vessel_volume.value / molar_mass_bulk;
-    let mut gas_composition = gas_composition;
+    let mut gas_composition = flash.y.clone();
+    let mut liquid_composition = flash.x.clone();
+    // **The class charges by the EOS volume**: `getVolume("m3")` sums each phase's
+    // `Z R T / P`, not the physical-properties density, and the inventory is scaled so
+    // that volume fills the vessel.
+    let eos_molar_volume = beta * flash.z_vapour * MOLAR_GAS_CONSTANT * initial_t.value
+        / initial_p.value
+        + (1.0 - beta) * flash.z_liquid * MOLAR_GAS_CONSTANT * initial_t.value / initial_p.value;
+    if !eos_molar_volume.is_finite() || eos_molar_volume <= 0.0 {
+        return Err(AzothError::invalid_input(
+            "initial_p",
+            format!("the EOS molar volume of the feed is {eos_molar_volume} m3/mol"),
+        ));
+    }
+    let total_moles = vessel_volume.value / eos_molar_volume;
     let mut gas_moles = beta * total_moles;
     let mut liquid_moles = (1.0 - beta) * total_moles;
     let mut gas_temperature = initial_t.value;
@@ -481,6 +468,18 @@ pub fn non_equilibrium_blowdown(
                 break;
             }
         };
+        // The class reads the compressibility from the physical-properties density at the
+        // pressure the step started from, and uses it in both the rate and the flow work.
+        let z_gas = if gas.density > 0.0 && gas.molar_mass > 0.0 {
+            let value = pressure * gas.molar_mass / (gas.density * GAS_CONSTANT * gas_temperature);
+            if value.is_finite() && value > 0.0 {
+                value
+            } else {
+                1.0
+            }
+        } else {
+            1.0
+        };
         let gas_mass = gas_moles * gas.molar_mass;
         let liquid_mass = liquid_moles * liquid.molar_mass;
         let liquid_volume = if liquid.density > 0.0 {
@@ -511,7 +510,7 @@ pub fn non_equilibrium_blowdown(
             discharge_coefficient
                 * area
                 * pressure
-                * (gas.gamma * gas.molar_mass / (GAS_CONSTANT * gas_temperature)).sqrt()
+                * (gas.gamma * gas.molar_mass / (z_gas * GAS_CONSTANT * gas_temperature)).sqrt()
                 * (2.0 / (gas.gamma + 1.0)).powf((gas.gamma + 1.0) / (2.0 * (gas.gamma - 1.0)))
         } else {
             let mut term = (2.0 * gas.gamma / (gas.gamma - 1.0))
@@ -523,7 +522,7 @@ pub fn non_equilibrium_blowdown(
             discharge_coefficient
                 * area
                 * pressure
-                * (gas.molar_mass / (GAS_CONSTANT * gas_temperature)).sqrt()
+                * (gas.molar_mass / (z_gas * GAS_CONSTANT * gas_temperature)).sqrt()
                 * term.sqrt()
         };
         if rate < 0.0 || rate.is_nan() {
@@ -587,9 +586,15 @@ pub fn non_equilibrium_blowdown(
             (fire_heat - wall_to_gas - wall_to_liquid) * step / (eff_wall_mass * wall_cp);
         wall_temperature = wall_temperature.clamp(MIN_ZONE_TEMPERATURE, flame);
         if gas_mass > 1.0e-9 && gas.cp_mass > 0.0 {
+            // **A fixed-volume open system**: `m cv dT = Q - (h - u) dm_out`, with
+            // `h - u = Z R T / M`; without the flow work the vapour does not cool on
+            // depressurisation at all.
+            let cv_gas_mass = gas.cp_mass / gas.gamma.max(1.0);
+            let flow_work = z_gas * GAS_CONSTANT * gas_temperature / gas.molar_mass * dm_out;
             let d_u = (wall_to_gas - interface_heat) * step
-                + dm_vap * gas.cp_mass * (liquid_temperature - gas_temperature);
-            gas_temperature += d_u / (gas_mass * gas.cp_mass);
+                + dm_vap * cv_gas_mass * (liquid_temperature - gas_temperature)
+                - flow_work;
+            gas_temperature += d_u / (gas_mass * cv_gas_mass);
         }
         gas_temperature = gas_temperature.clamp(MIN_ZONE_TEMPERATURE, wall_temperature);
         if liquid_mass > 1.0e-9 && liquid.cp_mass > 0.0 {
@@ -613,6 +618,74 @@ pub fn non_equilibrium_blowdown(
             }
             gas_moles = gas_total;
             liquid_moles -= moved;
+        }
+        // **Flash boil-off**: liquid left superheated by the pressure drop flashes
+        // isenthalpically at the new pressure, and the vapour it forms moves to the vapour
+        // zone, cooling the liquid. Without this the liquid zone only boiled from wall heat
+        // and stayed at its initial pressure-equilibrium state.
+        let liquid_mass_now = liquid_moles * molar_mass_of(&mixture, &liquid_composition)?;
+        if liquid_moles > 0.0 && liquid_mass_now > 1.0e-6 {
+            let liquid_pressure = pascals(pressure);
+            // **The liquid system is a single oil phase, so its enthalpy is the liquid
+            // root's, not the equilibrium split's**: the class's `TPflash` on the phase
+            // system leaves one phase, and the PH flash is what creates the vapour.
+            let liquid_root_enthalpy = (|| -> std::result::Result<f64, AzothError> {
+                let reduced =
+                    mixture.reduced_parameters(kelvins(liquid_temperature), liquid_pressure)?;
+                let root = mixture
+                    .phase_state(&reduced, &liquid_composition, RootSide::Liquid)?
+                    .z;
+                Ok(molar_enthalpy_entropy(
+                    &mixture,
+                    &ideal_gas,
+                    kelvins(liquid_temperature),
+                    liquid_pressure,
+                    &liquid_composition,
+                    root,
+                )?
+                .h
+                .value)
+            })();
+            let flashed = liquid_root_enthalpy.and_then(|enthalpy| {
+                ph_flash(
+                    &mixture,
+                    &ideal_gas,
+                    liquid_pressure,
+                    joules_per_mole(enthalpy),
+                    &liquid_composition,
+                )
+            });
+            match flashed {
+                Ok(solution) => {
+                    liquid_temperature = solution.temperature.value;
+                    if solution.phase == Phase::TwoPhase {
+                        let split = solution.vapour_fraction.unwrap_or(0.0);
+                        let moved_moles = split * liquid_moles;
+                        let vapour_mass = moved_moles * molar_mass_of(&mixture, &solution.y)?;
+                        let gas_mass_before =
+                            gas_moles * molar_mass_of(&mixture, &gas_composition)?;
+                        let gas_total = gas_moles + moved_moles;
+                        if gas_total > 0.0 {
+                            for (index, value) in gas_composition.iter_mut().enumerate() {
+                                *value = (gas_moles * *value + moved_moles * solution.y[index])
+                                    / gas_total;
+                            }
+                        }
+                        gas_moles = gas_total;
+                        liquid_moles *= 1.0 - split;
+                        liquid_composition = solution.x.clone();
+                        if vapour_mass > 0.0 {
+                            let mixed = gas_mass_before + vapour_mass;
+                            gas_temperature = (gas_mass_before * gas_temperature
+                                + vapour_mass * liquid_temperature)
+                                / mixed;
+                        }
+                    }
+                }
+                Err(_) => {
+                    fallbacks += 1.0;
+                }
+            }
         }
         time += step;
         push_point(

@@ -378,6 +378,13 @@ def _solve_efficiency(
         states = _states(components, t, p, inlet_z, p_out, efficiency)
         residual = states.outlet_t.to("K").magnitude - target
         if not (abs(residual) > 0.01 or iteration < 3) or iteration >= 50:
+            if abs(residual) > 0.01:
+                raise InvalidInputError(
+                    "outlet_temperature",
+                    f"the efficiency solve could not match the target {target} K within "
+                    f"0.01 K; the last outlet temperature was "
+                    f"{states.outlet_t.to('K').magnitude} K",
+                )
             return states.h_in, states.h_out, states.outlet_t, efficiency
 
 

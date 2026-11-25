@@ -90,9 +90,9 @@ serving_section=
 coverage_gap_m2=510.0
 coverage_fraction=0.0
 flow_deficit_lpm=5100.0
-flow_feasible=true
-pressure_feasible=true
-verdict=COVERAGE_GAP_SUPPLY_ADEQUATE
+flow_feasible=false
+pressure_feasible=false
+verdict=SUPPLY_DATA_INCOMPLETE
 
 fwca_refuse_area
 protected_area_m2=0.0

@@ -13,7 +13,7 @@ assumptions = [
 references = [
     "Van Everdingen, A. F. & Hurst, W. (1949). \"The Application of the Laplace Transformation to Flow Problems in Reservoirs.\" Transactions of the AIME 186, 305-324. DOI 10.2118/949305-G.",
     "Carter, R. D. & Tracy, G. W. (1960). \"An Improved Method for Calculating Water Influx.\" Transactions of the AIME 219, 415-417. DOI 10.2118/1519-G.",
-    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/reservoirproperties/materialbalance/VanEverdingenHurstAquifer.java` and `RadialInfiniteInfluence.java` at commit 118d9af are the port source.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/reservoirproperties/materialbalance/VanEverdingenHurstAquifer.java` and `RadialInfiniteInfluence.java` at commit b40bb113 are the port source.",
     "`validation/neqsim/captures/pvt_van_everdingen_hurst.tsv` - the infinite-acting pressure and derivative at the class's own reference times, the bounded policy, the dimensionless time and constant, the Carter-Tracy recurrence and the influence table.",
 ]
 [source]

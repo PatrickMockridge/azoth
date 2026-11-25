@@ -8,7 +8,7 @@ assumptions = [
     "**a distance below one metre evaluates the transmissivity at one metre**, the correlation's own `max(d, 1)`; the flux's `1/d^2` still applies at the stated distance.",
     "**heat of combustion is in J/kg and crosses unconverted.** Neither the vocabulary nor `uom` carries a mass-specific energy unit, so it is declared dimensionless here, as the thermal calculations declare latent heat.",
     "**a non-positive distance is refused**: the class answers `Infinity` there. **A non-positive target flux is refused**: the class throws `IllegalArgumentException`.",
-    "**relative humidity is the class's setter, which clamps to `[0, 1]`.** The port refuses a stated value outside `(0, 1]`: the clamp's zero makes the correlation `NaN`, which the class admits and the port does not publish. Absent is `0.5`.",
+    "**relative humidity is the class's setter, clamped to `[0, 1]`.** Zero humidity is unit transmissivity (NeqSim `#4978`, fixed by the pin), so the port accepts it and publishes `tau = 1`. Absent is `0.5`.",
     "**the constructor's guards are the ranges**: mass flow at least zero, heat of combustion above zero, and the radiative fraction in `[0, 1]`.",
 ]
 references = [
@@ -40,7 +40,7 @@ description = "the fraction of the combustion heat radiated, in `[0, 1]`; 0.20 i
 [inputs.relative_humidity]
 unit = "dimensionless"
 optional = true
-description = "the ambient relative humidity in `(0, 1]`, which the transmissivity reads. **Absent is `0.5`.** A stated zero is refused: the class clamps it to zero and answers `NaN`.\n"
+description = "the ambient relative humidity in `[0, 1]`, which the transmissivity reads. **Absent is `0.5`.** Zero is unit transmissivity.\n"
 [inputs.distance]
 unit = "m"
 optional = true
@@ -88,11 +88,11 @@ rationale = "the class's constructor refuses a fraction outside [0, 1]"
 [[valid_range]]
 quantity = "relative_humidity"
 min = 0
-min_inclusive = false
+min_inclusive = true
 max = 1
 max_inclusive = true
 severity = "error"
-rationale = "the class clamps to [0, 1] and answers NaN at zero, so the port refuses both the clamp and the NaN"
+rationale = "the class clamps to [0, 1]; zero humidity is unit transmissivity"
 [[valid_range]]
 quantity = "distance"
 min = 0

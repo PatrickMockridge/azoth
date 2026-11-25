@@ -6,15 +6,15 @@ assumptions = [
     "**the stage oil and gas volumes are untranslated**, as the classes' `getVolume()` is; a density or a viscosity is the phase's physical property.",
     "**the standard state is 288.15 K and 1.01325 bar**: a gas volume is its uncorrected volume when the gas phase is re-initialised there, and the stock-tank volume is the oil phase's.",
     "**the train's stage temperatures are Celsius in the class** (`stage + 273.15`); this id takes Kelvin everywhere and the probe converts.",
-    "**the train's stage oil density is read before the carried phase's physical properties are re-initialised**, so the class's field is the previous stage's density - the reservoir's 494.89 at stage 1. The id publishes the density at the stage; the capture records the lagged numbers as evidence.",
+    "**each stage's oil density is the liquid flashed at that stage**, read after its physical properties are initialised (NeqSim `#5208`, fixed by the pin); the port publishes the same value.",
     "**the first-stage optimisation minimises Bo over a P/T grid** and reports `1/Bo` as the maximum oil recovery; the optimal stage matches the class, while the cascade compounds a flash difference into a few percent of Bo and GOR.",
     "**the stock-tank API is only defined inside the class's `(500, 1100) kg/m3` band**, against water at 999 kg/m3.",
     "**inputs are SI** and the fluid is the characterization row list; SRK and the databank kij are the defaults.",
 ]
 references = [
-    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/GOR.java`, `SeparatorTest.java` and `MultiStageSeparatorTest.java` at commit 118d9af are the port source.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/GOR.java`, `SeparatorTest.java` and `MultiStageSeparatorTest.java` at commit b40bb113 are the port source.",
     "`validation/neqsim/captures/pvt_separator.tsv` - the continuous and staged cascades on a binary, the upstream 11-component train, and its first-stage optimisation.",
-    "NeqSim #5208 - the train reads the carried phase's density before re-initialising it, so the stage row is the previous stage's density.",
+    "NeqSim #5208 - the train reports the oil flashed at each stage (fixed by the pin).",
 ]
 [source]
 standard = "NeqSim pvtsimulation/simulation/{GOR,SeparatorTest,MultiStageSeparatorTest}.java"

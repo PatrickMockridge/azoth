@@ -70,12 +70,12 @@ fn the_gas_case_governs_by_rate_and_takes_the_j_orifice() {
     );
     close(
         study.required_area.expect("sized").value,
-        5.368_645_081_220_35e-4,
+        5.393_485_760_524_218e-4,
         "the required area",
     );
     close(
         study.required_area_in2.expect("sized"),
-        0.832_141_651_872_458,
+        0.835_991_964_865_183_7,
         "the required area in square inches",
     );
     assert_eq!(study.recommended_orifice.as_deref(), Some("J"));
@@ -86,18 +86,18 @@ fn the_gas_case_governs_by_rate_and_takes_the_j_orifice() {
     );
     close(
         study.selected_orifice_capacity.expect("capacity").value,
-        3.093_223_364_325_135,
+        3.078_976_961_716_487_7,
         "the selected capacity",
     );
     assert!(study.capacity_adequate);
     close(
         study.acceptance_peak_pressure.expect("accepted").value,
-        2.2e6,
+        2_189_867.5,
         "the peak pressure",
     );
     close(
         study.acceptance_allowable_pressure.expect("accepted").value,
-        2.2e6,
+        2_189_867.5,
         "the allowable pressure",
     );
     close(
@@ -132,18 +132,18 @@ fn the_liquid_case_takes_the_f_orifice() {
     let study = run(2.0e6, &[liquid], None);
     close(
         study.required_area.expect("sized").value,
-        1.532_521_527_143_841_8e-4,
+        1.536_234_519_861_117_4e-4,
         "the required area",
     );
     close(
         study.required_area_in2.expect("sized"),
-        0.237_541_311_789_919_08,
+        0.238_116_826_812_126_81,
         "the required area in square inches",
     );
     assert_eq!(study.recommended_orifice.as_deref(), Some("F"));
     close(
         study.selected_orifice_capacity.expect("capacity").value,
-        6.462_033_860_272_482,
+        6.446_415_486_676_667,
         "the selected capacity",
     );
 }
@@ -171,18 +171,18 @@ fn the_two_phase_case_takes_the_d_orifice() {
     let study = run(2.0e6, &[two_phase], None);
     close(
         study.required_area.expect("sized").value,
-        1.358_325_287_559_367_8e-5,
+        1.365_597_383_837_508_4e-5,
         "the required area",
     );
     close(
         study.required_area_in2.expect("sized"),
-        0.021_054_084_065_338_333,
+        0.021_166_801_783_084_947,
         "the required area in square inches",
     );
     assert_eq!(study.recommended_orifice.as_deref(), Some("D"));
     close(
         study.selected_orifice_capacity.expect("capacity").value,
-        5.224_639_535_903_379,
+        5.196_817_220_063_186,
         "the selected capacity",
     );
 }
@@ -199,20 +199,24 @@ fn no_credible_scenario_is_the_class_s_message() {
     assert!(study.accepted.is_none());
     assert_eq!(
         study.messages,
-        vec!["No credible relief scenario defined; nothing to size"]
+        vec!["No credible positive relief demand defined"]
     );
 }
 
 #[test]
-fn a_zero_rate_governs_and_still_runs_acceptance() {
+fn a_zero_rate_leaves_the_study_unsized() {
     let zero = vapour("Zero rate", 0.0);
     let study = run(2.0e6, &[zero], None);
-    assert_eq!(study.governing_name.as_deref(), Some("Zero rate"));
+    assert!(study.governing_name.is_none());
     assert!(study.required_area.is_none());
-    assert_eq!(study.accepted, Some(true));
+    assert!(study.accepted.is_none());
     assert_eq!(
         study.messages,
-        vec!["Governing relief rate is zero; relief device cannot be sized"]
+        vec![
+            "Zero rate: Missing or invalid pressure, relief demand, cause or relieving-phase \
+             property basis",
+            "Resolve all credible relief demands before selecting an orifice"
+        ]
     );
 }
 
@@ -226,44 +230,31 @@ fn a_capacity_shortfall_names_the_largest_orifice() {
     assert_eq!(study.recommended_orifice.as_deref(), Some("T"));
     close(
         study.required_area_in2.expect("sized"),
-        374.322_619_917_908_2,
+        376.054_607_787_639_2,
         "the required area",
     );
     assert!(!study.capacity_adequate);
     assert_eq!(
         study.messages,
         vec![
-            "Required relief area exceeds the largest standard orifice; multiple or larger \
-             relief devices are required"
+            "Capacity shortfall: A single standard orifice cannot be selected for this relief \
+             demand"
         ]
     );
 }
 
 #[test]
-fn an_acceptance_failure_carries_the_basis_prose() {
+fn a_set_pressure_above_the_mawp_is_refused() {
     let study = run(8.0e5, &[vapour("Blocked outlet gas", 2.0)], Some(1.0e6));
-    assert_eq!(study.recommended_orifice.as_deref(), Some("K"));
-    close(
-        study.acceptance_peak_pressure.expect("accepted").value,
-        1.1e6,
-        "the peak pressure",
-    );
-    close(
-        study.acceptance_allowable_pressure.expect("accepted").value,
-        8.8e5,
-        "the allowable pressure",
-    );
-    close(
-        study.acceptance_margin.expect("accepted").value,
-        -2.2e5,
-        "the margin",
-    );
-    assert_eq!(study.accepted, Some(false));
+    assert!(study.recommended_orifice.is_none());
+    assert!(study.accepted.is_none());
     assert_eq!(
         study.messages,
         vec![
-            "Relieving pressure exceeds the allowable accumulated pressure: 110% of MAWP \
-             (8.00 bara x 1.10) for Blocked outlet, single device"
+            "Blocked outlet gas: Missing or invalid pressure, relief demand, cause or \
+             relieving-phase property basis"
+                .to_string(),
+            "Resolve all credible relief demands before selecting an orifice".to_string()
         ]
     );
 }
@@ -279,7 +270,7 @@ fn a_fire_case_takes_the_twenty_one_percent_basis() {
     assert_eq!(study.recommended_orifice.as_deref(), Some("H"));
     close(
         study.acceptance_peak_pressure.expect("accepted").value,
-        2.42e6,
+        2_398_721.75,
         "the peak pressure",
     );
     close(
@@ -297,16 +288,24 @@ fn an_empty_study_has_nothing_to_size() {
     assert!(!study.capacity_adequate);
     assert_eq!(
         study.messages,
-        vec!["No credible relief scenario defined; nothing to size"]
+        vec!["No credible positive relief demand defined"]
     );
 }
 
 #[test]
-fn a_gas_governing_case_without_a_molar_mass_is_refused() {
+fn a_gas_case_without_a_molar_mass_leaves_the_study_unsized() {
     let mut gas = vapour("No molar mass", 2.0);
     gas.molar_mass = None;
-    let outcome = overpressure_protection_study(pascals(2.0e6), &[gas], None, None, None);
-    assert!(outcome.is_err(), "the gas sizing needs a molar mass");
+    let study = run(2.0e6, &[gas], None);
+    assert!(study.required_area.is_none());
+    assert_eq!(
+        study.messages,
+        vec![
+            "No molar mass: Missing or invalid pressure, relief demand, cause or relieving-phase \
+             property basis",
+            "Resolve all credible relief demands before selecting an orifice"
+        ]
+    );
 }
 
 #[test]

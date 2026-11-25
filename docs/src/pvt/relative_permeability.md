@@ -101,5 +101,5 @@ declared checks *that call* could not evaluate.
 
 - Corey, A. T. (1954). "The Interrelation Between Gas and Oil Relative Permeabilities." Producers Monthly 19(1), 38-41.
 - Lomeland, F., Ebeltoft, E. & Thomas, W. H. (2005). "A New Versatile Relative Permeability Correlation." Society of Core Analysts, SCA2005-32.
-- NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/reservoirproperties/relpermeability/RelativePermeabilityGenerator.java` at commit 118d9af is the port source.
+- NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/reservoirproperties/relpermeability/RelativePermeabilityGenerator.java` at commit b40bb113 is the port source.
 - `validation/neqsim/captures/pvt_relative_permeability.tsv` - the curve primitives and every table type at the class test's parameters, the critical-saturation state and the descending grid.

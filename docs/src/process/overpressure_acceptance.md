@@ -38,7 +38,7 @@ not an equation, and both implementations read it from here.
 | Name | Unit | Description |
 |---|---|---|
 | `accumulation_factor` | dimensionless | 1.21 fire, 1.16 multiple non-fire, 1.10 single non-fire. |
-| `allowable_pressure` | Pa | `mawp accumulation_factor`. |
+| `allowable_pressure` | Pa | `mawp + (mawp - atm) (accumulation_factor - 1)`. |
 | `margin` | Pa | `allowable_pressure - peak_pressure`. |
 | `accepted` | - | whether the peak is at or below the allowable pressure. |
 
@@ -51,7 +51,7 @@ not an equation, and both implementations read it from here.
 
 - **the accumulation factor is 1.21 for a fire, 1.16 for several non-fire devices and 1.10 for one**, the class's three constants.
 - **fire ignores `multipleDevices`**: a fire always takes 1.21, whatever the device count.
-- **the allowable pressure is `MAWP factor`**, the margin is `allowable - peak`, and acceptance is `peak <= allowable`, so the equality is accepted.
+- **the allowable pressure is `MAWP + (MAWP - atm) (factor - 1)`**, the accumulation on the gauge MAWP; the margin is `allowable - peak`, and acceptance is `peak <= nextUp(allowable)`, so the equality is accepted.
 - **the class works in bara**; this id carries Pa and converts through bara, so the comparison and the margin match the class's own arithmetic.
 - **the basis string is prose** and sits outside this id; the factor, the allowable and the margin carry the decision.
 - **the class validates nothing**: the port refuses a non-positive pressure or a non-finite value.
@@ -60,12 +60,12 @@ not an equation, and both implementations read it from here.
 
 | Case | Inputs | Expected |
 |---|---|---|
-| `oa_fire` | peak_pressure = 1050000.0, mawp = 1000000.0, cause = fire, multiple_devices = False | accumulation_factor = 1.21, allowable_pressure = 1210000.0, margin = 159999.99999999997, accepted = True |
-| `oa_single_at_limit` | peak_pressure = 1100000.0, mawp = 1000000.0, cause = blocked_outlet, multiple_devices = False | accumulation_factor = 1.1, allowable_pressure = 1100000.0, margin = 0.0, accepted = True |
-| `oa_multiple` | peak_pressure = 1150000.0, mawp = 1000000.0, cause = blocked_outlet, multiple_devices = True | accumulation_factor = 1.16, allowable_pressure = 1160000.0, margin = 9999.999999999964, accepted = True |
-| `oa_fire_multiple_ignored` | peak_pressure = 1200000.0, mawp = 1000000.0, cause = fire, multiple_devices = True | accumulation_factor = 1.21, allowable_pressure = 1210000.0, margin = 9999.999999999964, accepted = True |
-| `oa_exceeded` | peak_pressure = 1220000.0, mawp = 1000000.0, cause = fire, multiple_devices = False | accumulation_factor = 1.21, allowable_pressure = 1210000.0, margin = -9999.999999999964, accepted = False |
-| `oa_single_exceeded` | peak_pressure = 1110000.0, mawp = 1000000.0, cause = blocked_outlet, multiple_devices = False | accumulation_factor = 1.1, allowable_pressure = 1100000.0, margin = -9999.999999999964, accepted = False |
+| `oa_fire` | peak_pressure = 1050000.0, mawp = 1000000.0, cause = fire, multiple_devices = False | accumulation_factor = 1.21, allowable_pressure = 1188721.75, margin = 138721.75000000003, accepted = True |
+| `oa_single_at_limit` | peak_pressure = 1100000.0, mawp = 1000000.0, cause = blocked_outlet, multiple_devices = False | accumulation_factor = 1.1, allowable_pressure = 1089867.5, margin = -10132.5, accepted = False |
+| `oa_multiple` | peak_pressure = 1150000.0, mawp = 1000000.0, cause = blocked_outlet, multiple_devices = True | accumulation_factor = 1.16, allowable_pressure = 1143788.0, margin = -6212.000000000017, accepted = False |
+| `oa_fire_multiple_ignored` | peak_pressure = 1200000.0, mawp = 1000000.0, cause = fire, multiple_devices = True | accumulation_factor = 1.21, allowable_pressure = 1188721.75, margin = -11278.249999999978, accepted = False |
+| `oa_exceeded` | peak_pressure = 1220000.0, mawp = 1000000.0, cause = fire, multiple_devices = False | accumulation_factor = 1.21, allowable_pressure = 1188721.75, margin = -31278.24999999991, accepted = False |
+| `oa_single_exceeded` | peak_pressure = 1110000.0, mawp = 1000000.0, cause = blocked_outlet, multiple_devices = False | accumulation_factor = 1.1, allowable_pressure = 1089867.5, margin = -20132.499999999887, accepted = False |
 
 ## How far this is checked
 **`partially_verified`** — exercised against expectations pinned in its own spec, with no independent oracle recorded for it - **the normal case rather than a defect**.

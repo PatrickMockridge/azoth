@@ -161,7 +161,7 @@ declared checks *that call* could not evaluate.
 
 ## References
 
-- NeqSim master, `pvtsimulation/flowassurance/PitzerScaleActivityModel.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.
+- NeqSim master, `pvtsimulation/flowassurance/PitzerScaleActivityModel.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.
 - `validation/neqsim/captures/pitzer_scale_activity_probe.tsv` - the Hamer-Wu NaCl curve, the eight salts' raw parameter sets, the nine coefficients at a strength grid and the products.
 - Pitzer, K. S. (1991). Activity Coefficients in Electrolyte Solutions, 2nd edition. Hamer, W. J.; Wu, Y.-C. (1972). J. Phys. Chem. Ref. Data 1, 1047-1100. PHREEQC version 3 `pitzer.dat`.
 

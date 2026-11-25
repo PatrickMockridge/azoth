@@ -14,14 +14,14 @@ parameters = [
     { parameter = "tc_multiplier_c7plus", initial = 1.0, lower = 0.95, upper = 1.05 },
 ]
 cce = [
-    { experiment = 0.0, temperature = 373.15, pressure = 25000000.0, relative_volume = 0.9980317970636378 },
-    { experiment = 0.0, temperature = 373.15, pressure = 20000000.0, relative_volume = 1.1028215960619943 },
-    { experiment = 0.0, temperature = 373.15, pressure = 15000000.0, relative_volume = 1.3009108004036105 },
+    { experiment = 0.0, temperature = 373.15, pressure = 25000000.0, relative_volume = 0.9977467494220793 },
+    { experiment = 0.0, temperature = 373.15, pressure = 20000000.0, relative_volume = 1.1177723544056017 },
+    { experiment = 0.0, temperature = 373.15, pressure = 15000000.0, relative_volume = 1.344662536647291 },
 ]
 max_iterations = 6.0
 [cases.expected]
 fitted_parameters = [
-    { parameter = "tc_multiplier_c7plus", value = 1.029994778729241, lower = 0.95, upper = 1.05 },
+    { parameter = "tc_multiplier_c7plus", value = 1.029999988314205, lower = 0.95, upper = 1.05 },
 ]
 degrees_of_freedom = 2.0
 
@@ -39,13 +39,13 @@ parameters = [
     { parameter = "bip_co2_hc", initial = 0.12, lower = 0.08, upper = 0.18 },
 ]
 dle = [
-    { experiment = 0.0, temperature = 323.15, pressure = 25000000.0, rs = 124.11323743589683, bo = 1.297774285932201, oil_density = 657.1251440903429 },
-    { experiment = 0.0, temperature = 323.15, pressure = 15000000.0, rs = 117.87406453877271, bo = 1.3196221126198664, oil_density = 642.5894780343832 },
-    { experiment = 0.0, temperature = 323.15, pressure = 8000000.0, rs = 54.85724347826862, bo = 1.1668447141587335, oil_density = 684.8946122783024 },
+    { experiment = 0.0, temperature = 323.15, pressure = 25000000.0, rs = 124.46822441360351, bo = 1.297774285932201, oil_density = 657.1251440903429 },
+    { experiment = 0.0, temperature = 323.15, pressure = 15000000.0, rs = 118.19000000135856, bo = 1.3196221126198664, oil_density = 642.5894780343832 },
+    { experiment = 0.0, temperature = 323.15, pressure = 8000000.0, rs = 54.98240543625079, bo = 1.1668447141587335, oil_density = 684.8946122783024 },
 ]
 max_iterations = 6.0
 [cases.expected]
 fitted_parameters = [
-    { parameter = "bip_co2_hc", value = 0.14999999104346481, lower = 0.08, upper = 0.18 },
+    { parameter = "bip_co2_hc", value = 0.149999991032325, lower = 0.08, upper = 0.18 },
 ]
 degrees_of_freedom = 8.0

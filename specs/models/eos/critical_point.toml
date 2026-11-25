@@ -12,7 +12,7 @@ references = [
     "Heidemann, R. A.; Khalil, A. M. (1980). \"The calculation of critical points.\" AIChE Journal 26(5), 769-779. DOI 10.1002/aic.690260510.",
     "Michelsen, M. L.; Mollerup, J. M. (2004). \"Thermodynamic Models: Fundamentals and Computational Aspects\", ch. 5.",
     "Peng, D. Y.; Robinson, D. B. (1976). \"A New Two-Constant Equation of State.\" Industrial & Engineering Chemistry Fundamentals 15(1), 59-64. DOI 10.1021/i160057a011.",
-    "NeqSim master, `CriticalPointFlash.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.",
+    "NeqSim master, `CriticalPointFlash.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.",
 ]
 [source]
 standard = "Heidemann, R. A.; Khalil, A. M. (1980)"

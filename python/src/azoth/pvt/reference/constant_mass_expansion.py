@@ -17,6 +17,7 @@ from azoth.core.warnings import Warning, WarningCode
 from azoth.eos.reference._mixture_state import reduced_parameters
 
 from . import _flash, _fluid, _saturation, _transport, _volume
+from ._standard import NEQSIM_GAS_CONSTANT
 
 MODEL_ID = "pvt.constant_mass_expansion"
 
@@ -142,8 +143,10 @@ def _constant_mass_expansion_of(
     schedule = [_positive(f"pressures[{index}]", value) for index, value in enumerate(schedule)]
 
     saturation_pressure, saturation, warnings = _saturation_state(fluid, t)
-    saturation_volume = saturation.volume_uncorrected()
-    z_saturation = saturation.z_mix()
+    saturation_volume = saturation.volume()
+    z_saturation = (
+        saturation_pressure * saturation_volume / (saturation.total_moles * NEQSIM_GAS_CONSTANT * t)
+    )
     # The phase carrying the material: NeqSim's flash is single-phase at the class's
     # midpoint, while ours can leave a trace incipient gas there.
     first = max(saturation.phases, key=lambda phase: phase.fraction)
@@ -156,7 +159,7 @@ def _constant_mass_expansion_of(
     for pressure in schedule:
         flash = fluid.flash(t, pressure, _flash.TWO_PHASE)
         phase = flash.phases[0]
-        total_volume = flash.volume_uncorrected()
+        total_volume = flash.volume()
         relative_volume = total_volume / saturation_volume
         gas_volume = phase.volume(flash.total_moles)
         gas_standard_volume = phase.moles(flash.total_moles) * _volume.R * T_SC / P_SC
@@ -168,9 +171,7 @@ def _constant_mass_expansion_of(
                     "flash",
                     "a two-phase CCE point has no oil phase, so its liquid volume is absent",
                 )
-            liquid_relative_volume: float | None = (
-                oil.volume_uncorrected(flash.total_moles) / saturation_volume
-            )
+            liquid_relative_volume: float | None = oil.volume(flash.total_moles) / saturation_volume
             y_factor: float | None = (
                 (saturation_pressure - pressure)
                 / pressure
@@ -205,7 +206,7 @@ def _constant_mass_expansion_of(
                 gas_volume=quantity(gas_volume, "m**3"),
                 gas_standard_volume=quantity(gas_standard_volume, "m**3"),
                 bg=gas_volume / gas_standard_volume,
-                z_gas=phase.z_factor,
+                z_gas=pressure * phase.molar_volume / (NEQSIM_GAS_CONSTANT * t),
                 oil_density=None if oil_density is None else quantity(oil_density, "kg/m**3"),
                 oil_viscosity=None if oil_viscosity is None else quantity(oil_viscosity, "Pa*s"),
                 liquid_relative_volume=liquid_relative_volume,

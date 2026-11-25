@@ -1,4 +1,4 @@
-characterization fluid rebuild at 118d9aff
+characterization fluid rebuild at b40bb113
 # columns = fluid|name|pseudo|moles|molar_mass|density|normal_boiling_point|critical_temperature|critical_pressure|acentric_factor|critical_volume|racket_z|racket_z_cpa|parachor|critical_viscosity|triple_point_temperature|heat_of_fusion|ideal_gas_enthalpy_of_formation|cp_a|cp_b|cp_c|cp_d|attractive_m
 # units = index|string|boolean|mol|kg/mol|kg/m3|K|K|Pa|1|m3/mol|1|1|1|Pa*s|K|J/mol|J/mol|J/(mol*K)|J/(mol*K2)|J/(mol*K3)|J/(mol*K4)|1
 

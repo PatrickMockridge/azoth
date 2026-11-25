@@ -91,13 +91,15 @@ pub fn overpressure_acceptance(
     } else {
         1.10
     };
-    let allowable_bara = mawp_bara * factor;
+    // The accumulation is a fraction of the gauge MAWP, `MAWP + (MAWP - atm) (factor - 1)`.
+    let allowable_bara = mawp_bara + (mawp_bara - 1.01325) * (factor - 1.0);
     let margin_bara = allowable_bara - peak_bara;
+    let next_up = f64::from_bits(allowable_bara.to_bits() + 1);
     Ok(OverpressureAcceptanceResult {
         accumulation_factor: factor,
         allowable_pressure: pascals(allowable_bara * 1.0e5),
         margin: pascals(margin_bara * 1.0e5),
-        accepted: peak_bara <= allowable_bara,
+        accepted: peak_bara <= next_up,
         warnings,
     })
 }

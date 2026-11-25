@@ -8,7 +8,7 @@
 
 **NeqSim process/safety/depressurization/NonEquilibriumBlowdownModel.java**
 
-Its `run`: the zone split, the vapour-controlled pressure, the wetted-wall boiling, the interfacial coupling, the boil-off and the clamps.
+Its `run`: the zone split, the vapour-controlled pressure, the wetted-wall boiling, the interfacial coupling, the wall-heat boil-off, the isenthalpic flash boil-off and the flow-work energy balance.
 
 
 ## Algorithm
@@ -73,6 +73,8 @@ checked against one.
 ## Assumptions
 
 - **the class's `run`**: the initial two-phase feed is charged to the vessel volume, split into vapour and liquid zones, and marched with each zone flashed at its own temperature and the shared pressure.
+- **the vapour zone is a fixed-volume open system**: `m cv dT = Q - (h - u) dm_out` with `h - u = Z R T/M`, and the boil-off it receives carries `cv (T_liq - T_gas)`; without the flow work the vapour does not cool on depressurisation.
+- **the liquid zone flashes isenthalpically at the new pressure every step** and the vapour it forms moves to the vapour zone, mixed in at the liquid temperature; a failed flash increments the fallback count and is skipped.
 - **the pressure is set by a TV flash of the vapour zone at `V - v_liquid`**, floored at the back pressure.
 - **the wall area is split by the wetted fraction `v_liquid / V`**; the wetted wall drives Rohsenow nucleate boiling capped at `critical_heat_flux`, and an interfacial term couples the zones.
 - **the boil-off is `min(max(q_wetted, 0) dt / latent_heat, 0.5 m_liquid)`**, transferred from the liquid zone to the vapour zone with the liquid's composition.
@@ -85,7 +87,7 @@ checked against one.
 
 | Case | Inputs | Expected |
 |---|---|---|
-| `fire_exposed_two_phase` | components = ['methane', 'propane', 'n-butane'], initial_z = [0.6, 0.2, 0.2], initial_t = 280.0, initial_p = 5000000.0, vessel_volume = 10.0, orifice_diameter = 0.012, discharge_coefficient = 0.85, back_pressure = 100000.0, fire_exposed_area = 20.0, wall_mass = 4000.0, wall_specific_heat = 470.0, inside_gas_coefficient = 50.0, interfacial_coefficient = 80.0, interfacial_area = 4.0, latent_heat = 350000.0, time_step = 1.0, max_time = 20.0, stop_pressure = 300000.0 | initial_pressure = 5000000.0, flash_fallback_count = 0.0, final_gas_temperature = 280.0960285030623, final_liquid_temperature = 280.0001237418308, recorded_points = 21.0 |
+| `fire_exposed_two_phase` | components = ['methane', 'propane', 'n-butane'], initial_z = [0.6, 0.2, 0.2], initial_t = 280.0, initial_p = 5000000.0, vessel_volume = 10.0, orifice_diameter = 0.012, discharge_coefficient = 0.85, back_pressure = 100000.0, fire_flame_temperature = 1200.0, fire_exposed_area = 20.0, wall_mass = 4000.0, wall_specific_heat = 470.0, inside_gas_coefficient = 50.0, interfacial_coefficient = 80.0, interfacial_area = 4.0, latent_heat = 350000.0, time_step = 1.0, max_time = 20.0, stop_pressure = 300000.0 | initial_pressure = 5000000.0, flash_fallback_count = 0.0, final_gas_temperature = 277.59753549478376, final_liquid_temperature = 279.65720995478966, max_temperature_bifurcation = 0.0, recorded_points = 21.0 |
 
 ## How far this is checked
 **`partially_verified`** — exercised against expectations pinned in its own spec, with no independent oracle recorded for it - **the normal case rather than a defect**.

@@ -353,48 +353,6 @@ outlet_h = -2779.1438208338673
 power = -783067.9455467018
 reported_isentropic_efficiency = 0.6354905789224377
 
-[[cases]]
-id = "an_unreachable_hot_target_lands_low"
-tolerance = 0.0005
-source = "`process_expander_power_modes.tsv`'s `solve_target_t_k=280`: hotter than the isenthalpic floor, so the secant drives the efficiency to its `1e-6` clamp and the outlet stays at the floor.\n"
-[cases.inputs]
-components = ["methane", "ethane", "propane", "n-butane"]
-inlet_n = 690.6184184064726
-inlet_z = [0.82, 0.1, 0.05, 0.03]
-inlet_p = 9000000.0
-inlet_t = 298.15
-outlet_pressure = 3000000.0
-isentropic_efficiency = 0.8
-outlet_temperature = 280.0
-[cases.expected]
-outlet_n = 690.6184184064726
-outlet_z = [0.82, 0.1, 0.05, 0.03]
-outlet_p = 3000000.0
-outlet_t = 263.30701273851537
-outlet_h = -1645.2807533505197
-reported_isentropic_efficiency = 1.0E-6
-
-[[cases]]
-id = "an_unreachable_cold_target_lands_high"
-tolerance = 0.0005
-source = "`process_expander_power_modes.tsv`'s `solve_target_t_k=240`: colder than the reversible outlet, so the efficiency stops at its `1.0` clamp.\n"
-[cases.inputs]
-components = ["methane", "ethane", "propane", "n-butane"]
-inlet_n = 690.6184184064726
-inlet_z = [0.82, 0.1, 0.05, 0.03]
-inlet_p = 9000000.0
-inlet_t = 298.15
-outlet_pressure = 3000000.0
-isentropic_efficiency = 0.8
-outlet_temperature = 240.0
-[cases.expected]
-outlet_n = 690.6184184064726
-outlet_z = [0.82, 0.1, 0.05, 0.03]
-outlet_p = 3000000.0
-outlet_t = 242.26684001928
-outlet_h = -3429.5144813861116
-power = -1232225.9025152659
-reported_isentropic_efficiency = 1.0
 
 [[cases]]
 id = "the_radial_design_is_the_capture"

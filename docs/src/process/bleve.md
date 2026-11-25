@@ -31,7 +31,7 @@ not an equation, and both implementations read it from here.
 | `fuel_mass` | kg | the mass of vaporising fuel, above zero. |
 | `heat_of_combustion` | dimensionless | the lower heating value in J/kg, above zero. Declared dimensionless because no vocabulary unit expresses a mass-specific energy. |
 | `radiative_fraction` | dimensionless | the fraction of the combustion energy radiated, in `[0, 1]`; 0.25 to 0.40 is the class's range. **The class's constructor does not validate it; the port does.** |
-| `relative_humidity` | dimensionless | *Optional.* the ambient relative humidity in `(0, 1]`, which the shared transmissivity reads. **Absent is `0.5`.** A stated zero is refused: the class answers `NaN`. |
+| `relative_humidity` | dimensionless | *Optional.* the ambient relative humidity in `[0, 1]`, which the shared transmissivity reads. **Absent is `0.5`.** Zero is unit transmissivity. |
 | `distance` | m | *Optional.* the distance from the fireball centre at which the flux is asked, above zero. **Absent leaves `transmissivity` and `incident_heat_flux` absent.** |
 | `target_flux` | W/m**2 | *Optional.* the flux whose distance is solved for, above zero. **Absent leaves `distance_to_flux` absent.** |
 
@@ -52,7 +52,7 @@ not an equation, and both implementations read it from here.
 | `fuel_mass > 0` | raises | the class's constructor refuses a non-positive mass |
 | `heat_of_combustion > 0` | raises | the class's constructor refuses a non-positive heating value |
 | `radiative_fraction >= 0 and radiative_fraction <= 1` | raises | the class does not validate it, and a negative fraction answers a negative SEP and flux |
-| `relative_humidity > 0 and relative_humidity <= 1` | raises | the class clamps to [0, 1] and answers NaN at zero, so the port refuses both |
+| `relative_humidity >= 0 and relative_humidity <= 1` | raises | the class clamps to [0, 1]; zero humidity is unit transmissivity |
 | `distance > 0` | raises | the class answers an infinite flux at zero distance |
 | `target_flux > 0` | raises | a non-positive target is not a contour; the class answers the far end of its numerical search for zero |
 
@@ -62,9 +62,9 @@ not an equation, and both implementations read it from here.
 - **the surface emissive power is `eta M dHc / (pi D^2 t)`**, the radiated fraction of the combustion energy over the fireball's area and lifetime.
 - **the view factor is the point source's, `D^2 / (4 d^2)` capped at one**, and the transmissivity is the jet fire's Wayne correlation; the helper is shared, not copied.
 - **the inverse is 60 halvings between `D/2 + 0.1` and 5000 m, with no early break.**
-- **a target above the near-field flux is absent.** The class returns its near bound, `D/2 + 0.1`; the port publishes no `distance_to_flux`. A non-positive target is refused: the class answers 2217.8 m for zero.
-- **the class's constructor validates the fuel mass and the heating value but not the radiative fraction**; a negative fraction answers a negative SEP and flux. The port refuses a fraction outside `[0, 1]`, as the jet fire does.
-- **relative humidity is the jet fire's setter, clamped to `[0, 1]` there.** The port refuses a stated value outside `(0, 1]`: the clamp's zero makes the shared correlation `NaN`. Absent is `0.5`.
+- **an unbracketed target is absent.** The class returns `NaN` when the target is outside `[D/2 + 0.1, 5000]` m (NeqSim `#4975`, fixed by the pin); the port publishes no `distance_to_flux`. A non-positive target is refused: the class throws for it.
+- **the class's constructor validates the radiative fraction in `[0, 1]`** (NeqSim `#4977`, fixed by the pin), and the port does the same.
+- **relative humidity is the jet fire's setter, clamped to `[0, 1]` there.** Zero humidity is unit transmissivity (NeqSim `#4978`, fixed by the pin); the port accepts it and publishes `tau = 1`. Absent is `0.5`.
 - **a non-positive distance is refused**: the class answers an infinite flux at zero. **Heat of combustion is in J/kg and crosses unconverted**, declared dimensionless for want of a vocabulary unit.
 
 ## Cases

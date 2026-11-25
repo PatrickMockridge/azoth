@@ -1,7 +1,7 @@
 // What `PhasePitzer.getPitzerParameterCoverage` reports, and what it refuses.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar PitzerCoverageProbe.java
-//     java -cp .:neqsim-118d9af.jar PitzerCoverageProbe
+//     javac -proc:none -cp neqsim-b40bb11.jar PitzerCoverageProbe.java
+//     java -cp .:neqsim-b40bb11.jar PitzerCoverageProbe
 //
 // The audit answers the question the *selection* rule does not: the selection rule asks
 // whether the PHREEQC catalogue covers the topology and falls back if not, while this asks

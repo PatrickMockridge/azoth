@@ -40,8 +40,8 @@ finest this can be held to**: its fraction solve ends at `ans.norm2() > 1e-6`, a
 wax states here agree to `2.95e-8`, `2.12e-7` and `1.38e-7` relative. A tighter tolerance
 would pin where NeqSim stopped rather than the state it stopped at.
 
-**The wax appears**: three phases - gas `0.691424728665901`, oil
-`0.237901878847604` and wax `0.0706733924864949`. The state is a real one: `x_i phi_i`
+**The wax appears**: three phases - gas `0.691537335897070`, oil
+`0.239419286088693` and wax `0.0690433780142373`. The state is a real one: `x_i phi_i`
 agrees across the three phases to `9.2e-08`, which is NeqSim's own convergence criterion, and
 the material balance closes to `6.3e-09`."""
 [cases.inputs]
@@ -51,13 +51,13 @@ T = 265.0
 P = 500000.0
 z = [0.7, 0.1, 0.1, 0.1]
 [cases.expected]
-wax_fraction = 0.0706733924864949
+wax_fraction = 0.0690433780142373
 phase_count = 3
 [[cases]]
 id = "the_names_feed_at_255_k"
 tolerance = 1e-06
-source = """The amount nearly doubles to `0.132007556310333`, with the oil falling from
-`0.2379` to `0.1749` and the gas holding at `0.6931` - the wax is what leaves the oil, which
+source = """The amount nearly doubles to `0.131014429499445`, with the oil falling from
+`0.2394` to `0.1758` and the gas holding at `0.6932` - the wax is what leaves the oil, which
 is the shape a precipitation curve has."""
 [cases.inputs]
 components = ["methane", "n-heptane", "nc14", "nc20"]
@@ -66,12 +66,12 @@ T = 255.0
 P = 500000.0
 z = [0.7, 0.1, 0.1, 0.1]
 [cases.expected]
-wax_fraction = 0.132007556310333
+wax_fraction = 0.131014429499445
 phase_count = 3
 [[cases]]
 id = "the_names_feed_at_245_k"
 tolerance = 1e-06
-source = """`0.154193075421103` at 245 K, the coldest state of the capture that has three
+source = """`0.153204549426707` at 245 K, the coldest state of the capture that has three
 phases. **235 K is not pinned**: NeqSim collapses the whole feed to one oil phase there where
 this finds gas `0.1420`, oil `0.6934` and wax `0.1653`, and the divergence is in the *phase
 count* rather than in the wax - azoth's own two-phase flash gives oil `0.3174` and gas
@@ -84,5 +84,5 @@ T = 245.0
 P = 500000.0
 z = [0.7, 0.1, 0.1, 0.1]
 [cases.expected]
-wax_fraction = 0.154193075421103
+wax_fraction = 0.153204549426707
 phase_count = 3

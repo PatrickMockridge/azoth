@@ -41,9 +41,11 @@ pub struct JetFireResult {
 
 /// Wayne's simplified atmospheric transmissivity; shared with `process.bleve`.
 pub(crate) fn wayne_transmissivity(distance: f64, relative_humidity: f64) -> f64 {
-    let water = relative_humidity * 1700.0;
-    let xpw = water * distance.max(1.0);
-    let log = xpw.log10();
+    if relative_humidity == 0.0 {
+        return 1.0;
+    }
+    let xpw = relative_humidity * 1700.0 * distance.max(1.0);
+    let log = xpw.max(1.0).log10();
     (1.006 - 0.01171 * log - 0.02368 * log * log).clamp(0.0, 1.0)
 }
 

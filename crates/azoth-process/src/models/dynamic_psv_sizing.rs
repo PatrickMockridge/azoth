@@ -9,6 +9,7 @@ use azoth_core::units::{
     Area, MassRate, Power, Pressure, ThermodynamicTemperature, Time, Volume, kilograms_per_second,
     pascals, square_meters,
 };
+use azoth_core::warning::WarningCode;
 use azoth_core::{AzothError, Result, Warning, apply_checks};
 use serde::Serialize;
 
@@ -24,7 +25,7 @@ use azoth_eos::results::{Phase, PtFlashResult};
 
 use crate::executor::json::{scalar, warnings as wire_warnings};
 use crate::model_gen;
-use crate::models::psv_sizing::gas_area;
+use crate::models::psv_sizing::{gas_area, relieving_pressure};
 use crate::models::psv_valve::step;
 
 /// The class's gas constant, J/(mol K).
@@ -45,7 +46,7 @@ pub struct DynamicPsvSizingResult {
     pub dynamic_required_area: Area,
     /// Steady-to-dynamic oversizing; absent when the dynamic area is not positive.
     pub oversizing_ratio: Option<f64>,
-    /// `set_pressure (1 + overpressure_fraction)`.
+    /// `set_pressure + (set_pressure - atm) overpressure_fraction`.
     #[serde(serialize_with = "scalar")]
     pub allowable_pressure: Pressure,
     /// The peak vessel pressure at the dynamically required area.
@@ -181,7 +182,7 @@ fn peak_pressure(
     compressibility: f64,
     time_step: f64,
     max_time: f64,
-) -> f64 {
+) -> (f64, bool) {
     let cv_mass = (GAS_CONSTANT / molar_mass) / (gamma - 1.0);
     let cp_mass = gamma * cv_mass;
     let mut temperature = initial_temperature;
@@ -192,7 +193,12 @@ fn peak_pressure(
     let mut time = 0.0;
     let mut open = false;
     let mut cycles = 0.0;
-    while time < max_time && mass > 1.0e-6 {
+    let mut complete = true;
+    while time < max_time {
+        if mass <= 1.0e-6 || time + time_step <= time {
+            complete = false;
+            break;
+        }
         let pressure = moles * compressibility * GAS_CONSTANT * temperature / vessel_volume;
         if pressure > peak {
             peak = pressure;
@@ -218,17 +224,19 @@ fn peak_pressure(
         let u_new = u_old + fire_heat_input * time_step - cp_mass * temperature * dm;
         let mass_new = mass - dm;
         if mass_new <= 1.0e-9 {
+            complete = false;
             break;
         }
         temperature = u_new / (mass_new * cv_mass);
         if temperature <= 0.0 || !temperature.is_finite() {
+            complete = false;
             break;
         }
         mass = mass_new;
         moles = mass / molar_mass;
         time += time_step;
     }
-    peak
+    (peak, complete)
 }
 
 /// The steady API 521 area and the dynamically required area for a cycling PSV.
@@ -372,7 +380,7 @@ pub fn dynamic_psv_sizing(
         compressibility = 1.0;
     }
 
-    let allowable = set_pressure.value * (1.0 + overpressure_fraction);
+    let allowable = relieving_pressure(set_pressure.value, overpressure_fraction);
     let relief_rate = fire_heat_input.value / latent;
     let steady = gas_area(
         relief_rate,
@@ -388,28 +396,9 @@ pub fn dynamic_psv_sizing(
     );
     let steady_area = steady.required_area;
 
-    let mut low = steady_area * 1.0e-3;
-    let mut high = steady_area * 3.0;
-    let mut peak_high = peak_pressure(
-        high,
-        set_pressure.value,
-        blowdown,
-        coefficient,
-        back_pressure.value,
-        fire_heat_input.value,
-        vessel_volume.value,
-        start_fraction,
-        initial_t.value,
-        molar_mass,
-        gamma,
-        compressibility,
-        step_seconds,
-        span,
-    );
-    if peak_high > allowable {
-        high = steady_area * 10.0;
-        peak_high = peak_pressure(
-            high,
+    let trial = |area: f64| {
+        peak_pressure(
+            area,
             set_pressure.value,
             blowdown,
             coefficient,
@@ -423,34 +412,55 @@ pub fn dynamic_psv_sizing(
             compressibility,
             step_seconds,
             span,
-        );
+        )
+    };
+    let no_feasible = |peak: f64, mut warnings: Vec<Warning>| {
+        warnings.push(Warning::new(
+            WarningCode::OutOfValidRange,
+            "no feasible area was found in the dynamic search; the class answers no dynamic area",
+        ));
+        Ok(DynamicPsvSizingResult {
+            steady_required_area: square_meters(steady_area),
+            dynamic_required_area: square_meters(f64::NAN),
+            oversizing_ratio: None,
+            allowable_pressure: pascals(allowable),
+            peak_dynamic_pressure: pascals(peak),
+            steady_relief_rate: kilograms_per_second(relief_rate),
+            warnings,
+        })
+    };
+    // Locate a passing trajectory before refining. A large trial can empty the inventory
+    // in one step, so the search doubles from the steady area's thousandth to ten times it.
+    let maximum = steady_area * 10.0;
+    let mut low = steady_area * 1.0e-3;
+    let mut high = low;
+    let (mut peak_high, mut complete_high) = trial(high);
+    let mut incomplete: Option<f64> = None;
+    while !(complete_high && peak_high <= allowable) {
+        if peak_high > allowable {
+            low = high;
+        } else {
+            incomplete = Some(peak_high);
+        }
+        if high >= maximum {
+            return no_feasible(incomplete.unwrap_or(peak_high), warnings);
+        }
+        high = (2.0 * high).min(maximum);
+        (peak_high, complete_high) = trial(high);
     }
     let mut dynamic_area = high;
     let mut peak_dynamic = peak_high;
     for _ in 0..BISECTION_STEPS {
         let mid = 0.5 * (low + high);
-        let peak = peak_pressure(
-            mid,
-            set_pressure.value,
-            blowdown,
-            coefficient,
-            back_pressure.value,
-            fire_heat_input.value,
-            vessel_volume.value,
-            start_fraction,
-            initial_t.value,
-            molar_mass,
-            gamma,
-            compressibility,
-            step_seconds,
-            span,
-        );
-        if peak <= allowable {
+        let (peak, complete) = trial(mid);
+        if complete && peak <= allowable {
             high = mid;
             dynamic_area = mid;
             peak_dynamic = peak;
-        } else {
+        } else if peak > allowable {
             low = mid;
+        } else {
+            return no_feasible(peak, warnings);
         }
         if (high - low) <= 1.0e-9 * steady_area {
             break;

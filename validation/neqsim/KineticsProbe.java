@@ -18,8 +18,8 @@
 // inputs are the phase pair and an effective-diffusion vector; those are printed for the
 // aqueous phase of a chemical system.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar KineticsProbe.java
-//     java -cp .:neqsim-118d9af.jar KineticsProbe > captures/kinetics_probe.tsv
+//     javac -proc:none -cp neqsim-b40bb11.jar KineticsProbe.java
+//     java -cp .:neqsim-b40bb11.jar KineticsProbe > captures/kinetics_probe.tsv
 
 import neqsim.chemicalreactions.ChemicalReactionOperations;
 import neqsim.chemicalreactions.chemicalreaction.ChemicalReaction;

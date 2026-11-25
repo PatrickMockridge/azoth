@@ -23,8 +23,8 @@ fn accept(peak: f64, mawp: f64, cause: &str, multiple: bool) -> OverpressureAcce
 fn the_fire_state_reproduces_the_capture() {
     let fire = accept(1_050_000.0, 1_000_000.0, "fire", false);
     close(fire.accumulation_factor, 1.21, "the fire factor");
-    close(fire.allowable_pressure.value, 1_210_000.0, "the allowable");
-    close(fire.margin.value, 159_999.999_999_999_97, "the margin");
+    close(fire.allowable_pressure.value, 1_188_721.75, "the allowable");
+    close(fire.margin.value, 138_721.750_000_000_03, "the margin");
     assert!(fire.accepted, "10.5 bara is below 12.1");
 
     let ignored = accept(1_200_000.0, 1_000_000.0, "fire", true);
@@ -41,17 +41,20 @@ fn the_non_fire_branches_reproduce_the_capture() {
     close(single.accumulation_factor, 1.10, "the single factor");
     close(
         single.allowable_pressure.value,
-        1_100_000.0,
+        1_089_867.5,
         "the allowable",
     );
-    close(single.margin.value, 0.0, "the equality margin");
-    assert!(single.accepted, "the equality is accepted");
+    close(single.margin.value, -10_132.5, "the margin");
+    assert!(
+        !single.accepted,
+        "the gauge basis puts 11.0 bara above the 10.9 bara allowable"
+    );
 
     let multiple = accept(1_150_000.0, 1_000_000.0, "blocked_outlet", true);
     close(multiple.accumulation_factor, 1.16, "the multiple factor");
     close(
         multiple.allowable_pressure.value,
-        1_160_000.0,
+        1_143_788.0,
         "the multiple allowable",
     );
 }
@@ -61,7 +64,7 @@ fn the_exceeded_states_are_rejected() {
     let fire = accept(1_220_000.0, 1_000_000.0, "fire", false);
     close(
         fire.margin.value,
-        -9_999.999_999_999_964,
+        -31_278.249_999_999_91,
         "the negative margin",
     );
     assert!(!fire.accepted, "12.2 bara is above 12.1");

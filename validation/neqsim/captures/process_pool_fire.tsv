@@ -65,8 +65,8 @@ target_flux_w_m2=12500.0
 total_burn_rate_kg_s=4.71238898038469
 flame_height_m=16.678690349069907
 surface_emissive_power_w_m2=56143.30542946426
-distance_to_flux_m=5.1
-flux_at_distance_w_m2=11709.814790768976
+distance_to_flux_m=NaN
+flux_at_distance_w_m2=NaN
 
 pool_fire_distance_10000
 pool_diameter_m=10.0
@@ -107,8 +107,8 @@ target_flux_w_m2=1000000.0
 total_burn_rate_kg_s=4.71238898038469
 flame_height_m=16.678690349069907
 surface_emissive_power_w_m2=56143.30542946426
-distance_to_flux_m=5.1
-flux_at_distance_w_m2=11709.814790768976
+distance_to_flux_m=NaN
+flux_at_distance_w_m2=NaN
 
 pool_fire_zero_target_evidence
 pool_diameter_m=10.0
@@ -121,8 +121,7 @@ target_flux_w_m2=0.0
 total_burn_rate_kg_s=4.71238898038469
 flame_height_m=16.678690349069907
 surface_emissive_power_w_m2=56143.30542946426
-distance_to_flux_m=1000.0
-flux_at_distance_w_m2=293.070387146219
+distance_to_flux_refusal=IllegalArgumentException: Contour target must be positive and finite
 
 pool_fire_dead_parameters
 pool_diameter_m=10.0

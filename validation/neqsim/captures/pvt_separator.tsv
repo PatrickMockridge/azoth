@@ -1,5 +1,9 @@
 separator
 [continuous_binary]
+GOR 210.19952704510527 Bo 1.0848181343719043
+GOR 224.62300642231548 Bo 1.0411026475767087
+GOR 231.72675023111753 Bo 1.0159266848652933
+GOR 233.68586355180275 Bo 1.0
 stage_1_pressure_pa=5000000.0
 stage_1_temperature_k=323.15
 stage_1_stage_gor=210.19952704510527
@@ -19,20 +23,20 @@ stage_4_oil_fvf=1.0
 [staged_binary]
 stage_1_pressure_pa=5000000.0
 stage_1_temperature_k=323.15
-stage_1_stage_gor=210.09985703850035
-stage_1_oil_fvf=1.0843037477215727
+stage_1_stage_gor=210.09985703876364
+stage_1_oil_fvf=1.0843037477229316
 stage_2_pressure_pa=2000000.0
 stage_2_temperature_k=313.15
-stage_2_stage_gor=14.472316569438366
-stage_2_oil_fvf=1.0400644000970958
+stage_2_stage_gor=14.472316569456503
+stage_2_oil_fvf=1.0400644000983992
 stage_3_pressure_pa=500000.0
 stage_3_temperature_k=303.15
-stage_3_stage_gor=7.063545010371176
-stage_3_oil_fvf=1.0152522149046608
+stage_3_stage_gor=7.063545010380028
+stage_3_oil_fvf=1.0152522149059329
 stage_4_pressure_pa=101325.0
 stage_4_temperature_k=288.15
-stage_4_stage_gor=1.893169014075703
-stage_4_oil_fvf=1.0
+stage_4_stage_gor=1.8931690140780753
+stage_4_oil_fvf=1.0000000000012532
 [train_upstream]
 total_gor=239.47388503058167
 bo=1.8173491732538267
@@ -45,9 +49,9 @@ stage_1_stage_gor=161.49733028241317
 stage_1_cumulative_gor=161.49733028241317
 stage_1_gas_volume_m3=0.9700963855280732
 stage_1_gas_density=43.10040883414266
-stage_1_oil_density=494.8913864514375
+stage_1_oil_density=602.4395770854218
 stage_1_gas_molar_mass=0.020066695492532725
-stage_1_oil_molar_mass=0.07029480452644189
+stage_1_oil_molar_mass=0.07029480452644188
 stage_1_gas_z_factor=0.8965717791566564
 stage_1_oil_viscosity=2.067906493415124E-4
 stage_2_pressure_pa=1000000.0
@@ -56,7 +60,7 @@ stage_2_stage_gor=54.654079043237125
 stage_2_cumulative_gor=216.1514093256503
 stage_2_gas_volume_m3=0.3283009350154175
 stage_2_gas_density=9.79637094529145
-stage_2_oil_density=602.4395770854218
+stage_2_oil_density=654.6968420484538
 stage_2_gas_molar_mass=0.023770235234470742
 stage_2_oil_molar_mass=0.08474349865539309
 stage_2_gas_z_factor=0.9634152718062052
@@ -67,7 +71,7 @@ stage_3_stage_gor=23.322475704931378
 stage_3_cumulative_gor=239.47388503058167
 stage_3_gas_volume_m3=0.14009550091853168
 stage_3_gas_density=1.618601751823603
-stage_3_oil_density=654.6968420484538
+stage_3_oil_density=685.0479302240026
 stage_3_gas_molar_mass=0.03780947139315711
 stage_3_oil_molar_mass=0.0919767753791744
 stage_3_gas_z_factor=0.9881124153761884

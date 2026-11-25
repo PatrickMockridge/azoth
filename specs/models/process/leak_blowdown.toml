@@ -3,17 +3,17 @@ name = "Vessel leak blowdown"
 kind = "procedure"
 assumptions = [
     "**the legacy `LeakModel.calculateSourceTerm` path**, not the modern `calculateReleaseFlow` (which is `process.hem_release`). `calculateMassFlowRate`, `calculateJetVelocity`, `calculateJetMomentum` and `calculateDropletSMD` are this calculation's internal arithmetic and are not separate ids.",
-    "**the inventory is the corrected total density times `vessel_volume`**; the fluid's amount sets only the composition. The vessel is one homogeneous, adiabatic, rigid control volume.",
-    "**each step records then updates**: `mass -= mdot dt`, `total += mdot dt`, and above 1% of the initial mass `P2 = P1 (mass/initialMass)^gamma` - the **initial** mass denominator, as the code has it - floored at `back_pressure`, with `T2 = T1 (P2/P1)^((gamma-1)/gamma)` and a TP flash.",
+    "**the inventory is scaled by the EOS molar volume**: `moles = vessel_volume/(Z R T/P)` at the initial flash, so the mass is the unshifted density times the volume while the rate uses the physical-properties density; the two differ by the volume shift.",
+    "**each substep removes at most 1% of the current mass** and with it the stream's enthalpy; the remaining state is the VU flash at the vessel volume and `U - removed h`, with the composition unchanged.",
+    "**the receiving-pressure crossing is located by halving the removed mass**, 64 iterations, until `0 <= P - back <= max(1e-3, 1e-9 back)`; a crossing that cannot be bracketed is refused rather than clamped.",
     "**the rate is the class's simplified orifice**: choked `Cd A P sqrt(gamma MW/(8314 T)) (2/(gamma+1))^((gamma+1)/(2(gamma-1)))` with `MW` in kg/kmol, else subsonic `Cd A sqrt(2 rho (P-back))`; zero when `P <= back`. `R = 8314` is the class's number.",
-    "**the jet is capped, the momentum is not**: `v = min(mdot/(rho A Cd), 1.2 sqrt(gamma 8314 T/MW))`; `momentum = mdot v + (P-back) A`, negative when the pressure is at or below the back pressure.",
-    "**the droplet SMD** is the class's Nukiyama-Tanasawa form with `0.02 N/m` as a fixed surrogate surface tension: only for two phases with liquid fraction `>= 0.001`, `585 d/sqrt(We) sqrt(rho_l/rho_v) (1-beta)^0.45`, capped at `d/2`; otherwise zero.",
+    "**the jet is capped, the momentum is not**: `v = min(mdot/(rho A Cd), 1.2 sqrt(gamma 8314 T/MW))`; `momentum = mdot v + (P-back) A`, both zero where the rate is zero.",
+    "**a single gas phase is required** at the initial state and after every VU flash, as `requireBlowdownGas`: a two-phase or liquid state is `invalid` with `PHASE_BOUNDARY`, so the droplet SMD is zero and the vapour mole fraction is one.",
     "**gamma is the class's `getGamma()`**: `Cp/Cv`, summed over the phases, from the cubic's `cp` and `cv = cp + T (dP/dT)^2/(dP/dV)`; the port refuses a gamma outside `(1, 2]` rather than substituting the class's `1.3`.",
     "**the class's silent fallbacks are refused**: ideal-gas density, `gamma = 1.3`, `MW = 16`, `rho = 1`, a NaN rate as zero, and the `init(3)` retry. A state that would need one is `invalid`, with the value in the diagnostic.",
-    "**the class's density cache is not reproduced.** It initialises physical properties once and reuses the density through the loop; this port flashes each step and uses the fresh corrected density (EOS volume less the Peneloux shift), a measured divergence.",
-    "**the series stops at the 1% floor or the declared points**. At the back-pressure floor the rate is zero, so the mass never reaches 1% and the loop runs to `ceil(duration/time_step)+1` in a zero-flow plateau.",
-    "**only visited rows are published.** The class allocates the declared slots and leaves unvisited ones as zeros; a zero row is not a state, so the result carries `number_of_points` and `recorded_points` and the rows themselves.",
-    "**`vapour_mole_fraction` is molar.** The class's `vaporMassFraction` is `getBeta()`, a mole fraction; this port publishes the physical value - 1 all-vapour, 0 all-liquid, beta two-phase - which differs from the class's single-phase `1.0`.",
+    "**mass and cumulative internal energy close to `1e-7`** relative on the initial inventory; a VU flash the solver cannot find is `VU_CLOSURE_FAILED`, and a closure miss is `CLOSURE_FAILED`.",
+    "**every declared point is published**, `ceil(duration/time_step)+1` rows at `0, dt, ... , duration`; the sample's state is the one the substeps reached at that time.",
+    "**the class's substep cap is the port's**: a run that reaches 1,000,000 substeps is refused with `SUBSTEP_LIMIT` rather than continued.",
     "**`time_to_empty` is the class's estimate**, `totalReleased/(0.5 peakRate)`, not the time the series empties; `scenario_name` is report-only; `ReleaseOrientation` is stored by the class and read by no arithmetic, so it is owed.",
     "**the fluid is PR with the classic mixing rule**; NeqSim's own `LeakModelTest` is SRK and is captured as evidence. `SourceTermResult`'s six exporters, `ReleaseFlowEnsemble`, `SourceTermSession`, the Fanno/pipe models and the frame envelope are owed and named in `ROADMAP.md`.",
 ]
@@ -23,13 +23,13 @@ references = [
 ]
 [source]
 standard = "NeqSim process/safety/release/LeakModel.java"
-edition = "Its `calculateSourceTerm`: the inventory from the corrected density and volume, the record-then-update loop, the choked/subsonic rate, the capped jet velocity, the unclamped momentum, the droplet SMD, the 1% floor, the isentropic update, and the totals."
+edition = "Its `calculateSourceTerm`: the inventory scaled by the EOS volume, the 1% substep loop, the VU flash at fixed volume and internal energy, the receiving-pressure bisection, the choked/subsonic rate, the capped jet velocity, the unclamped momentum, and the totals."
 [algorithm]
-scheme = "explicit_euler_isentropic_blowdown"
+scheme = "substepped_vu_blowdown"
 initialisation = "tp_flash_at_the_initial_state"
 convergence = "relative"
-tolerance = 0.01
-max_iterations = 100000
+tolerance = 1.0e-7
+max_iterations = 1000000
 [implementations]
 python = "azoth.process.leak_blowdown"
 rust = "azoth_process::leak_blowdown"
@@ -108,16 +108,16 @@ unit = "Pa"
 description = "the recorded state's pressure.\n"
 [outputs.points.fields.vapour_mole_fraction]
 unit = "dimensionless"
-description = "the physical vapour mole fraction: 1 all-vapour, 0 all-liquid, beta two-phase.\n"
+description = "one, because the model requires a single gas phase.\n"
 [outputs.points.fields.jet_velocity]
 unit = "m/s"
-description = "`mdot/(rho A Cd)`, capped at 1.2 times the ideal-gas sound speed.\n"
+description = "`mdot/(rho A Cd)`, capped at 1.2 times the ideal-gas sound speed; zero where the rate is zero.\n"
 [outputs.points.fields.jet_momentum]
 unit = "N"
-description = "`mdot v + (P-back) A`, unclamped.\n"
+description = "`mdot v + (P-back) A`, under the same zero-rate rule.\n"
 [outputs.points.fields.droplet_smd]
 unit = "m"
-description = "the liquid Sauter mean diameter, zero for a single phase or a trace liquid.\n"
+description = "zero; the model requires a single gas phase.\n"
 [outputs.total_mass_released]
 unit = "kg"
 optional = true

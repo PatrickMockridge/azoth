@@ -92,7 +92,7 @@ optional = true
 description = "the steady-to-dynamic oversizing; absent only at a zero dynamic area.\n"
 [outputs.allowable_pressure]
 unit = "Pa"
-description = "the allowable accumulated pressure `set_pressure (1 + overpressure_fraction)`.\n"
+description = "the allowable accumulated pressure `set_pressure + (set_pressure - atm) overpressure_fraction`.\n"
 [outputs.peak_dynamic_pressure]
 unit = "Pa"
 description = "the peak vessel pressure at the dynamically required area.\n"

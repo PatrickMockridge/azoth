@@ -24,23 +24,23 @@ assumptions = [
     "**`runDeltaT`'s first pass is not modelled.** It seeds `outStream[0]` at `guessOutTemperature` and recurses; the branch that answers then re-clones both inlets, so the seed cannot reach `UAvalue` - the class's own test agrees to `1e-3` with and without a prior rating.",
     "**the two dead tests are carried as the class has them**: `thermalEffectiveness` is compared with `1.0` and is the class's field, and `hotColdDutyBalance` is hard-set to `1.0`. On a fresh exchanger the field is `0.0`, so the second `PHflash` runs and is a no-op at the enthalpy it was given.",
     "**a pinned outlet wins over `use_delta_t`**: `runDeltaT` delegates to `runSpecifiedStream`, so the pin runs and the delta-T branch is unreachable. The result carries a `FALLBACK_TO_INPUT` warning naming it.",
-    "**`runTransient`'s enabled branch is one step here.** Absent `time_step` is the steady `run`; a stated one is a call, **including zero**, because the class applies its outlet enthalpy shifts at `dt = 0` too. The session loop and the clock are outside the id.\n",
-    "**the enabled branch needs the class's three gates.** `dynamic_model_enabled`, a positive `wall_mass` and a positive `heat_transfer_area`; otherwise `runTransient` delegates to `Heater.runTransient`, the steady `run`. The fallback keeps every steady mode.\n",
-    "**the shell is `inStream[0]` and the tube `inStream[1]`, the reverse of the thermal-hydraulic rating.** `transient_tube_side` states the mapping; `rating_tube_side` does not apply, because the rating's stream 0 is the tube and the transient's is the shell.\n",
-    "**the wall is forward Euler.** `T_wall += (h_shell*A*(T_shell - T_wall) - h_tube*A*(T_wall - T_tube))/(m_wall*cp_wall) * dt`, where `T_shell`/`T_tube` are the CSTR temperatures with a positive holdup and the inlet temperatures otherwise. The wall update reads the pre-step wall.\n",
-    "**the two CSTR holdups are the class's ODEs.** `dT_shell/dt = (mdot*cp*(T_in - T_shell) - h_shell*A*(T_shell - T_wall))/(rho*V*cp)`, and the tube's `+ h_tube*A*(T_wall - T_tube)`. Density and mass Cp are the inlet's; a non-positive fluid mass or Cp skips the ODE and keeps the seeded state.\n",
-    "**the outlet enthalpy shift is a measured quirk.** The class applies the two duties (W) to the **total** inlet enthalpy as if they were J: `h_out = h_in - q`, each PH-flashed at the inlet pressure; the source's `* dt_effective` comment is not the code. The temperatures do integrate by `dt`.\n",
-    "**`duty` remains this id's hot-side release.** The class's `getDuty()` is `q_shell_to_wall`; this result publishes `n_hot*(h_hot_in - h_hot_out)`, as every other branch does. They agree when the shell is hot and differ otherwise, because the class applies the two side shifts independently.\n",
-    "**first-step seeding is the class's NaN sentinel.** An absent or NaN `wall_temperature` seeds to the mean of the two inlets; an absent or NaN holdup temperature seeds to its side's inlet. The post-step states are outputs, which is how a stateless id carries state.\n",
-    "**a two-phase side is refused.** The class's `getDensity` and `getCp` average the phases; this port's property surface is single-phase, so it refuses rather than pick one. The capture records the class's two-phase answer as evidence, uncased.\n",
-    "**a non-positive molar flow is refused**, because the outlet shift divides by the side's moles; the existing `hot_in_n`/`cold_in_n` check keeps that division out of the arithmetic.\n",
-    "**negative wall mass, area and holdup clamp; non-finite ones, a non-positive `wall_cp` and negative HTCs refuse.** The class's setters clamp the first three; `Math.max(0, NaN)` is NaN in Java, so this refuses non-finite parameters instead of carrying NaN.\n",
+    "**`runTransient`'s enabled branch is one interval here.** Absent `time_step` is the steady `run`; a stated positive one is a call. The session loop, the clock and the class's UUID identity are outside the id.\n",
+    "**the gate is `dynamic_model_enabled` alone.** The class then requires positive wall mass, wall Cp, both film coefficients and area; a zero or absent one is refused rather than falling back to the steady run.\n",
+    "**the shell is `inStream[0]` and the tube `inStream[1]`**, the reverse of the thermal-hydraulic rating. `transient_tube_side` states the mapping; `rating_tube_side` does not apply.\n",
+    "**the state is the class's `ThermalState`**: two fluid temperatures and the wall, with each side's holdup mass and specific enthalpy. A stateless call takes the previous step's temperatures and returns the next.\n",
+    "**each interval solves the first law by Newton**: `r_i = m_i/dt (h_i - h_i0) + mdot_i (h_i - h_in,i) + g_i (T_i - T_w)`, `r_w = C_w/dt (T_w - T_w0) - sum_i g_i (T_i - T_w)`, with `g_i = htc_i A` and the analytic Jacobian.\n",
+    "**the solver is the class's**: 40 iterations, the residual bound `max(1e-5, 1e-5/dt)`, a halving line search from 1 to 1e-6 bounded to the initial and inlet temperatures, and a refusal when no trial reduces the residual.\n",
+    "**each candidate flashes single-phase**: enthalpy, heat capacity and corrected density at the candidate temperature. A two-phase candidate or a non-finite property is refused.\n",
+    "**the balance receipt is the class's**: accumulation `E_end - E_start`, boundary `dt sum_i mdot_i (h_in,i - h_out,i)` and residual `accumulation - boundary`, over the fluid holdups and the wall.\n",
+    "**`duty` is the class's `getDuty()` here**: `htc_shell A (T_shell - T_wall)`, not the hot-side release the steady branches publish.\n",
+    "**seeding is the class's NaN sentinel**: an absent or NaN wall temperature seeds to the mean of the two inventory temperatures, and an absent or NaN fluid temperature seeds to its inlet.\n",
+    "**a non-positive timestep, molar flow or gate is refused**, and holdup volumes are finite nonnegative; the class's setters clamp a negative volume.\n",
     "**`calculateSteadyState = false` is not modelled.** It copies the outlet pressure to the inlet and re-runs the inlet, a mutation of the caller's stream; a one-step id has no inlet to mutate. The capture records the class's `NullPointerException` on its single-stream `outStream`.\n",
     "**the mechanical estimate runs on the step too.** `runTransient` never calls `calcDesign`; the flag is the caller's, computed from the step's outlets with zero effectiveness and the stated `ua` (or the class's 500) as the UA basis.\n",
 ]
 references = [
     "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/equipment/heatexchanger/HeatExchanger.java` is the port source, through its `run` and `runTransient`.",
-    "`validation/neqsim/captures/process_heat_exchanger_transient.tsv` - the gate's fallback, the first-step seed, the ten-step wall trajectory, the holdup CSTRs against the zero-holdup control, the `dt` quirk, the hot-tube mapping and the degenerate evidence rows.",
+    "`validation/neqsim/captures/process_heat_exchanger_transient.tsv` - the gate's fallback and refusals, the wall trajectory, the thermal inventory and the energy-balance receipt at the pin; the CSTR rows are the previous pin's evidence.",
 ]
 [source]
 standard = "NeqSim process/equipment/heatexchanger/HeatExchanger.java"
@@ -491,11 +491,23 @@ description = "the post-step metal-wall temperature. Present on the dynamic bran
 [outputs.shell_fluid_temperature]
 unit = "K"
 optional = true
-description = "the post-step shell-side CSTR temperature; present only with a positive `shell_holdup_volume` (or echoed on a fallback), absent where the class's field stays NaN.\n"
+description = "the shell-side fluid temperature the step solved; absent on a steady fallback.\n"
 [outputs.tube_fluid_temperature]
 unit = "K"
 optional = true
-description = "the post-step tube-side CSTR temperature, on the same terms.\n"
+description = "the tube-side fluid temperature the step solved, on the same terms.\n"
+[outputs.thermal_inventory_energy]
+unit = "J"
+optional = true
+description = "the post-step fluid-plus-wall thermal inventory, `sum_i m_i h_i + m_wall cp_wall T_wall`; absent on a steady fallback.\n"
+[outputs.balance_accumulation]
+unit = "J"
+optional = true
+description = "the interval's inventory change, `E_end - E_start`; absent on a steady fallback.\n"
+[outputs.balance_boundary_energy]
+unit = "J"
+optional = true
+description = "the interval's boundary energy, `dt sum_i mdot_i (h_in,i - h_out,i)`; absent on a steady fallback.\n"
 
 [[valid_range]]
 quantity = "ua"

@@ -62,7 +62,7 @@ not an equation, and both implementations read it from here.
 - **beyond `Rbar = 1` it decays as `plateau Rbar^-beta`**, with `beta = 1.0` for classes 1-5 and `1.2` for classes 6-10. The side-on overpressure is `dPbar p0`.
 - **the strength class is the class's `int`, 1 to 10.** It is declared dimensionless with a range, and a non-integral value is refused because the class's constructor would truncate it.
 - **the inverse is 80 halvings between 0.1 and 50000 m, with no early break.**
-- **a target above the near-field overpressure is absent.** The class returns its near bound, 0.1 m, where the overpressure is already below the target; the port publishes no `distance_to_overpressure`. A non-positive target is refused: the class throws.
+- **an unbracketed target is absent.** The class returns `NaN` when the target is outside the `0.1` to `50000` m search (NeqSim `#4975`, fixed by the pin); the port publishes no `distance_to_overpressure`. A non-positive target is refused: the class throws.
 - **a non-positive distance is refused**: the class answers an infinite overpressure at zero. **The ambient pressure is the class's setter**, 101325 Pa when absent.
 - **heat of combustion is in J/kg and crosses unconverted**, declared dimensionless because no vocabulary unit expresses a mass-specific energy.
 

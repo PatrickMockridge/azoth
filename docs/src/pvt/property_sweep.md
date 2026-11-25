@@ -42,7 +42,7 @@ checked against one.
 - **two of the four class sweeps are here**: `density` is `DensitySim` and `viscosity` is `ViscositySim`, one flash per temperature/pressure pair.
 - **the phase densities are the volume-corrected ones** and the viscosities the phase correlations NeqSim's phase type selects; a negative viscosity is floored at `1e-5 Pa s` as `PhysicalProperties` does.
 - **the availability flags are `ViscositySim`'s three**, published for both modes so a caller can tell an absent phase from a zero property.
-- **the wax half is owed**: `WaxFractionSim` and `ViscosityWaxOilSim` need NeqSim's TBP wax model, whose fluid cannot cross as characterization rows, and the class's own wax model refuses a databank n-alkane wax former (`Invalid reference-liquid fugacity coefficient for nC20`).
+- **the wax half is owed**: `WaxFractionSim` and `ViscosityWaxOilSim` need NeqSim's TBP wax model, whose fluid cannot cross as characterization rows. The named n-alkane feed itself now runs (`#5210`, fixed by the pin); the remaining gap is this library's input model, not the class.
 - **`WaxFractionSim`'s GOR and Bo outputs are vestigial zeros** and are not published; `DensitySim`'s wax fraction, which it hardcodes to zero, is not a field here.
 - **inputs are SI** and the fluid is the characterization row list; SRK and the databank kij are the defaults.
 
@@ -67,6 +67,6 @@ declared checks *that call* could not evaluate.
 
 ## References
 
-- NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/DensitySim.java` and `ViscositySim.java` at commit 118d9af are the port source.
+- NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/DensitySim.java` and `ViscositySim.java` at commit b40bb113 are the port source.
 - `validation/neqsim/captures/pvt_property_sweep.tsv` - a two-phase binary and a pure-gas sweep, in both modes.
-- NeqSim #5210 - `WaxFractionSim` throws on a named-component wax feed built with `addTBPWax()`.
+- NeqSim #5210 - the named-paraffin wax feed and the per-phase beta convergence (fixed by the pin).

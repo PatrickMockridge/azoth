@@ -1,8 +1,8 @@
 // The gamma-phi flash of an SRK vapour over a `PhaseGENRTL` liquid, for
 // `eos.ge_nrtl_flash`.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar NrtlGammaPhiFlash.java
-//     java -cp .:neqsim-118d9af.jar NrtlGammaPhiFlash
+//     javac -proc:none -cp neqsim-b40bb11.jar NrtlGammaPhiFlash.java
+//     java -cp .:neqsim-b40bb11.jar NrtlGammaPhiFlash
 //
 // **Why this drives the loop itself.** `SystemNRTL` does not opt into NeqSim's direct
 // gamma-phi flash: `EosGeFlashModel.requiresDirectGammaPhiFlash` defaults to false,

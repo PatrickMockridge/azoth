@@ -11,7 +11,7 @@ assumptions = [
     "**TBP and plus fluids cannot cross as rows**, so the upstream tests' characterized fluids are an owed parity item rather than retyped here; the capture pins databank states.",
 ]
 references = [
-    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/SaturationPressure.java` and `SaturationTemperature.java` at commit 118d9af are the port source.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/SaturationPressure.java` and `SaturationTemperature.java` at commit b40bb113 are the port source.",
     "`validation/neqsim/captures/pvt_saturation.tsv` - two pressure searches, an unbracketed pressure fallback, a temperature search and its unbracketed fallback.",
 ]
 [source]

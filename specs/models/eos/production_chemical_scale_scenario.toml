@@ -12,7 +12,7 @@ assumptions = [
     "the class's warning map is reported as a record list of its codes and messages, in insertion order; the formatted calcite delta is the class's `%.2f`.\n",
 ]
 references = [
-    "NeqSim master, `process/chemistry/scale/ProductionChemicalScaleScenario.java` and `process/chemistry/ProductionChemical.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.",
+    "NeqSim master, `process/chemistry/scale/ProductionChemicalScaleScenario.java` and `process/chemistry/ProductionChemical.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.",
     "`validation/neqsim/captures/production_chemical_scenario_probe.tsv` - caustic, MDEA and HCl adjusters, two triazine doses, a scale and a corrosion inhibitor, no bicarbonate, a large caustic dose, the B-dot and Pitzer models, and an unsupported active.",
 ]
 [source]

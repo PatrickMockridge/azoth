@@ -33,8 +33,6 @@ _DEFAULT_PFP_CONDUCTIVITY = 0.2
 #: The rating's 60-minute boundary, s; exactly 3600 s is short.
 _LONG_DURATION_S = 3600.0
 _LONG_DURATION_EPSILON_S = 1.0e-6
-#: The floor on the fire-to-steel driving temperature, K.
-_MIN_DRIVING_TEMPERATURE_K = 1.0
 
 
 class _Solution(NamedTuple):
@@ -153,6 +151,12 @@ def _evaluate(
             "publishes a zero or negative bare-steel time with an infinite or negative "
             "thickness",
         )
+    if fire <= 0.5 * (initial + critical):
+        raise InvalidInputError(
+            "fire_temperature",
+            "the fire temperature must exceed the mean steel temperature; at or below it the "
+            "class refuses the demand rather than publishing a cooled-steel thickness",
+        )
 
     mass_per_area = _STEEL_DENSITY * thickness
     delta_t = critical - initial
@@ -162,7 +166,7 @@ def _evaluate(
     if required:
         q_allow_value = mass_per_area * _STEEL_CP * delta_t / survival
         steel_average_value = 0.5 * (initial + critical)
-        driving_value = max(_MIN_DRIVING_TEMPERATURE_K, fire - steel_average_value)
+        driving_value = fire - steel_average_value
         required_thickness = conductivity * driving_value / q_allow_value
         q_allow: float | None = q_allow_value
         steel_average: float | None = steel_average_value

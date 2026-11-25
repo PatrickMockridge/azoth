@@ -3,13 +3,13 @@ name = "PSV sizing"
 kind = "procedure"
 assumptions = [
     "**the `service` selects one of the class's three methods.** `gas` and `liquid` publish the API 520 orifice ladder; `two_phase` publishes an area only, because the omega method selects no orifice.",
-    "**the relieving pressure is `set_pressure (1 + overpressure_fraction)`**, and the gas area is the API 520 US-customary equation converted through the class's own constants: 7936.64 lb/hr per kg/s, 6894.76 Pa per psia, 1.8 R per K and 1000 g per kg of molar mass.",
+    "**the relieving pressure is `set_pressure + (set_pressure - atm) overpressure_fraction`**, the API 520 gauge accumulation. The gas area is the US-customary equation through the class's constants: 7936.64 lb/hr per kg/s, 6894.76 Pa per psia, 1.8 R per K.",
     "**the gas back-pressure factor is the class's two branches.** Balanced bellows above the critical ratio uses the isentropic subcritical expression capped at 1; a conventional valve above half the relieving pressure uses `1 - 2 (r - 0.5)` floored at 0.1.",
     "**the liquid branch is API 520 Section 5.8 with the class's corrections.** `Kw` derates only a balanced-bellows valve above half the relieving pressure, `Kv` is the Reynolds correction clamped to `[0.2, 1]`, and `Kp` is `min(0.6 + 4 f, 1)` below 0.25 overpressure.",
     "**the liquid pressure difference is in psig, and a non-positive difference is silently 1 psi**, the class's substitution. The port refuses a back pressure at or above the relieving pressure instead of reproducing that state.",
     "**the two-phase branch is the class's omega method.** The class validates no input; a non-positive mass flux answers zero area, and the port refuses the states that make it non-finite or non-positive.",
     "**the orifice ladder is the standard API 520 D to T table, and the first area at or above the requirement is selected.** Above 26 in2 the class still answers T at 26.0 in2, undersized; the port publishes that area and not a verdict.",
-    "**the capacity helper is not the sizing inverse.** `calculateMassFlowCapacity` uses `R = 8314` with a molar mass the class's javadoc calls kg/mol while the sizing path multiplies by 1000, so a round trip is sqrt(1000) low. Both are reproduced.",
+    "**the capacity helper is the sizing relation read forwards.** `calculateMassFlowCapacity` uses `R = 8.3144621` with the kg/mol molar mass, so a selected orifice admits at least the demand it was sized for.",
     "**`PSVSizingResult.getMassFlowCapacity` is the input mass flow echoed**, not a capacity; it is not published. `mass_flow_capacity` is only the `calculateMassFlowCapacity` result.",
     "**the liquid mass flow is `volume_flow liquid_density`**, the class's own product; the two-phase mass flow is the caller's.",
 ]
@@ -109,7 +109,7 @@ description = "the discharge coefficient the capacity helper is called with, abo
 [outputs]
 [outputs.relieving_pressure]
 unit = "Pa"
-description = "`set_pressure (1 + overpressure_fraction)`.\n"
+description = "`set_pressure + (set_pressure - atm) overpressure_fraction`.\n"
 [outputs.back_pressure_fraction]
 unit = "dimensionless"
 description = "`back_pressure / relieving_pressure`.\n"

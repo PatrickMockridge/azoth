@@ -144,16 +144,16 @@ fn a_mixture_resolves_the_rule_at_reduced_parameters() {
 /// state NeqSim's own `TPflashUMRCPADehydrationLifecycleTest` pins its water-in-gas
 /// envelope at. The expected values are NeqSim's output, recorded rather than recomputed.
 ///
-/// **The UNIFAC set is the `_umrmc` one**, because the UMR-CPA model pairs the rule
+/// **The UNIFAC set is the `_umrcpa` one**, because the UMR-CPA model pairs the rule
 /// with a Mathias-Copeman attraction term, and NeqSim's
-/// `PhaseGEUnifacUMRPRU.useMcInteractionParameters` selects that table for attractive
-/// terms 13, 19 and 22. The `_umr` tables give a different `ln gamma` here, so this key
-/// is what says which was read.
+/// `PhaseGEUnifacUMRPRU.useMcInteractionParameters` selects the `_umrcpa` table for it
+/// (the `_umrmc` tables are the separate UMR-PRU-MC variant's). The `_umr` tables give a
+/// different `ln gamma` here, so this key is what says which was read.
 #[test]
 fn the_unifac_umrpru_set_reproduces_neqsims_activity_coefficients() {
     use azoth_eos::databank::UmrpruSet;
 
-    let params = databank::unifac_umrpru_parameters(&["methane", "water"], UmrpruSet::Umrmc)
+    let params = databank::unifac_umrpru_parameters(&["methane", "water"], UmrpruSet::Umrcpa)
         .expect("the pair resolves");
     let result = azoth_eos::unifac_umrpru_activity_coefficients(&params, 298.15, &[0.98, 0.02])
         .expect("the coefficients evaluate");

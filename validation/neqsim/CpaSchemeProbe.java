@@ -52,8 +52,8 @@ import neqsim.thermo.system.SystemSrkCPA;
  * probe cannot see association".
  *
  * <pre>
- * javac -proc:none -cp neqsim-118d9af.jar CpaSchemeProbe.java
- * java -cp .:neqsim-118d9af.jar CpaSchemeProbe
+ * javac -proc:none -cp neqsim-b40bb11.jar CpaSchemeProbe.java
+ * java -cp .:neqsim-b40bb11.jar CpaSchemeProbe
  * </pre>
  */
 public final class CpaSchemeProbe {

@@ -3,15 +3,14 @@
 Spec: ``specs/models/process/leak_blowdown.toml``
 
 The Python twin of ``crates/azoth-process/src/models/leak_blowdown.rs``, written to mirror it.
-The port source is ``LeakModel.calculateSourceTerm(duration, timeStep)``: the inventory from
-the corrected density and the vessel volume, the record-then-update loop with its simplified
-orifice, capped jet velocity, unclamped momentum and droplet SMD, and the isentropic pressure
-and temperature update. The modern ``calculateReleaseFlow`` path is
+The port source is ``LeakModel.calculateSourceTerm(duration, timeStep)``: the inventory at
+fixed volume and internal energy, the substep loop that removes at most one percent of the
+mass at a time, the simplified orifice, the capped jet velocity, the unclamped momentum and
+the VU flash that solves the remaining state. The modern ``calculateReleaseFlow`` path is
 :mod:`azoth.process.reference.hem_release`.
 
-The class's silent fallbacks - an ideal-gas density, ``gamma = 1.3``, methane's molar mass,
-``rho = 1``, a NaN rate as zero - are refused here, and the class's cached density is not
-reproduced: every step flashes and uses the fresh corrected density.
+The class's silent fallbacks - ``gamma = 1.3``, methane's molar mass, ``rho = 1``, a NaN
+rate as zero - are refused here, and so is any state that is not a single gas phase.
 """
 
 from __future__ import annotations
@@ -28,23 +27,26 @@ from azoth.eos import components as _components
 from azoth.eos.reference._entropy_state import molar_mass_of
 from azoth.eos.reference._heat_capacity import phase_capacity
 from azoth.eos.reference._mixture_state import phase_state, reduced_parameters
+from azoth.eos.reference.molar_enthalpy_entropy import molar_enthalpy_entropy
 from azoth.eos.reference.pr_molar_volume import MOLAR_GAS_CONSTANT
 from azoth.eos.reference.pt_flash import check_composition, pt_flash
+from azoth.eos.reference.vu_flash import vu_flash
+from azoth.eos.reference.vu_flash_single_comp import vu_flash_single_comp
 
 MODEL_ID = "process.leak_blowdown"
 
 #: The class's fixed gas constant, J/(kmol K).
 R = 8314.0
-#: The class's surrogate surface tension for the droplet correlation, N/m.
-SURFACE_TENSION = 0.02
-#: The class's Nukiyama-Tanasawa coefficient.
-SMD_COEFFICIENT = 585.0
-#: The class's liquid-fraction exponent.
-SMD_LIQUID_EXPONENT = 0.45
-#: The class's liquid-fraction gate.
-SMD_LIQUID_FLOOR = 0.001
-#: The inventory floor, relative to the initial mass.
-MASS_FLOOR = 0.01
+#: The largest mass one substep may remove, as a fraction of the current inventory.
+SUBSTEP_MASS_FRACTION = 0.01
+#: The class's substep cap.
+MAX_SUBSTEPS = 1_000_000
+#: The receiving-pressure event's absolute bracket, Pa.
+RECEIVING_PRESSURE_FLOOR = 1e-3
+#: The receiving-pressure event's relative bracket.
+RECEIVING_PRESSURE_RELATIVE = 1e-9
+#: The closure check's relative tolerance.
+CLOSURE_TOLERANCE = 1e-7
 #: The declared-point cap.
 MAX_POINTS = 100_000
 #: The velocity cap, as a multiple of the ideal-gas sound speed.
@@ -71,27 +73,29 @@ class _Point(NamedTuple):
 
 
 class _Phase(NamedTuple):
-    molar_mass: float
-    molar_volume: float
     density: float
     cp: float
     cv: float
+    molar_enthalpy: float
 
 
 class _State(NamedTuple):
-    flash: Any
-    pressure: float
     temperature: float
+    pressure: float
     density: float
     gamma: float
-    vapour_fraction: float | None
-    vapour_density: float | None
-    liquid_density: float | None
+    molar_enthalpy: float
+    compressibility: float
 
-    def vapour_mole_fraction(self) -> float:
-        if self.flash.phase == "two_phase":
-            return 0.0 if self.vapour_fraction is None else self.vapour_fraction
-        return 1.0 if self.flash.phase == "all_vapour" else 0.0
+    def molar_internal_energy(self) -> float:
+        return self.molar_enthalpy - self.compressibility * MOLAR_GAS_CONSTANT * self.temperature
+
+
+class _Advanced(NamedTuple):
+    state: _State
+    moles: float
+    mass: float
+    energy: float
 
 
 class _Outcome(NamedTuple):
@@ -105,6 +109,7 @@ class _Outcome(NamedTuple):
     time_to_empty: float | None
     diagnostics: tuple[tuple[str, str], ...]
     initial_mass: float
+    initial_density: float
     initial_gamma: float
     gammas: tuple[float, ...]
 
@@ -265,7 +270,7 @@ def _states(
     diagnostics: list[tuple[str, str]] = [
         (
             "MODEL_ASSUMPTIONS",
-            "Rigid adiabatic vessel; equilibrium TP flashes; simplified orifice; no slip "
+            "Rigid adiabatic vessel; equilibrium flashes; simplified orifice; no slip "
             "or friction in the jet",
         )
     ]
@@ -275,61 +280,134 @@ def _states(
         )
 
     state = _flash_state(mixture, ideal_gas, t, p, z)
-    initial_mass = state.density * volume
+    # The class scales the inventory by the **EOS** volume, ``V / (Z R T / P)``, not by
+    # the physical-properties density the rate uses. The two differ by the volume shift.
+    initial_molar_volume = state.compressibility * MOLAR_GAS_CONSTANT * t / p
+    if not initial_molar_volume > 0.0 or not math.isfinite(initial_molar_volume):
+        raise _Failure(
+            "DENSITY_UNAVAILABLE", f"the initial molar volume is {initial_molar_volume} m3/mol"
+        )
+    initial_gamma = state.gamma
+    initial_density = state.density
+
+    molar_mass = molar_mass_of(mixture, z)
+    molar_mass_kmol = 1000.0 * molar_mass
+    area = math.pi * diameter * diameter / 4.0
+    number_of_points = math.ceil(duration / step) + 1
+    moles = volume / initial_molar_volume
+    mass = moles * molar_mass
+    initial_mass = mass
     if not initial_mass > 0.0 or not math.isfinite(initial_mass):
         raise _Failure(
             "DENSITY_UNAVAILABLE",
-            f"the initial density is {state.density} kg/m3 and the volume {volume} m3",
+            f"the initial inventory is {initial_mass} kg for a {volume} m3 vessel",
         )
-    initial_gamma = state.gamma
-
-    area = math.pi * diameter * diameter / 4.0
-    number_of_points = math.ceil(duration / step) + 1
-    mass = initial_mass
+    energy = moles * state.molar_internal_energy()
+    initial_energy = energy
     total = 0.0
+    released_energy = 0.0
     peak = 0.0
     points: list[_Point] = []
     gammas: list[float] = []
-    floor_reached = False
-    mass_floor = False
+    substeps = 0
+    stopped = state.pressure <= back
+    elapsed = 0.0
 
     for index in range(number_of_points):
-        if not mass > MASS_FLOOR * initial_mass:
-            mass_floor = True
-            break
-        time = index * step
-        row, mdot = _record_point(mixture, state, z, back, diameter, coefficient, area, time)
-        peak = max(peak, mdot)
-        points.append(row)
+        sample_time = duration if index + 1 == number_of_points else index * step
+        while not stopped and elapsed < sample_time:
+            substeps += 1
+            if substeps > MAX_SUBSTEPS:
+                raise _Failure(
+                    "SUBSTEP_LIMIT", f"the run reached the class's {MAX_SUBSTEPS} substeps"
+                )
+            rate = _screening_rate(state, molar_mass_kmol, back, area, coefficient)
+            if rate == 0.0:
+                stopped = True
+                break
+            sub_step = min(sample_time - elapsed, SUBSTEP_MASS_FRACTION * mass / rate)
+            if not sub_step > 0.0 or elapsed + sub_step <= elapsed:
+                raise _Failure(
+                    "TIMESTEP_UNREPRESENTABLE",
+                    f"a substep of {sub_step} s at {elapsed} s is not representable",
+                )
+            next_state = _advance(
+                mixture,
+                ideal_gas,
+                state,
+                z,
+                volume,
+                moles,
+                mass,
+                energy,
+                molar_mass,
+                rate * sub_step,
+                state.pressure,
+            )
+            tolerance = max(RECEIVING_PRESSURE_FLOOR, back * RECEIVING_PRESSURE_RELATIVE)
+            if next_state.state.pressure < back:
+                lower = 0.0
+                upper = sub_step
+                located = False
+                for _ in range(64):
+                    sub_step = 0.5 * (lower + upper)
+                    next_state = _advance(
+                        mixture,
+                        ideal_gas,
+                        state,
+                        z,
+                        volume,
+                        moles,
+                        mass,
+                        energy,
+                        molar_mass,
+                        rate * sub_step,
+                        state.pressure,
+                    )
+                    difference = next_state.state.pressure - back
+                    if 0.0 <= difference <= tolerance:
+                        located = True
+                        break
+                    if difference >= 0.0:
+                        lower = sub_step
+                    else:
+                        upper = sub_step
+                if not located:
+                    raise _Failure(
+                        "RECEIVING_PRESSURE_EVENT_FAILED",
+                        "the receiving-pressure crossing could not be bracketed",
+                    )
+                stopped = True
+            removed = rate * sub_step
+            total += removed
+            released_energy += removed * state.molar_enthalpy / molar_mass
+            elapsed += sub_step
+            state = next_state.state
+            moles = next_state.moles
+            mass = next_state.mass
+            energy = next_state.energy
+            stopped = stopped or state.pressure <= back + tolerance
+        elapsed = sample_time
+        rate = 0.0 if stopped else _screening_rate(state, molar_mass_kmol, back, area, coefficient)
+        peak = max(peak, rate)
+        points.append(
+            _record_point(state, rate, sample_time, molar_mass_kmol, back, area, coefficient)
+        )
         gammas.append(state.gamma)
 
-        mass -= mdot * step
-        total += mdot * step
-        if not mass > MASS_FLOOR * initial_mass:
-            mass_floor = True
-            break
+    if not _closes(mass + total, initial_mass, initial_mass):
+        raise _Failure(
+            "CLOSURE_FAILED",
+            f"the final inventory {mass} kg plus {total} kg released does not close on "
+            f"{initial_mass} kg",
+        )
+    energy_scale = max(abs(initial_energy), abs(released_energy))
+    if not _closes(energy + released_energy, initial_energy, energy_scale):
+        raise _Failure(
+            "CLOSURE_FAILED",
+            f"the final energy {energy} J plus {released_energy} J released does not close",
+        )
 
-        ratio = (mass / initial_mass) ** state.gamma
-        new_pressure = state.pressure * ratio
-        floored = max(new_pressure, back)
-        if floored > new_pressure:
-            floor_reached = True
-        new_temperature = state.temperature * (floored / state.pressure) ** (
-            (state.gamma - 1.0) / state.gamma
-        )
-        state = _flash_state(mixture, ideal_gas, new_temperature, floored, z)
-
-    if floor_reached:
-        diagnostics.append(
-            (
-                "PRESSURE_FLOOR_REACHED",
-                "The isentropic update was floored at the receiving pressure",
-            )
-        )
-    if mass_floor:
-        diagnostics.append(
-            ("MASS_FLOOR_REACHED", "The loop ended below 1% of the initial inventory")
-        )
     time_to_empty = total / (0.5 * peak) if peak > 0.0 else 0.0
     return _Outcome(
         status="valid",
@@ -342,23 +420,15 @@ def _states(
         time_to_empty=time_to_empty,
         diagnostics=tuple(diagnostics),
         initial_mass=initial_mass,
+        initial_density=initial_density,
         initial_gamma=initial_gamma,
         gammas=tuple(gammas),
     )
 
 
-def _record_point(
-    mixture: Any,
-    state: _State,
-    z: list[float],
-    back: float,
-    diameter: float,
-    coefficient: float,
-    area: float,
-    time: float,
-) -> tuple[_Point, float]:
-    molar_mass = molar_mass_of(mixture, z)
-    mw = 1000.0 * molar_mass
+def _screening_rate(
+    state: _State, molar_mass_kmol: float, back: float, area: float, coefficient: float
+) -> float:
     if state.pressure <= back:
         mdot = 0.0
     else:
@@ -372,7 +442,7 @@ def _record_point(
                 coefficient
                 * area
                 * state.pressure
-                * math.sqrt(state.gamma * mw / (R * state.temperature))
+                * math.sqrt(state.gamma * molar_mass_kmol / (R * state.temperature))
                 * factor
             )
         else:
@@ -380,52 +450,114 @@ def _record_point(
             mdot = coefficient * area * math.sqrt(2.0 * state.density * drop)
     if not math.isfinite(mdot) or mdot < 0.0:
         raise _Failure("FLASH_FAILED", f"the rate at {state.pressure} Pa is {mdot} kg/s")
-    if mdot <= 0.0:
+    return mdot
+
+
+def _record_point(
+    state: _State,
+    rate: float,
+    time: float,
+    molar_mass_kmol: float,
+    back: float,
+    area: float,
+    coefficient: float,
+) -> _Point:
+    if rate == 0.0:
         velocity = 0.0
+        momentum = 0.0
     else:
-        raw = mdot / (state.density * area * coefficient)
-        sound = math.sqrt(state.gamma * R * state.temperature / mw)
+        raw = rate / (state.density * area * coefficient)
+        sound = math.sqrt(state.gamma * R * state.temperature / molar_mass_kmol)
         velocity = min(raw, VELOCITY_CAP * sound)
-    momentum = mdot * velocity + (state.pressure - back) * area
-    smd = _droplet_smd(state, diameter, velocity)
+        momentum = rate * velocity + (state.pressure - back) * area
+    return _Point(
+        time=time,
+        mass_flow_rate=rate,
+        temperature=state.temperature,
+        pressure=state.pressure,
+        vapour_mole_fraction=1.0,
+        jet_velocity=velocity,
+        jet_momentum=momentum,
+        droplet_smd=0.0,
+    )
+
+
+def _advance(
+    mixture: Any,
+    ideal_gas: Any,
+    before: _State,
+    z: list[float],
+    volume: float,
+    moles: float,
+    mass: float,
+    energy: float,
+    molar_mass: float,
+    removed: float,
+    previous_pressure: float,
+) -> _Advanced:
+    new_moles = moles * (1.0 - removed / mass)
+    if not math.isfinite(new_moles) or new_moles <= 0.0:
+        raise _Failure(
+            "VU_CLOSURE_FAILED",
+            f"removing {removed} kg of a {mass} kg inventory leaves {new_moles} mol",
+        )
+    target_energy = energy - removed * before.molar_enthalpy / molar_mass
+    molar_volume = volume / new_moles
+    molar_energy = target_energy / new_moles
+    if (
+        not math.isfinite(molar_volume)
+        or molar_volume <= 0.0
+        or not math.isfinite(molar_energy)
+        or not math.isfinite(target_energy)
+    ):
+        raise _Failure(
+            "VU_CLOSURE_FAILED",
+            f"the VU target is {molar_volume} m3/mol at {molar_energy} J/mol",
+        )
+    try:
+        pressure, temperature, _phase = _vu_at(
+            mixture, ideal_gas, previous_pressure, molar_volume, molar_energy, z
+        )
+    except Exception as error:  # the class's VU flash throws out of the loop
+        raise _Failure(
+            "VU_CLOSURE_FAILED",
+            f"the VU flash at {molar_volume} m3/mol and {molar_energy} J/mol refused: {error}",
+        ) from error
+    state = _flash_state(mixture, ideal_gas, temperature, pressure, z)
+    return _Advanced(
+        state=state,
+        moles=new_moles,
+        mass=new_moles * molar_mass,
+        energy=target_energy,
+    )
+
+
+def _vu_at(
+    mixture: Any, ideal_gas: Any, previous_pressure: float, v: float, u: float, z: list[float]
+) -> tuple[float, float, str]:
+    """The class's VU dispatch: the pure route first, then the mixture iteration."""
+    if len(mixture.components) == 1:
+        try:
+            single = vu_flash_single_comp(
+                mixture,
+                ideal_gas,
+                quantity(previous_pressure, "Pa"),
+                quantity(v, "m**3/mol"),
+                quantity(u, "J/mol"),
+            )
+            return previous_pressure, single.T.to("K").magnitude, "two_phase"
+        except Exception:  # the class falls through on any refusal
+            pass
+    flash = vu_flash(mixture, ideal_gas, quantity(v, "m**3/mol"), quantity(u, "J/mol"), z)
+    return flash.P.to("Pa").magnitude, flash.T.to("K").magnitude, flash.phase
+
+
+def _closes(actual: float, expected: float, scale: float) -> bool:
     return (
-        _Point(
-            time=time,
-            mass_flow_rate=mdot,
-            temperature=state.temperature,
-            pressure=state.pressure,
-            vapour_mole_fraction=state.vapour_mole_fraction(),
-            jet_velocity=velocity,
-            jet_momentum=momentum,
-            droplet_smd=smd,
-        ),
-        mdot,
+        math.isfinite(actual)
+        and math.isfinite(expected)
+        and abs(actual - expected) <= CLOSURE_TOLERANCE * max(abs(scale), 1e-10)
     )
-
-
-def _droplet_smd(state: _State, diameter: float, velocity: float) -> float:
-    if state.vapour_fraction is None:
-        return 0.0
-    liquid_fraction = 1.0 - state.vapour_fraction
-    if liquid_fraction < SMD_LIQUID_FLOOR:
-        return 0.0
-    vapour = state.vapour_density
-    liquid = state.liquid_density
-    if vapour is None or liquid is None or not vapour > 0.0 or not liquid > 0.0:
-        return 0.0
-    weber = vapour * velocity * velocity * diameter / SURFACE_TENSION
-    if math.isnan(weber):
-        raise _Failure("DROPLET_SMD_NOT_FINITE", "the droplet Weber number is NaN")
-    smd = (
-        SMD_COEFFICIENT
-        * diameter
-        / math.sqrt(weber)
-        * math.sqrt(liquid / vapour)
-        * liquid_fraction**SMD_LIQUID_EXPONENT
-    )
-    if math.isnan(smd):
-        raise _Failure("DROPLET_SMD_NOT_FINITE", "the droplet Sauter mean diameter is NaN")
-    return float(min(smd, diameter / 2.0))
 
 
 def _flash_state(
@@ -434,40 +566,19 @@ def _flash_state(
     reduced = reduced_parameters(mixture, temperature, pressure)
     kij = mixture.effective_kij(reduced.t_kelvin)
     flash = pt_flash(mixture, quantity(temperature, "K"), quantity(pressure, "Pa"), z)
-    if flash.phase == "two_phase":
-        beta = flash.vapour_fraction
-        if beta is None:
-            raise _Failure(
-                "FLASH_FAILED", "the flash split the feed and reported no vapour fraction"
-            )
-        vapour = _phase_of(
-            mixture, ideal_gas, reduced, kij, temperature, pressure, list(flash.y), flash.z_vapour
+    if flash.phase != "all_vapour":
+        raise _Failure(
+            "PHASE_BOUNDARY",
+            f"the flash at {pressure:.6f} Pa found a non-gas state, and the class requires a "
+            "single gas phase",
         )
-        liquid = _phase_of(
-            mixture, ideal_gas, reduced, kij, temperature, pressure, list(flash.x), flash.z_liquid
+    root = phase_state(reduced, kij, z, liquid=False).z
+    phase = _phase_of(mixture, ideal_gas, reduced, kij, temperature, pressure, z, root)
+    if not phase.density > 0.0 or not math.isfinite(phase.density):
+        raise _Failure(
+            "DENSITY_UNAVAILABLE", f"the density at {pressure} Pa is {phase.density} kg/m3"
         )
-        mass = beta * vapour.molar_mass + (1.0 - beta) * liquid.molar_mass
-        volume = beta * vapour.molar_volume + (1.0 - beta) * liquid.molar_volume
-        density = mass / volume
-        cp = beta * vapour.cp + (1.0 - beta) * liquid.cp
-        cv = beta * vapour.cv + (1.0 - beta) * liquid.cv
-        gamma = cp / cv
-        vapour_fraction: float | None = beta
-        vapour_density: float | None = vapour.density
-        liquid_density: float | None = liquid.density
-    else:
-        if flash.phase == "trivial":
-            raise _Failure("FLASH_FAILED", f"the flash found a trivial solution at {pressure} Pa")
-        liquid_side = flash.phase != "all_vapour"
-        root = phase_state(reduced, kij, z, liquid=liquid_side).z
-        phase = _phase_of(mixture, ideal_gas, reduced, kij, temperature, pressure, z, root)
-        density = phase.density
-        gamma = phase.cp / phase.cv
-        vapour_fraction = None
-        vapour_density = None
-        liquid_density = None
-    if not density > 0.0 or not math.isfinite(density):
-        raise _Failure("DENSITY_UNAVAILABLE", f"the density at {pressure} Pa is {density} kg/m3")
+    gamma = phase.cp / phase.cv
     if not math.isfinite(gamma) or not 1.0 < gamma <= 2.0:
         raise _Failure(
             "GAMMA_OUT_OF_RANGE",
@@ -475,14 +586,12 @@ def _flash_state(
             "(1, 2]",
         )
     return _State(
-        flash=flash,
-        pressure=pressure,
         temperature=temperature,
-        density=density,
+        pressure=pressure,
+        density=phase.density,
         gamma=gamma,
-        vapour_fraction=vapour_fraction,
-        vapour_density=vapour_density,
-        liquid_density=liquid_density,
+        molar_enthalpy=phase.molar_enthalpy,
+        compressibility=root,
     )
 
 
@@ -505,12 +614,14 @@ def _phase_of(
             f"the corrected molar volume at {p} Pa is {molar_volume} m3/mol",
         )
     capacity = phase_capacity(mixture, ideal_gas, reduced, kij, t, p, composition, root)
+    enthalpy = molar_enthalpy_entropy(
+        mixture, ideal_gas, quantity(t, "K"), quantity(p, "Pa"), composition, root
+    )
     return _Phase(
-        molar_mass=molar_mass,
-        molar_volume=molar_volume,
         density=molar_mass / molar_volume,
         cp=capacity.cp,
         cv=capacity.cv,
+        molar_enthalpy=float(enthalpy.h.to("J/mol").magnitude),
     )
 
 

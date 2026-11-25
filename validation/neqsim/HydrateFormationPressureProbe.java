@@ -11,8 +11,8 @@
 // The same feed as `HydrateProbe`, at temperatures below its formation temperature, so
 // there is a pressure to find rather than none.
 //
-//   javac -proc:none -cp neqsim-118d9af.jar HydrateFormationPressureProbe.java
-//   java -cp .:neqsim-118d9af.jar HydrateFormationPressureProbe > captures/hydrate_formation_pressure_probe.tsv
+//   javac -proc:none -cp neqsim-b40bb11.jar HydrateFormationPressureProbe.java
+//   java -cp .:neqsim-b40bb11.jar HydrateFormationPressureProbe > captures/hydrate_formation_pressure_probe.tsv
 
 import neqsim.thermo.component.ComponentHydrate;
 import neqsim.thermo.phase.PhaseInterface;

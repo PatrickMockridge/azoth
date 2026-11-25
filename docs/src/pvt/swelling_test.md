@@ -69,5 +69,5 @@ declared checks *that call* could not evaluate.
 
 ## References
 
-- NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/SwellingTest.java` at commit 118d9af is the port source.
+- NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/SwellingTest.java` at commit b40bb113 is the port source.
 - `validation/neqsim/captures/pvt_swelling.tsv` - the pinned upstream case, a mixed injection gas, and a zero-injection schedule.

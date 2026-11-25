@@ -218,8 +218,8 @@ pub fn expander_at_power(
 /// is not, and the efficiency is clamped by the setter's `[1e-6, 1]` window. The loop stops
 /// when the temperature is within `0.01` K after at least three iterations, or at fifty.
 ///
-/// An unreachable target therefore lands on the nearest clamp rather than converging - the
-/// hot side is the isenthalpic floor and the cold side the reversible outlet.
+/// An unreachable target is refused: the hot side's limit is the isenthalpic outlet and the
+/// cold side's the reversible outlet, and a target beyond either has no efficiency.
 ///
 /// # Errors
 /// Whatever the flash refuses.
@@ -271,6 +271,16 @@ pub fn solve_efficiency(
         outlet = expander_replay(feed, outlet_pressure, efficiency)?;
         let residual = outlet.t.value - target.value;
         if !(residual.abs() > EFFICIENCY_SOLVE_TOLERANCE || iteration < 3) || iteration >= 50 {
+            if residual.abs() > EFFICIENCY_SOLVE_TOLERANCE {
+                return Err(AzothError::invalid_input(
+                    "outlet_temperature",
+                    format!(
+                        "the efficiency solve could not match the target {} K within {} K; \
+                         the last outlet temperature was {} K",
+                        target.value, EFFICIENCY_SOLVE_TOLERANCE, outlet.t.value
+                    ),
+                ));
+            }
             return Ok((outlet, efficiency));
         }
     }
@@ -474,20 +484,18 @@ mod power_modes_tests {
     }
 
     #[test]
-    fn the_unreachable_hot_target_lands_on_the_lower_clamp() {
-        let (outlet, efficiency) =
-            solve_efficiency(&feed(), pascals(3_000_000.0), kelvins(280.0), 0.8)
-                .expect("the captured state");
-        close(efficiency, MIN_EFFICIENCY, 5.0e-4, "efficiency");
-        close(outlet.t.value, 263.307_012_738_515_37, 5.0e-4, "outlet_t");
+    fn the_unreachable_hot_target_is_refused() {
+        assert!(
+            solve_efficiency(&feed(), pascals(3_000_000.0), kelvins(280.0), 0.8).is_err(),
+            "280 K is above the isenthalpic outlet, so no efficiency reaches it"
+        );
     }
 
     #[test]
-    fn the_unreachable_cold_target_lands_on_the_upper_clamp() {
-        let (outlet, efficiency) =
-            solve_efficiency(&feed(), pascals(3_000_000.0), kelvins(240.0), 0.8)
-                .expect("the captured state");
-        close(efficiency, 1.0, 5.0e-4, "efficiency");
-        close(outlet.t.value, 242.266_840_019_28, 5.0e-4, "outlet_t");
+    fn the_unreachable_cold_target_is_refused() {
+        assert!(
+            solve_efficiency(&feed(), pascals(3_000_000.0), kelvins(240.0), 0.8).is_err(),
+            "240 K is below the reversible outlet, so no efficiency reaches it"
+        );
     }
 }

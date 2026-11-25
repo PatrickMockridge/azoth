@@ -53,7 +53,7 @@ wetted_area=100.0
 has_drainage=true
 has_fire_fighting=false
 latent_heat=300000.0
-relief_rate=6.284722503339891
-relief_rate_kg_per_hr=22625.001012023607
+relief_rate=10.324901255486964
+relief_rate_kg_per_hr=37169.64451975307
 relieving_temperature=350.0
 

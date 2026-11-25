@@ -15,13 +15,12 @@ from azoth.core.units import input_to_si, quantity
 from azoth.core.warnings import Warning, WarningCode
 
 from . import _flash, _fluid, _ledger, _saturation
+from ._standard import NEQSIM_AIR_MOLAR_MASS_KG_PER_MOL, NEQSIM_GAS_CONSTANT
 
 MODEL_ID = "pvt.differential_liberation"
 
-AIR_MOLAR_MASS = 0.028
 T_SC = 288.15
 P_SC = 101_325.0
-P_SC_BAR = 1.01325
 BISECTION_LIMIT = 500
 
 
@@ -164,17 +163,10 @@ def _differential_liberation_of(
                     "flash",
                     "a two-phase DLE point has no gas phase, and there is nothing to remove",
                 )
-            gas_standard = (
-                gas.volume(flash.total_moles)
-                * (pressure / 1.0e5)
-                / P_SC_BAR
-                / gas.z_factor
-                * T_SC
-                / t
-            )
+            gas_standard = gas.moles(flash.total_moles) * NEQSIM_GAS_CONSTANT * T_SC / P_SC
             total_gas_standard += gas_standard
-            row["z_gas"] = gas.z_factor
-            row["relative_gas_gravity"] = gas.molar_mass / AIR_MOLAR_MASS
+            row["z_gas"] = pressure * gas.molar_volume / (NEQSIM_GAS_CONSTANT * t)
+            row["relative_gas_gravity"] = gas.molar_mass / NEQSIM_AIR_MOLAR_MASS_KG_PER_MOL
             oil = flash.oil()
             liquid = oil if oil is not None else flash.phases[0]
             row["oil_density"] = liquid.density()
@@ -193,7 +185,9 @@ def _differential_liberation_of(
     standard_gas = standard.gas()
     voil_std = None if standard_oil is None else standard_oil.volume(standard.total_moles)
     if standard_gas is not None:
-        total_gas_standard += standard_gas.volume(standard.total_moles)
+        total_gas_standard += (
+            standard_gas.moles(standard.total_moles) * NEQSIM_GAS_CONSTANT * T_SC / P_SC
+        )
     else:
         warnings.append(
             Warning(

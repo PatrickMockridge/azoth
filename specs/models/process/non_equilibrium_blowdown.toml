@@ -3,6 +3,8 @@ name = "Non-equilibrium blowdown"
 kind = "procedure"
 assumptions = [
     "**the class's `run`**: the initial two-phase feed is charged to the vessel volume, split into vapour and liquid zones, and marched with each zone flashed at its own temperature and the shared pressure.",
+    "**the vapour zone is a fixed-volume open system**: `m cv dT = Q - (h - u) dm_out` with `h - u = Z R T/M`, and the boil-off it receives carries `cv (T_liq - T_gas)`; without the flow work the vapour does not cool on depressurisation.",
+    "**the liquid zone flashes isenthalpically at the new pressure every step** and the vapour it forms moves to the vapour zone, mixed in at the liquid temperature; a failed flash increments the fallback count and is skipped.",
     "**the pressure is set by a TV flash of the vapour zone at `V - v_liquid`**, floored at the back pressure.",
     "**the wall area is split by the wetted fraction `v_liquid / V`**; the wetted wall drives Rohsenow nucleate boiling capped at `critical_heat_flux`, and an interfacial term couples the zones.",
     "**the boil-off is `min(max(q_wetted, 0) dt / latent_heat, 0.5 m_liquid)`**, transferred from the liquid zone to the vapour zone with the liquid's composition.",
@@ -19,7 +21,7 @@ references = [
 ]
 [source]
 standard = "NeqSim process/safety/depressurization/NonEquilibriumBlowdownModel.java"
-edition = "Its `run`: the zone split, the vapour-controlled pressure, the wetted-wall boiling, the interfacial coupling, the boil-off and the clamps."
+edition = "Its `run`: the zone split, the vapour-controlled pressure, the wetted-wall boiling, the interfacial coupling, the wall-heat boil-off, the isenthalpic flash boil-off and the flow-work energy balance."
 [algorithm]
 scheme = "explicit_euler_two_zone_blowdown"
 initialisation = "stated_initial_state"

@@ -26,8 +26,8 @@ import neqsim.thermo.system.SystemSrkEos;
  * wrong everywhere. The state is the one {@code eos.ph_flash}'s own case uses.
  *
  * <pre>
- * javac -proc:none -cp neqsim-118d9af.jar PhFlashJacobianProbe.java
- * java -cp .:neqsim-118d9af.jar PhFlashJacobianProbe
+ * javac -proc:none -cp neqsim-b40bb11.jar PhFlashJacobianProbe.java
+ * java -cp .:neqsim-b40bb11.jar PhFlashJacobianProbe
  * </pre>
  */
 public final class PhFlashJacobianProbe {

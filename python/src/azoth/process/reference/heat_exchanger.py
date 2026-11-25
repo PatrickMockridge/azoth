@@ -397,9 +397,9 @@ def heat_exchanger(
     holdup_shell = 0.0 if shell_holdup_si is None else max(0.0, shell_holdup_si)
     holdup_tube = 0.0 if tube_holdup_si is None else max(0.0, tube_holdup_si)
     area_m2 = 0.0 if area_si is None else max(0.0, area_si)
-    active_transient = (
-        transient_requested and bool(dynamic_model_enabled) and wall_mass_kg > 0.0 and area_m2 > 0.0
-    )
+    # `dynamicModelEnabled` alone selects the active branch at the pin; a zero wall mass or
+    # area is then a refusal from the class's thermal-configuration guard.
+    active_transient = transient_requested and bool(dynamic_model_enabled)
 
     diagnostics: RatingDiagnostics | None = None
     transient_state: TransientState | None = None
@@ -545,6 +545,10 @@ def heat_exchanger(
             wall_temperature=wall_temperature_si,
             shell_fluid_temperature=shell_fluid_temperature_si,
             tube_fluid_temperature=tube_fluid_temperature_si,
+            thermal_inventory_energy=None,
+            balance_accumulation=None,
+            balance_boundary_energy=None,
+            balance_residual=None,
         )
 
     mechanical = None
@@ -591,7 +595,10 @@ def heat_exchanger(
         # so the same exchanger could report either sign for one physical direction of heat. This
         # is `n_hot * (h_hot_in - h_hot_out)`, positive whenever the hot side cools, which is the
         # frame a reader comparing two runs needs and the one the Rust half publishes.
-        duty=from_si((states.hot_in_h - states.hot_out_h) * hot_n, "W"),
+        duty=from_si(
+            states.duty if active_transient else (states.hot_in_h - states.hot_out_h) * hot_n,
+            "W",
+        ),
         ntu=None if states.rating is None else states.rating.ntu,
         effectiveness=None if states.rating is None else states.rating.effectiveness,
         c_min=None if states.rating is None else from_si(states.rating.c_min, "W/K"),
@@ -619,6 +626,21 @@ def heat_exchanger(
             or transient_state.tube_fluid_temperature is None
             or math.isnan(transient_state.tube_fluid_temperature)
             else from_si(transient_state.tube_fluid_temperature, "K")
+        ),
+        thermal_inventory_energy=(
+            None
+            if transient_state is None or transient_state.thermal_inventory_energy is None
+            else from_si(transient_state.thermal_inventory_energy, "J")
+        ),
+        balance_accumulation=(
+            None
+            if transient_state is None or transient_state.balance_accumulation is None
+            else from_si(transient_state.balance_accumulation, "J")
+        ),
+        balance_boundary_energy=(
+            None
+            if transient_state is None or transient_state.balance_boundary_energy is None
+            else from_si(transient_state.balance_boundary_energy, "J")
         ),
         mechanical_selected_type=(
             None if mechanical is None else mechanical.selected.mechanical_type
@@ -703,6 +725,10 @@ class TransientState:
     wall_temperature: float | None
     shell_fluid_temperature: float | None
     tube_fluid_temperature: float | None
+    thermal_inventory_energy: float | None
+    balance_accumulation: float | None
+    balance_boundary_energy: float | None
+    balance_residual: float | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -951,6 +977,79 @@ def _transient_phase(
     return density, cp_mass, n * molar_mass
 
 
+def _transient_properties(
+    components: list[str],
+    z: list[float],
+    pressure: float,
+    temperature: float,
+) -> tuple[float, float, float, float]:
+    """A single-phase state's mass enthalpy, mass Cp, corrected density and molar mass."""
+    mixture, ideal_gas = _components.mixture_of(components, eos="pr")
+    flash = pt_flash_solve(mixture, quantity(temperature, "K"), quantity(pressure, "Pa"), z)
+    if flash.phase == Phase.TWO_PHASE:
+        raise InvalidInputError(
+            "stream",
+            "the exchanger's thermal inventory requires a finite stable single-phase fluid",
+        )
+    root = flash.z_vapour if flash.phase == Phase.ALL_VAPOUR else flash.z_liquid
+    composition = list(z)
+    molar_mass = sum(
+        (component.molar_mass.to("kg/mol").magnitude if component.molar_mass else 0.0) * fraction
+        for component, fraction in zip(mixture.components, composition, strict=True)
+    )
+    volume = (
+        pr_molar_volume(root, quantity(temperature, "K"), quantity(pressure, "Pa"))
+        .v.to("m**3/mol")
+        .magnitude
+    )
+    density = (
+        pr_mass_density(
+            quantity(molar_mass, "kg/mol"),
+            quantity(volume - mixture.volume_shift(composition), "m**3/mol"),
+        )
+        .rho.to("kg/m**3")
+        .magnitude
+    )
+    cp_mass = (
+        molar_enthalpy_entropy(
+            mixture,
+            ideal_gas,
+            quantity(temperature, "K"),
+            quantity(pressure, "Pa"),
+            composition,
+            root,
+        )
+        .cp.to("J/(mol*K)")
+        .magnitude
+        / molar_mass
+    )
+    h_molar, _ = enthalpy_at(mixture, ideal_gas, temperature, pressure, z)
+    return h_molar / molar_mass, cp_mass, density, molar_mass
+
+
+def _solve3(matrix: list[list[float]], rhs: list[float]) -> list[float] | None:
+    """Gaussian elimination with partial pivoting for the 3x3 thermal Jacobian."""
+    values = [row[:] for row in matrix]
+    result = list(rhs)
+    for column in range(3):
+        pivot = max(range(column, 3), key=lambda row: abs(values[row][column]))
+        if not math.isfinite(values[pivot][column]) or abs(values[pivot][column]) < 1.0e-300:
+            return None
+        values[column], values[pivot] = values[pivot], values[column]
+        result[column], result[pivot] = result[pivot], result[column]
+        diagonal = values[column][column]
+        for row in range(column + 1, 3):
+            factor = values[row][column] / diagonal
+            for k in range(column, 3):
+                values[row][k] -= factor * values[column][k]
+            result[row] -= factor * result[column]
+    solution = [0.0, 0.0, 0.0]
+    for row in reversed(range(3)):
+        total = result[row] - sum(values[row][k] * solution[k] for k in range(row + 1, 3))
+        solution[row] = total / values[row][row]
+    return solution
+
+
 def _transient_states(
     hot_components: list[str],
     hot_in_n: float,
@@ -976,109 +1075,227 @@ def _transient_states(
     *,
     tube_is_hot: bool,
 ) -> ExchangerStates:
-    """One `HeatExchanger.runTransient` step of the enabled branch.
+    """One `HeatExchanger.runTransient` interval of the enabled branch.
 
-    The class's stream 0 is the shell and stream 1 the tube, the reverse of the rating; the
-    outlet shift applies the heat **rate** as though it were a joule while the temperatures
-    integrate by `time_step`.
+    The class's stream 0 is the shell and stream 1 the tube. Both fluid temperatures and
+    the wall are solved together from the interval's first law, with the class's Newton,
+    line search and balance receipt.
     """
-    hot_mixture, hot_gas = _components.mixture_of(hot_components, eos="pr")
-    cold_mixture, cold_gas = _components.mixture_of(cold_components, eos="pr")
-    hot_h, _ = enthalpy_at(hot_mixture, hot_gas, hot_in_t, hot_in_p, hot_in_z)
-    cold_h, _ = enthalpy_at(cold_mixture, cold_gas, cold_in_t, cold_in_p, cold_in_z)
-    hot = (hot_components, hot_in_n, hot_in_z, hot_in_p, hot_in_t, hot_mixture, hot_gas, hot_h)
+    if not math.isfinite(time_step) or time_step <= 0.0:
+        raise InvalidInputError(
+            "time_step", f"a finite positive timestep is required, and {time_step} is not"
+        )
+    for name, value in (
+        ("wall_mass", wall_mass),
+        ("wall_cp", wall_cp),
+        ("heat_transfer_area", area),
+        ("shell_side_htc", shell_side_htc),
+        ("tube_side_htc", tube_side_htc),
+    ):
+        if not math.isfinite(value) or value <= 0.0:
+            raise InvalidInputError(
+                name,
+                "Wall mass/Cp, both film coefficients and area must be finite and positive",
+            )
+    for name, value in (("shell_holdup_volume", shell_holdup), ("tube_holdup_volume", tube_holdup)):
+        if not math.isfinite(value) or value < 0.0:
+            raise InvalidInputError(
+                name, f"a finite nonnegative volume is required, and {value} is not"
+            )
+    for name, carried in (
+        ("wall_temperature", wall_temperature),
+        ("shell_fluid_temperature", shell_fluid_temperature),
+        ("tube_fluid_temperature", tube_fluid_temperature),
+    ):
+        if carried is not None and not math.isfinite(carried) and not math.isnan(carried):
+            raise InvalidInputError(
+                name, f"a carried temperature is finite or NaN, and {carried} is neither"
+            )
+
+    hot = (
+        hot_components,
+        hot_in_z,
+        hot_in_p,
+        hot_in_t,
+        *_transient_properties(hot_components, hot_in_z, hot_in_p, hot_in_t),
+    )
     cold = (
         cold_components,
-        cold_in_n,
         cold_in_z,
         cold_in_p,
         cold_in_t,
-        cold_mixture,
-        cold_gas,
-        cold_h,
+        *_transient_properties(cold_components, cold_in_z, cold_in_p, cold_in_t),
     )
     shell, tube = (cold, hot) if tube_is_hot else (hot, cold)
-    shell_names, shell_n, shell_z, shell_p, shell_t, _shell_mix, _shell_gas, shell_h = shell
-    tube_names, tube_n, tube_z, tube_p, tube_t, _tube_mix, _tube_gas, tube_h = tube
+    (
+        shell_names,
+        shell_z,
+        shell_p,
+        shell_in_t,
+        shell_in_h,
+        _,
+        shell_in_density,
+        _,
+    ) = shell
+    (
+        tube_names,
+        tube_z,
+        tube_p,
+        tube_in_t,
+        tube_in_h,
+        _,
+        tube_in_density,
+        _,
+    ) = tube
+    hot_molar_mass = hot[7]
+    cold_molar_mass = cold[7]
+    shell_flow = cold_in_n * cold_molar_mass if tube_is_hot else hot_in_n * hot_molar_mass
+    tube_flow = hot_in_n * hot_molar_mass if tube_is_hot else cold_in_n * cold_molar_mass
 
-    # The refusal is independent of the holdup: a two-phase side has no one density or Cp.
-    _transient_phase(shell_names, shell_n, shell_z, shell_p, shell_t)
-    _transient_phase(tube_names, tube_n, tube_z, tube_p, tube_t)
-
+    shell_t = (
+        shell_in_t
+        if shell_fluid_temperature is None or math.isnan(shell_fluid_temperature)
+        else shell_fluid_temperature
+    )
+    tube_t = (
+        tube_in_t
+        if tube_fluid_temperature is None or math.isnan(tube_fluid_temperature)
+        else tube_fluid_temperature
+    )
     wall = (
         0.5 * (shell_t + tube_t)
         if wall_temperature is None or math.isnan(wall_temperature)
         else wall_temperature
     )
-
-    if shell_holdup > 0.0:
-        shell_state = (
-            shell_t
-            if shell_fluid_temperature is None or math.isnan(shell_fluid_temperature)
-            else shell_fluid_temperature
+    if not math.isfinite(wall) or wall <= 0.0:
+        raise InvalidInputError(
+            "wall_temperature", "the initial wall temperature must be finite and positive"
         )
-        shell_density, shell_cp, shell_mass_flow = _transient_phase(
-            shell_names, shell_n, shell_z, shell_p, shell_t
-        )
-        fluid_mass = shell_density * shell_holdup
-        if fluid_mass > 0.0 and shell_cp > 0.0:
-            mixing = shell_mass_flow * shell_cp * (shell_t - shell_state)
-            to_wall = shell_side_htc * area * (shell_state - wall)
-            shell_state += (mixing - to_wall) / (fluid_mass * shell_cp) * time_step
-        shell_for_wall = shell_state
-        shell_out_state = shell_state
-    else:
-        shell_for_wall = shell_t
-        shell_out_state = None
+    shell_start_h, _, _, _ = _transient_properties(shell_names, shell_z, shell_p, shell_t)
+    tube_start_h, _, _, _ = _transient_properties(tube_names, tube_z, tube_p, tube_t)
+    start_temperature = [shell_t, tube_t, wall]
+    start_enthalpy = [shell_start_h, tube_start_h]
+    start_mass = [shell_holdup * shell_in_density, tube_holdup * tube_in_density]
+    wall_capacity = wall_mass * wall_cp
+    conductance = [shell_side_htc * area, tube_side_htc * area]
+    mass_flow = [shell_flow, tube_flow]
+    inlet_enthalpy = [shell_in_h, tube_in_h]
 
-    if tube_holdup > 0.0:
-        tube_state = (
-            tube_t
-            if tube_fluid_temperature is None or math.isnan(tube_fluid_temperature)
-            else tube_fluid_temperature
-        )
-        tube_density, tube_cp, tube_mass_flow = _transient_phase(
-            tube_names, tube_n, tube_z, tube_p, tube_t
-        )
-        fluid_mass = tube_density * tube_holdup
-        if fluid_mass > 0.0 and tube_cp > 0.0:
-            mixing = tube_mass_flow * tube_cp * (tube_t - tube_state)
-            wall_to_fluid = tube_side_htc * area * (wall - tube_state)
-            tube_state += (mixing + wall_to_fluid) / (fluid_mass * tube_cp) * time_step
-        tube_for_wall = tube_state
-        tube_out_state = tube_state
-    else:
-        tube_for_wall = tube_t
-        tube_out_state = None
+    def evaluate(
+        temperature: list[float],
+    ) -> tuple[list[float], list[tuple[float, float, float, float]], list[list[float]]]:
+        sides = [
+            _transient_properties(shell_names, shell_z, shell_p, temperature[0]),
+            _transient_properties(tube_names, tube_z, tube_p, temperature[1]),
+        ]
+        residual = [0.0, 0.0, 0.0]
+        jacobian = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
+        residual[2] = wall_capacity / time_step * (temperature[2] - start_temperature[2])
+        jacobian[2][2] = wall_capacity / time_step
+        for side in range(2):
+            h_mass, cp_mass, _, _ = sides[side]
+            transfer = conductance[side] * (temperature[side] - temperature[2])
+            residual[side] = (
+                start_mass[side] / time_step * (h_mass - start_enthalpy[side])
+                + mass_flow[side] * (h_mass - inlet_enthalpy[side])
+                + transfer
+            )
+            jacobian[side][side] = (
+                start_mass[side] / time_step + mass_flow[side]
+            ) * cp_mass + conductance[side]
+            jacobian[side][2] = -conductance[side]
+            residual[2] -= transfer
+            jacobian[2][side] = -conductance[side]
+            jacobian[2][2] += conductance[side]
+        return residual, sides, jacobian
 
-    q_shell_to_wall = shell_side_htc * area * (shell_for_wall - wall)
-    q_wall_to_tube = tube_side_htc * area * (wall - tube_for_wall)
-    wall += (q_shell_to_wall - q_wall_to_tube) / (wall_mass * wall_cp) * time_step
-
-    shell_out_h = shell_h - divide(q_shell_to_wall, shell_n)
-    tube_out_h = tube_h + divide(q_wall_to_tube, tube_n)
+    temperature = list(start_temperature)
+    bounds = [*start_temperature, shell_in_t, tube_in_t]
+    minimum = min(bounds)
+    maximum = max(bounds)
+    evaluated = None
+    for _ in range(40):
+        residual, sides, jacobian = evaluate(temperature)
+        maximum_residual = max(abs(value) for value in residual)
+        if maximum_residual < max(1.0e-5, 1.0e-5 / time_step):
+            evaluated = (temperature, sides, residual, maximum_residual)
+            break
+        change = _solve3(jacobian, [-residual[0], -residual[1], -residual[2]])
+        if change is None:
+            raise InvalidInputError("time_step", "the exchanger enthalpy Jacobian is singular")
+        accepted = False
+        fraction = 1.0
+        while fraction >= 1.0e-6:
+            trial = [temperature[node] + fraction * change[node] for node in range(3)]
+            if all(
+                math.isfinite(value) and minimum - 1.0e-8 <= value <= maximum + 1.0e-8
+                for value in trial
+            ):
+                trial_residual, trial_sides, _ = evaluate(trial)
+                if max(abs(value) for value in trial_residual) < maximum_residual:
+                    temperature = trial
+                    sides = trial_sides
+                    residual = trial_residual
+                    accepted = True
+                    break
+            fraction *= 0.5
+        if not accepted:
+            raise InvalidInputError(
+                "time_step", "bounded exchanger enthalpy solve failed to reduce its residual"
+            )
+    if evaluated is None:
+        residual, sides, _ = evaluate(temperature)
+        if max(abs(value) for value in residual) >= max(1.0e-5, 1.0e-5 / time_step):
+            raise InvalidInputError("time_step", "exchanger enthalpy solve exceeded 40 iterations")
+        evaluated = (temperature, sides, residual, max(abs(value) for value in residual))
+    solved_temperature, sides, _, _ = evaluated
+    shell_h = sides[0][0] * sides[0][3]
+    tube_h = sides[1][0] * sides[1][3]
     if tube_is_hot:
-        hot_out_h, cold_out_h = tube_out_h, shell_out_h
+        hot_out_h, cold_out_h = tube_h, shell_h
     else:
-        hot_out_h, cold_out_h = shell_out_h, tube_out_h
+        hot_out_h, cold_out_h = shell_h, tube_h
+    duty = conductance[0] * (solved_temperature[0] - solved_temperature[2])
 
+    start_energy = (
+        start_mass[0] * start_enthalpy[0]
+        + start_mass[1] * start_enthalpy[1]
+        + wall_capacity * start_temperature[2]
+    )
+    end_energy = (
+        start_mass[0] * sides[0][0]
+        + start_mass[1] * sides[1][0]
+        + wall_capacity * solved_temperature[2]
+    )
+    boundary_energy = time_step * (
+        mass_flow[0] * (inlet_enthalpy[0] - sides[0][0])
+        + mass_flow[1] * (inlet_enthalpy[1] - sides[1][0])
+    )
+    accumulation = end_energy - start_energy
+
+    hot_out_t = solved_temperature[1] if tube_is_hot else solved_temperature[0]
+    cold_out_t = solved_temperature[0] if tube_is_hot else solved_temperature[1]
     return ExchangerStates(
-        hot_in_h=hot_h,
-        cold_in_h=cold_h,
+        hot_in_h=hot[4],
+        cold_in_h=cold[4],
         hot_out_h=hot_out_h,
         cold_out_h=cold_out_h,
-        hot_out_t=_temperature(hot_mixture, hot_gas, hot_in_p, hot_out_h, hot_in_z),
-        cold_out_t=_temperature(cold_mixture, cold_gas, cold_in_p, cold_out_h, cold_in_z),
+        hot_out_t=quantity(hot_out_t, "K"),
+        cold_out_t=quantity(cold_out_t, "K"),
         hot_out_p=hot_in_p,
         cold_out_p=cold_in_p,
-        duty=q_shell_to_wall,
+        duty=duty,
         rating=None,
         ua_value=None,
         delta_t_side=None,
         transient=TransientState(
-            wall_temperature=wall,
-            shell_fluid_temperature=shell_out_state,
-            tube_fluid_temperature=tube_out_state,
+            wall_temperature=solved_temperature[2],
+            shell_fluid_temperature=solved_temperature[0],
+            tube_fluid_temperature=solved_temperature[1],
+            thermal_inventory_energy=end_energy,
+            balance_accumulation=accumulation,
+            balance_boundary_energy=boundary_energy,
+            balance_residual=accumulation - boundary_energy,
         ),
     )
 

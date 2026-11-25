@@ -9,7 +9,7 @@ assumptions = [
 ]
 references = [
     "Gao, K.; Wu, J.; Bell, I. H.; Lemmon, E. W. (2020). \"Thermodynamic Properties of Ammonia.\" Journal of Physical and Chemical Reference Data.",
-    "NeqSim master, `thermo/util/referenceequations/Ammonia2023.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.",
+    "NeqSim master, `thermo/util/referenceequations/Ammonia2023.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.",
 ]
 [source]
 standard = "Gao, K.; Wu, J.; Bell, I. H.; Lemmon, E. W. (2020)"

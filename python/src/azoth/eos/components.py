@@ -2754,6 +2754,11 @@ _UMRPRU_SETS: dict[str, tuple[str, str, str]] = {
         "data/components/UNIFACInterParamB_UMRMC.csv",
         "data/components/UNIFACInterParamC_UMRMC.csv",
     ),
+    "umrcpa": (
+        "data/components/UNIFACInterParamA_UMRCPA.csv",
+        "data/components/UNIFACInterParamB_UMRCPA.csv",
+        "data/components/UNIFACInterParamC_UMRCPA.csv",
+    ),
 }
 
 
@@ -3387,7 +3392,7 @@ def umr_cpa_mixture_of(
     mixed by a universal rule rather than an interaction matrix. Three choices are made
     here and nowhere else:
 
-    * the mixing rule is ``"umr"`` over the ``_umrmc`` UNIFAC tables, which is what
+    * the mixing rule is ``"umr"`` over the ``_umrcpa`` UNIFAC tables, which is what
       ``SystemUMRCPAEoS``'s construction and ``SystemThermo``'s ``"UMR-CPA"`` selector
       both name, and the interaction matrix is **zero** - the rule reads no ``kij`` column;
     * the alpha is the five-parameter Mathias-Copeman term seeded with ``UMRCPA_MC1..5``,
@@ -3428,7 +3433,7 @@ def umr_cpa_mixture_of(
                 "1 is not expressible as one mixture-level alpha",
             )
 
-    tables = unifac_umrpru_parameters(resolved, "umrmc")
+    tables = unifac_umrpru_parameters(resolved, "umrcpa")
     fluid = mixture(
         tuple(e.component(alpha=alpha) for e in entries),
         cubic=_cubic("pr"),

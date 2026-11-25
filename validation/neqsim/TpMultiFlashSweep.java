@@ -1,7 +1,7 @@
 // A grid sweep: how often `setMultiPhaseCheck(true)` changes a cubic flash at all.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar TpMultiFlashSweep.java
-//     java -cp .:neqsim-118d9af.jar TpMultiFlashSweep
+//     javac -proc:none -cp neqsim-b40bb11.jar TpMultiFlashSweep.java
+//     java -cp .:neqsim-b40bb11.jar TpMultiFlashSweep
 //
 // `TpMultiFlashProbe.java` found no state where the multiflash reported three phases and one
 // state where it differed from `TPflash` at all - a water/hydrocarbon pair, through the

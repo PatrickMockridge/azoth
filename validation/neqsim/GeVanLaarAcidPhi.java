@@ -1,7 +1,7 @@
 // What `PhaseGEVanLaarAcid` reports for a liquid, for `eos.ge_van_laar_acid_phase`.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar GeVanLaarAcidPhi.java
-//     java -cp .:neqsim-118d9af.jar GeVanLaarAcidPhi
+//     javac -proc:none -cp neqsim-b40bb11.jar GeVanLaarAcidPhi.java
+//     java -cp .:neqsim-b40bb11.jar GeVanLaarAcidPhi
 //
 // **Why a bare phase and not `SystemVanLaarActivitySRK`.** That class carries a great
 // deal of tuning, and all of it is vapour-side or flash-iteration: tuned HNO3 SRK

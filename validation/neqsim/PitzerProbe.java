@@ -1,7 +1,7 @@
 // What a built `SystemPitzer` actually reads, before anything is ported.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar PitzerProbe.java
-//     java -cp .:neqsim-118d9af.jar PitzerProbe
+//     javac -proc:none -cp neqsim-b40bb11.jar PitzerProbe.java
+//     java -cp .:neqsim-b40bb11.jar PitzerProbe
 //
 // The port needs to know three things this prints, and none of them is in the class's
 // javadoc:

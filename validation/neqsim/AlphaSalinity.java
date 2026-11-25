@@ -4,8 +4,8 @@ import neqsim.thermodynamicoperations.ThermodynamicOperations;
 
 // Which of a Soreide-Whitson phase's salinity-dependent quantities actually respond.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar AlphaSalinity.java
-//     java -cp .:neqsim-118d9af.jar AlphaSalinity
+//     javac -proc:none -cp neqsim-b40bb11.jar AlphaSalinity.java
+//     java -cp .:neqsim-b40bb11.jar AlphaSalinity
 //
 // The tranche's third F instrument, and the one that separates two things that look alike.
 // Over eight brines from zero to `7.59 mol/kg`:

@@ -1,7 +1,7 @@
 //! `thermal.fouling_model` - fixed, Kern-Seaton and Ebert-Panchal fouling.
 //!
 //! Transcribed from `process/mechanicaldesign/heatexchanger/FoulingModel.java` at NeqSim
-//! `118d9aff`: the fixed TEMA resistance, the Kern-Seaton asymptote, and the Ebert-Panchal
+//! `b40bb113`: the fixed TEMA resistance, the Kern-Seaton asymptote, and the Ebert-Panchal
 //! threshold model with its analytical resistance, rate, threshold temperature and
 //! threshold velocity.
 //!

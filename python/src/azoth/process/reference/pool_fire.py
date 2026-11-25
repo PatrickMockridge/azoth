@@ -83,7 +83,10 @@ def _distance_to_flux(
     """The class's bisection, absent when the fire never reaches the target."""
     lo = diameter / 2.0 + _NEAR_CLEARANCE
     hi = _SEARCH_MAX
-    if _incident_heat_flux(diameter, burn_rate, air_density, lo) < target:
+    if (
+        _incident_heat_flux(diameter, burn_rate, air_density, lo) < target
+        or _incident_heat_flux(diameter, burn_rate, air_density, hi) > target
+    ):
         return None
     for _ in range(_BISECTION_STEPS):
         mid = 0.5 * (lo + hi)

@@ -19,8 +19,8 @@ target_flux_w_m2=
 fireball_diameter_m=58.0
 fireball_duration_s=4.5
 surface_emissive_power_w_m2=290175.4808651283
-transmissivity=0.3728721363977805
-incident_heat_flux_w_m2=9099.48135950447
+transmissivity=0.3728721363977804
+incident_heat_flux_w_m2=9099.481359504467
 
 bleve_humidity_05_50m
 fuel_mass_kg=1000.0
@@ -45,8 +45,8 @@ target_flux_w_m2=
 fireball_diameter_m=58.0
 fireball_duration_s=4.5
 surface_emissive_power_w_m2=290175.4808651283
-transmissivity=NaN
-incident_heat_flux_w_m2=NaN
+transmissivity=1.0
+incident_heat_flux_w_m2=97615.03176302915
 
 bleve_distance_12500
 fuel_mass_kg=1000.0
@@ -58,8 +58,8 @@ target_flux_w_m2=12500.0
 fireball_diameter_m=58.0
 fireball_duration_s=4.5
 surface_emissive_power_w_m2=290175.4808651283
-distance_to_flux_m=86.9917978858796
-flux_at_distance_w_m2=12500.000000000002
+distance_to_flux_m=86.99179788587963
+flux_at_distance_w_m2=12499.999999999995
 
 bleve_small_target
 fuel_mass_kg=1000.0
@@ -72,7 +72,7 @@ fireball_diameter_m=58.0
 fireball_duration_s=4.5
 surface_emissive_power_w_m2=290175.4808651283
 distance_to_flux_m=1305.5034136141694
-flux_at_distance_w_m2=9.999999999999984
+flux_at_distance_w_m2=10.0
 
 bleve_unreachable_1mw
 fuel_mass_kg=1000.0
@@ -84,8 +84,8 @@ target_flux_w_m2=1000000.0
 fireball_diameter_m=58.0
 fireball_duration_s=4.5
 surface_emissive_power_w_m2=290175.4808651283
-distance_to_flux_m=29.1
-flux_at_distance_w_m2=143372.4448266442
+distance_to_flux_m=NaN
+flux_at_distance_w_m2=NaN
 
 bleve_negative_fraction
 fuel_mass_kg=1000.0
@@ -94,13 +94,7 @@ radiative_fraction=-0.3
 relative_humidity=default_0.5
 distance_m=100.0
 target_flux_w_m2=12500.0
-fireball_diameter_m=58.0
-fireball_duration_s=4.5
-surface_emissive_power_w_m2=-290175.4808651283
-transmissivity=0.3728721363977805
-incident_heat_flux_w_m2=-9099.48135950447
-distance_to_flux_m=29.1
-flux_at_distance_w_m2=-143372.4448266442
+refusal=IllegalArgumentException: radiativeFraction must be in [0,1]
 
 bleve_zero_distance_evidence
 fuel_mass_kg=1000.0
@@ -125,6 +119,5 @@ target_flux_w_m2=0.0
 fireball_diameter_m=58.0
 fireball_duration_s=4.5
 surface_emissive_power_w_m2=290175.4808651283
-distance_to_flux_m=2217.7920686533635
-flux_at_distance_w_m2=1.1016795352527029E-14
+distance_to_flux_refusal=IllegalArgumentException: Contour target must be positive and finite
 

@@ -13,10 +13,15 @@ use serde::Serialize;
 use crate::executor::json::{optional_scalar, scalar, warnings as wire_warnings};
 use crate::model_gen;
 
-/// `Q = C1 F A_ft2^0.82`, the class's Table 4 correlation with F always 1.0.
-fn fire_heat_input(area_m2: f64, has_drainage: bool) -> f64 {
+/// `Q = C1 F A_ft2^0.82`, the class's Table 4 correlation with F always 1.0. The
+/// 21 000 coefficient is credited only with both drainage and firefighting; else 34 500.
+fn fire_heat_input(area_m2: f64, has_drainage: bool, has_fire_fighting: bool) -> f64 {
     let area_ft2 = area_m2 * 10.7639;
-    let coefficient = if has_drainage { 21_000.0 } else { 34_500.0 };
+    let coefficient = if has_drainage && has_fire_fighting {
+        21_000.0
+    } else {
+        34_500.0
+    };
     coefficient * area_ft2.powf(0.82) * 0.293_071_07
 }
 
@@ -67,7 +72,6 @@ pub fn fire_case_relief(
         },
         &mut warnings,
     )?;
-    let _ = has_fire_fighting;
 
     let area = wetted_area
         .map(|value| value.value)
@@ -83,7 +87,7 @@ pub fn fire_case_relief(
         })
         .unwrap_or(0.0);
     let heat_input_watts = if area > 0.0 {
-        fire_heat_input(area, has_drainage)
+        fire_heat_input(area, has_drainage, has_fire_fighting)
     } else {
         0.0
     };

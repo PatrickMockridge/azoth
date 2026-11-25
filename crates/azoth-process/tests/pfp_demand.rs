@@ -170,7 +170,7 @@ fn a_short_jet_fire_is_j60() {
 }
 
 #[test]
-fn the_driving_temperature_is_floored_at_one() {
+fn the_driving_temperature_is_the_actual_difference() {
     let result = demand(
         100.0e3,
         0.012,
@@ -185,10 +185,29 @@ fn the_driving_temperature_is_floored_at_one() {
     assert!(result.pfp_required);
     close(
         result.required_pfp_thickness.value,
-        4.051_583_409_441_203e-05,
-        "the floored thickness",
+        1.418_054_193_304_513e-05,
+        "the actual-difference thickness",
     );
     assert_eq!(result.rating, "h60");
+}
+
+#[test]
+fn a_fire_at_or_below_the_steel_mean_is_refused() {
+    assert!(
+        pfp_demand(
+            watts_per_square_meter(100.0e3),
+            meters(0.012),
+            seconds(3600.0),
+            None,
+            None,
+            None,
+            Some(kelvins(480.0)),
+            None,
+            None,
+        )
+        .is_err(),
+        "a fire at the mean steel temperature has no driving difference"
+    );
 }
 
 #[test]

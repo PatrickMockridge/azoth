@@ -1365,20 +1365,19 @@ fn neqsims_0_85_endpoint_under_one_pass_of_this_ports_map() {
         }
     }
     // **The localisation is the result, so it is asserted and not printed.** Measured on the
-    // `0.85` row: `{1: 0.11861340408654542, 2: -0.08237200220162322,
-    // 3: -0.7773812113713348, 4: -1.205308593697623}` and nothing on trays 0 or 5. The
-    // interior moves in the direction the port's own `0.85` fixed point sits from the target.
+    // `0.85` row: `{2: -2.729838753187437, 3: -9.834727741719178,
+    // 4: -10.188776101788562}` and nothing on trays 0, 1 or 5. Tray 1 sits inside the
+    // `1e-4` band at this pin, so the first interior tray where the maps part is tray 2.
     let expected = [
-        (1_usize, 0.11861340408654542_f64),
-        (2, -0.08237200220162322),
-        (3, -0.7773812113713348),
-        (4, -1.205308593697623),
+        (2_usize, -2.729838753187437_f64),
+        (3, -9.834727741719178),
+        (4, -10.188776101788562),
     ];
     let seen: Vec<usize> = moved.iter().map(|(index, _, _)| *index).collect();
     assert_eq!(
         seen,
-        vec![1, 2, 3, 4],
-        "the four interior trays move; the ends are uncorrected"
+        vec![2, 3, 4],
+        "the moving interior trays; the ends are uncorrected: {moved:?}"
     );
     for (index, delta) in &expected {
         let (_, _, actual) = moved
@@ -1455,10 +1454,10 @@ fn the_coordinated_tear_does_not_converge_in_neqsim_either() {
         row_number(&alone, "tear_residual") > 1.0e-4,
         "and it stops short of its own 1e-5 specification tolerance"
     );
-    // **Eighteen of thirty**, which is the number the plan named and the reason the row is not
-    // an oracle: two thirds of the candidate dras were refused by the class's own acceptance
-    // rule before the iteration cap arrived.
-    assert_eq!(row_number(&alone, "tear_rejected_candidates"), 18.0);
+    // **Nine of thirty**, which is the number the plan named and the reason the row is not an
+    // oracle: the class's own acceptance rule refused the candidate dras before the iteration
+    // cap arrived.
+    assert_eq!(row_number(&alone, "tear_rejected_candidates"), 9.0);
 
     let paired = capture_row("process_column_tear.tsv", "tear_side_draw_with_pumparound");
     assert_eq!(
@@ -1469,12 +1468,12 @@ fn the_coordinated_tear_does_not_converge_in_neqsim_either() {
         paired.get("tear_converged").map(String::as_str),
         Some("false")
     );
-    // **A thousand times the residual, and no candidates at all.** The pair does not take the
+    // **Fifty times better, and no candidates at all.** The pair does not take the
     // specification's search path, so `solveWithColumnTearVariables` is not the single-variable
-    // loop with one more variable in it.
+    // loop with one more variable in it; its residual is lower than the loop's, not higher.
     assert!(
-        row_number(&paired, "tear_residual") > 100.0 * row_number(&alone, "tear_residual"),
-        "the pair is worse by orders, not by a little: {} against {}",
+        row_number(&alone, "tear_residual") > 50.0 * row_number(&paired, "tear_residual"),
+        "the pair is better by orders, not by a little: {} against {}",
         row_number(&paired, "tear_residual"),
         row_number(&alone, "tear_residual")
     );

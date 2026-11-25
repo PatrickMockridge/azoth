@@ -24,6 +24,7 @@ from azoth.process.reference.overpressure_acceptance import (
 from azoth.process.reference.psv_sizing import (
     _gas_area,
     _liquid_area,
+    _relieving_pressure,
     _select_orifice,
     _two_phase_area,
 )
@@ -192,7 +193,7 @@ def overpressure_protection_study(
         if governing is None or float(row["relief_rate"]) > float(governing["relief_rate"]):
             governing = row
     if governing is None:
-        return _empty(["No credible relief scenario defined; nothing to size"], warnings)
+        return _empty(["No credible positive relief demand defined"], warnings)
 
     cause = str(governing["cause"])
     phase = str(governing["phase"])
@@ -206,15 +207,34 @@ def overpressure_protection_study(
     capacity: float | None = None
     adequate = False
 
+    if set_si > mawp_si:
+        return _empty(
+            [
+                f"{governing['name']}: Missing or invalid pressure, relief demand, cause or "
+                "relieving-phase property basis",
+                "Resolve all credible relief demands before selecting an orifice",
+            ],
+            warnings,
+        )
     if rate <= 0.0:
-        messages.append("Governing relief rate is zero; relief device cannot be sized")
-    elif phase == "vapour":
+        return _empty(
+            [
+                f"{governing['name']}: Missing or invalid pressure, relief demand, cause or "
+                "relieving-phase property basis",
+                "Resolve all credible relief demands before selecting an orifice",
+            ],
+            warnings,
+        )
+    if phase == "vapour":
         molar_mass = governing.get("molar_mass")
         if molar_mass is None:
-            raise InvalidInputError(
-                "scenarios",
-                f"the governing vapour scenario {governing['name']!r} has no molar mass, "
-                "and the gas sizing needs one",
+            return _empty(
+                [
+                    f"{governing['name']}: Missing or invalid pressure, relief demand, cause "
+                    "or relieving-phase property basis",
+                    "Resolve all credible relief demands before selecting an orifice",
+                ],
+                warnings,
             )
         temperature = (
             DEFAULT_TEMPERATURE
@@ -243,8 +263,8 @@ def overpressure_protection_study(
         adequate = selected_in2 >= required_in2
         if not adequate:
             messages.append(
-                "Required relief area exceeds the largest standard orifice; multiple or "
-                "larger relief devices are required"
+                f"{governing['name']}: A single standard orifice cannot be selected for "
+                "this relief demand"
             )
     elif phase == "liquid":
         stated = governing.get("density")
@@ -282,8 +302,8 @@ def overpressure_protection_study(
         adequate = selected_in2 >= required_in2
         if not adequate:
             messages.append(
-                "Required liquid relief area exceeds the largest standard orifice; multiple "
-                "or larger relief devices are required"
+                f"{governing['name']}: A single standard orifice cannot be selected for "
+                "this relief demand"
             )
     else:
         missing = any(
@@ -329,11 +349,11 @@ def overpressure_protection_study(
             adequate = selected >= area_in2
             if not adequate:
                 messages.append(
-                    "Required two-phase relief area exceeds the largest standard orifice; "
-                    "multiple or larger relief devices are required"
+                    f"{governing['name']}: A single standard orifice cannot be selected for "
+                    "this relief demand"
                 )
 
-    peak = set_si * (1.0 + overpressure)
+    peak = _relieving_pressure(set_si, overpressure)
     acceptance = acceptance_check(quantity(peak, "Pa"), quantity(mawp_si, "Pa"), cause, multiple)
     if not acceptance.accepted:
         suffix = (
@@ -342,7 +362,8 @@ def overpressure_protection_study(
         factor = acceptance.accumulation_factor
         messages.append(
             "Relieving pressure exceeds the allowable accumulated pressure: "
-            f"{factor * 100.0:.0f}% of MAWP ({mawp_si / 1.0e5:.2f} bara x {factor:.2f}) "
+            f"{factor * 100.0:.0f}% of gauge MAWP "
+            f"({mawp_si / 1.0e5 - 1.01325:.2f} barg x {factor:.2f}, standard atmosphere) "
             f"for {_CAUSE_LABELS[cause]}{suffix}"
         )
     warnings.extend(acceptance.warnings)

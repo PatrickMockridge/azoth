@@ -316,9 +316,9 @@ fn the_overpressure_acceptance_case_runs_through_the_dispatch() {
     );
     let outputs = ok(&outcome);
     assert!((number(outputs, "accumulation_factor") - 1.1).abs() < 1e-12);
-    assert!((number(outputs, "allowable_pressure") - 1_100_000.0).abs() < 1e-6);
-    assert!((number(outputs, "margin") - 0.0).abs() < 1e-6);
-    assert_eq!(outputs.outputs["accepted"], json!(true));
+    assert!((number(outputs, "allowable_pressure") - 1_089_867.5).abs() < 1e-6);
+    assert!((number(outputs, "margin") + 10_132.5).abs() < 1e-6);
+    assert_eq!(outputs.outputs["accepted"], json!(false));
 }
 
 #[test]
@@ -360,11 +360,11 @@ fn the_psv_sizing_case_runs_through_the_dispatch() {
         }),
     );
     let outputs = ok(&outcome);
-    assert!((number(outputs, "relieving_pressure") - 1_100_000.0).abs() < 1e-6);
-    assert!((number(outputs, "required_area") - 7.267_430_890_193_706e-4).abs() < 1e-15);
-    assert!((number(outputs, "required_area_in2") - 1.126_454_040_888_106_3).abs() < 1e-12);
+    assert!((number(outputs, "relieving_pressure") - 1_089_867.5).abs() < 1e-6);
+    assert!((number(outputs, "required_area") - 7.387_252_687_683_11e-4).abs() < 1e-15);
+    assert!((number(outputs, "required_area_in2") - 1.145_026_456_643_795_3).abs() < 1e-12);
     assert_eq!(outputs.outputs["recommended_orifice"], json!("J"));
-    assert!((number(outputs, "back_pressure_correction") - 0.643_499_521_697_216_9).abs() < 1e-12);
+    assert!((number(outputs, "back_pressure_correction") - 0.638_947_488_430_712_5).abs() < 1e-12);
 }
 
 #[test]
@@ -426,8 +426,8 @@ fn the_psv_fire_sizing_case_runs_through_the_dispatch() {
     );
     let outputs = ok(&outcome);
     assert!((number(outputs, "overpressure_fraction") - 0.21).abs() < 1e-12);
-    assert!((number(outputs, "required_area") - 0.002_364_274_017_247_606_5).abs() < 1e-15);
-    assert!((number(outputs, "required_area_in2") - 3.664_632_055_997_902_4).abs() < 1e-12);
+    assert!((number(outputs, "required_area") - 0.002_406_594_782_058_630_3).abs() < 1e-15);
+    assert!((number(outputs, "required_area_in2") - 3.730_229_372_649_622_3).abs() < 1e-12);
     assert_eq!(outputs.outputs["recommended_orifice"], json!("N"));
 }
 

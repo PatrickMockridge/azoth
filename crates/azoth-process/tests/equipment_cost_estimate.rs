@@ -287,11 +287,11 @@ fn the_separator_carries_its_stack_and_bill_of_materials() {
 
     let result = run(vec![separator]);
     let row = &result.equipment[0];
-    assert!(close(row.purchased_equipment_cost, 4185.028871129008));
-    assert!(close(row.bare_module_cost, 17231.85637687369));
-    assert!(close(row.total_module_cost, 21539.820471092113));
-    assert!(close(row.grass_roots_cost, 32309.73070663817));
-    assert!(close(row.total_cost, 21539.820471092113));
+    assert!(close(row.purchased_equipment_cost, 4823.880926503424));
+    assert!(close(row.bare_module_cost, 19862.329714877847));
+    assert!(close(row.total_module_cost, 24827.91214359731));
+    assert!(close(row.grass_roots_cost, 37241.86821539597));
+    assert!(close(row.total_cost, 24827.91214359731));
     assert!(close(
         row.installation_man_hours,
         99.47819038665551 * 3600.0

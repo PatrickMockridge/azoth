@@ -52,7 +52,7 @@ not an equation, and both implementations read it from here.
 | `steady_required_area` | m**2 | the steady API 521 required orifice area. |
 | `dynamic_required_area` | m**2 | the dynamically required orifice area. |
 | `oversizing_ratio` | dimensionless | *Optional.* the steady-to-dynamic oversizing; absent only at a zero dynamic area. |
-| `allowable_pressure` | Pa | the allowable accumulated pressure `set_pressure (1 + overpressure_fraction)`. |
+| `allowable_pressure` | Pa | the allowable accumulated pressure `set_pressure + (set_pressure - atm) overpressure_fraction`. |
 | `peak_dynamic_pressure` | Pa | the peak vessel pressure at the dynamically required area. |
 | `steady_relief_rate` | kg/s | the steady relief rate `fire_heat_input / latent_heat`. |
 
@@ -86,13 +86,12 @@ not an equation, and both implementations read it from here.
 
 | Case | Inputs | Expected |
 |---|---|---|
-| `fifty_bara_gas` | components = ['methane', 'ethane', 'propane'], initial_z = [0.85, 0.1, 0.05], initial_t = 350.0, initial_p = 5000000.0, vessel_volume = 5.0, fire_heat_input = 500000.0, set_pressure = 5000000.0, overpressure_fraction = 0.21, back_pressure = 100000.0 | steady_required_area = 0.00013484834741989848, dynamic_required_area = 5.401978650632388e-05, oversizing_ratio = 2.496276941118831, allowable_pressure = 6050000.0, peak_dynamic_pressure = 6049999.996251063, steady_relief_rate = 1.4285714285714286 |
-| `low_pressure_small_vessel` | components = ['methane', 'ethane', 'propane'], initial_z = [0.85, 0.1, 0.05], initial_t = 350.0, initial_p = 1100000.0, vessel_volume = 1.0, fire_heat_input = 150000.0, set_pressure = 1100000.0, overpressure_fraction = 0.21, back_pressure = 100000.0 | steady_required_area = 0.00019424246655211374, dynamic_required_area = 6.094593000614838e-05, oversizing_ratio = 3.1871277792055692, allowable_pressure = 1331000.0, peak_dynamic_pressure = 1330999.9986886573, steady_relief_rate = 0.42857142857142855 |
+| `fifty_bara_gas` | components = ['methane', 'ethane', 'propane'], initial_z = [0.85, 0.1, 0.05], initial_t = 350.0, initial_p = 5000000.0, vessel_volume = 5.0, fire_heat_input = 500000.0, set_pressure = 5000000.0, overpressure_fraction = 0.21, back_pressure = 100000.0 | steady_required_area = 0.00013532429190157695, dynamic_required_area = 5.44015269712034e-05, oversizing_ratio = 2.487509072552481, allowable_pressure = 6028721.75, peak_dynamic_pressure = 6028721.746112543, steady_relief_rate = 1.4285714285714286 |
 
 ## How far this is checked
 **`partially_verified`** — exercised against expectations pinned in its own spec, with no independent oracle recorded for it - **the normal case rather than a defect**.
 
-- Tests: 2 declared, every one run
+- Tests: 1 declared, every one run
 - External check: no external validation case names it
 
 The same account travels with every result this returns: `result.provenance`

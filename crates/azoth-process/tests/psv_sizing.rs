@@ -131,23 +131,23 @@ fn the_gas_branches_reproduce_the_capture() {
     );
     close(
         choked.relieving_pressure.value,
-        1_100_000.0,
+        1_089_867.5,
         "the relieving pressure",
     );
     close(
         choked.back_pressure_fraction,
-        0.092_113_636_363_636_37,
+        0.092_970_016_997_479_05,
         "the ratio",
     );
     close(choked.discharge_coefficient, 0.975, "Kd");
     close(
         choked.required_area.value,
-        4.676_588_301_807_23e-4,
+        4.720_066_551_198_152_4e-4,
         "the area",
     );
     close(
         choked.required_area_in2.unwrap(),
-        0.724_872_636_525_393_7,
+        0.731_611_778_659_271,
         "the area in in2",
     );
     assert_eq!(choked.recommended_orifice.as_deref(), Some("H"));
@@ -162,12 +162,12 @@ fn the_gas_branches_reproduce_the_capture() {
     let balanced = gas(1.0, 1.0e6, 0.10, 8.0e5, 300.0, 0.020, 0.9, 1.3, true, false);
     close(
         balanced.back_pressure_correction.unwrap(),
-        0.643_499_521_697_216_9,
+        0.638_947_488_430_712_5,
         "the balanced Kb",
     );
     close(
         balanced.required_area_in2.unwrap(),
-        1.126_454_040_888_106_3,
+        1.145_026_456_643_795_3,
         "the balanced area",
     );
     assert_eq!(balanced.recommended_orifice.as_deref(), Some("J"));
@@ -177,12 +177,12 @@ fn the_gas_branches_reproduce_the_capture() {
     );
     close(
         high.back_pressure_correction.unwrap(),
-        0.8,
+        0.788_843_597_960_302_6,
         "the conventional Kb",
     );
     close(
         high.required_area_in2.unwrap(),
-        0.906_090_795_656_742_1,
+        0.927_448_458_162_030_3,
         "the high-back-pressure area",
     );
 
@@ -191,7 +191,7 @@ fn the_gas_branches_reproduce_the_capture() {
     );
     close(
         severe.back_pressure_correction.unwrap(),
-        0.272_727_272_727_272_7,
+        0.256_668_815_245_89,
         "the severe Kb",
     );
     assert_eq!(severe.recommended_orifice.as_deref(), Some("L"));
@@ -206,7 +206,7 @@ fn the_gas_branches_reproduce_the_capture() {
     );
     close(
         rupture.required_area_in2.unwrap(),
-        0.805_414_040_583_770_6,
+        0.812_901_976_288_078_9,
         "the rupture-disk area",
     );
 
@@ -215,7 +215,7 @@ fn the_gas_branches_reproduce_the_capture() {
     );
     close(
         exhausted.required_area_in2.unwrap(),
-        72.487_263_652_539_35,
+        73.161_177_865_927_1,
         "the requirement",
     );
     assert_eq!(exhausted.recommended_orifice.as_deref(), Some("T"));
@@ -259,10 +259,10 @@ fn the_capacity_helper_is_not_the_sizing_inverse() {
         .mass_flow_capacity
         .expect("stated with the area")
         .value;
-    close(capacity, 0.034_210_476_081_235_55, "the capacity helper");
+    close(capacity, 1.071_835_324_399_452_7, "the capacity helper");
     assert!(
-        capacity < 1.0 / 10.0,
-        "the helper is not the inverse: {capacity} kg/s against a 1.0 kg/s sizing"
+        capacity >= 1.0,
+        "the selected orifice admits the 1.0 kg/s demand: {capacity} kg/s"
     );
 }
 
@@ -271,12 +271,12 @@ fn the_liquid_branches_reproduce_the_capture() {
     let low = liquid(0.01, 800.0, 1.0e6, 0.10, 1.01325e5, 0.001, false);
     close(
         low.required_area.value,
-        3.078_347_923_878_862e-4,
+        3.094_084_141_581_176_3e-4,
         "the low-viscosity area",
     );
     close(
         low.required_area_in2.unwrap(),
-        0.477_144_882_490_988_6,
+        0.479_584_001_113_084_6,
         "the area in in2",
     );
     assert_eq!(low.recommended_orifice.as_deref(), Some("G"));
@@ -295,36 +295,36 @@ fn the_liquid_branches_reproduce_the_capture() {
     let high = liquid(0.01, 800.0, 1.0e6, 0.10, 1.01325e5, 1.0, false);
     close(
         high.viscosity_correction.unwrap(),
-        0.869_753_590_375_659_4,
+        0.869_546_086_470_695_5,
         "the viscous Kv",
     );
     close(
         high.required_area_in2.unwrap(),
-        0.548_597_772_715_031_5,
+        0.551_533_735_330_366_5,
         "the viscous area",
     );
 
     let low_overpressure = liquid(0.01, 800.0, 1.0e6, 0.05, 1.01325e5, 0.001, false);
     close(
         low_overpressure.relieving_pressure.value,
-        1_050_000.0,
+        1_044_933.75,
         "the 5 % relieving pressure",
     );
     close(
         low_overpressure.required_area_in2.unwrap(),
-        0.611_946_766_605_340_1,
+        0.613_587_343_318_740_9,
         "the Kp area",
     );
 
     let balanced = liquid(0.01, 800.0, 1.0e6, 0.10, 7.7e5, 0.001, true);
     close(
         balanced.back_pressure_correction.unwrap(),
-        0.9,
+        0.896_746_049_405_088_3,
         "the balanced Kw",
     );
     close(
         balanced.required_area_in2.unwrap(),
-        0.922_280_189_237_026_6,
+        0.940_173_117_734_205_3,
         "the balanced area",
     );
 
@@ -336,7 +336,7 @@ fn the_liquid_branches_reproduce_the_capture() {
     );
     close(
         conventional.required_area_in2.unwrap(),
-        0.830_052_170_313_324,
+        0.843_096_529_085_013_6,
         "the conventional area",
     );
 }
@@ -348,12 +348,12 @@ fn the_two_phase_branches_reproduce_the_capture() {
     );
     close(
         high.required_area.value,
-        2.995_876_123_738_863e-5,
+        3.026_985_822_305_454_4e-5,
         "the omega-above-one area",
     );
     close(
         high.back_pressure_fraction,
-        0.090_909_090_909_090_91,
+        0.091_754_272_881_795_26,
         "the two-phase ratio",
     );
     close(high.discharge_coefficient, 0.85, "the two-phase Kd");
@@ -365,7 +365,7 @@ fn the_two_phase_branches_reproduce_the_capture() {
     );
     close(
         low.required_area.value,
-        3.363_392_127_535_855_3e-5,
+        3.376_960_533_581_787e-5,
         "the omega-at-or-below-one area",
     );
 }

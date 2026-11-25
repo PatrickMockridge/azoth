@@ -555,7 +555,7 @@ describe("the safety study", () => {
     const psv = safety.study.scenarios.find((entry) => entry.id === "psv_1");
     expect(psv?.family).toBe("overpressure");
     expect(psv?.result?.outputs.recommended_orifice).toBe("H");
-    expect(psv?.result?.outputs.required_area_in2).toBeCloseTo(0.7248726365253937, 12);
+    expect(psv?.result?.outputs.required_area_in2).toBeCloseTo(0.731611778659271, 12);
 
     const sif = safety.study.scenarios.find((entry) => entry.id === "sif_1");
     expect(sif?.family).toBe("risk");

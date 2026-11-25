@@ -77,4 +77,4 @@ declared checks *that call* could not evaluate.
 ## References
 
 - Span, R.; Wagner, W. (1996). "A New Equation of State for Carbon Dioxide Covering the Fluid Region from the Triple-Point Temperature to 1100 K at Pressures up to 800 MPa." Journal of Physical and Chemical Reference Data 25(6), 1509-1596.
-- NeqSim master, `thermo/util/spanwagner/NeqSimSpanWagner.java`, Apache-2.0, commit 118d9aff9206504c136a08e1348b86cdd6cff669.
+- NeqSim master, `thermo/util/spanwagner/NeqSimSpanWagner.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.

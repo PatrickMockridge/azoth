@@ -118,7 +118,7 @@ declared checks *that call* could not evaluate.
 ## References
 
 - Crane Technical Paper No. 410, "Flow of Fluids Through Valves, Fittings and Pipe" (2013).
-- NeqSim master (118d9aff), `process/equipment/pipeline/Fittings.java` `STANDARD_LD_VALUES`, Apache-2.0: equivalent-length defaults, not a verified Crane TP-410 transcription. The one azoth-only row, `plug_valve_straightway`, remains an estimated dummy.
+- NeqSim master (b40bb113), `process/equipment/pipeline/Fittings.java` `STANDARD_LD_VALUES`, Apache-2.0: equivalent-length defaults, not a verified Crane TP-410 transcription. The one azoth-only row, `plug_valve_straightway`, remains an estimated dummy.
 
 
 ---

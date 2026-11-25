@@ -39,7 +39,7 @@ def test_temperature_conversions_are_the_class_arithmetic() -> None:
 
 
 def test_the_laboratory_literals_are_the_class_ones() -> None:
-    assert s.NEQSIM_AIR_MOLAR_MASS_KG_PER_MOL == 0.028
+    assert s.NEQSIM_AIR_MOLAR_MASS_KG_PER_MOL == 0.028_965_46
     assert s.CCE_BG_INTERNAL_FACTOR == 1.0e5
     assert s.CVD_CELL_VOLUME_RELATIVE_TOLERANCE == 1.0e-8
     assert s.CVD_MAX_CELL_VOLUME_ITERATIONS == 100

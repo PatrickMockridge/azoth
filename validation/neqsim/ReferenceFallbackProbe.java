@@ -19,8 +19,8 @@
 // claim is that they are the same number taken raw and not negated: azoth reads that
 // column out of the same `COMP.csv` row.
 //
-//     javac -proc:none -cp neqsim-118d9af.jar ReferenceFallbackProbe.java
-//     java -cp .:neqsim-118d9af.jar ReferenceFallbackProbe > captures/reference_fallback_probe.tsv
+//     javac -proc:none -cp neqsim-b40bb11.jar ReferenceFallbackProbe.java
+//     java -cp .:neqsim-b40bb11.jar ReferenceFallbackProbe > captures/reference_fallback_probe.tsv
 
 import java.util.ArrayList;
 import neqsim.chemicalreactions.ChemicalReactionOperations;

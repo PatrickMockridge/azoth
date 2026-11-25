@@ -74,6 +74,6 @@ declared checks *that call* could not evaluate.
 
 ## References
 
-- NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/ConstantVolumeDepletion.java` at commit 118d9af is the port source.
+- NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/ConstantVolumeDepletion.java` at commit b40bb113 is the port source.
 - `validation/neqsim/captures/pvt_constant_volume_depletion.tsv` - an eight-point schedule through the restoration, the same fluid at 350 K, and a richer 0.60/0.40 fluid.
-- NeqSim #5209 - the same phase-0 indexing the saturation classes use.
+- NeqSim #5209 - the whole-cell corrected saturation state and the gas/oil density QC (fixed by the pin).

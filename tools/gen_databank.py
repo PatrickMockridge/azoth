@@ -102,6 +102,21 @@ VENDORED_FILES = (
         "UNIFACInterParamC_UMRMC.csv",
         "UNIFACInterParamC_UMRMC.csv",
     ),
+    (
+        "neqsim/UNIFACInterParamA_UMRCPA.csv",
+        "UNIFACInterParamA_UMRCPA.csv",
+        "UNIFACInterParamA_UMRCPA.csv",
+    ),
+    (
+        "neqsim/UNIFACInterParamB_UMRCPA.csv",
+        "UNIFACInterParamB_UMRCPA.csv",
+        "UNIFACInterParamB_UMRCPA.csv",
+    ),
+    (
+        "neqsim/UNIFACInterParamC_UMRCPA.csv",
+        "UNIFACInterParamC_UMRCPA.csv",
+        "UNIFACInterParamC_UMRCPA.csv",
+    ),
     ("neqsim/MBWR32param.csv", "MBWR32param.csv", "mbwr32.csv"),
     # The electrolyte pair parameters. Same shape as the rest of this list - no unit
     # conversion and no row filtering - and compiled rather than read from

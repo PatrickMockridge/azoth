@@ -11471,31 +11471,31 @@ value = 0.0
 unit = "1/K**3"
 
 [components.glycerol.Tc]
-value = 766.0999999999999
+value = 850.0
 unit = "K"
 
 [components.glycerol.Pc]
-value = 3313000.0000000005
+value = 7500000.0
 unit = "Pa"
 
 [components.glycerol.omega]
-value = 1.2874
+value = 0.513
 unit = "dimensionless"
 
 [components.glycerol.cp_a]
-value = 86.4
+value = 14.352
 unit = "J/(mol*K)"
 
 [components.glycerol.cp_b]
-value = 0.6008
+value = 0.3967
 unit = "J/(mol*K**2)"
 
 [components.glycerol.cp_c]
-value = -0.0003622
+value = -0.0002338
 unit = "J/(mol*K**3)"
 
 [components.glycerol.cp_d]
-value = 7.2e-08
+value = 5.34e-08
 unit = "J/(mol*K**4)"
 
 [components.glycerol.cp_e]
@@ -11511,23 +11511,23 @@ value = 1.0
 unit = "angstrom"
 
 [components.glycerol.dielectric_1]
-value = -19.2905
+value = 0.0
 unit = "dimensionless"
 
 [components.glycerol.dielectric_2]
-value = 29814.5
+value = 12671.4
 unit = "K"
 
 [components.glycerol.dielectric_3]
-value = -0.019678
+value = 0.0
 unit = "1/K"
 
 [components.glycerol.dielectric_4]
-value = 0.013189
+value = 0.0
 unit = "1/K**2"
 
 [components.glycerol.dielectric_5]
-value = 0.031144
+value = 0.0
 unit = "1/K**3"
 
 [components."h+".Tc]
@@ -14175,7 +14175,7 @@ value = 667.039001464
 unit = "K"
 
 [components.n-bcychexane.Pc]
-value = 3150870.1171
+value = 2570000.0
 unit = "Pa"
 
 [components.n-bcychexane.omega]
@@ -15851,15 +15851,15 @@ value = -3.11e-07
 unit = "1/K**3"
 
 [components.nc16.Tc]
-value = 717.0
+value = 723.0
 unit = "K"
 
 [components.nc16.Pc]
-value = 1419000.0
+value = 1400000.0
 unit = "Pa"
 
 [components.nc16.omega]
-value = 0.742
+value = 0.7174
 unit = "dimensionless"
 
 [components.nc16.cp_a]
@@ -15911,15 +15911,15 @@ value = -3.11e-07
 unit = "1/K**3"
 
 [components.nc17.Tc]
-value = 735.5
+value = 736.0
 unit = "K"
 
 [components.nc17.Pc]
-value = 1363000.0
+value = 1340000.0
 unit = "Pa"
 
 [components.nc17.omega]
-value = 0.6572
+value = 0.7697
 unit = "dimensionless"
 
 [components.nc17.cp_a]
@@ -16091,15 +16091,15 @@ value = -3.11e-07
 unit = "1/K**3"
 
 [components.nc19.Tc]
-value = 760.0999999999999
+value = 758.0
 unit = "K"
 
 [components.nc19.Pc]
-value = 1247000.0
+value = 1210000.0
 unit = "Pa"
 
 [components.nc19.omega]
-value = 0.7073
+value = 0.8522
 unit = "dimensionless"
 
 [components.nc19.cp_a]
@@ -16151,11 +16151,11 @@ value = -3.11e-07
 unit = "1/K**3"
 
 [components.nc20.Tc]
-value = 767.0
+value = 768.0
 unit = "K"
 
 [components.nc20.Pc]
-value = 1115000.0
+value = 1160000.0
 unit = "Pa"
 
 [components.nc20.omega]
@@ -16211,15 +16211,15 @@ value = -3.11e-07
 unit = "1/K**3"
 
 [components.nc21.Tc]
-value = 779.5999999999999
+value = 778.0
 unit = "K"
 
 [components.nc21.Pc]
-value = 1074000.0
+value = 1110020.0
 unit = "Pa"
 
 [components.nc21.omega]
-value = 0.861
+value = 0.942
 unit = "dimensionless"
 
 [components.nc21.cp_a]
@@ -16271,15 +16271,15 @@ value = -3.11e-07
 unit = "1/K**3"
 
 [components.nc22.Tc]
-value = 792.1999999999999
+value = 787.0
 unit = "K"
 
 [components.nc22.Pc]
-value = 1116000.0
+value = 1059960.0
 unit = "Pa"
 
 [components.nc22.omega]
-value = 0.777
+value = 0.973
 unit = "dimensionless"
 
 [components.nc22.cp_a]
@@ -16331,15 +16331,15 @@ value = -3.11e-07
 unit = "1/K**3"
 
 [components.nc23.Tc]
-value = 801.9
+value = 796.0
 unit = "K"
 
 [components.nc23.Pc]
-value = 1082000.0
+value = 1020040.0
 unit = "Pa"
 
 [components.nc23.omega]
-value = 0.799
+value = 1.0262
 unit = "dimensionless"
 
 [components.nc23.cp_a]
@@ -16391,15 +16391,15 @@ value = -3.11e-07
 unit = "1/K**3"
 
 [components.nc24.Tc]
-value = 806.3
+value = 804.0
 unit = "K"
 
 [components.nc24.Pc]
-value = 932000.0
+value = 980000.0000000001
 unit = "Pa"
 
 [components.nc24.omega]
-value = 0.95
+value = 1.071
 unit = "dimensionless"
 
 [components.nc24.cp_a]
@@ -16451,7 +16451,7 @@ value = -3.11e-07
 unit = "1/K**3"
 
 [components.nc25.Tc]
-value = 857.0
+value = 812.0
 unit = "K"
 
 [components.nc25.Pc]
@@ -16751,15 +16751,15 @@ value = -3.11e-07
 unit = "1/K**3"
 
 [components.nc30.Tc]
-value = 863.05
+value = 844.0
 unit = "K"
 
 [components.nc30.Pc]
-value = 868000.0
+value = 799960.0
 unit = "Pa"
 
 [components.nc30.omega]
-value = 1.307
+value = 1.2986
 unit = "dimensionless"
 
 [components.nc30.cp_a]
@@ -16871,15 +16871,15 @@ value = -3.11e-07
 unit = "1/K**3"
 
 [components.nc39.Tc]
-value = 912.0
+value = 879.571
 unit = "K"
 
 [components.nc39.Pc]
-value = 821000.0000000001
+value = 432090.0
 unit = "Pa"
 
 [components.nc39.omega]
-value = 1.0889
+value = 1.5085
 unit = "dimensionless"
 
 [components.nc39.cp_a]
@@ -20359,7 +20359,7 @@ value = 2964000.0
 unit = "Pa"
 
 [components.trans-12-dm-cy-c6.omega]
-value = 0.3304
+value = 0.2379
 unit = "dimensionless"
 
 [components.trans-12-dm-cy-c6.cp_a]
@@ -25447,7 +25447,7 @@ value = 0.025
 unit = "dimensionless"
 
 [associations.glycerol.a_srk]
-value = 2.2800000000000002
+value = 2.002043
 unit = "Pa*m**6/mol**2"
 
 [associations.glycerol.b_srk]
@@ -25455,23 +25455,23 @@ value = 7.060000000000001e-05
 unit = "m**3/mol"
 
 [associations.glycerol.m_srk]
-value = 1.18
+value = 1.32642
 unit = "dimensionless"
 
 [associations.glycerol.volume_pr]
-value = 0.0188
+value = 0.025
 unit = "dimensionless"
 
 [associations.glycerol.a_pr]
-value = 3.9126000000000003
+value = 2.002043
 unit = "Pa*m**6/mol**2"
 
 [associations.glycerol.b_pr]
-value = 0.0001321
+value = 7.060000000000001e-05
 unit = "m**3/mol"
 
 [associations.glycerol.m_pr]
-value = 1.1692
+value = 1.32642
 unit = "dimensionless"
 
 [associations.h2s]

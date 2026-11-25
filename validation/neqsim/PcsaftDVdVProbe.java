@@ -15,8 +15,8 @@ import neqsim.thermo.system.SystemPCSAFTa;
  * number rather than an expression.
  *
  * <pre>
- * javac -proc:none -cp neqsim-118d9af.jar PcsaftDVdVProbe.java
- * java -cp .:neqsim-118d9af.jar PcsaftDVdVProbe
+ * javac -proc:none -cp neqsim-b40bb11.jar PcsaftDVdVProbe.java
+ * java -cp .:neqsim-b40bb11.jar PcsaftDVdVProbe
  * </pre>
  */
 public final class PcsaftDVdVProbe {
