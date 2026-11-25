@@ -61,9 +61,10 @@ dev = [
   "pydexpi>=2.1",
 ]
 agent = [
-  # Running an orchestration needs the DeepSeek Harness runtime; exporting the
-  # skills (`tools/export_skills.py --target dsh`) and using the library do not.
-  "deepseek-harness-sdk",
+  # The DeepSeek Harness runtime, when the npm `dsh` is not already on PATH. Exporting
+  # the skills (`tools/export_skills.py --target dsh`) and using the library do not need
+  # it. The SDK is a developer preview: the range holds the 0.2 line the launcher targets.
+  "deepseek-harness-sdk>=0.2.2rc2,<0.3",
 ]
 notebook = [
   # The kernel `tools/check_notebooks.py` starts, and the cell formats it reads.
@@ -271,7 +272,7 @@ module = ["jsonschema", "referencing"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-# The orchestration runtime publishes no type information and is an optional extra,
-# absent from an environment that has not installed `azoth-engine[agent]`.
-module = ["deepseek_harness_sdk"]
+# The runtime is an optional extra absent from an environment that has not installed
+# `azoth-engine[agent]`; the launcher locates it, it does not import it.
+module = ["deepseek_harness"]
 ignore_missing_imports = true

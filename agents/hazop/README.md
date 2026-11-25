@@ -19,7 +19,9 @@ Roles, and the skills each chains:
 The worksheet is the serialisation of the run — `@hazop` — so a run re-entered
 with `*` is the same run.
 
-Runnable via `python/azoth/agents` (the DeepSeek Harness boundary). The runtime is
-a dev preview; this file fixes the agent, and the runtime executes it.
+Runnable through `tools/launch_dsh.py --study hazop`: the chair is the root preset, the
+three roles are subagent presets, and [`agents/deepseek/skills/azoth-hazop.md`](../deepseek/skills/azoth-hazop.md)
+carries the procedure. The runtime is a dev preview; this file fixes the agent, and the
+runtime executes it.
 
-Setup: [`agents/README.md`](../README.md).
+Setup: [`agents/README.md`](../README.md) and [`agents/deepseek/README.md`](../deepseek/README.md).

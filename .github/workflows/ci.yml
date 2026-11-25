@@ -41,6 +41,7 @@ jobs:
       notebooks: ${{ steps.plan.outputs.notebooks }}
       wheel-data: ${{ steps.plan.outputs.wheel-data }}
       ui: ${{ steps.plan.outputs.ui }}
+      dsh-plugin: ${{ steps.plan.outputs.dsh-plugin }}
       docs-build: ${{ steps.plan.outputs.docs-build }}
       docs-drift: ${{ steps.plan.outputs.docs-drift }}
       lean-verify: ${{ steps.plan.outputs.lean-verify }}
@@ -504,6 +505,23 @@ jobs:
           wasm-pack build crates/azoth-wasm --target nodejs --out-dir pkg --release \
             --no-pack --no-typescript
           node crates/azoth-wasm/test/smoke.mjs crates/azoth-wasm/pkg/azoth_wasm.js
+
+  dsh-plugin:
+    name: dsh-plugin
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: scope
+    if: needs.scope.outputs.dsh-plugin == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      # The plugin imports no @deepseek-ai/* package, so this job needs no DSH, no pnpm and
+      # no node_modules: it is `node --check` and the pure bridge tests.
+      - run: node --check agents/deepseek/plugin/index.js
+      - run: node --check agents/deepseek/plugin/bridge.js
+      - run: node --test agents/deepseek/plugin/test/*.test.mjs
 
   docs-build:
     name: docs-build

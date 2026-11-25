@@ -21,13 +21,16 @@ is [Orchestration](./orchestration.md).
 ## Run it
 
 ```bash
-pip install 'azoth-engine[agent]'  # DeepSeek Harness SDK + runtime
-python tools/export_skills.py      # from a checkout: write the skills into each tool's directory
+python tools/launch_dsh.py --check --flowsheet specs/flowsheets/demo.toml
+python tools/launch_dsh.py web --flowsheet specs/flowsheets/demo.toml
 ```
 
-The distribution name is `azoth-engine` and it is on PyPI. Exporting the skills still runs
-from a clone, because `tools/export_skills.py` is a repository tool.
+The launcher exports the skills to `.dsh/skills/`, generates the DeepSeek Harness overlay,
+and mounts the calculation plugin and the flowsheet MCP server. `--check` is the read-only
+probe; `--study hazop` enables the four role presets and Agent Teams.
+[`agents/deepseek/README.md`](../../../agents/deepseek/README.md) has the modes, the two
+tool surfaces and the caveats.
 
-`python/azoth/agents` is the one place that imports the DeepSeek Harness SDK; the skills
-themselves need no runtime. [`agents/README.md`](../../../agents/README.md) has the full
-setup and the caveats.
+The distribution name `azoth-engine` is on PyPI; the launcher and the skills are
+repository features, because `tools/launch_dsh.py` is a repository tool. The
+`agent` extra supplies the SDK's bundled runtime when `dsh` is not on PATH.

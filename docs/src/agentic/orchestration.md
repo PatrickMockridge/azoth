@@ -25,9 +25,9 @@ deviation, a cause, a safeguard.
 composition of its roles, each role a process whose only free names are its
 declared channels.
 
-*Status: **specified**. There is no orchestration runtime, so
-`Azoth.Orchestration` does not exist; the claim is what the first agent is checked
-against.*
+*Status: **executed, not proved**. DeepSeek Harness runs the team as a root agent with
+role presets and a task board; the claim is what that execution is checked against, and
+the proof would still be the Lean layer.*
 
 ## A HAZOP is a process
 
@@ -52,14 +52,16 @@ checking the orchestration layer wants the instance, not the general statement.*
 
 [`agents/hazop/`](../../../agents/hazop/README.md) is the first agent: the roles
 above, the skills each chains, and the pipeline, in the terms this page fixes. It
-is runnable through `python/azoth/agents`, the DeepSeek Harness boundary. The tool
-schema a model is handed — `@tool` and `*tool`, the same reflection surface a GUI
-side panel or a notebook offers — is [the middleware](../architecture/middleware.md),
-deferred until P12.
+is runnable through `tools/launch_dsh.py --study hazop`, which mounts the chair as the
+root preset and the process, safety and scribe roles as subagent presets over the
+DeepSeek Harness Team board. The tool schema a model is handed — `@tool` and `*tool`, the
+same reflection surface a GUI side panel or a notebook offers — is
+[the middleware](../architecture/middleware.md), served by `azoth mcp`.
 
 ## What is not here
 
-There is deliberately no orchestration runtime. A team is a process the calculus
-states; what runs it is the boundary in `python/azoth/agents`, and the claims above
-are proved when that runtime exists — the same "specified until the layer exists"
-discipline as the process and reflection layers.
+The runtime is DeepSeek Harness, not an azoth module: azoth owns the specification and
+the role definitions, and `tools/launch_dsh.py` composes them into a DSH profile. The
+claims above remain **executed, not proved** — the same "specified until a proof exists"
+discipline as the process and reflection layers, with the Lean layer still the place a
+proof would live.

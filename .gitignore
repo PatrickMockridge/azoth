@@ -35,6 +35,7 @@ docs/book/
 # `tools/export_skills.py` writes azoth's catalog into each tool's discovery
 # directory. Generated from skills.toml, so never committed.
 .dsh/
+.dsh-home/
 .claude/skills/
 .opencode/skills/
 # A second checkout of this repository, made by an agent tool's worktree feature. A nested
