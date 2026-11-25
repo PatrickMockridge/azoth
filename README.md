@@ -82,10 +82,10 @@ them different.
   subtracted the wrong quantity reported a NeqSim defect that was azoth's own.
 - **An agentic layer.** Ninety skills under `skills/` teach an agent to call the library,
   and a four-role HAZOP team chains them. `python tools/launch_dsh.py` starts DeepSeek
-  Harness with the skills, a calculation plugin for every registered id, and the flowsheet
-  MCP server. A calculation run can also be emitted as an r-gen claim bundle — the spec,
-  result, both implementations' agreement and the external cases as anchored evidence —
-  with `python -m azoth.rgen`.
+  Harness with an engineering persona, a welcome card, the skills, a calculation plugin
+  for every registered id, and the default demo flowsheet. A calculation run can also be
+  emitted as an r-gen claim bundle — the spec, result, both implementations' agreement and
+  the external cases as anchored evidence — with `python -m azoth.rgen`.
 
 ## The DeepSeek Harness interface
 
@@ -107,9 +107,11 @@ a browser front end. `--persona software` leaves DSH's coding preset in place.
 |---|---|---|
 | calculation plugin | `azoth_help`, `azoth_catalogue`, `azoth_spec`, `azoth_calc` | the glossary, then every registered id — 98 calculations and 300 models — through `python -m azoth.harness`; a result carries warnings and provenance |
 | flowsheet MCP | `mcp__azoth__*` | the 20 `azoth mcp --flowsheet F` edit commands, and the `azoth://document`, `azoth://diagnostics`, `azoth://report` and `azoth://catalogue` resources |
-| skills and team | `/azoth-hazop`, four presets | the 90 catalog skills, or the curated HAZOP subset, over the Agent Teams board |
+| skills and team | `/azoth-hazop`, four presets | the 90 catalog skills, or the curated HAZOP subset, over the Agent Teams board (web profile) |
 
-Hosted DeepSeek is the default (`DEEPSEEK_API_KEY`, `deepseek-v4-flash`); `--base-url`
+The HAZOP team is a web-profile experience; the headless one-shot composes no preset
+roster, so `--study hazop` is refused there. Hosted DeepSeek is the default
+(`DEEPSEEK_API_KEY`, `deepseek-v4-flash`); `--base-url`
 routes the same harness at any OpenAI-compatible endpoint serving open-weight weights.
 `--permission-mode` is required: `read-only` allows calculations and in-memory flowsheet
 edits but refuses file writes. The full interface — modes, flags, the bridge's JSON
