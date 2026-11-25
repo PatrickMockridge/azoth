@@ -2,7 +2,7 @@
 
 The library is a Python package with a Rust core. A script and a notebook use the same
 surface: `import azoth`, pass `pint` quantities in, and read a frozen result out. This page is
-the route for both, and the seven worked notebooks under
+the route for both, and the eight worked notebooks under
 [`notebooks/`](https://github.com/PatrickMockridge/azoth/tree/main/notebooks) are the long form.
 
 ## Install and import
@@ -202,6 +202,9 @@ figures without running anything:
 - [`07-field-development-design.ipynb`](https://github.com/PatrickMockridge/azoth/blob/main/notebooks/07-field-development-design.ipynb)
   — the selected platform's equipment, both export routes, CAPEX and OPEX, the production DCF
   and the sensitivity behind the recommendation.
+- [`08-offshore-debottlenecking.ipynb`](https://github.com/PatrickMockridge/azoth/blob/main/notebooks/08-offshore-debottlenecking.ipynb)
+  — the year-ten debottleneck: the binding capacity chain, the relief and flare checks, the fix
+  packages, the incremental DCF and the shutdown schedule.
 
 They read no repository file; the flowsheet in notebook 04 is embedded as text. CI executes
 them, so an example that stops running fails the push rather than the reader.
