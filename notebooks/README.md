@@ -1,8 +1,8 @@
 # Worked notebooks
 
-Five Jupyter notebooks using the published `azoth-engine` package. They read no repository file:
-each one installs, imports `azoth`, and runs. Their outputs are committed so GitHub renders the
-tables and figures, and CI re-executes them so they cannot stop running quietly.
+Seven Jupyter notebooks using the published `azoth-engine` package. They read no repository
+file: each one installs, imports `azoth`, and runs. Their outputs are committed so GitHub
+renders the tables and figures, and CI re-executes them so they cannot stop running quietly.
 
 | notebook | what it shows |
 |---|---|
@@ -11,6 +11,8 @@ tables and figures, and CI re-executes them so they cannot stop running quietly.
 | [`03-advanced-calculations.ipynb`](03-advanced-calculations.ipynb) | an LMTD correction factor, packed-column sizing and its operating window, a liquid property table from a flash, and a check that did not run. |
 | [`04-process-simulation.ipynb`](04-process-simulation.ipynb) | the unit-operation palette, a flowsheet document opened with the embedded palette, its stream table, an active recycle, an edit-and-run, and a unit operation called directly. |
 | [`05-data-science.ipynb`](05-data-science.ipynb) | the batch API over arrays, pandas tables, a compressibility sweep, a conduction sweep, and ISO 6976 over three gas blends. |
+| [`06-field-development-screening.ipynb`](06-field-development-screening.ipynb) | a drilling report, a PT flash map, a well-deliverability forecast, the host-capacity gate, the separation-stage study that decides NUI against manned, and the tieback hydraulics. |
+| [`07-field-development-design.ipynb`](07-field-development-design.ipynb) | the selected three-stage platform, its export-line hydraulics on both routes, CAPEX and OPEX, a production DCF and the sensitivity behind the recommendation. |
 
 ## Run them
 
@@ -25,7 +27,7 @@ jupyter lab
 
 The `notebook` extra in `pyproject.toml` names the same tools; it ships with the next release.
 
-To execute all five headlessly and check the committed shape:
+To execute all seven headlessly and check the committed shape:
 
 ```bash
 python tools/check_notebooks.py

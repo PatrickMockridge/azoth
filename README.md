@@ -164,9 +164,10 @@ to the [GitHub release](https://github.com/PatrickMockridge/azoth/releases).
 The distribution name is `azoth-engine` because `azoth` is taken on PyPI; `import azoth`
 is what the package has always been and is unchanged by it.
 
-Worked examples live in [`notebooks/`](notebooks/README.md): five executed notebooks from a
+Worked examples live in [`notebooks/`](notebooks/README.md): seven executed notebooks from a
 single Reynolds number through a phase envelope and a flowsheet with a recycle to the batch API
-and pandas. They read no repository file and run against the installed wheel.
+and pandas, and a two-part field-development concept study. They read no repository file and run
+against the installed wheel.
 [Python scripting and Jupyter](docs/src/using/python.md) explains the API they use.
 
 ## Running the tests
