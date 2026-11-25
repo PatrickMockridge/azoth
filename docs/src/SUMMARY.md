@@ -444,4 +444,5 @@
   - [Skills](./agentic/skills.md)
   - [The skills roadmap](./agentic/roadmap.md)
   - [Orchestration](./agentic/orchestration.md)
+  - [DeepSeek Harness](./agentic/harness.md)
 - [Solvers](./theory/solvers.md)

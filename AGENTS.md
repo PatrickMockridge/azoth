@@ -9,15 +9,18 @@ azoth is a chemical-engineering calculation library with an agentic layer on top
   HAZOP team of four roles, defined in `agents/hazop/README.md` and exported to
   `.claude/agents/` and `.opencode/agents/`; run `/hazop` to start a study.
 
-Setup, from a checkout - `azoth-engine` is not on PyPI yet, so the `agent` extra is
-installed from the tree rather than from an index:
+Setup, from a checkout:
 
 ```bash
-pip install '.[agent]'         # DeepSeek Harness SDK + runtime binary (team runtime)
-python tools/export_skills.py  # write the skills into each tool's directory
+pip install '.[agent]'          # optional: the SDK's bundled runtime, when dsh is not on PATH
+python tools/launch_dsh.py --check --flowsheet specs/flowsheets/demo.toml
+python tools/launch_dsh.py web --flowsheet specs/flowsheets/demo.toml
+python tools/launch_dsh.py headless --study hazop --flowsheet F "Run a HAZOP on F"
 ```
 
-See [`agents/README.md`](agents/README.md) for the full setup and caveats.
+The launcher exports the skills, writes the DSH overlay, and mounts the calculation plugin
+and the flowsheet MCP server. See [`agents/deepseek/README.md`](agents/deepseek/README.md)
+for the modes and caveats.
 
 ## The NeqSim oracle
 

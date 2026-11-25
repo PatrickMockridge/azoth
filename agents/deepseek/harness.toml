@@ -1,0 +1,68 @@
+# The DeepSeek Harness launcher's declared values.
+#
+# This is not a DSH configuration file: `tools/launch_dsh.py` reads it and renders a
+# `--patch` overlay for the shipped web or headless profile. Keeping the values here means
+# a DSH version bump or a model change is a one-line edit, not a hunt through YAML.
+
+[harness]
+# The release the generated overlay and plugin are tested against. `dsh_version` is what
+# `npx` fetches when no installed `dsh` is found; `tested_node` is that release's floor.
+tested_dsh = "0.2.2-rc.5"
+dsh_version = "0.2.2-rc.5"
+tested_node = "22.19"
+default_model = "deepseek-v4-flash"
+default_provider = "deepseek-official"
+max_tasks = 256
+
+[plugin]
+timeout_ms = 120000
+max_output_bytes = 4194304
+
+[mcp]
+tool_call_timeout_ms = 60000
+startup_timeout_ms = 30000
+close_timeout_ms = 5000
+
+[skills]
+# `--skills hazop` writes these catalog skills plus the harness-only `azoth-hazop`
+# procedure. `--skills full` writes all 90 catalog skills.
+hazop = [
+  "azoth-run-calculation",
+  "azoth-keycard",
+  "azoth-units-vocabulary",
+  "azoth-provenance-verification",
+  "azoth-relief-load-screening",
+  "azoth-depressurization-screening",
+  "azoth-psv-orifice-screening",
+  "azoth-separator-modelling",
+  "azoth-flare-radiation-screening",
+  "azoth-safety-function-coverage-screening",
+  "azoth-vacuum-collapse-screening",
+  "azoth-firewater-deluge-design",
+  "azoth-hydrate-margin-check",
+  "azoth-hydrate-screening",
+  "azoth-wax-margin-check",
+  "azoth-produced-water-scale-screening",
+  "azoth-final-report-writing-style",
+  "azoth-prose-english",
+]
+
+[presets.chair]
+id = "azoth-hazop-chair"
+order = 10
+prompt = "prompts/chair.md"
+
+[presets.process]
+id = "azoth-process"
+order = 11
+prompt = "prompts/process.md"
+
+[presets.safety]
+id = "azoth-safety"
+order = 12
+prompt = "prompts/safety.md"
+
+[presets.scribe]
+id = "azoth-scribe"
+order = 13
+prompt = "prompts/scribe.md"

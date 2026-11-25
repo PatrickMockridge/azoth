@@ -8,9 +8,10 @@ heat transfer) with an agentic layer on top.
 - **Orchestration** is in `agents/README.md`. The one agent is a HAZOP team of four
   roles, defined in `agents/hazop/README.md` and exported to `.claude/agents/` and
   `.opencode/agents/`; run `/hazop` to start a study.
-- **Runtime**: `pip install '.[agent]'`, from a checkout - `azoth-engine` is not on PyPI
-  yet - installs the DeepSeek Harness SDK for the team orchestration; the skills
-  themselves need no runtime.
+- **Runtime**: `python tools/launch_dsh.py` starts DeepSeek Harness with the skills, the
+  calculation plugin and the flowsheet MCP server; `--check` is the read-only probe.
+  `pip install '.[agent]'` supplies the SDK's bundled runtime when `dsh` is not on PATH;
+  the skills themselves need no runtime.
 
 ## Running tests and builds
 
