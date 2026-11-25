@@ -56,13 +56,17 @@ test('catalogue and spec use flags, not stdin', () => {
   assert.deepEqual(one.args.slice(-2), ['eos.pt_flash', '--full'])
 })
 
-test('an error envelope becomes a typed error', () => {
+test('an error envelope becomes a typed engineering refusal', () => {
   assert.throws(
     () =>
       parseBridgeStdout(
         '{"kind":"error","error":{"type":"UnknownId","field":"id","message":"nope"}}',
       ),
-    (error) => error.type === 'UnknownId' && error.field === 'id',
+    (error) =>
+      error.type === 'UnknownId' &&
+      error.field === 'id' &&
+      error.detail === 'nope' &&
+      /azoth_catalogue/.test(error.message),
   )
 })
 
@@ -82,14 +86,17 @@ test('runProcess refuses a bridge that writes non-JSON', async () => {
 
 test('runProcess refuses a non-zero exit with no stdout', async () => {
   const python = fakeScript('echo failed >&2; exit 3')
-  await assert.rejects(runBridge('version', {}, { ...CONFIG, python }), /exited 3: failed/)
+  await assert.rejects(
+    runBridge('version', {}, { ...CONFIG, python }),
+    /calculation bridge failed \(exit 3\): failed/,
+  )
 })
 
 test('runProcess enforces the timeout', async () => {
   const python = fakeScript('sleep 5')
   await assert.rejects(
     runBridge('version', {}, { ...CONFIG, python, timeoutMs: 100 }),
-    /timed out/,
+    /took longer than 1 s/,
   )
 })
 
@@ -97,7 +104,7 @@ test('runProcess enforces the output cap', async () => {
   const python = fakeScript('printf "0123456789abcdef"')
   await assert.rejects(
     runBridge('version', {}, { ...CONFIG, python, maxOutputBytes: 4 }),
-    /more than 4 bytes/,
+    /too large to display/,
   )
 })
 

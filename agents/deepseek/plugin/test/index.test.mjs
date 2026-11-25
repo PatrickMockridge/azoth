@@ -11,16 +11,36 @@ function harness() {
   }
 }
 
-test('apply registers the three azoth tools', () => {
+test('apply registers the four azoth tools', () => {
   const { ctx, tools } = harness()
   apply(ctx, { python: '/usr/bin/python3' })
-  assert.deepEqual([...tools.keys()], ['azoth_catalogue', 'azoth_spec', 'azoth_calc'])
+  assert.deepEqual([...tools.keys()], [
+    'azoth_help',
+    'azoth_catalogue',
+    'azoth_spec',
+    'azoth_calc',
+  ])
   const calc = tools.get('azoth_calc')
   assert.deepEqual(calc.parameters.required, ['id', 'inputs'])
   assert.equal(calc.parameters.additionalProperties, false)
   assert.equal(calc.output.schema.type, 'object')
   assert.equal(typeof calc.output.render, 'function')
   assert.ok(calc.timeoutMs > 0)
+  assert.match(tools.get('azoth_catalogue').description, /plant words/)
+})
+
+test('the help tool defines the ambiguous engineering terms', () => {
+  const { ctx, tools } = harness()
+  apply(ctx, { python: '/usr/bin/python3' })
+  const help = tools.get('azoth_help')
+  return Promise.resolve(help.execute({}, {})).then((value) => {
+    assert.match(value.terms.FEED, /Front-End Engineering Design/)
+    assert.match(value.terms.model, /thermodynamic/)
+    assert.match(value.what, /chemical-engineering/)
+    const text = help.output.render({}, value).map((block) => block.text).join('\n')
+    assert.match(text, /FEED: Front-End Engineering Design/)
+    assert.match(text, /azoth_catalogue finds a calculation/)
+  })
 })
 
 test('apply refuses a missing interpreter', () => {
@@ -32,8 +52,8 @@ test('the calc tool validates before spawning', async () => {
   const { ctx, tools } = harness()
   apply(ctx, { python: '/usr/bin/python3' })
   const calc = tools.get('azoth_calc')
-  await assert.rejects(calc.execute({}, {}), /`id` must be a non-empty string/)
-  await assert.rejects(calc.execute({ id: 'x' }, {}), /`inputs` must be a JSON object/)
+  await assert.rejects(calc.execute({}, {}), /`id` must be a calculation id/)
+  await assert.rejects(calc.execute({ id: 'x' }, {}), /`inputs` must be an object/)
 })
 
 test('the result renderer names the fields and the provenance', () => {
@@ -62,7 +82,8 @@ test('the result renderer names the fields and the provenance', () => {
   assert.match(text, /hydraulics\.reynolds_number \(rust\)/)
   assert.match(text, /re = 149401\.2/)
   assert.match(text, /warnings: 0/)
-  assert.match(text, /partially_verified/)
+  assert.match(text, /verification: partially_verified/)
+  assert.match(text, /screening value, not a design deliverable/)
   assert.match(text, /spec 9c558ab44622/)
 })
 

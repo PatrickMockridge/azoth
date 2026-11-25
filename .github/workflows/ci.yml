@@ -521,7 +521,9 @@ jobs:
       # no node_modules: it is `node --check` and the pure bridge tests.
       - run: node --check agents/deepseek/plugin/index.js
       - run: node --check agents/deepseek/plugin/bridge.js
-      - run: node --test agents/deepseek/plugin/test/*.test.mjs
+      - run: node --check agents/deepseek/ui/index.js
+      - run: node --check agents/deepseek/ui/client.js
+      - run: node --test agents/deepseek/plugin/test/*.test.mjs agents/deepseek/ui/test/*.test.mjs
 
   docs-build:
     name: docs-build

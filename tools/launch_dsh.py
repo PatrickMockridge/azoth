@@ -31,7 +31,9 @@ import subprocess
 import sys
 import tempfile
 import tomllib
+import uuid
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -42,6 +44,9 @@ import export_skills  # noqa: E402
 
 SCHEMA = "azoth.launch-check/1"
 MANIFEST = "azoth.skills/1"
+WORKSPACE_DOMAIN = "workspace"
+WORKSPACE_VERSION = 2
+WORKSPACE_TITLE = "azoth"
 HAZOP_SKILL = "azoth-hazop"
 HAZOP_DESCRIPTION = (
     "Run a HAZOP as an azoth team: nodes and guidewords, deviation, cause, consequence "
@@ -78,6 +83,17 @@ class Toolchain:
     root: Path
     dsh_home: Path
     notes: list[str] = field(default_factory=list)
+
+
+class WorkspaceError(Exception):
+    """A DSH workspace store that cannot be pinned without guessing."""
+
+
+@dataclass
+class WorkspaceReport:
+    status: str
+    detail: str
+    changed: bool = False
 
 
 def _which(name: str) -> Path | None:
@@ -179,7 +195,7 @@ def child_env(
     source = str(root / "python" / "src")
     parts = [source, env.get("PYTHONPATH", "")]
     env["PYTHONPATH"] = os.pathsep.join(part for part in parts if part)
-    env["DSH_PERMISSION_MODE"] = args.permission_mode
+    env["DSH_PERMISSION_MODE"] = args.permission_mode or "read-only"
     if dsh_home is not None:
         env["DSH_HOME"] = str(dsh_home)
     return env
@@ -294,6 +310,158 @@ def render_yaml(rows: list[dict[str, Any]]) -> str:
 
 
 # ---------------------------------------------------------------------------------------
+# the DSH workspace
+
+
+def _now() -> str:
+    return datetime.now(UTC).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
+def _canonical(path: str | Path) -> str:
+    return str(Path(path).expanduser().resolve())
+
+
+def _workspace_store(store: Path) -> dict[str, Any]:
+    """A store this launcher can pin without guessing, or a named refusal."""
+    try:
+        data = json.loads(store.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise WorkspaceError(f"{store}: {exc}") from exc
+    if not isinstance(data, dict):
+        raise WorkspaceError(f"{store}: the store is not a JSON object")
+    unit = data.get("unit")
+    if (
+        not isinstance(unit, dict)
+        or unit.get("name") != WORKSPACE_DOMAIN
+        or unit.get("version") != WORKSPACE_VERSION
+    ):
+        raise WorkspaceError(f"{store}: not a {WORKSPACE_DOMAIN} version {WORKSPACE_VERSION} store")
+    global_state = data.get("global")
+    tables = data.get("tables")
+    if not isinstance(global_state, dict) or not isinstance(tables, dict):
+        raise WorkspaceError(f"{store}: `global` and `tables` are not objects")
+    order = global_state.get("workspaceIds")
+    workspaces = tables.get("workspaces")
+    if not isinstance(order, list) or not isinstance(workspaces, dict):
+        raise WorkspaceError(
+            f"{store}: `workspaceIds` is not a list or `workspaces` is not an object"
+        )
+    if len(order) != len(set(order)):
+        raise WorkspaceError(f"{store}: `workspaceIds` repeats an id")
+    if set(order) != set(workspaces):
+        raise WorkspaceError(f"{store}: `workspaceIds` and `workspaces` name different ids")
+    for workspace_id, record in workspaces.items():
+        if not isinstance(workspace_id, str) or not isinstance(record, dict):
+            raise WorkspaceError(f"{store}: a workspace entry is not a record")
+        if not isinstance(record.get("path"), str) or not isinstance(record.get("title"), str):
+            raise WorkspaceError(f"{store}: workspace {workspace_id} has no path or title")
+        if not isinstance(record.get("sessionIds"), list):
+            raise WorkspaceError(f"{store}: workspace {workspace_id} has no session list")
+    return data
+
+
+def _write_store(store: Path, data: dict[str, Any]) -> None:
+    store.parent.mkdir(parents=True, exist_ok=True)
+    handle, temporary = tempfile.mkstemp(dir=store.parent, prefix=".workspace.", suffix=".json")
+    try:
+        with os.fdopen(handle, "w", encoding="utf-8") as stream:
+            json.dump(data, stream, indent=2)
+            stream.write("\n")
+        Path(temporary).chmod(0o600)
+        Path(temporary).replace(store)
+    finally:
+        if Path(temporary).exists():
+            Path(temporary).unlink()
+
+
+def ensure_workspace(root: Path, home: Path, *, write: bool) -> WorkspaceReport:
+    """Make the checkout the workspace DSH opens, preserving every other record."""
+    store = home / "storages" / "workspace.json"
+    canonical = _canonical(root)
+    if not store.is_file():
+        if not write:
+            return WorkspaceReport("warn", f"{canonical}: no workspace store yet; a launch pins it")
+        only_id = str(uuid.uuid4())
+        now = _now()
+        data: dict[str, Any] = {
+            "unit": {"name": WORKSPACE_DOMAIN, "version": WORKSPACE_VERSION},
+            "global": {
+                "initialized": True,
+                "defaultWorkspaceId": only_id,
+                "workspaceIds": [only_id],
+                "archivedSessionIds": [],
+                "pinnedSessionIds": [],
+            },
+            "tables": {
+                "workspaces": {
+                    only_id: {
+                        "path": canonical,
+                        "title": WORKSPACE_TITLE,
+                        "sessionIds": [],
+                        "createdAt": now,
+                        "updatedAt": now,
+                    }
+                }
+            },
+        }
+        _write_store(store, data)
+        return WorkspaceReport("ok", f"{canonical}: pinned", changed=True)
+
+    try:
+        data = _workspace_store(store)
+    except WorkspaceError as exc:
+        if write:
+            raise
+        return WorkspaceReport("fail", str(exc))
+
+    global_state = data["global"]
+    order: list[str] = global_state["workspaceIds"]
+    workspaces: dict[str, Any] = data["tables"]["workspaces"]
+    workspace_id: str | None = next(
+        (key for key, record in workspaces.items() if _canonical(record["path"]) == canonical),
+        None,
+    )
+    detail = f"{canonical}: "
+    changed = False
+    if workspace_id is None:
+        workspace_id = str(uuid.uuid4())
+        now = _now()
+        workspaces[workspace_id] = {
+            "path": canonical,
+            "title": WORKSPACE_TITLE,
+            "sessionIds": [],
+            "createdAt": now,
+            "updatedAt": now,
+        }
+        order.insert(0, workspace_id)
+        detail += "added workspace"
+        changed = True
+    elif order[0] != workspace_id:
+        order.remove(workspace_id)
+        order.insert(0, workspace_id)
+        detail += "moved to first"
+        changed = True
+    else:
+        detail += "first"
+
+    if not global_state.get("initialized"):
+        global_state["initialized"] = True
+        changed = True
+    if global_state.get("defaultWorkspaceId") not in order:
+        global_state["defaultWorkspaceId"] = workspace_id
+        changed = True
+
+    if changed and write:
+        _write_store(store, data)
+        return WorkspaceReport("ok", detail, changed=True)
+    if changed:
+        return WorkspaceReport(
+            "warn", f"{detail}; a launch moves it to the first workspace", changed=True
+        )
+    return WorkspaceReport("ok", detail)
+
+
+# ---------------------------------------------------------------------------------------
 # the overlay
 
 
@@ -366,6 +534,45 @@ def _role_plugins() -> list[dict[str, Any]]:
     ]
 
 
+def _engineer_plugins(args: argparse.Namespace, config: dict[str, Any]) -> list[dict[str, Any]]:
+    meta = config["presets"]["engineer"]
+    prompt = Path(args.root).resolve() / "agents" / "deepseek" / str(meta["prompt"])
+    plugins = _role_plugins()
+    plugins.insert(1, {"id": "time-context", "name": "@deepseek-ai/dsh-time-context"})
+    plugins.append({"id": "tool-ask-user", "name": "@deepseek-ai/dsh-tool-ask-user"})
+    plugins.append(
+        {
+            "id": "compaction",
+            "name": "cordis:group",
+            "group": True,
+            "isolate": {"compaction": True, "toolResultPruner": True},
+            "config": [
+                {"id": "compaction-basic", "name": "@deepseek-ai/dsh-compaction-basic"},
+                {"id": "command-compact", "name": "@deepseek-ai/dsh-command-compact"},
+                {
+                    "id": "tool-result-pruner",
+                    "name": "@deepseek-ai/dsh-compaction-tool-result-pruner",
+                    "config": {"thresholdChars": 8192, "headChars": 4096, "tailChars": 1024},
+                },
+            ],
+        }
+    )
+    return [_persona(prompt), *plugins]
+
+
+def _engineer_preset(args: argparse.Namespace, config: dict[str, Any]) -> dict[str, Any]:
+    meta = config["presets"]["engineer"]
+    return {
+        "id": f"preset-{meta['id']}",
+        "name": "@deepseek-ai/dsh-agent-preset",
+        "config": {
+            "id": str(meta["id"]),
+            "order": int(meta["order"]),
+            "plugins": _engineer_plugins(args, config),
+        },
+    }
+
+
 def _presets(args: argparse.Namespace, config: dict[str, Any]) -> list[dict[str, Any]]:
     roles = config["presets"]
     process = str(roles["process"]["id"])
@@ -416,6 +623,7 @@ def build_overlay(
 ) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     inserts: list[dict[str, Any]] = []
+    mode = "headless" if args.headless else "web" if args.web else args.mode
     plugin = tc.root / "agents" / "deepseek" / "plugin" / "index.js"
     if plugin.is_file():
         inserts.append(
@@ -425,6 +633,9 @@ def build_overlay(
                 "config": _plugin_config(tc, config),
             }
         )
+    ui = tc.root / "agents" / "deepseek" / "ui" / "index.js"
+    if args.persona == "engineer" and args.study != "hazop" and mode == "web" and ui.is_file():
+        inserts.append({"id": "azoth-ui", "name": str(ui), "config": {}})
     if args.flowsheet and tc.azoth is not None:
         inserts.append(
             {
@@ -465,6 +676,26 @@ def build_overlay(
         {"id": "agent-default-model", "config": {"provider": provider, "model": args.model}}
     )
 
+    if args.persona == "engineer" and args.study != "hazop":
+        engineer = str(config["presets"]["engineer"]["id"])
+        preset = _engineer_preset(args, config)
+        if mode == "web":
+            rows.append({"id": "agent-preset-registry", "config": {"default": engineer}})
+            rows.append({"insert": [preset]})
+        else:
+            rows.append(
+                {
+                    "insert": [
+                        {
+                            "id": "agent-preset-registry",
+                            "name": "@deepseek-ai/dsh-agent-preset-registry",
+                            "config": {"default": engineer},
+                        },
+                        preset,
+                    ]
+                }
+            )
+
     if args.study == "hazop":
         chair = str(config["presets"]["chair"]["id"])
         rows.append(
@@ -477,7 +708,6 @@ def build_overlay(
             }
         )
         presets = _presets(args, config)
-        mode = "headless" if args.headless else "web" if args.web else args.mode
         if mode == "web":
             rows.append({"id": "agent-preset-registry", "config": {"default": chair}})
             rows.append({"insert": presets})
@@ -554,7 +784,9 @@ def export_skills_for_launch(args: argparse.Namespace, config: dict[str, Any]) -
     return len(files)
 
 
-def skills_report(args: argparse.Namespace, config: dict[str, Any]) -> tuple[str, str]:
+def skills_report(
+    args: argparse.Namespace, config: dict[str, Any], home: Path | None = None
+) -> tuple[str, str]:
     """A check result for the exported tree, computed without writing."""
     try:
         files = _skill_files(args, config)
@@ -581,7 +813,17 @@ def skills_report(args: argparse.Namespace, config: dict[str, Any]) -> tuple[str
         return "fail", "; ".join(stale[:5])
     if orphans:
         return "warn", f"orphaned skills: {', '.join(orphans[:5])}"
-    return "ok", f"{len(files)} skills"
+    store_home = home or Path(
+        args.dsh_home
+        or os.environ.get("AZOTH_DSH_HOME")
+        or str(Path(args.root).resolve() / ".dsh-home")
+    )
+    workspace = ensure_workspace(Path(args.root), store_home, write=False)
+    if workspace.status == "fail":
+        return "fail", f"{len(files)} skills exported, but {workspace.detail}"
+    if workspace.status == "warn":
+        return "warn", f"{len(files)} skills exported; {workspace.detail}"
+    return "ok", f"{len(files)} skills in {workspace.detail}"
 
 
 # ---------------------------------------------------------------------------------------
@@ -793,17 +1035,22 @@ def _probe_plugin(args: argparse.Namespace, tc: Toolchain, env: dict[str, str]) 
     plugin = tc.root / "agents" / "deepseek" / "plugin"
     index = plugin / "index.js"
     bridge = plugin / "bridge.js"
+    ui = tc.root / "agents" / "deepseek" / "ui"
     if not index.is_file():
         return Check("plugin", "warn", "agents/deepseek/plugin/index.js is not present")
     if tc.node is None:
         return Check("plugin", "warn", "node not found; plugin not checked")
+    sources = [index, bridge]
+    tests = sorted((plugin / "test").glob("*.test.mjs"))
+    if ui.is_dir():
+        sources.extend([ui / "index.js", ui / "client.js"])
+        tests.extend(sorted((ui / "test").glob("*.test.mjs")))
     try:
-        for source in (index, bridge):
+        for source in sources:
             if source.is_file():
                 proc = _run([str(tc.node), "--check", str(source)], env=env, timeout=args.timeout)
                 if proc.returncode != 0:
                     return Check("plugin", "fail", proc.stderr.strip()[-300:])
-        tests = sorted((plugin / "test").glob("*.test.mjs"))
         if tests:
             proc = _run(
                 [str(tc.node), "--test", *(str(path) for path in tests)],
@@ -816,6 +1063,47 @@ def _probe_plugin(args: argparse.Namespace, tc: Toolchain, env: dict[str, str]) 
         return Check("plugin", "fail", str(exc))
     suffix = f", {len(tests)} node tests" if tests else ""
     return Check("plugin", "ok", f"{index.name}{suffix}")
+
+
+def _probe_workspace(tc: Toolchain) -> Check:
+    report = ensure_workspace(tc.root, tc.dsh_home, write=False)
+    return Check("workspace", report.status, report.detail)
+
+
+def _probe_preset(args: argparse.Namespace, tc: Toolchain, config: dict[str, Any]) -> Check | None:
+    if args.persona != "engineer" or args.study == "hazop":
+        return None
+    meta = config["presets"].get("engineer")
+    if not isinstance(meta, dict) or not meta.get("id") or not meta.get("prompt"):
+        return Check("preset", "fail", "harness.toml has no [presets.engineer]")
+    prompt = tc.root / "agents" / "deepseek" / str(meta["prompt"])
+    if not prompt.is_file() or not prompt.read_text(encoding="utf-8").strip():
+        return Check("preset", "fail", f"{prompt} is missing or empty")
+    return Check("preset", "ok", f"{meta['id']} ({prompt.name})")
+
+
+def _probe_ui(args: argparse.Namespace, tc: Toolchain) -> Check | None:
+    if args.persona != "engineer" or args.study == "hazop" or args.mode not in ("web", "check"):
+        return None
+    package = tc.root / "agents" / "deepseek" / "ui"
+    manifest = package / "package.json"
+    client = package / "client.js"
+    index = package / "index.js"
+    for path in (manifest, client, index):
+        if not path.is_file():
+            return Check("ui", "fail", f"{path} is missing")
+    try:
+        document = json.loads(manifest.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        return Check("ui", "fail", f"{manifest}: {exc}")
+    dsh = document.get("dsh") if isinstance(document, dict) else None
+    client_meta = dsh.get("client") if isinstance(dsh, dict) else None
+    if not isinstance(client_meta, dict) or client_meta.get("platform") != "web":
+        return Check("ui", "fail", f"{manifest}: no dsh.client web manifest")
+    exports = document.get("exports") if isinstance(document, dict) else None
+    if not isinstance(exports, dict) or not isinstance(exports.get("./client"), str):
+        return Check("ui", "fail", f"{manifest}: no exports['./client']")
+    return Check("ui", "ok", f"{document.get('name', 'azoth-dsh-ui')} ({client.name})")
 
 
 def _probe_key(args: argparse.Namespace) -> Check:
@@ -858,7 +1146,14 @@ def run_checks(args: argparse.Namespace, config: dict[str, Any]) -> list[Check]:
             checks.append(mcp)
         checks.append(_probe_bridge(args, tc, env))
         checks.append(_probe_plugin(args, tc, env))
-        status, detail = skills_report(args, config)
+        checks.append(_probe_workspace(tc))
+        preset = _probe_preset(args, tc, config)
+        if preset is not None:
+            checks.append(preset)
+        ui = _probe_ui(args, tc)
+        if ui is not None:
+            checks.append(ui)
+        status, detail = skills_report(args, config, tc.dsh_home)
         checks.append(Check("skills", status, detail))
         checks.append(_probe_key(args))
         return checks
@@ -898,9 +1193,17 @@ def _launch_argv(
 
 
 def _launch(args: argparse.Namespace, config: dict[str, Any]) -> int:
+    if args.permission_mode is None:
+        raise SystemExit("launch_dsh: choose --permission-mode read-only or workspace-write")
     tc = resolve(args, config)
     if args.study == "hazop" and not args.flowsheet:
         raise SystemExit("launch_dsh: --study hazop needs --flowsheet")
+    try:
+        workspace = ensure_workspace(tc.root, tc.dsh_home, write=True)
+    except WorkspaceError as exc:
+        raise SystemExit(f"launch_dsh: cannot pin the workspace: {exc}") from exc
+    if workspace.changed:
+        print(f"launch_dsh: {workspace.detail}")
     task = _task(args) if args.mode == "headless" else None
     if args.mode == "headless" and not task:
         raise SystemExit("launch_dsh: headless mode needs a task")
@@ -937,6 +1240,7 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--headless", action="store_true", help="headless one-shot")
     p.add_argument("--web", action="store_true", help="interactive web UI")
     p.add_argument("--flowsheet")
+    p.add_argument("--no-flowsheet", action="store_true")
     p.add_argument("--no-run", action="store_true")
     p.add_argument("--palette", default=str(ROOT / "specs" / "unit_ops"))
     p.add_argument("--require-flowsheet", action="store_true")
@@ -954,11 +1258,10 @@ def parser() -> argparse.ArgumentParser:
     )
     p.add_argument("--api-key-env")
     p.add_argument("--reasoning-effort", choices=("off", "low", "high", "max"))
+    p.add_argument("--persona", choices=("engineer", "software"), default="engineer")
     p.add_argument("--study", choices=("none", "hazop"), default="none")
     p.add_argument("--skills", choices=("full", "hazop", "none"), default="full")
-    p.add_argument(
-        "--permission-mode", choices=("read-only", "workspace-write"), default="workspace-write"
-    )
+    p.add_argument("--permission-mode", choices=("read-only", "workspace-write"), default=None)
     p.add_argument("--port", type=int)
     p.add_argument("--no-open", action="store_true")
     p.add_argument("--host")
@@ -989,6 +1292,12 @@ def main(argv: list[str] | None = None) -> int:
     config = tomllib.loads(config_path.read_text(encoding="utf-8"))
     if args.model is None:
         args.model = str(config["harness"]["default_model"])
+    if args.flowsheet and args.no_flowsheet:
+        raise SystemExit("launch_dsh: --flowsheet and --no-flowsheet are mutually exclusive")
+    if args.flowsheet is None and not args.no_flowsheet:
+        demo = Path(args.root) / "specs" / "flowsheets" / "demo.toml"
+        if demo.is_file():
+            args.flowsheet = str(demo)
 
     if args.mode == "check" or args.print_config or args.dry_run:
         if args.mode == "check":

@@ -47,6 +47,11 @@ hazop = [
   "azoth-prose-english",
 ]
 
+[presets.engineer]
+id = "azoth-engineer"
+order = 5
+prompt = "prompts/engineer.md"
+
 [presets.chair]
 id = "azoth-hazop-chair"
 order = 10

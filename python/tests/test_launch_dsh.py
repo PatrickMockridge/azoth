@@ -71,6 +71,11 @@ def _root(tmp_path: Path) -> Path:
                 "[skills]",
                 'hazop = ["azoth-test"]',
                 "",
+                "[presets.engineer]",
+                'id = "azoth-engineer"',
+                "order = 5",
+                'prompt = "prompts/engineer.md"',
+                "",
                 "[presets.chair]",
                 'id = "azoth-hazop-chair"',
                 "order = 10",
@@ -98,10 +103,30 @@ def _root(tmp_path: Path) -> Path:
     (harness / "skills" / "azoth-hazop.md").write_bytes(
         (ROOT / "agents" / "deepseek" / "skills" / "azoth-hazop.md").read_bytes()
     )
-    for name in ("chair", "process", "safety", "scribe"):
+    for name in ("engineer", "chair", "process", "safety", "scribe"):
         (harness / "prompts" / f"{name}.md").write_bytes(
             (ROOT / "agents" / "deepseek" / "prompts" / f"{name}.md").read_bytes()
         )
+    ui = harness / "ui"
+    ui.mkdir()
+    (ui / "index.js").write_text("export function apply() {}\n", encoding="utf-8")
+    (ui / "client.js").write_text(
+        "window.__ModuleLoader__.load({ id: 'azoth-dsh-ui', factory() { return {} } })\n",
+        encoding="utf-8",
+    )
+    (ui / "package.json").write_text(
+        json.dumps(
+            {
+                "name": "azoth-dsh-ui",
+                "exports": {".": "./index.js", "./client": "./client.js"},
+                "dsh": {"client": {"platform": "web"}},
+            }
+        ),
+        encoding="utf-8",
+    )
+    demo = root / "specs" / "flowsheets" / "demo.toml"
+    demo.parent.mkdir(parents=True)
+    demo.write_text("", encoding="utf-8")
     return root
 
 
@@ -140,12 +165,25 @@ def _find(rows: list[dict[str, Any]], row_id: str) -> dict[str, Any] | None:
     return None
 
 
-def test_general_web_overlay_has_no_team_or_presets(tmp_path: Path) -> None:
+def test_engineer_web_overlay_has_the_engineer_preset_but_no_team(tmp_path: Path) -> None:
     rows = _rows(_root(tmp_path), "--flowsheet", "case.toml")
     assert _find(rows, "mcp-azoth-flowsheet") is not None
     assert _find(rows, "llm-deepseek") is not None
-    assert _find(rows, "agent-preset-registry") is None
+    assert _find(rows, "azoth-ui") is not None
+    registry = _find(rows, "agent-preset-registry")
+    assert registry is not None
+    assert registry["config"]["default"] == "azoth-engineer"
+    assert _find(rows, "preset-azoth-engineer") is not None
+    assert _find(rows, "agent-team") is None
     assert _find(rows, "preset-azoth-hazop-chair") is None
+
+
+def test_software_persona_leaves_the_shipped_standard_root(tmp_path: Path) -> None:
+    rows = _rows(_root(tmp_path), "--persona", "software", "--flowsheet", "case.toml")
+    assert _find(rows, "azoth-ui") is None
+    assert _find(rows, "agent-preset-registry") is None
+    assert _find(rows, "preset-azoth-engineer") is None
+    assert _find(rows, "llm-deepseek") is not None
 
 
 def test_study_overlay_wires_the_team_and_four_presets(tmp_path: Path) -> None:
@@ -156,6 +194,8 @@ def test_study_overlay_wires_the_team_and_four_presets(tmp_path: Path) -> None:
     registry = _find(rows, "agent-preset-registry")
     assert registry is not None
     assert registry["config"]["default"] == "azoth-hazop-chair"
+    assert _find(rows, "azoth-ui") is None
+    assert _find(rows, "preset-azoth-engineer") is None
     chair = _find(rows, "preset-azoth-hazop-chair")
     assert chair is not None
     subagent = next(
@@ -259,6 +299,7 @@ def test_check_is_read_only_and_reports_the_fake_runtime(
     assert report["schema"] == "azoth.launch-check/1"
     assert report["checks"]
     assert all("status" in check for check in report["checks"])
+    assert {"workspace", "preset", "ui"} <= {check["name"] for check in report["checks"]}
     assert code in (0, 1)
 
 
@@ -266,5 +307,113 @@ def test_print_config_does_not_write(tmp_path: Path, capsys: pytest.CaptureFixtu
     root = _root(tmp_path)
     code = launch_dsh.main(["--print-config", "--root", str(root)])
     assert code == 0
-    assert "- id:" in capsys.readouterr().out
+    output = capsys.readouterr().out
+    assert "- id:" in output
+    assert "preset-azoth-engineer" in output
+    assert "azoth-ui" in output
+    assert "mcp-azoth-flowsheet" in output
     assert not (root / ".dsh" / "patches").exists()
+
+
+def test_print_config_can_leave_out_the_demo_and_the_engineer_ui(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    root = _root(tmp_path)
+    code = launch_dsh.main(
+        ["--print-config", "--no-flowsheet", "--persona", "software", "--root", str(root)]
+    )
+    assert code == 0
+    output = capsys.readouterr().out
+    assert "mcp-azoth-flowsheet" not in output
+    assert "preset-azoth-engineer" not in output
+    assert "azoth-ui" not in output
+
+
+def test_flowsheet_and_no_flowsheet_are_mutually_exclusive(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    with pytest.raises(SystemExit, match="mutually exclusive"):
+        launch_dsh.main(
+            ["--print-config", "--flowsheet", "case.toml", "--no-flowsheet", "--root", str(root)]
+        )
+
+
+def test_launch_requires_an_explicit_permission_mode(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    with pytest.raises(SystemExit, match="permission-mode"):
+        launch_dsh.main(["web", "--root", str(root)])
+
+
+def _workspace_state(path: str, workspace_id: str) -> dict[str, Any]:
+    now = "2026-01-01T00:00:00.000Z"
+    return {
+        "unit": {"name": "workspace", "version": 2},
+        "global": {
+            "initialized": True,
+            "defaultWorkspaceId": workspace_id,
+            "workspaceIds": [workspace_id],
+            "archivedSessionIds": [],
+            "pinnedSessionIds": [],
+        },
+        "tables": {
+            "workspaces": {
+                workspace_id: {
+                    "path": path,
+                    "title": "elsewhere",
+                    "sessionIds": [],
+                    "createdAt": now,
+                    "updatedAt": now,
+                }
+            }
+        },
+    }
+
+
+def test_workspace_pins_the_checkout_first_and_is_idempotent(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    home = tmp_path / "home"
+    first = launch_dsh.ensure_workspace(root, home, write=True)
+    assert first.changed
+    store = json.loads((home / "storages" / "workspace.json").read_text())
+    workspace_id = store["global"]["workspaceIds"][0]
+    assert store["global"]["defaultWorkspaceId"] == workspace_id
+    assert store["tables"]["workspaces"][workspace_id]["path"] == str(root.resolve())
+    second = launch_dsh.ensure_workspace(root, home, write=True)
+    assert not second.changed
+    assert json.loads((home / "storages" / "workspace.json").read_text()) == store
+
+
+def test_workspace_preserves_another_workspace_and_moves_azoth_first(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    home = tmp_path / "home"
+    elsewhere = home / "storages" / "workspace.json"
+    elsewhere.parent.mkdir(parents=True)
+    elsewhere.write_text(json.dumps(_workspace_state("/tmp/elsewhere", "other")), encoding="utf-8")
+    check = launch_dsh.ensure_workspace(root, home, write=False)
+    assert check.status == "warn"
+    assert check.changed
+    launch_dsh.ensure_workspace(root, home, write=True)
+    store = json.loads(elsewhere.read_text())
+    assert len(store["global"]["workspaceIds"]) == 2
+    assert "other" in store["global"]["workspaceIds"]
+    assert store["global"]["workspaceIds"][0] != "other"
+    assert store["tables"]["workspaces"]["other"]["path"] == "/tmp/elsewhere"
+
+
+def test_workspace_refuses_a_corrupt_store(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    home = tmp_path / "home"
+    store = home / "storages" / "workspace.json"
+    store.parent.mkdir(parents=True)
+    store.write_text("{", encoding="utf-8")
+    report = launch_dsh.ensure_workspace(root, home, write=False)
+    assert report.status == "fail"
+    with pytest.raises(launch_dsh.WorkspaceError):
+        launch_dsh.ensure_workspace(root, home, write=True)
+
+
+def test_workspace_is_not_written_by_a_read(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    home = tmp_path / "home"
+    report = launch_dsh.ensure_workspace(root, home, write=False)
+    assert report.status == "warn"
+    assert not (home / "storages" / "workspace.json").exists()

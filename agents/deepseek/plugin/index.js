@@ -1,4 +1,4 @@
-// The DSH plugin: three tools over `python -m azoth.harness`.
+// The DSH plugin: four tools over `python -m azoth.harness`.
 //
 // It imports nothing from @deepseek-ai/*. `ToolsService.register` accepts a plain
 // ToolDefinition (`output.schema`, `output.render`, `execute`), so the plugin mounts by
@@ -13,6 +13,34 @@ export const inject = ['tools']
 
 const MAX_RENDER_BYTES = 65_536
 const OUTPUT_SCHEMA = { type: 'object', additionalProperties: true }
+
+const HELP = {
+  what:
+    'azoth is a chemical-engineering calculation library: thermodynamics, hydraulics, ' +
+    'heat transfer, unit operations and process safety. It is not a web project.',
+  terms: {
+    FEED: 'Front-End Engineering Design; not a browser front end.',
+    model: 'a thermodynamic, property or equipment model; not an AI model.',
+    catalogue: "azoth's list of calculations and models; use azoth_catalogue.",
+    keycard: 'an optional data-entitlement card; omit it unless the user has one.',
+    screening:
+      'a value for study; not a design deliverable unless its verification says verified.',
+  },
+  order: [
+    'azoth_catalogue finds a calculation from plant words or an id.',
+    'azoth_spec reads its inputs, units, valid range, assumptions and source.',
+    'azoth_calc runs it and returns warnings and provenance.',
+  ],
+  examples: [
+    'Size a pump for 100 m³/h of water at 8 bar discharge.',
+    'What is the pressure drop in 100 m of 0.1 m pipe at 1.5 m/s?',
+    'Check the demo separator at its current conditions.',
+    'What can azoth calculate for relief and fire cases?',
+  ],
+  flowsheet:
+    'The flowsheet tools hold one document in memory and never write it. Export ' +
+    'azoth://document and save the TOML if the user wants the edit kept.',
+}
 
 function content(text) {
   const value = String(text)
@@ -46,6 +74,21 @@ function shortHash(value) {
   return typeof value === 'string' ? value.slice(0, 12) : 'unknown'
 }
 
+function verificationNote(value) {
+  switch (value) {
+    case 'verified':
+      return 'externally checked against its validation cases'
+    case 'partially_verified':
+      return 'partly externally checked; screening value, not a design deliverable'
+    case 'unverified':
+      return 'not externally checked; screening value, not a design deliverable'
+    case 'source_needed':
+      return 'no external source found; do not use it as a design value'
+    default:
+      return 'verification not stated; treat it as screening'
+  }
+}
+
 function renderResult(_args, value) {
   try {
     const result = value?.result ?? {}
@@ -58,10 +101,30 @@ function renderResult(_args, value) {
     const codes = warnings.map((warning) => warning?.code ?? String(warning))
     lines.push(`warnings: ${warnings.length}${codes.length ? ` (${codes.join(', ')})` : ''}`)
     const provenance = result.provenance ?? {}
+    const verification = provenance.verification ?? 'unknown'
+    lines.push(`verification: ${verification} — ${verificationNote(verification)}`)
     lines.push(
-      `provenance: ${provenance.verification ?? 'unknown'}, ` +
-        `spec ${shortHash(provenance.spec_sha256)}, rust ${shortHash(provenance.rust_sha256)}`,
+      `provenance: spec ${shortHash(provenance.spec_sha256)}, ` +
+        `rust ${shortHash(provenance.rust_sha256)}`,
     )
+    return content(lines.join('\n'))
+  } catch {
+    return renderJson(_args, value)
+  }
+}
+
+function renderHelp(_args, value) {
+  try {
+    const lines = [value?.what ?? 'azoth is a chemical-engineering calculation library.']
+    lines.push('', 'Terms:')
+    for (const [term, meaning] of Object.entries(value?.terms ?? {})) {
+      lines.push(`${term}: ${meaning}`)
+    }
+    lines.push('', 'How to get a number:')
+    for (const step of value?.order ?? []) lines.push(`- ${step}`)
+    lines.push('', 'Example questions:')
+    for (const example of value?.examples ?? []) lines.push(`- ${example}`)
+    if (value?.flowsheet) lines.push('', value.flowsheet)
     return content(lines.join('\n'))
   } catch {
     return renderJson(_args, value)
@@ -83,13 +146,13 @@ function tool({ name: toolName, description, parameters, execute, render = rende
 
 function requireId(args) {
   if (typeof args?.id !== 'string' || args.id.length === 0) {
-    throw new Error('azoth: `id` must be a non-empty string')
+    throw new Error('azoth: `id` must be a calculation id from azoth_catalogue')
   }
 }
 
 function requireInputs(args) {
   if (args?.inputs === null || typeof args?.inputs !== 'object' || Array.isArray(args.inputs)) {
-    throw new Error('azoth: `inputs` must be a JSON object')
+    throw new Error("azoth: `inputs` must be an object of the calculation's inputs")
   }
 }
 
@@ -105,13 +168,36 @@ export function apply(ctx, config = {}) {
 
   ctx.tools.register(
     tool({
+      name: 'azoth_help',
+      description:
+        'Read this first when the user asks what azoth can do, or uses FEED, model, ' +
+        'catalogue, keycard or screening. It explains those terms and the order to call ' +
+        'the calculation tools.',
+      parameters: {
+        type: 'object',
+        properties: {},
+        additionalProperties: false,
+      },
+      execute: () => HELP,
+      render: renderHelp,
+    }),
+  )
+
+  ctx.tools.register(
+    tool({
       name: 'azoth_catalogue',
       description:
-        'List azoth calculations and models by id. Use it to find an id before azoth_spec or azoth_calc.',
+        'Find azoth calculations and fluid-property models from plant words or an id: ' +
+        'pump power, pipe pressure drop, PSV sizing, separator capacity, hydrate. Returns ' +
+        'ids and their input and output names. Call azoth_spec on a candidate before ' +
+        'azoth_calc.',
       parameters: {
         type: 'object',
         properties: {
-          query: { type: 'string', description: 'case-insensitive id or name filter' },
+          query: {
+            type: 'string',
+            description: 'plant words or an id fragment, e.g. pump, PSV, hydrate',
+          },
           kind: { type: 'string', enum: ['calc', 'model'] },
           limit: { type: 'number', description: 'page size, 1..500' },
           offset: { type: 'number', description: 'page offset' },
@@ -127,11 +213,16 @@ export function apply(ctx, config = {}) {
     tool({
       name: 'azoth_spec',
       description:
-        'Read one azoth calculation or model declaration: inputs with their units, outputs, valid range, source and assumptions.',
+        "Read one calculation's engineering declaration: each input with its unit and " +
+        'valid range, the outputs, assumptions, source and verification. Call this before ' +
+        'azoth_calc so the inputs are in the units it asks for.',
       parameters: {
         type: 'object',
         properties: {
-          id: { type: 'string', description: 'a registered id, e.g. hydraulics.darcy_weisbach' },
+          id: {
+            type: 'string',
+            description: 'a calculation id from azoth_catalogue',
+          },
           full: { type: 'boolean', description: 'include the worked example and test cases' },
         },
         required: ['id'],
@@ -149,18 +240,31 @@ export function apply(ctx, config = {}) {
     tool({
       name: 'azoth_calc',
       description:
-        'Run a registered azoth calculation or model by id. Dimensioned inputs are numbers in the spec unit or {value, unit}; the result carries warnings and provenance.',
+        'Run an azoth calculation. `id` comes from azoth_catalogue and `inputs` are the ' +
+        'values azoth_spec asks for, as numbers in its units or {value, unit} pairs. The ' +
+        'result carries warnings and the source and verification of the number. Treat ' +
+        'unverified results as screening, not design deliverables.',
       parameters: {
         type: 'object',
         properties: {
-          id: { type: 'string', description: 'a registered id' },
+          id: { type: 'string', description: 'a calculation id from azoth_catalogue' },
           inputs: {
             type: 'object',
             additionalProperties: true,
-            description: 'the spec inputs, in the units azoth_spec declares',
+            description: "the calculation's inputs, in the units azoth_spec shows",
           },
-          keycard: { type: 'string', description: 'a keycard path under the working directory' },
-          backend: { type: 'string', enum: ['auto', 'python', 'rust'] },
+          keycard: {
+            type: 'string',
+            description:
+              'optional path to a data-entitlement card under the working directory; ' +
+              'omit unless the user has one',
+          },
+          backend: {
+            type: 'string',
+            enum: ['auto', 'python', 'rust'],
+            description:
+              'leave auto unless the user asks to compare the Python and Rust implementations',
+          },
         },
         required: ['id', 'inputs'],
         additionalProperties: false,
