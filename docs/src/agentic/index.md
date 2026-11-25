@@ -21,13 +21,14 @@ is [Orchestration](./orchestration.md).
 ## Run it
 
 ```bash
-python tools/launch_dsh.py --check --flowsheet specs/flowsheets/demo.toml
-python tools/launch_dsh.py web --flowsheet specs/flowsheets/demo.toml
+python tools/launch_dsh.py --check
+python tools/launch_dsh.py web --permission-mode read-only
 ```
 
-The launcher exports the skills to `.dsh/skills/`, generates the DeepSeek Harness overlay,
-and mounts the calculation plugin and the flowsheet MCP server. `--check` is the read-only
-probe; `--study hazop` enables the four role presets and Agent Teams.
+The launcher exports the skills to `.dsh/skills/`, pins the checkout as the DSH workspace,
+generates the overlay, and mounts the engineering preset, the welcome card, the calculation
+plugin and the demo flowsheet. `--check` is the read-only probe; `--study hazop` enables
+the four role presets and Agent Teams; `--persona software` uses DSH's coding preset.
 [DeepSeek Harness](./harness.md) is the interface reference — modes, flags, the tools the
 model is handed, the bridge's JSON envelopes and the check report — and
 [`agents/deepseek/README.md`](../../../agents/deepseek/README.md) is the setup page.

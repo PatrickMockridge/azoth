@@ -9,9 +9,9 @@ edit rather than a hunt through YAML.
 ## The launcher
 
 ```bash
-python tools/launch_dsh.py --check --flowsheet F
-python tools/launch_dsh.py web --flowsheet F
-python tools/launch_dsh.py headless --flowsheet F "Run a HAZOP on F"
+python tools/launch_dsh.py --check
+python tools/launch_dsh.py web --permission-mode read-only
+python tools/launch_dsh.py headless --permission-mode read-only "Size a pump for 100 m³/h"
 ```
 
 | mode | what starts |
@@ -21,26 +21,52 @@ python tools/launch_dsh.py headless --flowsheet F "Run a HAZOP on F"
 | `check` | the read-only probe, also reached with `--check` |
 
 A real launch exports the skills to `.dsh/skills/`, writes the overlay to
-`.dsh/patches/azoth-<mode>.yml`, and starts DSH with `DSH_HOME` set to `<root>/.dsh-home`
-unless `--dsh-home` or the environment names another. `--print-config` prints the overlay
-and `--dry-run` adds the exact argv; neither writes, and neither exports the skills.
+`.dsh/patches/azoth-<mode>.yml`, pins the checkout as DSH's first workspace, and starts
+DSH with `DSH_HOME` set to `<root>/.dsh-home` unless `--dsh-home` or the environment names
+another. `--print-config` prints the overlay and `--dry-run` adds the exact argv; neither
+writes, and neither exports the skills.
 
 | flags | effect |
 |---|---|
-| `--flowsheet F` | mount the flowsheet MCP server on `F`; required by `--study hazop` |
+| `--persona engineer\|software` | the engineering experience (default) or the shipped coding preset |
+| `--flowsheet F` | mount the flowsheet MCP server on `F`; defaults to `specs/flowsheets/demo.toml` |
+| `--no-flowsheet` | do not mount a flowsheet server |
 | `--palette P`, `--no-run` | passed to `azoth mcp`; the palette defaults to `specs/unit_ops` |
 | `--study hazop` | enable Agent Teams, mount the four presets, make the chair the root |
 | `--skills full\|hazop\|none` | export all 90 catalog skills, the curated HAZOP subset, or none |
+| `--permission-mode read-only\|workspace-write` | required for a launch; no default |
 | `--model ID` | the model id, default `deepseek-v4-flash` |
 | `--base-url URL`, `--api`, `--api-key-env` | use an OpenAI-compatible provider instead of hosted DeepSeek |
 | `--reasoning-effort` | `off`, `low`, `high` or `max`; hosted route only |
-| `--permission-mode` | `workspace-write` (default) or `read-only` |
 | `--port`, `--no-open`, `--host`, `--allow-remote` | the web UI's binding; a non-loopback host needs `--allow-remote` |
 | `--session-id` | name a headless session |
 | `--dsh`, `--python`, `--azoth-bin`, `--node`, `--dsh-home` | name the toolchain |
 | `--no-npx` | refuse the `npx` fallback |
 | `--json` | a check report as JSON, or headless output as JSON |
 | `--verbose`, `--timeout` | print the argv and notes; the per-probe timeout in seconds |
+
+## The workspace and the two experiences
+
+DSH scans the skills and instruction files of the **session workspace**, not the
+process's working directory. The launcher therefore writes the checkout into
+`$DSH_HOME/storages/workspace.json` as the first workspace, adding a record when it is
+absent and preserving every other workspace and session. Without that record a session
+opens DSH's own `~/Documents/deepseek-harness/default-workspace`, and neither `AGENTS.md`
+nor `.dsh/skills` is discovered.
+
+`--persona engineer` (the default) mounts `azoth-engineer` as the web root preset: the
+engineering persona, `agent-instructions` for `AGENTS.md`, the skill catalog, file and
+shell tools, ask-user and compaction. Headless composes no preset roster, so there the
+same prompt is written to the deployment `system-prompt`, where the base's
+`agent-instructions` and skill rows read the same workspace. Web also mounts the azoth
+welcome card. `--persona software` leaves DSH's shipped coding persona in place.
+`--study hazop` keeps precedence over both and mounts the four role presets instead.
+
+The first time the page opens, the welcome card says what azoth is, distinguishes FEED
+from a browser front end, and names the screening boundary. Three starter buttons fill
+the composer with engineer questions: a pump sizing, the demo separator, and relief and
+fire calculations. A missing model key is reported by DSH; the key is saved on the
+**Settings → Models** page or exported as `DEEPSEEK_API_KEY`.
 
 The environment carries the same choices: `AZOTH_DSH` and `AZOTH_BIN` name the runtime and
 the CLI, `AZOTH_PYTHON` names the interpreter, `DSH_HOME` or `AZOTH_DSH_HOME` sets the
@@ -69,8 +95,11 @@ warns, unless `--require-flowsheet` makes that a failure.
 | `flowsheet` | `azoth check` accepts `F` against the palette |
 | `mcp` | a stdio `initialize` request and tool listing, under the name `azoth` |
 | `bridge` | `python -m azoth.harness version` prints JSON |
-| `plugin` | `node --check` on both sources and the plugin's `node --test` suite |
-| `skills` | the exported skills are present, current and not orphaned |
+| `plugin` | `node --check` and `node --test` for the plugin and the welcome UI |
+| `workspace` | the first workspace is the checkout; a missing store is a warning because a launch seeds it |
+| `preset` | the `azoth-engineer` prompt and `harness.toml` row exist in engineer mode |
+| `ui` | the welcome UI's `client.js` and `dsh.client` manifest exist in engineer web mode |
+| `skills` | the exported skills are present, current, not orphaned, and in the pinned workspace |
 | `api-key` | the key's environment variable is set; its value is never read |
 
 Each probe is `ok`, `warn` or `fail`; one line each, or `--json` for a report of the form
@@ -79,10 +108,12 @@ The exit status is `0` when no probe failed and `1` otherwise.
 
 ## The model's tool surface
 
-The calculation plugin registers three tools. Each is a thin call to the bridge:
+The calculation plugin registers four tools. Three are thin calls to the bridge; the
+fourth is the orientation the model reads when the user asks what azoth can do:
 
 | tool | arguments | bridge command |
 |---|---|---|
+| `azoth_help` | none | none; returns the glossary and example questions |
 | `azoth_catalogue` | `query`, `kind`, `limit`, `offset` | `catalogue` |
 | `azoth_spec` | `id`, `full` | `spec` |
 | `azoth_calc` | `id`, `inputs`, `keycard`, `backend` | `run` |
@@ -141,15 +172,18 @@ and is tested with `node --test`.
 | overlay row | what it configures |
 |---|---|
 | `azoth-calc` | the plugin, mounted by absolute path with the Python path and caps |
-| `mcp-azoth-flowsheet` | the flowsheet server; omitted when no `--flowsheet` is given |
+| `azoth-ui` | the plain-JS welcome card and starters; engineer web mode only |
+| `mcp-azoth-flowsheet` | the flowsheet server; omitted by `--no-flowsheet` or a missing CLI |
 | `llm-deepseek` | the hosted route: `DEEPSEEK_API_KEY` and the model id |
 | `llm-pi-ai` | the `--base-url` route: provider `azoth-gateway`, `AZOTH_DSH_API_KEY` by default |
 | `agent-default-model` | the provider and model every agent starts from |
+| `agent-preset-registry` | the root preset; `azoth-engineer` in engineer mode |
+| `preset-azoth-engineer` | the engineering persona, instructions, skills and tools |
 | `agent-team` | the Team board, `maxTasks` from `harness.toml`, enabled by `--study hazop` |
-| `agent-preset-registry` | the root preset; overwritten on web, inserted on headless |
 | four preset rows | `azoth-hazop-chair`, `azoth-process`, `azoth-safety`, `azoth-scribe` |
 
-The team, registry and preset rows are rendered only under `--study hazop`.
+The engineer preset and welcome UI are rendered only outside `--study hazop`; the team
+and HAZOP preset rows are rendered only under it.
 
 The values the generator reads are declared in
 [`agents/deepseek/harness.toml`](../../../agents/deepseek/harness.toml): the tested DSH
@@ -161,7 +195,8 @@ launcher renders by mode rather than committing one patch.
 ## Skills and the team
 
 The 90 catalog skills export with `name` and `description` frontmatter over their unchanged
-bodies; `--skills hazop` writes the curated subset named in `harness.toml`.
+bodies to the checkout's `.dsh/skills/`, which is the project root DSH scans once the
+workspace is pinned; `--skills hazop` writes the curated subset named in `harness.toml`.
 `agents/deepseek/skills/azoth-hazop.md` is a harness-only procedure, not a catalog skill,
 and is what `/azoth-hazop` loads.
 
@@ -174,13 +209,15 @@ execution is a mapping of it, not a proof.
 
 ## Security and limits
 
-The launcher sets `workspace-write` and never mounts `sdk-minimal`, whose
-`danger-full-access` pin is the wrong default. A non-loopback host requires
-`--allow-remote`. The calculation tool accepts registry ids only — no `eval`, no shell,
-no import by a model-supplied string; a keycard path must be under the working directory.
-The bridge caps inputs at 1 MB; the plugin caps a result at 4 MiB and times a call out at
-120 s; the CLI caps its own output at 8 MB; the flowsheet MCP client times a tool call at
-60 s.
+A launch requires `--permission-mode read-only` or `workspace-write`; there is no default.
+Read-only leaves calculations and the in-memory flowsheet edits available while refusing
+file writes. The launcher sets `DSH_PERMISSION_MODE` from that choice and never mounts
+`sdk-minimal`, whose `danger-full-access` pin is the wrong default. A non-loopback host
+requires `--allow-remote`. The calculation tool accepts registry ids only — no `eval`, no
+shell, no import by a model-supplied string; a keycard path must be under the working
+directory. The bridge caps inputs at 1 MB; the plugin caps a result at 4 MiB and times a
+call out at 120 s; the CLI caps its own output at 8 MB; the flowsheet MCP client times a
+tool call at 60 s.
 
 The library's models are `unverified` or `partially_verified`; a result is evidence for a
 finding, not a design deliverable. The provenance block says which.

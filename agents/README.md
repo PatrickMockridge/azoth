@@ -29,16 +29,17 @@ for that path.
 1. **Prerequisites** — Python 3.12, the checkout, and DeepSeek Harness. `dsh` on
    `PATH` is enough; `pip install '.[agent]'` supplies the SDK and its bundled runtime
    when npm is not the route.
-2. **Check the environment** — `python tools/launch_dsh.py --check --flowsheet F`
-   probes the Python bridge, the azoth CLI and its flowsheet MCP handshake, the Node
-   plugin and its tests, the exported skills, and the model key.
-3. **Launch** — `python tools/launch_dsh.py web --flowsheet F` starts the web UI; the
-   launcher exports the skills to `.dsh/skills/` and writes the DSH overlay itself.
+2. **Check the environment** — `python tools/launch_dsh.py --check` probes the Python
+   bridge, the azoth CLI and its flowsheet MCP handshake, the Node plugin and welcome UI,
+   the exported skills, the DSH workspace, the engineering preset, and the model key.
+3. **Launch** — `python tools/launch_dsh.py web --permission-mode read-only` starts the
+   engineering experience; the launcher exports the skills to `.dsh/skills/`, pins the
+   checkout as the workspace, loads the demo flowsheet and writes the overlay itself.
 
 ## Run the HAZOP team
 
 ```bash
-python tools/launch_dsh.py web --study hazop --flowsheet F
+python tools/launch_dsh.py web --permission-mode read-only --study hazop --flowsheet F
 ```
 
 `--study hazop` enables Agent Teams and the four role presets in

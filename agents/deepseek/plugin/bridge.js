@@ -9,6 +9,30 @@ import { delimiter } from 'node:path'
 const DEFAULT_TIMEOUT_MS = 120_000
 const DEFAULT_MAX_OUTPUT_BYTES = 4 * 1024 * 1024
 
+const REFUSAL_HELP = {
+  UnknownId:
+    "That is not one of azoth's calculations. Call azoth_catalogue with plant words to find the right id.",
+  UndefinedInput:
+    'The calculation refused an input. Check azoth_spec for its unit, type and valid range.',
+  HarnessInputError:
+    'The calculation refused an input. Check azoth_spec for its unit, type and valid range.',
+  InputTooLarge: 'The inputs are too large. Reduce the arrays or split the calculation.',
+  OutputTooLarge: 'The result is too large to display. Ask for a smaller calculation.',
+}
+
+function refusal(document) {
+  const type = document?.error?.type ?? 'Error'
+  const field = document?.error?.field
+  const detail = document?.error?.message ?? 'unknown refusal'
+  const help = REFUSAL_HELP[type]
+  const where = field ? ` (input: ${field})` : ''
+  const error = new Error(help ? `${help}${where}` : `${detail}${where}`)
+  error.type = type
+  error.field = field
+  error.detail = detail
+  return error
+}
+
 export function buildInvocation(tool, args, cfg) {
   if (!cfg || !cfg.python) {
     throw new Error('azoth bridge: config.python is required')
@@ -62,12 +86,7 @@ export function parseBridgeStdout(stdout) {
     throw new Error(`azoth bridge wrote non-JSON: ${text.slice(-500)}`)
   }
   if (document && document.kind === 'error') {
-    const error = new Error(
-      `${document.error?.type ?? 'Error'}: ${document.error?.message ?? 'unknown refusal'}`,
-    )
-    error.type = document.error?.type
-    error.field = document.error?.field
-    throw error
+    throw refusal(document)
   }
   return document
 }
@@ -101,7 +120,14 @@ export function runProcess(
     }
     const timer = setTimeout(() => {
       kill()
-      finish(() => reject(new Error(`azoth bridge timed out after ${timeoutMs} ms`)))
+      finish(() =>
+        reject(
+          new Error(
+            `The calculation took longer than ${Math.max(1, Math.round(timeoutMs / 1000))} s. ` +
+              'Narrow the inputs or choose a simpler calculation.',
+          ),
+        ),
+      )
     }, timeoutMs)
     const onAbort = () => {
       kill()
@@ -120,7 +146,12 @@ export function runProcess(
       if (Buffer.byteLength(stdout) > maxOutputBytes) {
         kill()
         finish(() =>
-          reject(new Error(`azoth bridge wrote more than ${maxOutputBytes} bytes`)),
+          reject(
+            new Error(
+              'The result is too large to display. Ask for a smaller calculation or a ' +
+                'narrower catalogue query.',
+            ),
+          ),
         )
       }
     })
@@ -133,7 +164,8 @@ export function runProcess(
         if (code !== 0 && !stdout.trim()) {
           reject(
             new Error(
-              `azoth bridge exited ${code}: ${stderr.trim().slice(-500) || 'no stderr'}`,
+              `The calculation bridge failed (exit ${code}): ` +
+                `${stderr.trim().slice(-500) || 'no detail'}`,
             ),
           )
           return
