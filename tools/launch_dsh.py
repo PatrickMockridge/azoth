@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Launch DeepSeek Harness with azoth's skills, tools and HAZOP team.
 
-The launcher does three things and no more:
+The launcher does four things:
 
-1. exports the skill catalog to `.dsh/skills/`, where DSH discovers a project's skills;
-2. renders a `--patch` overlay for the shipped `web` or `headless` profile; and
-3. starts `dsh` with that overlay.
+1. pins the checkout as DSH's first workspace, where its instructions and skills live;
+2. exports the skill catalog to `.dsh/skills/`;
+3. renders a `--patch` overlay for the shipped `web` or `headless` profile; and
+4. starts `dsh` with that overlay.
 
 The overlay is generated rather than committed because the web and headless profiles
 compose differently, the paths are absolute, and the DSH plugin API is a developer preview.
@@ -13,9 +14,9 @@ Everything DSH-specific is in this file; the calculation logic is in `python -m 
 and the tool bridge is `agents/deepseek/plugin/`.
 
 Usage:
-    python tools/launch_dsh.py --check --flowsheet specs/flowsheets/demo.toml
-    python tools/launch_dsh.py web --flowsheet specs/flowsheets/demo.toml
-    python tools/launch_dsh.py headless --study hazop --flowsheet F "Run a HAZOP on F"
+    python tools/launch_dsh.py --check
+    python tools/launch_dsh.py web --permission-mode read-only
+    python tools/launch_dsh.py headless --permission-mode read-only "Size a pump for 100 m3/h"
 """
 
 from __future__ import annotations
@@ -528,9 +529,17 @@ def _role_plugins() -> list[dict[str, Any]]:
             "config": {"catalogDescriptionMaxLength": 500},
         },
         {"id": "tool-fs", "name": "@deepseek-ai/dsh-tool-fs", "config": {"applyPatch": False}},
-        {"id": "tool-fs-search", "name": "@deepseek-ai/dsh-tool-fs-search"},
+        {
+            "id": "tool-fs-search",
+            "name": "@deepseek-ai/dsh-tool-fs-search",
+            "config": {"sampleOverCapGlobResults": False},
+        },
         {"id": "tool-bash", "name": "@deepseek-ai/dsh-tool-bash"},
-        {"id": "tool-todo", "name": "@deepseek-ai/dsh-tool-todo"},
+        {
+            "id": "tool-todo",
+            "name": "@deepseek-ai/dsh-tool-todo",
+            "config": {"allowParallelInProgress": True},
+        },
     ]
 
 
@@ -678,21 +687,21 @@ def build_overlay(
 
     if args.persona == "engineer" and args.study != "hazop":
         engineer = str(config["presets"]["engineer"]["id"])
-        preset = _engineer_preset(args, config)
         if mode == "web":
             rows.append({"id": "agent-preset-registry", "config": {"default": engineer}})
-            rows.append({"insert": [preset]})
+            rows.append({"insert": [_engineer_preset(args, config)]})
         else:
+            # Headless composes no preset roster; its deployment persona is the hook.
+            prompt = (
+                Path(args.root).resolve()
+                / "agents"
+                / "deepseek"
+                / str(config["presets"]["engineer"]["prompt"])
+            )
             rows.append(
                 {
-                    "insert": [
-                        {
-                            "id": "agent-preset-registry",
-                            "name": "@deepseek-ai/dsh-agent-preset-registry",
-                            "config": {"default": engineer},
-                        },
-                        preset,
-                    ]
+                    "id": "system-prompt",
+                    "config": {"personaPrefix": prompt.read_text(encoding="utf-8").rstrip("\n")},
                 }
             )
 
@@ -1275,8 +1284,19 @@ def parser() -> argparse.ArgumentParser:
     return p
 
 
+def _argv_with_mode(argv: list[str]) -> list[str]:
+    """Let `--headless "task"` mean `headless "task"`, not a task parsed as the mode."""
+    words = list(argv)
+    bare = [word for word in words if not word.startswith("-")]
+    for flag, mode in (("--headless", "headless"), ("--web", "web"), ("--check", "check")):
+        if flag in words and (not bare or bare[0] not in ("web", "headless", "check")):
+            words.insert(0, mode)
+            break
+    return words
+
+
 def main(argv: list[str] | None = None) -> int:
-    args = parser().parse_args(argv)
+    args = parser().parse_intermixed_args(_argv_with_mode(sys.argv[1:] if argv is None else argv))
     if args.check:
         args.mode = "check"
     if args.headless:

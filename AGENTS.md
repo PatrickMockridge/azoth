@@ -13,13 +13,14 @@ Setup, from a checkout:
 
 ```bash
 pip install '.[agent]'          # optional: the SDK's bundled runtime, when dsh is not on PATH
-python tools/launch_dsh.py --check --flowsheet specs/flowsheets/demo.toml
-python tools/launch_dsh.py web --flowsheet specs/flowsheets/demo.toml
-python tools/launch_dsh.py headless --study hazop --flowsheet F "Run a HAZOP on F"
+python tools/launch_dsh.py --check
+python tools/launch_dsh.py web --permission-mode read-only
+python tools/launch_dsh.py headless --permission-mode read-only "Size a pump for 100 m³/h"
 ```
 
-The launcher exports the skills, writes the DSH overlay, and mounts the calculation plugin
-and the flowsheet MCP server. The
+The launcher exports the skills, pins the checkout as DSH's workspace, loads the demo
+flowsheet, and mounts the engineering persona, the calculation plugin and the flowsheet MCP
+server; `--persona software` uses DSH's coding preset instead. The
 [DeepSeek Harness chapter](docs/src/agentic/harness.md) is the interface reference — modes,
 flags, the tools the model is handed, the bridge's JSON envelopes and the check report —
 and [`agents/deepseek/README.md`](agents/deepseek/README.md) has the setup and caveats.

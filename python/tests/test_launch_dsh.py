@@ -173,9 +173,22 @@ def test_engineer_web_overlay_has_the_engineer_preset_but_no_team(tmp_path: Path
     registry = _find(rows, "agent-preset-registry")
     assert registry is not None
     assert registry["config"]["default"] == "azoth-engineer"
-    assert _find(rows, "preset-azoth-engineer") is not None
+    preset = _find(rows, "preset-azoth-engineer")
+    assert preset is not None
+    plugins = {plugin["id"]: plugin for plugin in preset["config"]["plugins"]}
+    assert plugins["tool-fs-search"]["config"]["sampleOverCapGlobResults"] is False
+    assert plugins["tool-todo"]["config"]["allowParallelInProgress"] is True
     assert _find(rows, "agent-team") is None
     assert _find(rows, "preset-azoth-hazop-chair") is None
+
+
+def test_headless_engineer_sets_the_deployment_persona(tmp_path: Path) -> None:
+    rows = _rows(_root(tmp_path), "--headless", "--flowsheet", "case.toml")
+    persona = _find(rows, "system-prompt")
+    assert persona is not None
+    assert "process-engineering assistant" in persona["config"]["personaPrefix"]
+    assert _find(rows, "agent-preset-registry") is None
+    assert _find(rows, "preset-azoth-engineer") is None
 
 
 def test_software_persona_leaves_the_shipped_standard_root(tmp_path: Path) -> None:
@@ -341,6 +354,26 @@ def test_launch_requires_an_explicit_permission_mode(tmp_path: Path) -> None:
     root = _root(tmp_path)
     with pytest.raises(SystemExit, match="permission-mode"):
         launch_dsh.main(["web", "--root", str(root)])
+
+
+def test_headless_flag_accepts_a_task_with_options_between(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    root = _root(tmp_path)
+    code = launch_dsh.main(
+        [
+            "--headless",
+            "--print-config",
+            "--permission-mode",
+            "read-only",
+            "--root",
+            str(root),
+            "hello",
+            "world",
+        ]
+    )
+    assert code == 0
+    assert "- id:" in capsys.readouterr().out
 
 
 def _workspace_state(path: str, workspace_id: str) -> dict[str, Any]:

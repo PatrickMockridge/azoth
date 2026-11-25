@@ -64,6 +64,7 @@ test('the hero card names the domain, FEED and the screening boundary', () => {
   assert.match(words, /Azoth · process engineering/)
   assert.match(words, /FEED here means Front-End Engineering Design/)
   assert.match(words, /screening values, not design deliverables/)
+  assert.match(words, /Settings → Models/)
   assert.match(words, /conversation/)
 })
 

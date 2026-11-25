@@ -90,26 +90,30 @@ them different.
 ## The DeepSeek Harness interface
 
 DeepSeek Harness (`dsh`) is the runtime the agentic layer executes on — MIT-licensed,
-plugin-first, and a `0.2` developer preview. The launcher exports the skills, renders the
-profile overlay, and starts it:
+plugin-first, and a `0.2` developer preview. The launcher exports the skills, pins the
+checkout as the session workspace, renders the profile overlay, and starts it:
 
 ```bash
-python tools/launch_dsh.py --check --flowsheet specs/flowsheets/demo.toml   # read-only probe
-python tools/launch_dsh.py web --flowsheet specs/flowsheets/demo.toml       # browser UI
-python tools/launch_dsh.py headless --study hazop --flowsheet F "Run a HAZOP on F"
+python tools/launch_dsh.py --check                                    # read-only probe
+python tools/launch_dsh.py web --permission-mode read-only            # browser UI
+python tools/launch_dsh.py headless --permission-mode read-only "Size a pump for 100 m³/h"
 ```
 
-Three surfaces are available:
+The default engineering experience mounts an azoth persona, the `AGENTS.md` instructions,
+the 90 skills and the demo flowsheet, and shows a welcome card that distinguishes FEED from
+a browser front end. `--persona software` leaves DSH's coding preset in place.
 
 | Surface | Names | What it exposes |
 |---|---|---|
-| calculation plugin | `azoth_catalogue`, `azoth_spec`, `azoth_calc` | every registered id — 98 calculations and 300 models — through `python -m azoth.harness`; a result carries warnings and provenance |
+| calculation plugin | `azoth_help`, `azoth_catalogue`, `azoth_spec`, `azoth_calc` | the glossary, then every registered id — 98 calculations and 300 models — through `python -m azoth.harness`; a result carries warnings and provenance |
 | flowsheet MCP | `mcp__azoth__*` | the 20 `azoth mcp --flowsheet F` edit commands, and the `azoth://document`, `azoth://diagnostics`, `azoth://report` and `azoth://catalogue` resources |
 | skills and team | `/azoth-hazop`, four presets | the 90 catalog skills, or the curated HAZOP subset, over the Agent Teams board |
 
 Hosted DeepSeek is the default (`DEEPSEEK_API_KEY`, `deepseek-v4-flash`); `--base-url`
 routes the same harness at any OpenAI-compatible endpoint serving open-weight weights.
-The full interface — modes, flags, the bridge's JSON envelopes and the check report — is
+`--permission-mode` is required: `read-only` allows calculations and in-memory flowsheet
+edits but refuses file writes. The full interface — modes, flags, the bridge's JSON
+envelopes and the check report — is
 [the DeepSeek Harness chapter](docs/src/agentic/harness.md).
 
 ## Inherent safety

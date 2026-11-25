@@ -14,6 +14,9 @@ const CARD = {
   note:
     'FEED here means Front-End Engineering Design. The demo flowsheet is loaded; ' +
     'results are screening values, not design deliverables.',
+  setup:
+    'First run: save the DeepSeek API key on Settings → Models, or launch with ' +
+    'DEEPSEEK_API_KEY set.',
 }
 
 const CARD_STYLE = {
@@ -72,6 +75,7 @@ function AzothHero({ hero, children }) {
       ),
       React.createElement('p', { style: { margin: '6px 0 0' } }, CARD.body),
       React.createElement('p', { style: MUTED_STYLE }, CARD.note),
+      React.createElement('p', { style: MUTED_STYLE }, CARD.setup),
       React.createElement(
         'ul',
         { style: LIST_STYLE },
