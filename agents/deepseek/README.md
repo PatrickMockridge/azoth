@@ -103,6 +103,10 @@ refuses the study. The formal statement of a team as a composition of role-proce
 is [`docs/src/agentic/orchestration.md`](../../docs/src/agentic/orchestration.md); this is
 its execution mapping, not a proof.
 
+A complete worked output is
+[`case-studies/azoth-feed-08`](../../case-studies/azoth-feed-08/README.md), the notebook-08 FEED
+study and HAZOP close-out.
+
 ## Security and limits
 
 - A launch requires `--permission-mode read-only` or `workspace-write`; there is no

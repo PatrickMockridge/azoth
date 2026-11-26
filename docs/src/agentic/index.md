@@ -35,6 +35,13 @@ model selector; `--provider` sets the default.
 model is handed, the bridge's JSON envelopes and the check report — and
 [`agents/deepseek/README.md`](../../../agents/deepseek/README.md) is the setup page.
 
+## Worked output
+
+[`case-studies/`](../../../case-studies/README.md) collects complete packages produced through
+the harness. The first, [`azoth-feed-08`](../../../case-studies/azoth-feed-08/README.md), is the
+notebook-08 FEED follow-on: equipment, materials, manhours, cost, a DEXPI PFD, reports, a project
+plan and an independent HAZOP close-out.
+
 The distribution name `azoth-engine` is on PyPI; the launcher and the skills are
 repository features, because `tools/launch_dsh.py` is a repository tool. The
 `agent` extra supplies the SDK's bundled runtime when `dsh` is not on PATH.
