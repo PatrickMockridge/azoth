@@ -1,4 +1,4 @@
-// The DSH plugin: four tools over `python -m azoth.harness`.
+// The DSH plugin: five tools over `python -m azoth.harness`.
 //
 // It imports nothing from @deepseek-ai/*. `ToolsService.register` accepts a plain
 // ToolDefinition (`output.schema`, `output.render`, `execute`), so the plugin mounts by
@@ -25,11 +25,16 @@ const HELP = {
     keycard: 'an optional data-entitlement card; omit it unless the user has one.',
     screening:
       'a value for study; not a design deliverable unless its verification says verified.',
+    dossier:
+      'a review of the supplied inputs: sources, claims, and how each input is bound.',
+    'hard gap': 'an input that cannot be constructed from the evidence; the target is refused.',
+    'soft gap': 'an input constructed by a licensed inference or a lower source rung; flagged.',
   },
   order: [
     'azoth_catalogue finds a calculation from plant words or an id.',
     'azoth_spec reads its inputs, units, valid range, assumptions and source.',
-    'azoth_calc runs it and returns warnings and provenance.',
+    'azoth_intake reviews the supplied evidence before a calculation runs.',
+    'azoth_calc runs it and returns warnings, provenance and any intake block.',
   ],
   examples: [
     'Size a pump for 100 m³/h of water at 8 bar discharge.',
@@ -107,10 +112,44 @@ function renderResult(_args, value) {
       `provenance: spec ${shortHash(provenance.spec_sha256)}, ` +
         `rust ${shortHash(provenance.rust_sha256)}`,
     )
+    if (value?.intake) {
+      lines.push(
+        '',
+        `intake: ${value.intake.enforcement ?? 'advisory'} for ` +
+          `${value.intake.target ?? value.id ?? '?'}`,
+      )
+      lines.push(...intakeLines(value.intake))
+    }
     return content(lines.join('\n'))
   } catch {
     return renderJson(_args, value)
   }
+}
+
+function intakeLines(value) {
+  const register = Array.isArray(value?.register) ? value.register : []
+  const requests = Array.isArray(value?.requests) ? value.requests : []
+  const hard = register.filter((gap) => gap.class === 'hard').length
+  const soft = register.filter((gap) => gap.class === 'soft').length
+  const lines = [`verdict: ${value?.verdict ?? 'unknown'} (${hard} hard, ${soft} soft)`]
+  for (const gap of register) {
+    lines.push(
+      `  ${gap.gap} ${gap.class} ${gap.code} ${gap.input}: ${gap.detail}`,
+    )
+  }
+  for (const request of requests) {
+    lines.push(
+      `  ${request.request}${request.blocking ? ' (blocking)' : ''} ${request.ask}`,
+    )
+  }
+  return lines
+}
+
+function renderIntake(_args, value) {
+  const dossier = value?.dossier
+  const name = typeof dossier === 'string' ? dossier : (dossier?.id ?? '?')
+  const lines = [`intake review: ${name}`, ...intakeLines(value)]
+  return content(lines.join('\n'))
 }
 
 function renderHelp(_args, value) {
@@ -156,6 +195,24 @@ function requireInputs(args) {
   }
 }
 
+function dossierChoice(args) {
+  const dossier = args?.dossier
+  const path = args?.dossier_path
+  if (dossier !== undefined && path !== undefined) {
+    throw new Error('azoth: pass `dossier` or `dossier_path`, not both')
+  }
+  if (
+    dossier !== undefined &&
+    (dossier === null || typeof dossier !== 'object' || Array.isArray(dossier))
+  ) {
+    throw new Error('azoth: `dossier` must be an object')
+  }
+  if (path !== undefined && (typeof path !== 'string' || path.length === 0)) {
+    throw new Error('azoth: `dossier_path` must be a path')
+  }
+  return { dossier, path }
+}
+
 export function apply(ctx, config = {}) {
   if (!config.python) throw new Error('azoth-calc: config.python is required')
   const cfg = {
@@ -164,6 +221,7 @@ export function apply(ctx, config = {}) {
     cwd: config.cwd,
     timeoutMs: config.timeoutMs ?? 120_000,
     maxOutputBytes: config.maxOutputBytes ?? 4_194_304,
+    requireDossier: config.requireDossier === true,
   }
 
   ctx.tools.register(
@@ -238,12 +296,53 @@ export function apply(ctx, config = {}) {
 
   ctx.tools.register(
     tool({
+      name: 'azoth_intake',
+      description:
+        'Review the supplied evidence before a calculation runs: the sources and claims, ' +
+        'and how each input of a target is bound. Returns hard gaps (the target is ' +
+        'refused), soft gaps (a licensed inference, a lower source rung) and the data ' +
+        'requests. It does not calculate the target.',
+      parameters: {
+        type: 'object',
+        properties: {
+          dossier: {
+            type: 'object',
+            additionalProperties: true,
+            description: 'the authored dossier: sources, claims and targets',
+          },
+          dossier_path: {
+            type: 'string',
+            description: 'a .toml or .json dossier under the working directory',
+          },
+          id: {
+            type: 'string',
+            description: 'review only this target id',
+          },
+        },
+        additionalProperties: false,
+      },
+      timeoutMs: cfg.timeoutMs,
+      execute: (args, exec) => {
+        const { dossier, path } = dossierChoice(args ?? {})
+        if (dossier === undefined && path === undefined) {
+          throw new Error('azoth: `dossier` or `dossier_path` is required')
+        }
+        return runBridge('intake', args ?? {}, cfg, exec)
+      },
+      render: renderIntake,
+    }),
+  )
+
+  ctx.tools.register(
+    tool({
       name: 'azoth_calc',
       description:
         'Run an azoth calculation. `id` comes from azoth_catalogue and `inputs` are the ' +
-        'values azoth_spec asks for, as numbers in its units or {value, unit} pairs. The ' +
-        'result carries warnings and the source and verification of the number. Treat ' +
-        'unverified results as screening, not design deliverables.',
+        'values azoth_spec asks for, as numbers in its units or {value, unit} pairs. A ' +
+        '`dossier` replaces `inputs` and adds an intake block to the result; a refused ' +
+        'dossier must not be presented as a constructible basis. The result carries ' +
+        'warnings and the source and verification of the number. Treat unverified results ' +
+        'as screening, not design deliverables.',
       parameters: {
         type: 'object',
         properties: {
@@ -252,6 +351,15 @@ export function apply(ctx, config = {}) {
             type: 'object',
             additionalProperties: true,
             description: "the calculation's inputs, in the units azoth_spec shows",
+          },
+          dossier: {
+            type: 'object',
+            additionalProperties: true,
+            description: 'a reviewed dossier; it replaces `inputs`',
+          },
+          dossier_path: {
+            type: 'string',
+            description: 'a .toml or .json dossier under the working directory; replaces `inputs`',
           },
           keycard: {
             type: 'string',
@@ -266,13 +374,25 @@ export function apply(ctx, config = {}) {
               'leave auto unless the user asks to compare the Python and Rust implementations',
           },
         },
-        required: ['id', 'inputs'],
+        required: ['id'],
         additionalProperties: false,
       },
       timeoutMs: cfg.timeoutMs,
       execute: (args, exec) => {
         requireId(args)
-        requireInputs(args)
+        const { dossier, path } = dossierChoice(args)
+        const hasDossier = dossier !== undefined || path !== undefined
+        if (hasDossier && args.inputs !== undefined) {
+          throw new Error('azoth: a dossier replaces `inputs`; pass one or the other')
+        }
+        if (!hasDossier) {
+          if (cfg.requireDossier) {
+            throw new Error(
+              'azoth: this session requires an intake dossier; call azoth_intake first',
+            )
+          }
+          requireInputs(args)
+        }
         return runBridge('run', args, cfg, exec)
       },
       render: renderResult,

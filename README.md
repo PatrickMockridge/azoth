@@ -81,7 +81,7 @@ them different.
   failure" reads the other way round, and that reading cost a session: a probe that
   subtracted the wrong quantity reported a NeqSim defect that was azoth's own.
 - **An agentic layer.** Ninety skills under `skills/` teach an agent to call the library,
-  and a four-role HAZOP team chains them. `python tools/launch_dsh.py` starts DeepSeek
+  and two four-role teams — HAZOP and intake — chain them. `python tools/launch_dsh.py` starts DeepSeek
   Harness with an engineering persona, a welcome card, the skills, a calculation plugin
   for every registered id, and the default demo flowsheet. A calculation run can also be
   emitted as an r-gen claim bundle — the spec, result, both implementations' agreement and
@@ -106,12 +106,14 @@ a browser front end. `--persona software` leaves DSH's coding preset in place.
 
 | Surface | Names | What it exposes |
 |---|---|---|
-| calculation plugin | `azoth_help`, `azoth_catalogue`, `azoth_spec`, `azoth_calc` | the glossary, then every registered id — 98 calculations and 303 models — through `python -m azoth.harness`; a result carries warnings and provenance |
+| calculation plugin | `azoth_help`, `azoth_catalogue`, `azoth_spec`, `azoth_intake`, `azoth_calc` | the glossary, an intake review of the supplied evidence, then every registered id — 98 calculations and 303 models — through `python -m azoth.harness`; a result carries warnings and provenance, and a dossier adds a sibling intake block |
 | flowsheet MCP | `mcp__azoth__*` | the 20 `azoth mcp --flowsheet F` edit commands, and the `azoth://document`, `azoth://diagnostics`, `azoth://report` and `azoth://catalogue` resources |
-| skills and team | `/azoth-hazop`, four presets | the 90 catalog skills, or the curated HAZOP subset, over the Agent Teams board (web profile) |
+| skills and teams | `/azoth-hazop` and `/intake`, four presets each | the 90 catalog skills, a curated subset, over the Agent Teams board (web profile) |
 
-The HAZOP team is a web-profile experience; the headless one-shot composes no preset
-roster, so `--study hazop` is refused there. Five provider routes are mounted by default
+The HAZOP and intake teams are web-profile experiences; the headless one-shot composes no
+preset roster, so either study is refused there. Intake checks the supplied evidence
+before a calculation: hard gaps refuse the target and soft gaps are flagged with the data
+requests that would close them. Five provider routes are mounted by default
 for the model selector — DeepSeek (default), OpenAI, Anthropic, Kimi and MiniMax — so a user with
 any one of those keys can choose a model without relaunching. `--provider` sets the
 default and `--model` the id; `--base-url` remains the escape to an OpenAI-compatible
@@ -257,7 +259,7 @@ spec files as the code.
 - **Use the library** — [the book front door](docs/src/index.md).
 - **Run the agentic layer** — `python tools/launch_dsh.py --check`, then
   [the DeepSeek Harness chapter](docs/src/agentic/harness.md); [`agents/README.md`](agents/README.md)
-  and [`agents/deepseek/README.md`](agents/deepseek/README.md) hold the setup and the HAZOP team.
+  and [`agents/deepseek/README.md`](agents/deepseek/README.md) hold the setup and both teams.
 - **Build on the agentic layer** — [`CLAUDE.md`](CLAUDE.md) and [`AGENTS.md`](AGENTS.md).
 - **Read a case study** — [`case-studies/README.md`](case-studies/README.md) indexes the
   DeepSeek Harness FEED study built on notebook 08.

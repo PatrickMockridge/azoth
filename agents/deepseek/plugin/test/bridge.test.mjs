@@ -48,6 +48,61 @@ test('run puts the inputs on stdin and names the id', () => {
   assert.equal(invocation.env.PYTHONDONTWRITEBYTECODE, '1')
 })
 
+test('run sends an inline dossier on stdin and a path as a flag', () => {
+  const inline = buildInvocation(
+    'run',
+    { id: 'eos.pt_flash', dossier: { id: 'd', sources: [], claims: [], targets: [] } },
+    CONFIG,
+  )
+  assert.deepEqual(inline.args, [
+    '-B',
+    '-m',
+    'azoth.harness',
+    'run',
+    'eos.pt_flash',
+    '--dossier-json',
+    '-',
+  ])
+  assert.equal(JSON.parse(inline.stdin).id, 'd')
+
+  const byPath = buildInvocation(
+    'run',
+    { id: 'eos.pt_flash', dossier_path: 'dossier.toml' },
+    CONFIG,
+  )
+  assert.deepEqual(byPath.args.slice(-2), ['--dossier-file', 'dossier.toml'])
+  assert.equal(byPath.stdin, undefined)
+
+  const strict = buildInvocation(
+    'run',
+    { id: 'eos.pt_flash', dossier_path: 'dossier.toml' },
+    { ...CONFIG, requireDossier: true },
+  )
+  assert.ok(strict.args.includes('--require-dossier'))
+})
+
+test('intake reviews a dossier through the bridge', () => {
+  const inline = buildInvocation(
+    'intake',
+    { dossier: { id: 'd' }, id: 'eos.pt_flash' },
+    CONFIG,
+  )
+  assert.deepEqual(inline.args, [
+    '-B',
+    '-m',
+    'azoth.harness',
+    'review',
+    '--id',
+    'eos.pt_flash',
+    '--dossier-json',
+    '-',
+  ])
+  assert.equal(JSON.parse(inline.stdin).id, 'd')
+  const byPath = buildInvocation('intake', { dossier_path: 'd.toml' }, CONFIG)
+  assert.deepEqual(byPath.args.slice(-2), ['--dossier-file', 'd.toml'])
+  assert.equal(byPath.stdin, undefined)
+})
+
 test('catalogue and spec use flags, not stdin', () => {
   const listing = buildInvocation('catalogue', { query: 'darcy', limit: 5 }, CONFIG)
   assert.deepEqual(listing.args.slice(-4), ['--query', 'darcy', '--limit', '5'])

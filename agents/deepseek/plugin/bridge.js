@@ -18,6 +18,16 @@ const REFUSAL_HELP = {
     'The calculation refused an input. Check azoth_spec for its unit, type and valid range.',
   InputTooLarge: 'The inputs are too large. Reduce the arrays or split the calculation.',
   OutputTooLarge: 'The result is too large to display. Ask for a smaller calculation.',
+  DossierInvalid:
+    'The dossier cannot be read. Check its sources, claims and targets against the intake schema.',
+  DossierRequired:
+    'This session requires an intake dossier. Call azoth_intake first, then pass it to azoth_calc.',
+  TargetMismatch:
+    'The dossier has no target, or more than one, for that id. Check the targets it names.',
+  InputsMismatch: 'A dossier replaces inputs; pass one or the other, not both.',
+  IntakeRefused:
+    'The dossier refuses this target. Do not present the result as a constructible basis; ' +
+    'answer the data requests first.',
 }
 
 function refusal(document) {
@@ -49,10 +59,28 @@ export function buildInvocation(tool, args, cfg) {
   let argv
   let stdin
   if (tool === 'run') {
-    argv = [...base, 'run', String(args.id), '--inputs-json', '-']
+    argv = [...base, 'run', String(args.id)]
+    if (args.dossier_path) {
+      argv.push('--dossier-file', String(args.dossier_path))
+    } else if (args.dossier) {
+      argv.push('--dossier-json', '-')
+      stdin = JSON.stringify(args.dossier)
+    } else {
+      argv.push('--inputs-json', '-')
+      stdin = JSON.stringify(args.inputs ?? {})
+    }
+    if (cfg.requireDossier === true) argv.push('--require-dossier')
     if (args.keycard) argv.push('--keycard', String(args.keycard))
     if (args.backend) argv.push('--backend', String(args.backend))
-    stdin = JSON.stringify(args.inputs ?? {})
+  } else if (tool === 'intake') {
+    argv = [...base, 'review']
+    if (args.id) argv.push('--id', String(args.id))
+    if (args.dossier_path) {
+      argv.push('--dossier-file', String(args.dossier_path))
+    } else {
+      argv.push('--dossier-json', '-')
+      stdin = JSON.stringify(args.dossier ?? {})
+    }
   } else if (tool === 'spec') {
     argv = [...base, 'spec', String(args.id)]
     if (args.full === true) argv.push('--full')

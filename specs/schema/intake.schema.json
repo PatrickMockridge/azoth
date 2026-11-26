@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/PatrickMockridge/Azoth/main/specs/schema/intake.schema.json",
+  "title": "Azoth intake dossier",
+  "description": "The authored layers of an input review: where the material came from, what it claims, and how each input of a target binds to a claim, a licensed rule, or an explicit absence. The register, requests and verdict are checker output and are not authored here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "sources", "claims", "targets"],
+  "properties": {
+    "schema": {
+      "const": "azoth.intake/1",
+      "description": "The dossier's format version. Absent is read as this version."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]*$",
+      "description": "The dossier's name, unique within a study. What a report cites."
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/source" }
+    },
+    "claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/claim" }
+    },
+    "targets": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/target" }
+    },
+    "premises": {
+      "type": "array",
+      "description": "Optional applicability notes. The checker does not require a verdict until a spec declares machine-readable caller conditions.",
+      "items": { "$ref": "#/$defs/premise" }
+    },
+    "audit": { "$ref": "#/$defs/audit" }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "locator", "excerpt"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^S-[A-Za-z0-9_.-]+$" },
+        "kind": {
+          "type": "string",
+          "enum": ["prompt", "file", "calculation"],
+          "description": "prompt = the user's words; file = a workspace document; calculation = a registered id's result."
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1,
+          "description": "For a prompt, a heading or message label; for a file, `path:start-end`; for a calculation, the id."
+        },
+        "excerpt": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The bounded text a claim's quote is checked against. A file source may carry only the relevant lines."
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Optional hash of the full file or prompt text, so a later reader can tell the excerpt is from the cited source."
+        },
+        "rank": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "The source ladder's rung: 1 is the most authoritative source sought for this material."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["used", "blocked", "absent"],
+          "default": "used",
+          "description": "Whether this rung was used, sought and not obtained (blocked), or not available. A blocked higher rung beside a used lower one is a soft gap."
+        },
+        "covers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "The inputs or facts this source would cover, so a blocked rung can be matched to the input it leaves thin."
+        },
+        "note": { "type": "string" }
+      }
+    },
+    "rung": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rung", "outcome"],
+      "properties": {
+        "rung": { "type": "string", "minLength": 1 },
+        "outcome": { "type": "string", "enum": ["used", "blocked", "absent"] },
+        "note": { "type": "string" }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "value", "quote", "source"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^C-[A-Za-z0-9_.-]+$" },
+        "value": {
+          "description": "The supplied value: a number, a string, a boolean, a vector, a matrix or a record list.",
+          "type": ["number", "string", "boolean", "array", "object"]
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The unit as the source states it. Required when the input's spec unit is not `dimensionless`; `unit` is converted by the same codec `azoth_calc` uses."
+        },
+        "quote": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The verbatim words the value was read from."
+        },
+        "source": { "type": "string", "pattern": "^S-[A-Za-z0-9_.-]+$" },
+        "rung": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The source-ladder rung this value came from, e.g. `laboratory report`."
+        },
+        "rungs_above": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/rung" }
+        }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "claim": { "type": "string", "pattern": "^C-[A-Za-z0-9_.-]+$" },
+        "rule": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "basis": { "type": "object" },
+        "absent": { "const": true },
+        "conflicted": { "const": true },
+        "note": { "type": "string" }
+      },
+      "oneOf": [
+        {
+          "required": ["claim"],
+          "not": { "anyOf": [{ "required": ["rule"] }, { "required": ["basis"] }, { "required": ["absent"] }, { "required": ["conflicted"] }] }
+        },
+        {
+          "required": ["rule", "basis"],
+          "not": { "anyOf": [{ "required": ["claim"] }, { "required": ["absent"] }, { "required": ["conflicted"] }] }
+        },
+        {
+          "required": ["absent"],
+          "not": { "anyOf": [{ "required": ["claim"] }, { "required": ["rule"] }, { "required": ["basis"] }, { "required": ["conflicted"] }] }
+        },
+        {
+          "required": ["conflicted"],
+          "not": { "anyOf": [{ "required": ["claim"] }, { "required": ["rule"] }, { "required": ["basis"] }, { "required": ["absent"] }] }
+        }
+      ]
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "claim": { "type": "string", "pattern": "^C-[A-Za-z0-9_.-]+$" },
+        "rule": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "basis": { "type": "object" },
+        "absent": { "const": true },
+        "conflicted": { "const": true },
+        "note": { "type": "string" }
+      },
+      "oneOf": [
+        {
+          "required": ["claim"],
+          "not": { "anyOf": [{ "required": ["rule"] }, { "required": ["basis"] }, { "required": ["absent"] }, { "required": ["conflicted"] }] }
+        },
+        {
+          "required": ["rule", "basis"],
+          "not": { "anyOf": [{ "required": ["claim"] }, { "required": ["absent"] }, { "required": ["conflicted"] }] }
+        },
+        {
+          "required": ["absent"],
+          "not": { "anyOf": [{ "required": ["claim"] }, { "required": ["rule"] }, { "required": ["basis"] }, { "required": ["conflicted"] }] }
+        },
+        {
+          "required": ["conflicted"],
+          "not": { "anyOf": [{ "required": ["claim"] }, { "required": ["rule"] }, { "required": ["basis"] }, { "required": ["absent"] }] }
+        }
+      ]
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "inputs"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$",
+          "description": "A registered azoth calculation or model id."
+        },
+        "inputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/input" }
+        }
+      }
+    },
+    "premise": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement", "verdict"],
+      "properties": {
+        "statement": { "type": "string", "minLength": 1 },
+        "verdict": { "type": "string", "enum": ["evidenced", "assumed", "violated", "not_applicable"] },
+        "basis": { "type": "string" }
+      }
+    },
+    "audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reviewer", "verdict"],
+      "properties": {
+        "reviewer": { "type": "string", "minLength": 1 },
+        "verdict": { "type": "string", "enum": ["signed", "returned"] },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

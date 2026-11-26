@@ -48,15 +48,38 @@ the same HAZOP.
 trip: it is that theorem at the process `hazop`. It is named here because a reader
 checking the orchestration layer wants the instance, not the general statement.*
 
-## The first agent
+## An intake review is a process
 
-[`agents/hazop/`](../../../agents/hazop/README.md) is the first agent: the roles
-above, the skills each chains, and the pipeline, in the terms this page fixes. It
-is runnable through `tools/launch_dsh.py web --permission-mode read-only --study hazop`,
-which mounts the chair as the root preset and the process, safety and scribe roles as
-subagent presets over the DeepSeek Harness Team board. The web profile is required: the
-headless one-shot composes no preset roster. The tool schema a model is handed — `@tool` and `*tool`, the
-same reflection surface a GUI side panel or a notebook offers — is
+An intake review passes the supplied material through a fixed pipeline:
+
+```
+source → claim → binding → verdict → request
+```
+
+as a process `intake`, each stage a role reading the previous stage's channel and writing
+the next: the reader writes sources and claims, the assessor writes bindings, the
+deterministic checker writes the verdict and the register, and the clerk writes the
+requests into the report. A **hard** gap means a target has no construction and is not
+run; a **soft** gap is a licensed inference or a lower source rung, and it runs flagged.
+The dossier is the serialisation of that process: `@intake` turns the procedure into data,
+and `*` re-enters it.
+
+**Claim (an intake dossier round-trips).** Quoting an intake review and dropping it back is
+the same review.
+
+*Status: **specified**, and it is the round-trip claim at the process `intake`.*
+
+## The agents
+
+[`agents/hazop/`](../../../agents/hazop/README.md) and
+[`agents/intake/`](../../../agents/intake/README.md) are the two agents: the roles above,
+the skills each chains, and the pipeline, in the terms this page fixes. HAZOP runs through
+`tools/launch_dsh.py web --permission-mode read-only --study hazop`, which mounts the chair
+as the root preset and the process, safety and scribe roles as subagent presets over the
+DeepSeek Harness Team board. Intake runs with `--study intake`, mounting the clerk and the
+reader, assessor and auditor. The web profile is required: the headless one-shot composes
+no preset roster. The tool schema a model is handed — `@tool` and `*tool`, the same
+reflection surface a GUI side panel or a notebook offers — is
 [the middleware](../architecture/middleware.md), served by `azoth mcp`.
 
 ## What is not here

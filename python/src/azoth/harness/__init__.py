@@ -9,26 +9,37 @@ DeepSeek Harness dependency.
 
 from __future__ import annotations
 
-from azoth.harness.api import run, version_info
+from azoth.harness.api import review, run, version_info
 from azoth.harness.catalogue import SCHEMA, catalogue, spec
 from azoth.harness.errors import (
+    DossierInvalid,
+    DossierRequired,
     HarnessError,
     HarnessInputError,
+    InputsMismatch,
     InputTooLarge,
+    IntakeRefused,
     OutputTooLarge,
+    TargetMismatch,
     UndefinedInput,
     UnknownId,
 )
 
 __all__ = [
     "SCHEMA",
+    "DossierInvalid",
+    "DossierRequired",
     "HarnessError",
     "HarnessInputError",
     "InputTooLarge",
+    "InputsMismatch",
+    "IntakeRefused",
     "OutputTooLarge",
+    "TargetMismatch",
     "UndefinedInput",
     "UnknownId",
     "catalogue",
+    "review",
     "run",
     "spec",
     "version_info",

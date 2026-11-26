@@ -49,13 +49,20 @@ MANIFEST = "azoth.skills/1"
 WORKSPACE_DOMAIN = "workspace"
 WORKSPACE_VERSION = 2
 WORKSPACE_TITLE = "azoth"
-HAZOP_SKILL = "azoth-hazop"
-HAZOP_DESCRIPTION = (
-    "Run a HAZOP as an azoth team: nodes and guidewords, deviation, cause, consequence "
-    "and safeguard, recorded on the DeepSeek Harness Team board. USE WHEN: a HAZOP, a "
-    "node-and-guideword study, or a process-safety review is to be run."
-)
 VERSION_RE = re.compile(r"\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?")
+
+
+def _study(config: dict[str, Any], name: str) -> dict[str, Any] | None:
+    """The selected study's table, or None for the engineer experience."""
+    if name in (None, "none"):
+        return None
+    studies = config.get("studies")
+    if not isinstance(studies, dict) or name not in studies:
+        raise SystemExit(f"launch_dsh: harness.toml has no [studies.{name}]")
+    study = studies[name]
+    if not isinstance(study, dict):
+        raise SystemExit(f"launch_dsh: [studies.{name}] is not a table")
+    return study
 
 
 # ---------------------------------------------------------------------------------------
@@ -488,6 +495,7 @@ def _plugin_config(tc: Toolchain, config: dict[str, Any]) -> dict[str, Any]:
         "cwd": str(tc.root),
         "timeoutMs": int(config["plugin"]["timeout_ms"]),
         "maxOutputBytes": int(config["plugin"]["max_output_bytes"]),
+        "requireDossier": bool(config["plugin"].get("require_dossier", False)),
     }
 
 
@@ -597,17 +605,22 @@ def _engineer_preset(args: argparse.Namespace, config: dict[str, Any]) -> dict[s
     }
 
 
-def _presets(args: argparse.Namespace, config: dict[str, Any]) -> list[dict[str, Any]]:
+def _presets(
+    args: argparse.Namespace, config: dict[str, Any], study: dict[str, Any]
+) -> list[dict[str, Any]]:
     roles = config["presets"]
-    process = str(roles["process"]["id"])
-    safety = str(roles["safety"]["id"])
-    scribe = str(roles["scribe"]["id"])
+    slugs = [str(slug) for slug in study["roles"]]
+    root = str(study["root"])
+    root_id = str(roles[root]["id"])
+    member_ids = [str(roles[slug]["id"]) for slug in slugs if slug != root]
     rows: list[dict[str, Any]] = []
-    for slug in ("chair", "process", "safety", "scribe"):
-        meta = roles[slug]
+    for slug in slugs:
+        meta = roles.get(slug)
+        if not isinstance(meta, dict) or not meta.get("id") or not meta.get("prompt"):
+            raise SystemExit(f"launch_dsh: [presets.{slug}] is not a preset")
         prompt = Path(args.root).resolve() / "agents" / "deepseek" / str(meta["prompt"])
         plugins = [_persona(prompt), *_role_plugins()]
-        if slug == "chair":
+        if str(meta["id"]) == root_id:
             plugins.extend(
                 [
                     {
@@ -622,12 +635,14 @@ def _presets(args: argparse.Namespace, config: dict[str, Any]) -> list[dict[str,
                             "provider": "spawn",
                             "toolName": "subagent",
                             "modelSelection": False,
-                            "allowedAgentPresets": [process, safety, scribe],
+                            "allowedAgentPresets": member_ids,
                             "maxDepth": 1,
                         },
                     },
                 ]
             )
+            if study.get("root_asks_user") is True:
+                plugins.append({"id": "tool-ask-user", "name": "@deepseek-ai/dsh-tool-ask-user"})
         rows.append(
             {
                 "id": f"preset-{meta['id']}",
@@ -648,6 +663,7 @@ def build_overlay(
     rows: list[dict[str, Any]] = []
     inserts: list[dict[str, Any]] = []
     mode = "headless" if args.headless else "web" if args.web else args.mode
+    study = _study(config, args.study)
     plugin = tc.root / "agents" / "deepseek" / "plugin" / "index.js"
     if plugin.is_file():
         inserts.append(
@@ -658,7 +674,7 @@ def build_overlay(
             }
         )
     ui = tc.root / "agents" / "deepseek" / "ui" / "index.js"
-    if args.persona == "engineer" and args.study != "hazop" and mode == "web" and ui.is_file():
+    if args.persona == "engineer" and study is None and mode == "web" and ui.is_file():
         inserts.append({"id": "azoth-ui", "name": str(ui), "config": {}})
     if args.flowsheet and tc.azoth is not None:
         inserts.append(
@@ -726,7 +742,7 @@ def build_overlay(
         {"id": "agent-default-model", "config": {"provider": provider, "model": args.model}}
     )
 
-    if args.persona == "engineer" and args.study != "hazop":
+    if args.persona == "engineer" and study is None:
         engineer = str(config["presets"]["engineer"]["id"])
         if mode == "web":
             rows.append({"id": "agent-preset-registry", "config": {"default": engineer}})
@@ -746,8 +762,8 @@ def build_overlay(
                 }
             )
 
-    if args.study == "hazop":
-        chair = str(config["presets"]["chair"]["id"])
+    if study is not None:
+        root = str(config["presets"][str(study["root"])]["id"])
         rows.append(
             {
                 "id": "agent-team",
@@ -757,9 +773,9 @@ def build_overlay(
                 },
             }
         )
-        presets = _presets(args, config)
+        presets = _presets(args, config, study)
         if mode == "web":
-            rows.append({"id": "agent-preset-registry", "config": {"default": chair}})
+            rows.append({"id": "agent-preset-registry", "config": {"default": root}})
             rows.append({"insert": presets})
         else:
             rows.append(
@@ -768,7 +784,7 @@ def build_overlay(
                         {
                             "id": "agent-preset-registry",
                             "name": "@deepseek-ai/dsh-agent-preset-registry",
-                            "config": {"default": chair},
+                            "config": {"default": root},
                         },
                         *presets,
                     ]
@@ -784,18 +800,32 @@ def build_overlay(
 def _skill_files(args: argparse.Namespace, config: dict[str, Any]) -> dict[Path, str]:
     if args.skills == "none":
         return {}
-    names = config["skills"]["hazop"] if args.skills == "hazop" else None
-    files = export_skills.expected(
-        Path(args.root).resolve(), ["dsh"], names, source_root=Path(args.root).resolve()
-    )
+    if args.skills == "full":
+        names = None
+    else:
+        table = config.get("skills", {})
+        if args.skills not in table:
+            raise SystemExit(f"launch_dsh: harness.toml has no [skills.{args.skills}]")
+        names = table[args.skills]
     root = Path(args.root).resolve()
+    files = export_skills.expected(root, ["dsh"], names, source_root=root)
     out = root / ".dsh" / "skills"
-    body = (root / "agents" / "deepseek" / "skills" / f"{HAZOP_SKILL}.md").read_text(
-        encoding="utf-8"
-    )
-    files[out / f"{HAZOP_SKILL}.md"] = export_skills.render_extra(
-        HAZOP_SKILL, HAZOP_DESCRIPTION, body
-    )
+    studies = config.get("studies", {})
+    if not isinstance(studies, dict):
+        raise SystemExit("launch_dsh: harness.toml's [studies] is not a table")
+    for name, meta in studies.items():
+        if not isinstance(meta, dict):
+            raise SystemExit(f"launch_dsh: [studies.{name}] is not a table")
+        skill = str(meta.get("skill", ""))
+        description = str(meta.get("description", ""))
+        if not skill or not description:
+            raise SystemExit(f"launch_dsh: [studies.{name}] needs `skill` and `description`")
+        body_path = root / "agents" / "deepseek" / "skills" / f"{skill}.md"
+        if not body_path.is_file():
+            raise SystemExit(f"launch_dsh: {body_path} is missing")
+        files[out / f"{skill}.md"] = export_skills.render_extra(
+            skill, description, body_path.read_text(encoding="utf-8")
+        )
     return files
 
 
@@ -969,9 +999,14 @@ def _probe_node(
     return Check("node", "ok", version)
 
 
-def _probe_azoth(args: argparse.Namespace, tc: Toolchain, env: dict[str, str]) -> Check:
+def _probe_azoth(
+    args: argparse.Namespace,
+    tc: Toolchain,
+    env: dict[str, str],
+    study: dict[str, Any] | None,
+) -> Check:
     if tc.azoth is None:
-        if args.flowsheet or args.study == "hazop":
+        if args.flowsheet or (study is not None and study.get("requires_flowsheet") is True):
             return Check("azoth", "fail", "no azoth CLI; the flowsheet MCP server needs one")
         return Check("azoth", "warn", "no azoth CLI; flowsheet tools unavailable")
     if tc.azoth.kind == "cargo":
@@ -985,9 +1020,16 @@ def _probe_azoth(args: argparse.Namespace, tc: Toolchain, env: dict[str, str]) -
     return Check("azoth", "ok", f"{tc.azoth} ({proc.stdout.strip()})")
 
 
-def _probe_flowsheet(args: argparse.Namespace, tc: Toolchain, env: dict[str, str]) -> Check | None:
+def _probe_flowsheet(
+    args: argparse.Namespace,
+    tc: Toolchain,
+    env: dict[str, str],
+    study: dict[str, Any] | None,
+) -> Check | None:
     if not args.flowsheet:
-        if args.require_flowsheet or args.study == "hazop":
+        if args.require_flowsheet or (
+            study is not None and study.get("requires_flowsheet") is True
+        ):
             return Check("flowsheet", "fail", "--flowsheet is required")
         return None
     path = Path(args.flowsheet).resolve()
@@ -1078,6 +1120,29 @@ def _probe_bridge(args: argparse.Namespace, tc: Toolchain, env: dict[str, str]) 
         document = json.loads(proc.stdout)
     except json.JSONDecodeError:
         return Check("bridge", "fail", "version did not print JSON")
+    example = tc.root / "agents" / "intake" / "examples" / "gas-analysis.toml"
+    if example.is_file():
+        try:
+            dossier = tomllib.loads(example.read_text(encoding="utf-8"))
+            reviewed = _run(
+                [str(tc.python), "-B", "-m", "azoth.harness", "review", "--dossier-json", "-"],
+                env=env,
+                timeout=args.timeout,
+                stdin=json.dumps(dossier),
+            )
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            return Check("bridge", "fail", f"review: {exc}")
+        if reviewed.returncode != 0:
+            return Check("bridge", "fail", (reviewed.stderr or reviewed.stdout).strip()[-200:])
+        try:
+            verdict = json.loads(reviewed.stdout).get("verdict")
+        except json.JSONDecodeError:
+            return Check("bridge", "fail", "review did not print JSON")
+        if verdict not in ("passed", "passed_with_flags", "refused"):
+            return Check("bridge", "fail", f"review verdict {verdict!r}")
+        return Check(
+            "bridge", "ok", f"azoth {document.get('azoth_version', '?')}; review {verdict}"
+        )
     return Check("bridge", "ok", f"azoth {document.get('azoth_version', '?')}")
 
 
@@ -1121,7 +1186,27 @@ def _probe_workspace(tc: Toolchain) -> Check:
 
 
 def _probe_preset(args: argparse.Namespace, tc: Toolchain, config: dict[str, Any]) -> Check | None:
-    if args.persona != "engineer" or args.study == "hazop":
+    study = _study(config, args.study)
+    if study is not None:
+        roles = config.get("presets", {})
+        if not isinstance(roles, dict):
+            return Check("preset", "fail", "harness.toml's [presets] is not a table")
+        missing: list[str] = []
+        ids: list[str] = []
+        for slug in study.get("roles", ()):
+            meta = roles.get(slug)
+            if not isinstance(meta, dict) or not meta.get("id") or not meta.get("prompt"):
+                missing.append(str(slug))
+                continue
+            prompt = tc.root / "agents" / "deepseek" / str(meta["prompt"])
+            if not prompt.is_file() or not prompt.read_text(encoding="utf-8").strip():
+                missing.append(str(slug))
+                continue
+            ids.append(str(meta["id"]))
+        if missing:
+            return Check("preset", "fail", f"missing or empty prompts for {missing}")
+        return Check("preset", "ok", f"{len(ids)} presets ({', '.join(ids)})")
+    if args.persona != "engineer":
         return None
     meta = config["presets"].get("engineer")
     if not isinstance(meta, dict) or not meta.get("id") or not meta.get("prompt"):
@@ -1133,7 +1218,7 @@ def _probe_preset(args: argparse.Namespace, tc: Toolchain, config: dict[str, Any
 
 
 def _probe_ui(args: argparse.Namespace, tc: Toolchain) -> Check | None:
-    if args.persona != "engineer" or args.study == "hazop" or args.mode not in ("web", "check"):
+    if args.persona != "engineer" or args.study != "none" or args.mode not in ("web", "check"):
         return None
     package = tc.root / "agents" / "deepseek" / "ui"
     manifest = package / "package.json"
@@ -1192,6 +1277,7 @@ def _probe_key(args: argparse.Namespace, config: dict[str, Any]) -> Check:
 
 def run_checks(args: argparse.Namespace, config: dict[str, Any]) -> list[Check]:
     tc = resolve(args, config, require_dsh=False)
+    study = _study(config, args.study)
     with tempfile.TemporaryDirectory(prefix="azoth-dsh-check-") as home:
         env = child_env(args, tc.root, dsh_home=Path(home))
         checks: list[Check] = []
@@ -1212,8 +1298,8 @@ def run_checks(args: argparse.Namespace, config: dict[str, Any]) -> list[Check]:
         checks.append(_probe_dsh(args, tc, env))
         if tc.dsh.kind == "npx":
             checks.append(_probe_node(args, tc, config, env))
-        checks.append(_probe_azoth(args, tc, env))
-        flowsheet = _probe_flowsheet(args, tc, env)
+        checks.append(_probe_azoth(args, tc, env, study))
+        flowsheet = _probe_flowsheet(args, tc, env, study)
         if flowsheet is not None:
             checks.append(flowsheet)
         mcp = _probe_mcp(args, tc, env)
@@ -1273,8 +1359,9 @@ def _launch(args: argparse.Namespace, config: dict[str, Any]) -> int:
     if args.permission_mode is None:
         raise SystemExit("launch_dsh: choose --permission-mode read-only or workspace-write")
     tc = resolve(args, config)
-    if args.study == "hazop" and not args.flowsheet:
-        raise SystemExit("launch_dsh: --study hazop needs --flowsheet")
+    study = _study(config, args.study)
+    if study is not None and study.get("requires_flowsheet") is True and not args.flowsheet:
+        raise SystemExit(f"launch_dsh: --study {args.study} needs --flowsheet")
     try:
         workspace = ensure_workspace(tc.root, tc.dsh_home, write=True)
     except WorkspaceError as exc:
@@ -1341,8 +1428,8 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--api-key-env")
     p.add_argument("--reasoning-effort", choices=("off", "low", "high", "max"))
     p.add_argument("--persona", choices=("engineer", "software"), default="engineer")
-    p.add_argument("--study", choices=("none", "hazop"), default="none")
-    p.add_argument("--skills", choices=("full", "hazop", "none"), default="full")
+    p.add_argument("--study", default="none")
+    p.add_argument("--skills", choices=("full", "hazop", "intake", "none"), default="full")
     p.add_argument("--permission-mode", choices=("read-only", "workspace-write"), default=None)
     p.add_argument("--port", type=int)
     p.add_argument("--no-open", action="store_true")
@@ -1376,9 +1463,9 @@ def main(argv: list[str] | None = None) -> int:
         args.mode = "headless"
     if args.web:
         args.mode = "web"
-    if args.study == "hazop" and args.mode == "headless":
+    if args.study != "none" and args.mode == "headless":
         raise SystemExit(
-            "launch_dsh: --study hazop needs the web profile; the headless one-shot "
+            f"launch_dsh: --study {args.study} needs the web profile; the headless one-shot "
             "composes no preset roster"
         )
     if args.host and not args.allow_remote and args.host not in ("127.0.0.1", "localhost"):
@@ -1388,6 +1475,9 @@ def main(argv: list[str] | None = None) -> int:
     if not config_path.is_file():
         raise SystemExit(f"launch_dsh: {config_path} does not exist")
     config = tomllib.loads(config_path.read_text(encoding="utf-8"))
+    _study(config, args.study)
+    if args.skills not in ("full", "none") and args.skills not in config.get("skills", {}):
+        raise SystemExit(f"launch_dsh: harness.toml has no [skills.{args.skills}]")
     provider_meta = config["providers"].get(args.provider)
     if not isinstance(provider_meta, dict):
         raise SystemExit(f"launch_dsh: harness.toml has no [providers.{args.provider}]")

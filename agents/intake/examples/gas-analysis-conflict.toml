@@ -1,0 +1,82 @@
+schema = "azoth.intake/1"
+id = "gas-analysis-conflict"
+
+[[sources]]
+id = "S-1"
+kind = "prompt"
+locator = "user message, HP gas analysis"
+rank = 2
+status = "used"
+covers = ["components", "z", "P", "T"]
+excerpt = """
+Gas analysis, Table 1 — methane 90.0, ethane 4.0, propane 2.0, n-butane 1.5,
+n-pentane 1.0, n-hexane 0.5 mol%; balance n-heptane (C7), not separately analysed;
+components methane ethane propane n-butane n-pentane n-hexane n-heptane;
+the table is at 50 barg and the caption states 300 K. A note on the same sheet states
+800 psig.
+"""
+
+[[claims]]
+id = "C-1"
+value = [90.0, 4.0, 2.0, 1.5, 1.0, 0.5]
+unit = "mol%"
+quote = "methane 90.0, ethane 4.0, propane 2.0, n-butane 1.5, n-pentane 1.0, n-hexane 0.5"
+source = "S-1"
+rung = "vendor gas analysis"
+
+[[claims]]
+id = "C-2"
+value = "n-heptane is not separately analysed"
+quote = "balance n-heptane (C7), not separately analysed"
+source = "S-1"
+
+[[claims]]
+id = "C-3"
+value = ["methane", "ethane", "propane", "n-butane", "n-pentane", "n-hexane", "n-heptane"]
+quote = "components methane ethane propane n-butane n-pentane n-hexane n-heptane"
+source = "S-1"
+
+[[claims]]
+id = "C-4"
+value = 50.0
+unit = "barg"
+quote = "50 barg"
+source = "S-1"
+
+[[claims]]
+id = "C-5"
+value = 300.0
+unit = "K"
+quote = "300 K"
+source = "S-1"
+
+[[claims]]
+id = "C-6"
+value = 800.0
+unit = "psig"
+quote = "800 psig"
+source = "S-1"
+
+[[targets]]
+id = "eos.pt_flash"
+
+[[targets.inputs]]
+name = "components"
+claim = "C-3"
+
+[[targets.inputs]]
+name = "P"
+conflicted = true
+note = "the table states 50 barg; a note on the same sheet states 800 psig"
+
+[[targets.inputs]]
+name = "T"
+claim = "C-5"
+
+[[targets.inputs]]
+name = "z"
+rule = "composition_remainder"
+[targets.inputs.basis]
+claim = "C-1"
+unreported = "C-2"
+component = "n-heptane"

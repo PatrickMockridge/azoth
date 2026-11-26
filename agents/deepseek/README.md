@@ -1,7 +1,7 @@
 # DeepSeek Harness
 
 The engineering entry point for azoth: a launcher, a calculation plugin, a welcome card,
-the skill catalog and a HAZOP team. DeepSeek Harness (`dsh`) is a developer preview from
+the skill catalog and two engineering teams, HAZOP and intake. DeepSeek Harness (`dsh`) is a developer preview from
 DeepSeek AI, built on Cordis; this directory holds the azoth side of it.
 
 ## Run it
@@ -53,12 +53,14 @@ with a pump sizing, the demo separator, and relief and fire questions.
 
 ## The two tool surfaces
 
-- **`azoth_help`, `azoth_catalogue`, `azoth_spec`, `azoth_calc`** — the plugin in
-  [`plugin/`](plugin/). `azoth_help` defines FEED, model, catalogue, keycard and
-  screening; the other three call `python -m azoth.harness`, which runs any of the 98
-  calculations and 300 models by id. Inputs are numbers in the unit `azoth_spec` declares,
-  or `{value, unit}`; the result is the library's `to_dict()` with warnings and the
-  provenance block, rendered with what its verification means.
+- **`azoth_help`, `azoth_catalogue`, `azoth_spec`, `azoth_intake`, `azoth_calc`** — the
+  plugin in [`plugin/`](plugin/). `azoth_help` defines FEED, model, catalogue, keycard,
+  dossier, hard gap and soft gap; `azoth_intake` checks a dossier before a calculation; the
+  others call `python -m azoth.harness`, which runs any of the 98 calculations and 303
+  models by id. Inputs are numbers in the unit `azoth_spec` declares, or `{value, unit}`;
+  a dossier replaces `inputs` and adds a sibling `intake` block. The result is the
+  library's `to_dict()` with warnings and the provenance block, rendered with what its
+  verification means.
 - **`mcp__azoth__*`** — the existing `azoth mcp --flowsheet F` server, mounted through
   `@deepseek-ai/dsh-mcp-client`. It exposes the 20 flowsheet edit commands and the
   `azoth://document`, `azoth://diagnostics`, `azoth://report` and `azoth://catalogue`
@@ -77,31 +79,38 @@ python -m azoth.harness catalogue --query darcy
 python -m azoth.harness spec hydraulics.darcy_weisbach
 python -m azoth.harness run hydraulics.reynolds_number \
   --inputs-json '{"rho":998,"v":1.5,"D":0.1,"mu":0.001002}'
+python -m azoth.harness review --dossier-file agents/intake/examples/gas-analysis.toml
+python -m azoth.harness run eos.pt_flash --dossier-file agents/intake/examples/gas-analysis.toml
 python -m azoth.harness version
 ```
 
 It writes one JSON envelope on stdout, schema `azoth.harness/1`, with `kind` of
-`catalogue`, `spec`, `result` or `error`; a result is the library's `to_dict()`, the
-provenance block included. The exit status is `0` for success, `2` for an unknown id, `3`
-for an invalid input, `4` for a calculation error and `5` for an internal failure. Inputs
-cap at 1 MB and the CLI's output at 8 MB. [The harness
+`catalogue`, `spec`, `review`, `result` or `error`; a result is the library's `to_dict()`,
+the provenance block included, with an `intake` sibling when a dossier was supplied. The
+exit status is `0` for success, `2` for an unknown id, `3` for an invalid input or a
+malformed dossier, `4` for a calculation error and `5` for an internal failure. Inputs cap
+at 1 MB and the CLI's output at 8 MB. [The harness
 chapter](../../docs/src/agentic/harness.md) states the full contract.
 
-## Skills and the HAZOP team
+## Skills and the two teams
 
 `tools/export_skills.py` writes the 90 catalog skills to `.dsh/skills/`, the project root
-DSH scans at rank 100 once the checkout is the session workspace. `--skills hazop` exports
-the curated subset in [`harness.toml`](harness.toml) instead.
-[`skills/azoth-hazop.md`](skills/azoth-hazop.md) is a harness-only procedure, not a catalog
-skill: it is what `/azoth-hazop` loads.
+DSH scans at rank 100 once the checkout is the session workspace. `--skills hazop` or
+`--skills intake` exports the curated subset in [`harness.toml`](harness.toml) instead.
+[`skills/azoth-hazop.md`](skills/azoth-hazop.md) and
+[`skills/azoth-intake.md`](skills/azoth-intake.md) are harness-only procedures, not catalog
+skills: they are what `/azoth-hazop` and `/intake` load.
 
 `--study hazop` (web only) enables Agent Teams and sets the root preset to
 `azoth-hazop-chair`. The chair creates one Team task per node × guideword, spawns the
 `azoth-process`, `azoth-safety` and `azoth-scribe` presets through the `subagent` tool, and
-the scribe renders the worksheet. The headless one-shot composes no preset roster, so it
-refuses the study. The formal statement of a team as a composition of role-processes
-is [`docs/src/agentic/orchestration.md`](../../docs/src/agentic/orchestration.md); this is
-its execution mapping, not a proof.
+the scribe renders the worksheet. `--study intake` sets the root to `azoth-intake-clerk`
+and spawns `azoth-intake-reader`, `azoth-intake-assessor` and `azoth-intake-auditor`; the
+clerk calls `azoth_intake` for a verdict and runs no refused target. The headless one-shot
+composes no preset roster, so it refuses either study. The formal statement of a team as a
+composition of role-processes is
+[`docs/src/agentic/orchestration.md`](../../docs/src/agentic/orchestration.md); this is its
+execution mapping, not a proof.
 
 A complete worked output is
 [`case-studies/azoth-feed-08`](../../case-studies/azoth-feed-08/README.md), the notebook-08 FEED
@@ -113,8 +122,9 @@ study and HAZOP close-out.
   default. The launcher sets `DSH_PERMISSION_MODE` from it and never mounts `sdk-minimal`,
   whose `danger-full-access` pin is the wrong default here. A non-loopback `--host`
   requires `--allow-remote`.
-- `azoth_calc` accepts registry ids only; there is no `eval`, no shell and no import by a
-  model-supplied string. A keycard path must be under the working directory.
+- `azoth_calc` and `azoth_intake` accept registry ids and a dossier only; there is no
+  `eval`, no shell and no import by a model-supplied string. A keycard path and a dossier
+  path must be under the working directory.
 - The bridge caps inputs at 1 MB and outputs at 8 MB; the plugin times a call out at 120 s.
 - The catalog's models are `unverified` or `partially_verified`. A result is evidence for a
   finding, not a design deliverable; the provenance block says which.

@@ -14,9 +14,12 @@ The orchestration layer: skills combined into agents, and agents composed into t
   statement is [`docs/src/agentic/orchestration.md`](../docs/src/agentic/orchestration.md):
   a role is a named process, a team its parallel composition.
 
-The one agent today is **HAZOP**: four roles — chair, process, safety, scribe — over
-the pipeline `guideword → deviation → cause → consequence → safeguard`. Its definition
-is [`agents/hazop/README.md`](hazop/README.md).
+Two agents run today. **HAZOP** — four roles, chair, process, safety and scribe — over
+the pipeline `guideword → deviation → cause → consequence → safeguard`; its definition
+is [`agents/hazop/README.md`](hazop/README.md). **Intake** — four roles, clerk, reader,
+assessor and auditor — over `source → claim → binding → verdict → request`, checking the
+supplied evidence before a calculation; its definition is
+[`agents/intake/README.md`](intake/README.md).
 
 ## Use the skills
 
@@ -47,6 +50,16 @@ python tools/launch_dsh.py web --permission-mode read-only --study hazop --flows
 The headless one-shot composes no preset roster and refuses the study.
 The agent definition is [`agents/hazop/README.md`](hazop/README.md); the formal spec is
 [`docs/src/agentic/orchestration.md`](../docs/src/agentic/orchestration.md).
+
+## Run the intake team
+
+```bash
+python tools/launch_dsh.py web --permission-mode read-only --study intake
+```
+
+`--study intake` enables Agent Teams with the clerk as the root preset and the reader,
+assessor and auditor as subagents; `azoth-intake` carries the procedure. It does not need
+a flowsheet. The definition is [`agents/intake/README.md`](intake/README.md).
 
 ## Caveats
 
