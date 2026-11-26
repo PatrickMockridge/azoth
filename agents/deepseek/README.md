@@ -42,10 +42,9 @@ relaunch:
 | `kimi` | Moonshot catalog | `kimi-k2.6` | `MOONSHOT_API_KEY` |
 | `minimax` | MiniMax catalog | `MiniMax-M2.7` | `MINIMAX_API_KEY` |
 
-`--provider` sets the session default; `--model` overrides the id. A provider whose key is
-absent still appears in the selector and refuses when chosen. `--base-url` replaces the
-native routes with an OpenAI-compatible gateway, vLLM/SGLang endpoint or any model the
-catalog does not list.
+`--provider` sets the session default; `--model` overrides the id. The selector offers the
+routes whose keys are available. `--base-url` replaces the native routes with an
+OpenAI-compatible gateway, vLLM/SGLang endpoint or any model the catalog does not list.
 
 The first web session shows a compact card: azoth is a chemical-engineering calculation
 library, FEED means Front-End Engineering Design (not a browser front end), the demo

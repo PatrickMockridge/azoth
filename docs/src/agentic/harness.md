@@ -37,7 +37,7 @@ writes, and neither exports the skills.
 | `--permission-mode read-only\|workspace-write` | required for a launch; no default |
 | `--provider NAME` | the default route: `deepseek`, `openai`, `anthropic`, `kimi` or `minimax` |
 | `--model ID` | the model id; defaults to the provider's declared default |
-| `--base-url URL`, `--api`, `--api-key-env` | use an OpenAI-compatible provider instead of hosted DeepSeek |
+| `--base-url URL`, `--api`, `--api-key-env` | use an OpenAI-compatible gateway instead of the native provider routes |
 | `--reasoning-effort` | `off`, `low`, `high` or `max`; hosted route only |
 | `--port`, `--no-open`, `--host`, `--allow-remote` | the web UI's binding; a non-loopback host needs `--allow-remote` |
 | `--session-id` | name a headless session |
@@ -89,8 +89,8 @@ model. `--model` overrides the provider's default id. OpenAI speaks the Response
 through the catalog; Anthropic, Kimi and MiniMax use their catalog protocols. The
 `--base-url` route is the escape hatch for an OpenAI-compatible gateway, an enterprise
 endpoint or a model the catalog does not list; it replaces the native routes for that
-launch. No open-weight deployment is required. A provider with no key still appears in
-the selector and refuses when selected; `--check` names which keys are set.
+launch. No open-weight deployment is required. The selector offers the routes whose
+credentials are available; `--check` names which provider keys are set.
 
 The environment carries the same choices: `AZOTH_DSH` and `AZOTH_BIN` name the runtime and
 the CLI, `AZOTH_PYTHON` names the interpreter, `DSH_HOME` or `AZOTH_DSH_HOME` sets the
