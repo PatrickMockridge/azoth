@@ -16,6 +16,7 @@ and the tool bridge is `agents/deepseek/plugin/`.
 Usage:
     python tools/launch_dsh.py --check
     python tools/launch_dsh.py web --permission-mode read-only
+    python tools/launch_dsh.py web --permission-mode read-only --provider openai --model gpt-5.5
     python tools/launch_dsh.py headless --permission-mode read-only "Size a pump for 100 m3/h"
 """
 
@@ -445,6 +446,20 @@ def ensure_workspace(root: Path, home: Path, *, write: bool) -> WorkspaceReport:
     else:
         detail += "first"
 
+    record = workspaces[workspace_id]
+    if write and not record["sessionIds"]:
+        # DSH's initial pick is the workspace with the latest session, falling back to its
+        # creation time. Keep an unused checkout ahead of a previously used default.
+        latest = str(record.get("updatedAt") or record["createdAt"])
+        others = [
+            str(other.get("updatedAt") or other["createdAt"])
+            for other_id, other in workspaces.items()
+            if other_id != workspace_id
+        ]
+        if others and latest < max(others):
+            record["createdAt"] = _now()
+            record["updatedAt"] = record["createdAt"]
+            changed = True
     if not global_state.get("initialized"):
         global_state["initialized"] = True
         changed = True
@@ -675,12 +690,38 @@ def build_overlay(
             }
         )
     else:
-        provider = str(config["harness"]["default_provider"])
-        model: dict[str, Any] = {"apiKeyEnv": args.api_key_env or "DEEPSEEK_API_KEY"}
-        model["models"] = [{"id": args.model}]
+        providers = config["providers"]
+        routes: dict[str, Any] = {}
+        for slug, meta in providers.items():
+            if meta["route"] != "llm-pi-ai":
+                continue
+            key_env = (
+                args.api_key_env
+                if slug == args.provider and args.api_key_env
+                else str(meta["api_key_env"])
+            )
+            routes[str(meta["provider"])] = {
+                "displayName": str(meta["label"]),
+                "apiKeyEnv": key_env,
+                "models": [{"id": str(model)} for model in meta["models"]],
+            }
+        if routes:
+            rows.append({"id": "llm-pi-ai", "config": {"providers": routes}})
+
+        deepseek = providers["deepseek"]
+        deepseek_key = (
+            args.api_key_env
+            if args.provider == "deepseek" and args.api_key_env
+            else str(deepseek["api_key_env"])
+        )
+        model: dict[str, Any] = {
+            "apiKeyEnv": deepseek_key,
+            "models": [{"id": str(item)} for item in deepseek["models"]],
+        }
         if args.reasoning_effort:
             model["reasoningEffort"] = args.reasoning_effort
         rows.append({"id": "llm-deepseek", "config": model})
+        provider = str(providers[args.provider]["provider"])
     rows.append(
         {"id": "agent-default-model", "config": {"provider": provider, "model": args.model}}
     )
@@ -1115,8 +1156,33 @@ def _probe_ui(args: argparse.Namespace, tc: Toolchain) -> Check | None:
     return Check("ui", "ok", f"{document.get('name', 'azoth-dsh-ui')} ({client.name})")
 
 
-def _probe_key(args: argparse.Namespace) -> Check:
-    key_env = args.api_key_env or ("AZOTH_DSH_API_KEY" if args.base_url else "DEEPSEEK_API_KEY")
+def _probe_provider(args: argparse.Namespace, config: dict[str, Any]) -> Check:
+    meta = config["providers"].get(args.provider)
+    if not isinstance(meta, dict):
+        return Check("provider", "fail", f"harness.toml has no [providers.{args.provider}]")
+    return Check(
+        "provider",
+        "ok",
+        f"{meta['label']} / {args.model} ({meta['provider']})",
+    )
+
+
+def _probe_providers(config: dict[str, Any]) -> Check:
+    seen = []
+    for slug, meta in config["providers"].items():
+        key_env = str(meta["api_key_env"])
+        seen.append(f"{slug}={'set' if os.environ.get(key_env) else 'no key'}")
+    return Check("providers", "ok", ", ".join(seen))
+
+
+def _probe_key(args: argparse.Namespace, config: dict[str, Any]) -> Check:
+    if args.base_url:
+        key_env = args.api_key_env or "AZOTH_DSH_API_KEY"
+    else:
+        meta = config["providers"].get(args.provider)
+        key_env = args.api_key_env or (
+            str(meta["api_key_env"]) if isinstance(meta, dict) else "DEEPSEEK_API_KEY"
+        )
     if os.environ.get(key_env):
         return Check("api-key", "ok", f"{key_env} is set")
     if args.base_url:
@@ -1162,9 +1228,11 @@ def run_checks(args: argparse.Namespace, config: dict[str, Any]) -> list[Check]:
         ui = _probe_ui(args, tc)
         if ui is not None:
             checks.append(ui)
+        checks.append(_probe_provider(args, config))
+        checks.append(_probe_providers(config))
         status, detail = skills_report(args, config, tc.dsh_home)
         checks.append(Check("skills", status, detail))
-        checks.append(_probe_key(args))
+        checks.append(_probe_key(args, config))
         return checks
 
 
@@ -1260,6 +1328,11 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--azoth-bin")
     p.add_argument("--node")
     p.add_argument("--dsh-home")
+    p.add_argument(
+        "--provider",
+        choices=("deepseek", "openai", "anthropic", "kimi", "minimax"),
+        default="deepseek",
+    )
     p.add_argument("--model")
     p.add_argument("--base-url")
     p.add_argument(
@@ -1315,8 +1388,11 @@ def main(argv: list[str] | None = None) -> int:
     if not config_path.is_file():
         raise SystemExit(f"launch_dsh: {config_path} does not exist")
     config = tomllib.loads(config_path.read_text(encoding="utf-8"))
+    provider_meta = config["providers"].get(args.provider)
+    if not isinstance(provider_meta, dict):
+        raise SystemExit(f"launch_dsh: harness.toml has no [providers.{args.provider}]")
     if args.model is None:
-        args.model = str(config["harness"]["default_model"])
+        args.model = str(provider_meta["default_model"])
     if args.flowsheet and args.no_flowsheet:
         raise SystemExit("launch_dsh: --flowsheet and --no-flowsheet are mutually exclusive")
     if args.flowsheet is None and not args.no_flowsheet:

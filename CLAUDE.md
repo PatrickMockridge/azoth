@@ -11,7 +11,8 @@ heat transfer) with an agentic layer on top.
 - **Runtime**: `python tools/launch_dsh.py` starts DeepSeek Harness with the skills, the
   engineering persona, the calculation plugin and the demo flowsheet; `--check` is the
   read-only probe, and a launch requires `--permission-mode read-only|workspace-write`.
-  `--persona software` uses DSH's coding preset instead.
+  DeepSeek, OpenAI, Anthropic, Kimi and MiniMax routes are mounted; `--provider` sets the
+  default and `--model` the id. `--persona software` uses DSH's coding preset instead.
   `pip install '.[agent]'` supplies the SDK's bundled runtime when `dsh` is not on PATH;
   the skills themselves need no runtime.
 

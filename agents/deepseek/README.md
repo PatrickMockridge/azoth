@@ -9,26 +9,42 @@ DeepSeek AI, built on Cordis; this directory holds the azoth side of it.
 ```bash
 python tools/launch_dsh.py --check
 python tools/launch_dsh.py web --permission-mode read-only
+python tools/launch_dsh.py web --permission-mode read-only --provider openai --model gpt-5.5
 python tools/launch_dsh.py headless --permission-mode read-only "Size a pump for 100 m³/h"
 python tools/launch_dsh.py web --permission-mode read-only --study hazop --flowsheet F
 ```
 
 `--check` is read-only. It probes the Python bridge, the `azoth` CLI and the flowsheet MCP
 handshake, the Node plugin and welcome UI, the exported skill hashes, the DSH workspace,
-the engineering preset, and whether the model key is set. `--print-config` prints the
+the engineering preset, the selected provider, and which provider keys are set.
+`--print-config` prints the
 generated overlay; `--dry-run` adds the exact argv. A real launch exports the skills to
 `.dsh/skills/`, writes the overlay to `.dsh/patches/azoth-<mode>.yml`, pins the checkout as
 DSH's first workspace, and starts the shipped `web` or `headless` profile with `--patch`.
 
-Defaults: `DEEPSEEK_API_KEY`, `deepseek-v4-flash`, `DSH_HOME=<root>/.dsh-home`, the demo
-flowsheet `specs/flowsheets/demo.toml`, and `--persona engineer`. `--persona software`
-leaves DSH's coding preset in place. `--no-flowsheet` starts without a case.
-`--permission-mode` is required for a launch: `read-only` keeps calculations and in-memory
-flowsheet edits available while refusing file writes; `workspace-write` permits them. A
-hosted key is one route; `--base-url` adds an OpenAI-compatible `llm-pi-ai` provider
-instead, for vLLM, SGLang or a gateway serving open-weight weights. `--dsh`/`AZOTH_DSH`
-names an installed runtime; the Python SDK's bundled runtime is the fallback; `npx` is the
-last resort and the only path that needs Node.
+Defaults: `--provider deepseek`, `DEEPSEEK_API_KEY`, `deepseek-v4-flash`,
+`DSH_HOME=<root>/.dsh-home`, the demo flowsheet `specs/flowsheets/demo.toml`, and
+`--persona engineer`. `--persona software` leaves DSH's coding preset in place.
+`--no-flowsheet` starts without a case. `--permission-mode` is required for a launch:
+`read-only` keeps calculations and in-memory flowsheet edits available while refusing
+file writes; `workspace-write` permits them. `--dsh`/`AZOTH_DSH` names an installed
+runtime; the Python SDK's bundled runtime is the fallback; `npx` is the last resort and
+the only path that needs Node.
+
+The launcher mounts five provider routes so the model selector can switch without a
+relaunch:
+
+| `--provider` | Route | Model default | Key |
+|---|---|---|---|
+| `deepseek` | `deepseek-official` | `deepseek-v4-flash` | `DEEPSEEK_API_KEY` |
+| `openai` | OpenAI catalog | `gpt-5.5` | `OPENAI_API_KEY` |
+| `anthropic` | Anthropic catalog | `claude-sonnet-5` | `ANTHROPIC_API_KEY` |
+| `kimi` | Moonshot catalog | `kimi-k2.6` | `MOONSHOT_API_KEY` |
+| `minimax` | MiniMax catalog | `MiniMax-M2.7` | `MINIMAX_API_KEY` |
+
+`--provider` sets the session default; `--model` overrides the id. The selector offers the
+routes whose keys are available. `--base-url` replaces the native routes with an
+OpenAI-compatible gateway, vLLM/SGLang endpoint or any model the catalog does not list.
 
 The first web session shows a compact card: azoth is a chemical-engineering calculation
 library, FEED means Front-End Engineering Design (not a browser front end), the demo

@@ -35,8 +35,9 @@ writes, and neither exports the skills.
 | `--study hazop` | web only; enable Agent Teams, mount the four presets, make the chair the root |
 | `--skills full\|hazop\|none` | export all 90 catalog skills, the curated HAZOP subset, or none |
 | `--permission-mode read-only\|workspace-write` | required for a launch; no default |
-| `--model ID` | the model id, default `deepseek-v4-flash` |
-| `--base-url URL`, `--api`, `--api-key-env` | use an OpenAI-compatible provider instead of hosted DeepSeek |
+| `--provider NAME` | the default route: `deepseek`, `openai`, `anthropic`, `kimi` or `minimax` |
+| `--model ID` | the model id; defaults to the provider's declared default |
+| `--base-url URL`, `--api`, `--api-key-env` | use an OpenAI-compatible gateway instead of the native provider routes |
 | `--reasoning-effort` | `off`, `low`, `high` or `max`; hosted route only |
 | `--port`, `--no-open`, `--host`, `--allow-remote` | the web UI's binding; a non-loopback host needs `--allow-remote` |
 | `--session-id` | name a headless session |
@@ -67,13 +68,36 @@ The first time the page opens, the welcome card says what azoth is, distinguishe
 from a browser front end, and names the screening boundary. Three starter buttons fill
 the composer with engineer questions: a pump sizing, the demo separator, and relief and
 fire calculations. A missing model key is reported by DSH; the key is saved on the
-**Settings → Models** page or exported as `DEEPSEEK_API_KEY`.
+**Settings → Models** page or exported as the selected provider's environment variable.
+
+## Providers
+
+Every launch without `--base-url` mounts five routes, so the model selector in the DSH UI
+can switch without a launcher change. The table is declared in `harness.toml` and rendered
+into the overlay:
+
+| `--provider` | Provider route | Model default | Key |
+|---|---|---|---|
+| `deepseek` (default) | `deepseek-official` | `deepseek-v4-flash` | `DEEPSEEK_API_KEY` |
+| `openai` | OpenAI catalog | `gpt-5.5` | `OPENAI_API_KEY` |
+| `anthropic` | Anthropic catalog | `claude-sonnet-5` | `ANTHROPIC_API_KEY` |
+| `kimi` | Moonshot catalog | `kimi-k2.6` | `MOONSHOT_API_KEY` |
+| `minimax` | MiniMax catalog | `MiniMax-M2.7` | `MINIMAX_API_KEY` |
+
+`--provider` only sets the session's default; the selector can choose another route or
+model. `--model` overrides the provider's default id. OpenAI speaks the Responses API
+through the catalog; Anthropic, Kimi and MiniMax use their catalog protocols. The
+`--base-url` route is the escape hatch for an OpenAI-compatible gateway, an enterprise
+endpoint or a model the catalog does not list; it replaces the native routes for that
+launch. No open-weight deployment is required. The selector offers the routes whose
+credentials are available; `--check` names which provider keys are set.
 
 The environment carries the same choices: `AZOTH_DSH` and `AZOTH_BIN` name the runtime and
 the CLI, `AZOTH_PYTHON` names the interpreter, `DSH_HOME` or `AZOTH_DSH_HOME` sets the
 harness's home, `DSH_PERMISSION_MODE` is the permission mode, and `PYTHONPATH` is extended
-with `python/src` for every child. The model key is `DEEPSEEK_API_KEY` on the hosted route
-and `AZOTH_DSH_API_KEY` on the `--base-url` route, unless `--api-key-env` names another.
+with `python/src` for every child. The selected provider's key is the one named in the
+providers table above; `--api-key-env` overrides it, and the `--base-url` route uses
+`AZOTH_DSH_API_KEY` by default.
 
 Resolution order for the runtime is `--dsh`, `AZOTH_DSH`, `dsh` on `PATH`, the Python SDK's
 bundled runtime, then `npx --yes @deepseek-ai/dsh@<pinned>` unless `--no-npx`. The `azoth`
@@ -100,8 +124,10 @@ warns, unless `--require-flowsheet` makes that a failure.
 | `workspace` | the first workspace is the checkout; a missing store is a warning because a launch seeds it |
 | `preset` | the `azoth-engineer` prompt and `harness.toml` row exist in engineer mode |
 | `ui` | the welcome UI's `client.js` and `dsh.client` manifest exist in engineer web mode |
+| `provider` | the selected provider route and model are declared |
+| `providers` | which provider key variables are set, without reading their values |
 | `skills` | the exported skills are present, current, not orphaned, and in the pinned workspace |
-| `api-key` | the key's environment variable is set; its value is never read |
+| `api-key` | the selected provider's key environment variable is set; its value is never read |
 
 Each probe is `ok`, `warn` or `fail`; one line each, or `--json` for a report of the form
 `{"schema":"azoth.launch-check/1","ok":true,"checks":[{"name":"repo","status":"ok","detail":"…"}]}`.
@@ -175,8 +201,8 @@ and is tested with `node --test`.
 | `azoth-calc` | the plugin, mounted by absolute path with the Python path and caps |
 | `azoth-ui` | the plain-JS welcome card and starters; engineer web mode only |
 | `mcp-azoth-flowsheet` | the flowsheet server; omitted by `--no-flowsheet` or a missing CLI |
-| `llm-deepseek` | the hosted route: `DEEPSEEK_API_KEY` and the model id |
-| `llm-pi-ai` | the `--base-url` route: provider `azoth-gateway`, `AZOTH_DSH_API_KEY` by default |
+| `llm-deepseek` | the hosted DeepSeek route: `DEEPSEEK_API_KEY` and the model ids |
+| `llm-pi-ai` | OpenAI, Anthropic, Kimi and MiniMax catalog routes, or the `--base-url` gateway |
 | `agent-default-model` | the provider and model every agent starts from |
 | `agent-preset-registry` | the root preset; `azoth-engineer` in engineer mode |
 | `preset-azoth-engineer` | the engineering persona, instructions, skills and tools |

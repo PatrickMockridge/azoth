@@ -55,13 +55,51 @@ def _root(tmp_path: Path) -> Path:
                 'tested_dsh = "0.2.2-rc.5"',
                 'dsh_version = "0.2.2-rc.5"',
                 'tested_node = "22.19"',
-                'default_model = "deepseek-v4-flash"',
-                'default_provider = "deepseek-official"',
                 "max_tasks = 256",
                 "",
                 "[plugin]",
                 "timeout_ms = 120000",
                 "max_output_bytes = 4194304",
+                "",
+                "[providers.deepseek]",
+                'label = "DeepSeek"',
+                'route = "llm-deepseek"',
+                'provider = "deepseek-official"',
+                'api_key_env = "DEEPSEEK_API_KEY"',
+                'default_model = "deepseek-v4-flash"',
+                'models = ["deepseek-v4-flash", "deepseek-v4-pro"]',
+                "",
+                "[providers.openai]",
+                'label = "OpenAI"',
+                'route = "llm-pi-ai"',
+                'provider = "openai"',
+                'api_key_env = "OPENAI_API_KEY"',
+                'default_model = "gpt-5.5"',
+                'models = ["gpt-5.5", "gpt-5.5-pro"]',
+                "",
+                "[providers.anthropic]",
+                'label = "Anthropic"',
+                'route = "llm-pi-ai"',
+                'provider = "anthropic"',
+                'api_key_env = "ANTHROPIC_API_KEY"',
+                'default_model = "claude-sonnet-5"',
+                'models = ["claude-sonnet-5"]',
+                "",
+                "[providers.kimi]",
+                'label = "Kimi (Moonshot)"',
+                'route = "llm-pi-ai"',
+                'provider = "moonshotai"',
+                'api_key_env = "MOONSHOT_API_KEY"',
+                'default_model = "kimi-k2.6"',
+                'models = ["kimi-k2.6"]',
+                "",
+                "[providers.minimax]",
+                'label = "MiniMax"',
+                'route = "llm-pi-ai"',
+                'provider = "minimax"',
+                'api_key_env = "MINIMAX_API_KEY"',
+                'default_model = "MiniMax-M2.7"',
+                'models = ["MiniMax-M2.7"]',
                 "",
                 "[mcp]",
                 "tool_call_timeout_ms = 60000",
@@ -135,7 +173,7 @@ def _args(root: Path, *extra: str) -> tuple[Any, dict[str, Any]]:
     args.root = str(root)
     config = tomllib.loads((root / "agents" / "deepseek" / "harness.toml").read_text())
     if args.model is None:
-        args.model = str(config["harness"]["default_model"])
+        args.model = str(config["providers"][args.provider]["default_model"])
     return args, config
 
 
@@ -189,6 +227,33 @@ def test_headless_engineer_sets_the_deployment_persona(tmp_path: Path) -> None:
     assert "process-engineering assistant" in persona["config"]["personaPrefix"]
     assert _find(rows, "agent-preset-registry") is None
     assert _find(rows, "preset-azoth-engineer") is None
+
+
+@pytest.mark.parametrize(
+    ("choice", "provider", "model"),
+    [
+        ("openai", "openai", "gpt-5.5"),
+        ("anthropic", "anthropic", "claude-sonnet-5"),
+        ("kimi", "moonshotai", "kimi-k2.6"),
+        ("minimax", "minimax", "MiniMax-M2.7"),
+    ],
+)
+def test_a_provider_choice_sets_the_default_and_mounts_the_routes(
+    tmp_path: Path, choice: str, provider: str, model: str
+) -> None:
+    rows = _rows(_root(tmp_path), "--provider", choice, "--flowsheet", "case.toml")
+    default = _find(rows, "agent-default-model")
+    assert default is not None
+    assert default["config"] == {"provider": provider, "model": model}
+    routes = _find(rows, "llm-pi-ai")
+    assert routes is not None
+    assert set(routes["config"]["providers"]) == {
+        "openai",
+        "anthropic",
+        "moonshotai",
+        "minimax",
+    }
+    assert _find(rows, "llm-deepseek") is not None
 
 
 def test_software_persona_leaves_the_shipped_standard_root(tmp_path: Path) -> None:

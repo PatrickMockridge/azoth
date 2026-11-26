@@ -95,7 +95,8 @@ checkout as the session workspace, renders the profile overlay, and starts it:
 
 ```bash
 python tools/launch_dsh.py --check                                    # read-only probe
-python tools/launch_dsh.py web --permission-mode read-only            # browser UI
+python tools/launch_dsh.py web --permission-mode read-only            # browser UI, DeepSeek
+python tools/launch_dsh.py web --permission-mode read-only --provider openai --model gpt-5.5
 python tools/launch_dsh.py headless --permission-mode read-only "Size a pump for 100 m³/h"
 ```
 
@@ -110,12 +111,13 @@ a browser front end. `--persona software` leaves DSH's coding preset in place.
 | skills and team | `/azoth-hazop`, four presets | the 90 catalog skills, or the curated HAZOP subset, over the Agent Teams board (web profile) |
 
 The HAZOP team is a web-profile experience; the headless one-shot composes no preset
-roster, so `--study hazop` is refused there. Hosted DeepSeek is the default
-(`DEEPSEEK_API_KEY`, `deepseek-v4-flash`); `--base-url`
-routes the same harness at any OpenAI-compatible endpoint serving open-weight weights.
-`--permission-mode` is required: `read-only` allows calculations and in-memory flowsheet
-edits but refuses file writes. The full interface — modes, flags, the bridge's JSON
-envelopes and the check report — is
+roster, so `--study hazop` is refused there. Five provider routes are mounted by default
+for the model selector — DeepSeek (default), OpenAI, Anthropic, Kimi and MiniMax — so a user with
+any one of those keys can choose a model without relaunching. `--provider` sets the
+default and `--model` the id; `--base-url` remains the escape to an OpenAI-compatible
+gateway or open-weight endpoint. `--permission-mode` is required: `read-only` allows
+calculations and in-memory flowsheet edits but refuses file writes. The full interface —
+modes, flags, provider keys, the bridge's JSON envelopes and the check report — is
 [the DeepSeek Harness chapter](docs/src/agentic/harness.md).
 
 ## Inherent safety
