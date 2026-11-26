@@ -767,10 +767,11 @@ fn solve3(matrix: [[f64; 3]; 3], rhs: [f64; 3]) -> Option<[f64; 3]> {
         matrix.swap(column, pivot);
         rhs.swap(column, pivot);
         let diagonal = matrix[column][column];
+        let pivot_row = matrix[column];
         for row in column + 1..3 {
             let factor = matrix[row][column] / diagonal;
-            for k in column..3 {
-                matrix[row][k] -= factor * matrix[column][k];
+            for (target, &source) in matrix[row][column..].iter_mut().zip(&pivot_row[column..]) {
+                *target -= factor * source;
             }
             rhs[row] -= factor * rhs[column];
         }
