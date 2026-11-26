@@ -120,6 +120,11 @@ calculations and in-memory flowsheet edits but refuses file writes. The full int
 modes, flags, provider keys, the bridge's JSON envelopes and the check report — is
 [the DeepSeek Harness chapter](docs/src/agentic/harness.md).
 
+The harness's worked output is in [`case-studies/`](case-studies/README.md): the AZ-FEED-08
+offshore-debottlenecking FEED study is a notebook-08 follow-on with equipment, materials,
+manhours, cost, a DEXPI PFD, reports, a project plan and an independent HAZOP close-out. Its
+README records the roughly half-hour, roughly 12-million-token session and the prompts.
+
 ## Inherent safety
 
 The worst thing this library can do is not crash. It is **return a wrong number that looks
