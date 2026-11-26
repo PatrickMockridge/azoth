@@ -18,6 +18,7 @@ function load() {
   vm.runInNewContext(SOURCE, { window, console })
   assert.equal(module.id, 'azoth-dsh-ui')
   const slots = new Map()
+  const opened = []
   const ctx = {
     slots: {
       inject(_name, register) {
@@ -28,8 +29,27 @@ function load() {
         return meta
       },
     },
+    workspaces: {
+      list: {
+        getSnapshot: () => ({
+          phase: 'ready',
+          items: [
+            { workspaceId: 'elsewhere', title: 'Default workspace' },
+            { workspaceId: 'azoth-id', title: 'azoth' },
+          ],
+        }),
+        subscribe: () => () => {},
+      },
+    },
+    uiWorkspace: {
+      openWorkspace: async (workspaceId) => opened.push(workspaceId),
+    },
+    effect: (effect) => effect(),
   }
-  module.factory(() => React).apply(ctx)
+  const api = module.factory(() => React)
+  assert.deepEqual([...api.inject], ['slots', 'workspaces', 'uiWorkspace'])
+  api.apply(ctx)
+  assert.deepEqual(opened, ['azoth-id'])
   return slots
 }
 
@@ -50,6 +70,16 @@ function buttons(node, found = []) {
   return found
 }
 
+function links(node, found = []) {
+  if (Array.isArray(node)) {
+    node.forEach((child) => links(child, found))
+  } else if (node && typeof node === 'object') {
+    if (node.type === 'a') found.push(node)
+    links(node.children, found)
+  }
+  return found
+}
+
 test('the UI registers a welcome card and a starter list', () => {
   const slots = load()
   assert.deepEqual([...slots.keys()], ['conversation.hero.frame', 'conversation.hero.options'])
@@ -57,15 +87,19 @@ test('the UI registers a welcome card and a starter list', () => {
   assert.equal(slots.get('conversation.hero.options').meta.id, 'azoth-starters')
 })
 
-test('the hero card names the domain, FEED and the screening boundary', () => {
+test('the hero card gives instructions and links the user manual', () => {
   const hero = load().get('conversation.hero.frame').component
   const tree = hero({ hero: true, children: React.createElement('div', null, 'conversation') })
   const words = text(tree)
   assert.match(words, /Azoth · process engineering/)
-  assert.match(words, /FEED here means Front-End Engineering Design/)
-  assert.match(words, /screening values, not design deliverables/)
-  assert.match(words, /Settings → Models/)
+  assert.match(words, /Ask about a pump/)
+  assert.match(words, /Choose a model in the model menu/)
+  assert.match(words, /Size a pump/)
+  assert.match(words, /demo separator/)
+  assert.match(words, /relief and fire/)
   assert.match(words, /conversation/)
+  assert.ok(links(tree).some((link) => link.props.href.endsWith('/azoth/manual/')))
+  assert.doesNotMatch(words, /FEED|screening|DEEPSEEK_API_KEY|Settings/)
 })
 
 test('the card renders only on the blank home', () => {

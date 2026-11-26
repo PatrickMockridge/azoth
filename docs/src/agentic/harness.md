@@ -51,9 +51,11 @@ writes, and neither exports the skills.
 DSH scans the skills and instruction files of the **session workspace**, not the
 process's working directory. The launcher therefore writes the checkout into
 `$DSH_HOME/storages/workspace.json` as the first workspace, adding a record when it is
-absent and preserving every other workspace and session. Without that record a session
-opens DSH's own `~/Documents/deepseek-harness/default-workspace`, and neither `AGENTS.md`
-nor `.dsh/skills` is discovered.
+absent and preserving every other workspace and session. The welcome UI also opens the
+workspace titled `azoth`, so a saved DSH selection does not reopen the default workspace.
+Without that record a session opens DSH's own
+`~/Documents/deepseek-harness/default-workspace`, and neither `AGENTS.md` nor `.dsh/skills`
+is discovered.
 
 `--persona engineer` (the default) mounts `azoth-engineer` as the web root preset: the
 engineering persona, `agent-instructions` for `AGENTS.md`, the skill catalog, file and
@@ -64,11 +66,12 @@ welcome card. `--persona software` leaves DSH's shipped coding persona in place.
 `--study hazop` (web only) keeps precedence over both and mounts the four role presets
 instead; the headless one-shot composes no preset roster and refuses it.
 
-The first time the page opens, the welcome card says what azoth is, distinguishes FEED
-from a browser front end, and names the screening boundary. Three starter buttons fill
-the composer with engineer questions: a pump sizing, the demo separator, and relief and
-fire calculations. A missing model key is reported by DSH; the key is saved on the
-**Settings → Models** page or exported as the selected provider's environment variable.
+The first time the page opens, the welcome card gives a one-line instruction, three
+example asks and a link to the user manual. The model menu below the composer chooses the
+provider and model; three starter buttons fill the composer with a pump sizing, the demo
+separator, and relief and fire questions. A missing model key is reported by DSH; the key
+is saved on the **Settings → Models** page or exported as the selected provider's
+environment variable.
 
 ## Providers
 

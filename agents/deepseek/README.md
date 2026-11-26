@@ -46,10 +46,10 @@ relaunch:
 routes whose keys are available. `--base-url` replaces the native routes with an
 OpenAI-compatible gateway, vLLM/SGLang endpoint or any model the catalog does not list.
 
-The first web session shows a compact card: azoth is a chemical-engineering calculation
-library, FEED means Front-End Engineering Design (not a browser front end), the demo
-flowsheet is loaded, and results are screening values. Three buttons fill the composer
-with a pump sizing, the demo separator, and relief and fire questions.
+The first web session shows a compact card with a one-line instruction, three example
+questions and a link to the user manual. Three buttons below it fill the composer with a
+pump sizing, the demo separator, and relief and fire questions; the model menu chooses the
+provider and model.
 
 ## The two tool surfaces
 

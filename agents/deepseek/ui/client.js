@@ -6,17 +6,14 @@ const STARTERS = [
   'What can azoth calculate for relief and fire cases?',
 ]
 
+const MANUAL = 'https://patrickmockridge.github.io/azoth/manual/'
+
 const CARD = {
   title: 'Azoth · process engineering',
   body:
-    'Ask in plant terms: pumps, pipes, valves, separators, exchangers, relief, fire or ' +
-    'HAZOP. azoth runs the calculation and shows its source and verification.',
-  note:
-    'FEED here means Front-End Engineering Design. The demo flowsheet is loaded; ' +
-    'results are screening values, not design deliverables.',
-  setup:
-    'First run: save your model provider’s API key on Settings → Models, then choose ' +
-    'the provider and model in the composer’s model menu.',
+    'Ask about a pump, pipe, valve, separator, exchanger, relief case or HAZOP. Type ' +
+    'your question below, or start with one of these:',
+  choose: 'Choose a model in the model menu below.',
 }
 
 const CARD_STYLE = {
@@ -74,16 +71,48 @@ function AzothHero({ hero, children }) {
         CARD.title,
       ),
       React.createElement('p', { style: { margin: '6px 0 0' } }, CARD.body),
-      React.createElement('p', { style: MUTED_STYLE }, CARD.note),
-      React.createElement('p', { style: MUTED_STYLE }, CARD.setup),
       React.createElement(
         'ul',
         { style: LIST_STYLE },
         STARTERS.map((text) => React.createElement('li', { key: text }, text)),
       ),
+      React.createElement('p', { style: MUTED_STYLE }, CARD.choose),
+      React.createElement(
+        'p',
+        { style: MUTED_STYLE },
+        'New to azoth? ',
+        React.createElement(
+          'a',
+          {
+            href: MANUAL,
+            target: '_blank',
+            rel: 'noreferrer',
+            style: { color: 'inherit', textDecoration: 'underline' },
+          },
+          'Read the user manual',
+        ),
+      ),
     ),
     children,
   )
+}
+
+function selectAzoth(ctx) {
+  let opened = false
+  let stop = () => {}
+  const tryOpen = () => {
+    if (opened) return
+    const snapshot = ctx.workspaces.list.getSnapshot()
+    if (snapshot.phase !== 'ready') return
+    const workspace = snapshot.items.find((item) => item.title === 'azoth')
+    if (!workspace) return
+    opened = true
+    stop()
+    ctx.uiWorkspace.openWorkspace(workspace.workspaceId).catch(() => {})
+  }
+  stop = ctx.workspaces.list.subscribe(tryOpen)
+  tryOpen()
+  return stop
 }
 
 function AzothStarters({ inputActions }) {
@@ -126,8 +155,9 @@ window.__ModuleLoader__.load({
     const react = require('react')
     React = react && react.createElement ? react : react.default
     return {
-      inject: ['slots'],
+      inject: ['slots', 'workspaces', 'uiWorkspace'],
       apply(ctx) {
+        ctx.effect(() => selectAzoth(ctx))
         ctx.slots.inject('conversation.hero.frame', () =>
           ctx.slots.register(
             { name: 'conversation.hero.frame', id: 'azoth-welcome', order: -100 },

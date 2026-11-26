@@ -101,8 +101,9 @@ python tools/launch_dsh.py headless --permission-mode read-only "Size a pump for
 ```
 
 The default engineering experience mounts an azoth persona, the `AGENTS.md` instructions,
-the 90 skills and the demo flowsheet, and shows a welcome card that distinguishes FEED from
-a browser front end. `--persona software` leaves DSH's coding preset in place.
+the 90 skills and the demo flowsheet, and shows a welcome card with a short instruction,
+three example asks and a link to the user manual. `--persona software` leaves DSH's coding
+preset in place.
 
 | Surface | Names | What it exposes |
 |---|---|---|
