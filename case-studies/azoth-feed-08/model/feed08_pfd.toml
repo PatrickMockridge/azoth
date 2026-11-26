@@ -1,0 +1,359 @@
+id = "flowsheets.feed08_debottleneck"
+name = "AZ-FEED-08 modified separation and compression train"
+products = ["Sales gas", "Condensate", "Produced water", "Fuel gas"]
+
+[[inputs]]
+name = "Wellstream"
+components = ["methane", "ethane", "propane", "i-butane", "n-butane", "i-pentane", "n-pentane", "n-hexane", "n-heptane", "n-octane", "co2", "nitrogen", "water"]
+n = 2230.0
+z = [0.6695691832094682, 0.05896995785292559, 0.03902423681443604, 0.009539257887973255, 0.01907851577594651, 0.009105655256701746, 0.011273668413059301, 0.013008078938145349, 0.013008078938145349, 0.009018934730447441, 0.01040646315051628, 0.0034688210501720926, 0.13452914798206278]
+P = 60.0e5
+T = 354.15
+
+[[instances]]
+id = "V-101"
+unit = "unit_ops.three_phase_separator"
+[instances.parameters]
+pressure_drop = 0.0
+heat_input = 0.0
+gas_in_aqueous = 0.0
+gas_in_oil = 0.0
+oil_in_aqueous = 0.0
+oil_in_gas = 0.0
+aqueous_in_gas = 0.0
+aqueous_in_oil = 0.0
+
+[[instances]]
+id = "K-101"
+unit = "unit_ops.compressor"
+[instances.parameters]
+outlet_pressure = 90.0e5
+isentropic_efficiency = 0.78
+
+[[instances]]
+id = "E-101"
+unit = "unit_ops.cooler"
+[instances.parameters]
+outlet_temperature = 313.15
+pressure_drop = 0.0
+
+[[instances]]
+id = "VLV-102"
+unit = "unit_ops.throttling_valve"
+[instances.parameters]
+outlet_pressure = 10.0e5
+
+[[instances]]
+id = "V-102"
+unit = "unit_ops.separator"
+[instances.parameters]
+pressure_drop = 0.0
+gas_in_liquid = 0.0
+
+[[instances]]
+id = "K-102A"
+unit = "unit_ops.compressor"
+[instances.parameters]
+outlet_pressure = 20.800838e5
+isentropic_efficiency = 0.78
+
+[[instances]]
+id = "E-102A"
+unit = "unit_ops.cooler"
+[instances.parameters]
+outlet_temperature = 313.15
+pressure_drop = 0.0
+
+[[instances]]
+id = "K-102B"
+unit = "unit_ops.compressor"
+[instances.parameters]
+outlet_pressure = 43.267487e5
+isentropic_efficiency = 0.78
+
+[[instances]]
+id = "E-102B"
+unit = "unit_ops.cooler"
+[instances.parameters]
+outlet_temperature = 313.15
+pressure_drop = 0.0
+
+[[instances]]
+id = "K-102C"
+unit = "unit_ops.compressor"
+[instances.parameters]
+outlet_pressure = 90.000000e5
+isentropic_efficiency = 0.78
+
+[[instances]]
+id = "E-102C"
+unit = "unit_ops.cooler"
+[instances.parameters]
+outlet_temperature = 313.15
+pressure_drop = 0.0
+
+[[instances]]
+id = "VLV-103"
+unit = "unit_ops.throttling_valve"
+[instances.parameters]
+outlet_pressure = 2.0e5
+
+[[instances]]
+id = "V-103"
+unit = "unit_ops.separator"
+[instances.parameters]
+pressure_drop = 0.0
+gas_in_liquid = 0.0
+
+[[instances]]
+id = "K-103A"
+unit = "unit_ops.compressor"
+[instances.parameters]
+outlet_pressure = 4.282255e5
+isentropic_efficiency = 0.78
+
+[[instances]]
+id = "E-103A"
+unit = "unit_ops.cooler"
+[instances.parameters]
+outlet_temperature = 313.15
+pressure_drop = 0.0
+
+[[instances]]
+id = "K-103B"
+unit = "unit_ops.compressor"
+[instances.parameters]
+outlet_pressure = 9.168853e5
+isentropic_efficiency = 0.78
+
+[[instances]]
+id = "E-103B"
+unit = "unit_ops.cooler"
+[instances.parameters]
+outlet_temperature = 313.15
+pressure_drop = 0.0
+
+[[instances]]
+id = "K-103C"
+unit = "unit_ops.compressor"
+[instances.parameters]
+outlet_pressure = 19.631682e5
+isentropic_efficiency = 0.78
+
+[[instances]]
+id = "E-103C"
+unit = "unit_ops.cooler"
+[instances.parameters]
+outlet_temperature = 313.15
+pressure_drop = 0.0
+
+[[instances]]
+id = "K-103D"
+unit = "unit_ops.compressor"
+[instances.parameters]
+outlet_pressure = 42.033931e5
+isentropic_efficiency = 0.78
+
+[[instances]]
+id = "E-103D"
+unit = "unit_ops.cooler"
+[instances.parameters]
+outlet_temperature = 313.15
+pressure_drop = 0.0
+
+[[instances]]
+id = "K-103E"
+unit = "unit_ops.compressor"
+[instances.parameters]
+outlet_pressure = 90.000000e5
+isentropic_efficiency = 0.78
+
+[[instances]]
+id = "E-103E"
+unit = "unit_ops.cooler"
+[instances.parameters]
+outlet_temperature = 313.15
+pressure_drop = 0.0
+
+[[instances]]
+id = "E-104"
+unit = "unit_ops.cooler"
+[instances.parameters]
+outlet_temperature = 288.15
+pressure_drop = 0.0
+
+[[instances]]
+id = "V-104"
+unit = "unit_ops.separator"
+[instances.parameters]
+pressure_drop = 98700.0
+gas_in_liquid = 0.0
+
+[[instances]]
+id = "M-101"
+unit = "unit_ops.mixer"
+
+[[connections]]
+from = "Wellstream"
+to = "V-101.feed"
+
+[[connections]]
+from = "V-101.vapour"
+to = "K-101.inlet"
+
+[[connections]]
+from = "K-101.outlet"
+to = "E-101.inlet"
+
+[[connections]]
+from = "V-101.light_liquid"
+to = "VLV-102.inlet"
+
+[[connections]]
+from = "VLV-102.outlet"
+to = "V-102.feed"
+
+[[connections]]
+from = "V-102.vapour"
+to = "K-102A.inlet"
+
+[[connections]]
+from = "K-102A.outlet"
+to = "E-102A.inlet"
+
+[[connections]]
+from = "E-102A.outlet"
+to = "K-102B.inlet"
+
+[[connections]]
+from = "K-102B.outlet"
+to = "E-102B.inlet"
+
+[[connections]]
+from = "E-102B.outlet"
+to = "K-102C.inlet"
+
+[[connections]]
+from = "K-102C.outlet"
+to = "E-102C.inlet"
+
+[[connections]]
+from = "V-102.liquid"
+to = "VLV-103.inlet"
+
+[[connections]]
+from = "VLV-103.outlet"
+to = "V-103.feed"
+
+[[connections]]
+from = "V-103.vapour"
+to = "K-103A.inlet"
+
+[[connections]]
+from = "K-103A.outlet"
+to = "E-103A.inlet"
+
+[[connections]]
+from = "E-103A.outlet"
+to = "K-103B.inlet"
+
+[[connections]]
+from = "K-103B.outlet"
+to = "E-103B.inlet"
+
+[[connections]]
+from = "E-103B.outlet"
+to = "K-103C.inlet"
+
+[[connections]]
+from = "K-103C.outlet"
+to = "E-103C.inlet"
+
+[[connections]]
+from = "E-103C.outlet"
+to = "K-103D.inlet"
+
+[[connections]]
+from = "K-103D.outlet"
+to = "E-103D.inlet"
+
+[[connections]]
+from = "E-103D.outlet"
+to = "K-103E.inlet"
+
+[[connections]]
+from = "K-103E.outlet"
+to = "E-103E.inlet"
+
+[[connections]]
+from = "V-103.liquid"
+to = "E-104.inlet"
+
+[[connections]]
+from = "E-104.outlet"
+to = "V-104.feed"
+
+[[connections]]
+from = "E-101.outlet"
+to = "M-101.feed[0]"
+
+[[connections]]
+from = "E-102C.outlet"
+to = "M-101.feed[1]"
+
+[[connections]]
+from = "E-103E.outlet"
+to = "M-101.feed[2]"
+
+[[connections]]
+from = "V-104.vapour"
+to = "Fuel gas"
+
+[[connections]]
+from = "M-101.product"
+to = "Sales gas"
+
+[[connections]]
+from = "V-104.liquid"
+to = "Condensate"
+
+[[connections]]
+from = "V-101.heavy_liquid"
+to = "Produced water"
+
+[layout.inputs]
+Wellstream = [0, 120]
+
+[layout.instances]
+V-101 = [40, 120]
+K-101 = [260, 120]
+E-101 = [470, 120]
+VLV-102 = [40, 320]
+V-102 = [250, 320]
+VLV-103 = [40, 540]
+V-103 = [250, 540]
+K-102A = [470, 320]
+E-102A = [680, 320]
+K-102B = [890, 320]
+E-102B = [1100, 320]
+K-102C = [1310, 320]
+E-102C = [1520, 320]
+K-103A = [470, 540]
+E-103A = [680, 540]
+K-103B = [890, 540]
+E-103B = [1100, 540]
+K-103C = [1310, 540]
+E-103C = [1520, 540]
+K-103D = [1730, 540]
+E-103D = [1940, 540]
+K-103E = [2150, 540]
+E-103E = [2360, 540]
+E-104 = [2610, 540]
+V-104 = [2820, 540]
+M-101 = [3050, 120]
+
+[layout.products]
+"Sales gas" = [3270, 120]
+"Condensate" = [3270, 640]
+"Fuel gas" = [3050, 640]
+"Produced water" = [40, 20]

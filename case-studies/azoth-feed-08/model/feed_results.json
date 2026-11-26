@@ -1,0 +1,1224 @@
+{
+  "meta": {
+    "source": "model/feed_model.py",
+    "azoth_version": "0.1.4",
+    "note": "FEED additions; illustrative asset; screening values only."
+  },
+  "co2": {
+    "co2_mol_pct_vapour": 1.22,
+    "co2_mol_pct_feed": 1.04,
+    "p_co2_vapour_bar": 0.732,
+    "p_co2_feed_bar": 0.624,
+    "temperature_c": 81.0,
+    "inhibited_rate_mm_yr": 0.15,
+    "uninhibited_rate_mm_yr": 1.5,
+    "design_life_years": 20.0,
+    "ca_required_mm": 3.0,
+    "ca_selected_mm": 3.0,
+    "uninhibited_ca_mm": 30.0,
+    "verdict": "CO2 partial pressure below 1 bar and temperature below 100 C: carbon steel with continuous inhibition and a 3 mm corrosion allowance is acceptable. Inhibition is a barrier, not a calculation; it must be monitored."
+  },
+  "mechanical": {
+    "v101": {
+      "design_pressure_barg": 66.0,
+      "design_temperature_c": 100.0,
+      "inside_diameter_mm": 1960.0,
+      "tangent_length_mm": 7260.0,
+      "s_mpa": 138.0,
+      "e": 1.0,
+      "t_required_mm": 48.25,
+      "ca_mm": 3.0,
+      "t_with_ca_mm": 51.25,
+      "t_selected_mm": 52.0
+    },
+    "gas_line": {
+      "size_in": 12,
+      "od_mm": 323.9,
+      "design_pressure_barg": 100.0,
+      "material": "API 5L X65 PSL2",
+      "s_mpa": 323.0,
+      "t_required_mm": 4.96,
+      "ca_mm": 3.0,
+      "t_with_ca_mm": 7.96,
+      "t_selected_mm": 12.7,
+      "schedule": "12.7 mm WT"
+    },
+    "condensate_line": {
+      "size_in": 6,
+      "od_mm": 168.3,
+      "design_pressure_barg": 30.0,
+      "material": "API 5L X65 PSL2",
+      "s_mpa": 323.0,
+      "t_required_mm": 0.78,
+      "ca_mm": 3.0,
+      "t_with_ca_mm": 3.78,
+      "t_selected_mm": 7.1,
+      "schedule": "SCH 40"
+    },
+    "water_line": {
+      "size_in": 8,
+      "od_mm": 219.1,
+      "design_pressure_barg": 25.0,
+      "material": "ASTM A312 TP316L",
+      "s_mpa": 138.0,
+      "t_required_mm": 1.97,
+      "ca_mm": 0.0,
+      "t_with_ca_mm": 1.97,
+      "t_selected_mm": 3.76,
+      "schedule": "SCH 10S"
+    },
+    "hipps_spool": {
+      "size_in": 10,
+      "od_mm": 273.0,
+      "design_pressure_barg": 100.0,
+      "material": "ASTM A312 TP316L",
+      "s_mpa": 138.0,
+      "t_required_mm": 9.61,
+      "ca_mm": 0.0,
+      "t_with_ca_mm": 9.61,
+      "t_selected_mm": 12.7,
+      "schedule": "12.7 mm WT"
+    }
+  },
+  "materials": {
+    "philosophy": [
+      "Carbon steel is the default for the dry and wet hydrocarbon service, with a 3.0 mm corrosion allowance and continuous CO2 inhibition.",
+      "316L is used for the produced-water package, HIPPS wetted parts and instrument connections where carbon-steel corrosion products would foul the water treatment.",
+      "No H2S is present, so NACE MR0175/ISO 15156 is not triggered; B7M bolting is nonetheless specified as a sour-service margin for future composition change.",
+      "External protection is ISO 12944 C5-M at 320 micrometres; hot surfaces above 60 C are PIR-insulated with 0.5 mm stainless cladding.",
+      "The flare tip is Inconel 625; the header is carbon steel with a 3 mm allowance and external ceramic insulation."
+    ],
+    "schedule": [
+      {
+        "item": "V-101 shell and heads",
+        "material": "SA-516 Gr 70N",
+        "spec": "ASME VIII-1",
+        "ca_mm": 3.0,
+        "notes": "existing vessel; internals change only"
+      },
+      {
+        "item": "V-101 internals",
+        "material": "316L",
+        "spec": "ASME VIII-1 / vendor",
+        "ca_mm": 0.0,
+        "notes": "inlet device, vane pack, weir"
+      },
+      {
+        "item": "V-102 / V-103 shells",
+        "material": "SA-516 Gr 70N",
+        "spec": "ASME VIII-1",
+        "ca_mm": 3.0,
+        "notes": "existing, no change"
+      },
+      {
+        "item": "K-101 casing / impellers",
+        "material": "CS / 17-4PH",
+        "spec": "API 617",
+        "ca_mm": 0.0,
+        "notes": "vendor re-rate kit"
+      },
+      {
+        "item": "HIPPS body and spool",
+        "material": "316L",
+        "spec": "API 6D / IEC 61508",
+        "ca_mm": 0.0,
+        "notes": "SIL-3 loop"
+      },
+      {
+        "item": "Hydrocyclone liners",
+        "material": "Super Duplex 25Cr",
+        "spec": "vendor",
+        "ca_mm": 0.0,
+        "notes": "produced water"
+      },
+      {
+        "item": "Coalescer vessel",
+        "material": "316L",
+        "spec": "ASME VIII-1",
+        "ca_mm": 0.0,
+        "notes": "produced water"
+      },
+      {
+        "item": "Produced-water piping",
+        "material": "316L / GRP",
+        "spec": "B31.3",
+        "ca_mm": 0.0,
+        "notes": "sweet, chloride-bearing"
+      },
+      {
+        "item": "Export gas line",
+        "material": "API 5L X65 PSL2",
+        "spec": "B31.3 / DNV",
+        "ca_mm": 3.0,
+        "notes": "3LPP external"
+      },
+      {
+        "item": "Condensate line",
+        "material": "API 5L X65 PSL2",
+        "spec": "B31.3",
+        "ca_mm": 3.0,
+        "notes": "3LPP external"
+      },
+      {
+        "item": "Flare tip",
+        "material": "Inconel 625",
+        "spec": "API 537",
+        "ca_mm": 0.0,
+        "notes": "fallback scope"
+      },
+      {
+        "item": "Structural steel",
+        "material": "S355 J2",
+        "spec": "EN 1993",
+        "ca_mm": 0.0,
+        "notes": "H-60 fireproofing at HP"
+      },
+      {
+        "item": "Bolting",
+        "material": "A193 B7M / A194 2HM",
+        "spec": "ASME",
+        "ca_mm": 0.0,
+        "notes": "sour margin"
+      },
+      {
+        "item": "Gaskets",
+        "material": "Spiral wound 316L / graphite",
+        "spec": "ASME B16.20",
+        "ca_mm": 0.0,
+        "notes": "all hydrocarbon flanges"
+      }
+    ],
+    "line_classes": [
+      {
+        "class": "A1",
+        "service": "Wet HP gas",
+        "size_in": "12",
+        "material": "X65",
+        "rating": "ANSI 900",
+        "ca_mm": 3.0,
+        "insulation": "PIR + SS cladding"
+      },
+      {
+        "class": "A2",
+        "service": "Wet HP/MP oil",
+        "size_in": "6",
+        "material": "X65",
+        "rating": "ANSI 900",
+        "ca_mm": 3.0,
+        "insulation": "PIR + SS cladding"
+      },
+      {
+        "class": "A3",
+        "service": "Produced water",
+        "size_in": "8",
+        "material": "316L",
+        "rating": "ANSI 300",
+        "ca_mm": 0.0,
+        "insulation": "none"
+      },
+      {
+        "class": "A4",
+        "service": "Relief / flare",
+        "size_in": "12",
+        "material": "CS",
+        "rating": "ANSI 300",
+        "ca_mm": 3.0,
+        "insulation": "ceramic fibre"
+      },
+      {
+        "class": "A5",
+        "service": "Condensate export",
+        "size_in": "6",
+        "material": "X65",
+        "rating": "ANSI 600",
+        "ca_mm": 3.0,
+        "insulation": "cellular glass"
+      }
+    ]
+  },
+  "datasheets": [
+    {
+      "tag": "V-101",
+      "service": "HP three-phase separator \u2014 internals",
+      "type": "Horizontal 3-phase separator, existing",
+      "design_p": "66 barg",
+      "design_t": "100 C",
+      "size": "ID 1.96 m x 7.26 m T/T",
+      "material": "SA-516 Gr 70N + 316L internals",
+      "ca": "3.0 mm",
+      "internals": "Inlet device, vane pack, weir and interface control; K 0.11 -> 0.14 m/s",
+      "nozzles": "Feed 12 in; gas 12 in; oil 6 in; water 8 in; PSV 4 in; instruments 2 in",
+      "weight": "30 t dry",
+      "insulation": "PIR 50 mm + SS cladding",
+      "code": "ASME VIII-1",
+      "qty": 1,
+      "scope": "Modify internals"
+    },
+    {
+      "tag": "K-101",
+      "service": "Export compressor \u2014 re-rate",
+      "type": "Centrifugal, 2-stage, existing",
+      "design_p": "100 barg",
+      "design_t": "120 C",
+      "size": "2,273 kW absorbed now; 2,689 kW at potential",
+      "material": "CS casing, 17-4PH impellers",
+      "ca": "n/a",
+      "internals": "Revised impellers/bundle, dry gas seals, driver re-rate to 2.7 MW",
+      "nozzles": "Suction 16 in; discharge 12 in",
+      "weight": "27.3 t",
+      "insulation": "none (acoustic lagging)",
+      "code": "API 617 / API 614",
+      "qty": 1,
+      "scope": "Re-rate +18%"
+    },
+    {
+      "tag": "SDV-101",
+      "service": "HIPPS final element \u2014 HP inlet isolation",
+      "type": "SIL-3 shutdown valve, 1oo2 initiators",
+      "design_p": "100 barg",
+      "design_t": "100 C",
+      "size": "10 in",
+      "material": "316L body, Duplex trim",
+      "ca": "0.0 mm",
+      "internals": "2 x PT, SIL-3 logic solver, partial-stroke test, <2 s closure",
+      "nozzles": "10 in ANSI 900",
+      "weight": "1.2 t",
+      "insulation": "none",
+      "code": "API 6D / IEC 61508",
+      "qty": 1,
+      "scope": "New HIPPS"
+    },
+    {
+      "tag": "V-105",
+      "service": "Produced-water hydrocyclone",
+      "type": "Package hydrocyclone, 2 x 50%",
+      "design_p": "25 barg",
+      "design_t": "80 C",
+      "size": "6,000 bbl/d total",
+      "material": "Super Duplex 25Cr liners",
+      "ca": "0.0 mm",
+      "internals": "12 mm liners, reject control valve",
+      "nozzles": "Inlet 8 in; water 8 in; reject 2 in",
+      "weight": "3.5 t",
+      "insulation": "none",
+      "code": "ASME VIII-1 / vendor",
+      "qty": 1,
+      "scope": "New"
+    },
+    {
+      "tag": "V-106",
+      "service": "Produced-water coalescer",
+      "type": "Horizontal coalescer, 1.2 m ID x 4.0 m T/T",
+      "design_p": "25 barg",
+      "design_t": "80 C",
+      "size": "6,000 bbl/d, 6.5 min retention (4.3 m3)",
+      "material": "316L",
+      "ca": "0.0 mm",
+      "internals": "Plate pack / coalescing media, oil skimmer",
+      "nozzles": "Inlet 8 in; water 8 in; oil 2 in",
+      "weight": "4.0 t",
+      "insulation": "none",
+      "code": "ASME VIII-1",
+      "qty": 1,
+      "scope": "New"
+    },
+    {
+      "tag": "PSV-102",
+      "service": "MP let-down overpressure protection",
+      "type": "Conventional PSV, V-102",
+      "design_p": "12 barg set",
+      "design_t": "100 C",
+      "size": "Sized for VLV-102 fail-open gas blowby",
+      "material": "316L trim",
+      "ca": "0.0 mm",
+      "internals": "Sized at detailed design; outlet to MP flare/vent header",
+      "nozzles": "2 in inlet x 3 in outlet",
+      "weight": "0.1 t",
+      "insulation": "none",
+      "code": "API 520 / API 521",
+      "qty": 1,
+      "scope": "New (HAZOP action)"
+    },
+    {
+      "tag": "PSV-103",
+      "service": "LP let-down overpressure protection",
+      "type": "Conventional PSV, V-103",
+      "design_p": "4 barg set",
+      "design_t": "100 C",
+      "size": "Sized for VLV-103 fail-open gas blowby",
+      "material": "316L trim",
+      "ca": "0.0 mm",
+      "internals": "Sized at detailed design; outlet to LP flare/vent header",
+      "nozzles": "2 in inlet x 3 in outlet",
+      "weight": "0.1 t",
+      "insulation": "none",
+      "code": "API 520 / API 521",
+      "qty": 1,
+      "scope": "New (HAZOP action)"
+    },
+    {
+      "tag": "PSV-104",
+      "service": "Produced-water package overpressure protection",
+      "type": "Conventional PSV, V-106",
+      "design_p": "25 barg set",
+      "design_t": "80 C",
+      "size": "Sized for LCV-102 fail-open / blocked outlet",
+      "material": "316L trim",
+      "ca": "0.0 mm",
+      "internals": "Outlet routed to a safe location; no relief to the water treatment",
+      "nozzles": "2 in inlet x 3 in outlet",
+      "weight": "0.1 t",
+      "insulation": "none",
+      "code": "API 520 / API 521",
+      "qty": 1,
+      "scope": "New (HAZOP action)"
+    },
+    {
+      "tag": "P-102",
+      "service": "Treated-water pump (2 x 50%)",
+      "type": "Centrifugal, API 610 OH1",
+      "design_p": "25 barg",
+      "design_t": "80 C",
+      "size": "2 x 50% at 19.9 m3/h (39.7 m3/h total) at 60 m",
+      "material": "316L casing / Duplex trim",
+      "ca": "0.0 mm",
+      "internals": "10.0 kW absorbed per duty pump; 15 kW motor; one standby",
+      "nozzles": "Suction 4 in; discharge 3 in",
+      "weight": "0.8 t",
+      "insulation": "none",
+      "code": "API 610",
+      "qty": 1,
+      "scope": "New"
+    },
+    {
+      "tag": "PSV-101",
+      "service": "HP separator relief",
+      "type": "Conventional PSV, P orifice",
+      "design_p": "66 barg set",
+      "design_t": "100 C",
+      "size": "6.38 in2 fitted; 3.60 in2 required with HIPPS",
+      "material": "316L trim",
+      "ca": "0.0 mm",
+      "internals": "Balanced bellows not required (constant back pressure 1.5 bar)",
+      "nozzles": "4 in inlet x 6 in outlet",
+      "weight": "0.2 t",
+      "insulation": "none",
+      "code": "API 520 / API 526",
+      "qty": 1,
+      "scope": "No change; re-certify"
+    },
+    {
+      "tag": "Flare",
+      "service": "Relief disposal \u2014 fallback scope",
+      "type": "Existing flare and header",
+      "design_p": "10 barg",
+      "design_t": "600 C",
+      "size": "46.34 kg/s design; 91.1% loaded",
+      "material": "CS header, Inconel 625 tip",
+      "ca": "3.0 mm",
+      "internals": "+25% capacity tip and header if HIPPS is not approved",
+      "nozzles": "Header 24 in",
+      "weight": "n/a",
+      "insulation": "ceramic fibre",
+      "code": "API 537 / API 521",
+      "qty": 1,
+      "scope": "Fallback +25%"
+    }
+  ],
+  "manhours": {
+    "rows": [
+      {
+        "discipline": "Process",
+        "engineering": 1200,
+        "fabrication": 0,
+        "offshore": 0,
+        "total": 1200
+      },
+      {
+        "discipline": "Mechanical",
+        "engineering": 1800,
+        "fabrication": 2400,
+        "offshore": 1200,
+        "total": 5400
+      },
+      {
+        "discipline": "Piping",
+        "engineering": 2400,
+        "fabrication": 3200,
+        "offshore": 1800,
+        "total": 7400
+      },
+      {
+        "discipline": "Electrical & instrumentation",
+        "engineering": 2600,
+        "fabrication": 1600,
+        "offshore": 1500,
+        "total": 5700
+      },
+      {
+        "discipline": "Structural",
+        "engineering": 800,
+        "fabrication": 1200,
+        "offshore": 1000,
+        "total": 3000
+      },
+      {
+        "discipline": "Safety & risk",
+        "engineering": 1100,
+        "fabrication": 0,
+        "offshore": 300,
+        "total": 1400
+      },
+      {
+        "discipline": "Project engineering & controls",
+        "engineering": 2000,
+        "fabrication": 400,
+        "offshore": 500,
+        "total": 2900
+      },
+      {
+        "discipline": "Procurement & expediting",
+        "engineering": 1400,
+        "fabrication": 0,
+        "offshore": 0,
+        "total": 1400
+      },
+      {
+        "discipline": "QA / commissioning",
+        "engineering": 900,
+        "fabrication": 800,
+        "offshore": 2500,
+        "total": 4200
+      }
+    ],
+    "totals": {
+      "engineering": 14200,
+      "fabrication": 9600,
+      "offshore": 8800,
+      "total": 32600
+    },
+    "rates_usd_per_h": {
+      "engineering": 110.0,
+      "fabrication": 85.0,
+      "offshore": 180.0
+    },
+    "labour_cost_musd": {
+      "engineering": 1.562,
+      "fabrication": 0.816,
+      "offshore": 1.584
+    },
+    "labour_cost_total_musd": 3.962
+  },
+  "cost": {
+    "groups": [
+      {
+        "group": "equipment",
+        "items": [
+          {
+            "item": "Compressor re-rate kit",
+            "musd": 11.0
+          },
+          {
+            "item": "HP separator internals",
+            "musd": 2.3
+          },
+          {
+            "item": "HIPPS SIL-3",
+            "musd": 2.9
+          },
+          {
+            "item": "Produced-water package",
+            "musd": 3.8
+          }
+        ],
+        "subtotal_musd": 20.0
+      },
+      {
+        "group": "bulk",
+        "items": [
+          {
+            "item": "Piping, valves and fittings",
+            "musd": 2.0
+          },
+          {
+            "item": "Electrical and instrumentation",
+            "musd": 1.4
+          },
+          {
+            "item": "Structural and architectural",
+            "musd": 0.8
+          }
+        ],
+        "subtotal_musd": 4.2
+      },
+      {
+        "group": "fabrication",
+        "items": [
+          {
+            "item": "Shop labour (9,600 h)",
+            "musd": 0.82
+          },
+          {
+            "item": "Consumables and materials",
+            "musd": 0.5
+          },
+          {
+            "item": "NDT and testing",
+            "musd": 0.3
+          },
+          {
+            "item": "Painting and insulation",
+            "musd": 0.2
+          },
+          {
+            "item": "Shop overhead",
+            "musd": 0.28
+          }
+        ],
+        "subtotal_musd": 2.1
+      },
+      {
+        "group": "offshore",
+        "items": [
+          {
+            "item": "Marine spread and logistics",
+            "musd": 1.85
+          },
+          {
+            "item": "Offshore labour (8,800 h)",
+            "musd": 1.58
+          },
+          {
+            "item": "Scaffolding and access",
+            "musd": 0.4
+          },
+          {
+            "item": "Commissioning consumables",
+            "musd": 0.47
+          }
+        ],
+        "subtotal_musd": 4.3
+      },
+      {
+        "group": "engineering",
+        "items": [
+          {
+            "item": "Engineering labour (14,200 h)",
+            "musd": 1.56
+          },
+          {
+            "item": "Specialist studies (SIL, relief, structural)",
+            "musd": 0.44
+          },
+          {
+            "item": "Third-party and software",
+            "musd": 0.16
+          },
+          {
+            "item": "Project controls",
+            "musd": 0.24
+          }
+        ],
+        "subtotal_musd": 2.4
+      },
+      {
+        "group": "owner",
+        "items": [
+          {
+            "item": "Operations readiness and training",
+            "musd": 0.5
+          },
+          {
+            "item": "Spares and first fills",
+            "musd": 0.5
+          },
+          {
+            "item": "Permits, inspection and MOC",
+            "musd": 0.3
+          }
+        ],
+        "subtotal_musd": 1.3
+      },
+      {
+        "group": "precommissioning",
+        "items": [
+          {
+            "item": "Pre-commissioning and start-up",
+            "musd": 1.7
+          }
+        ],
+        "subtotal_musd": 1.7
+      }
+    ],
+    "total_musd": 36.0,
+    "hazop_allowance_musd": 1.8,
+    "hazop_note": "HAZOP actions (level trips, PSVs, standby pump, larger coalescer, F&G/ESD) are estimated at 1.8 MUSD and sit inside the Class 4/5 accuracy band; the 36.0 MUSD estimate of record is unchanged pending the Class 3 estimate.",
+    "estimate_of_record_musd": 36.0,
+    "reconciles": true,
+    "class": "AACE Class 4/5",
+    "accuracy": "-30% / +50%",
+    "contingency": "None applied; allowances carry vendor and installation contingency."
+  },
+  "schedule": {
+    "activities": [
+      {
+        "id": "A1",
+        "phase": "A Design",
+        "name": "FEED close-out and design basis freeze",
+        "start": 0,
+        "duration": 2,
+        "finish": 2,
+        "predecessors": "",
+        "discipline": "Process",
+        "hours": 815.0,
+        "cost_musd": 0.35
+      },
+      {
+        "id": "A2",
+        "phase": "A Design",
+        "name": "Relief, flare and HIPPS basis update",
+        "start": 2,
+        "duration": 3,
+        "finish": 5,
+        "predecessors": "A1",
+        "discipline": "Safety & risk",
+        "hours": 1222.0,
+        "cost_musd": 0.53
+      },
+      {
+        "id": "A3",
+        "phase": "A Design",
+        "name": "Mechanical datasheets and vendor enquiry",
+        "start": 3,
+        "duration": 4,
+        "finish": 7,
+        "predecessors": "A1",
+        "discipline": "Mechanical",
+        "hours": 1579.0,
+        "cost_musd": 0.68
+      },
+      {
+        "id": "A4",
+        "phase": "A Design",
+        "name": "Piping, E&I and structural detailed design",
+        "start": 4,
+        "duration": 6,
+        "finish": 10,
+        "predecessors": "A3",
+        "discipline": "Piping",
+        "hours": 3820.0,
+        "cost_musd": 1.65
+      },
+      {
+        "id": "A5",
+        "phase": "A Design",
+        "name": "HAZOP, SIL review and design freeze",
+        "start": 7,
+        "duration": 3,
+        "finish": 10,
+        "predecessors": "A2,A4",
+        "discipline": "Safety & risk",
+        "hours": 1070.0,
+        "cost_musd": 0.46
+      },
+      {
+        "id": "A6",
+        "phase": "A Design",
+        "name": "Approved-for-construction issue",
+        "start": 10,
+        "duration": 1,
+        "finish": 11,
+        "predecessors": "A5",
+        "discipline": "Project engineering & controls",
+        "hours": 458.0,
+        "cost_musd": 0.2
+      },
+      {
+        "id": "B1",
+        "phase": "B Procurement",
+        "name": "Compressor re-rate purchase order",
+        "start": 8,
+        "duration": 1,
+        "finish": 9,
+        "predecessors": "A3",
+        "discipline": "Procurement & expediting",
+        "hours": 560.0,
+        "cost_musd": 0.24
+      },
+      {
+        "id": "B2",
+        "phase": "B Procurement",
+        "name": "HIPPS purchase order",
+        "start": 8,
+        "duration": 1,
+        "finish": 9,
+        "predecessors": "A3",
+        "discipline": "Procurement & expediting",
+        "hours": 408.0,
+        "cost_musd": 0.18
+      },
+      {
+        "id": "B3",
+        "phase": "B Procurement",
+        "name": "Separator internals purchase order",
+        "start": 8,
+        "duration": 1,
+        "finish": 9,
+        "predecessors": "A3",
+        "discipline": "Procurement & expediting",
+        "hours": 382.0,
+        "cost_musd": 0.17
+      },
+      {
+        "id": "B4",
+        "phase": "B Procurement",
+        "name": "Produced-water package purchase order",
+        "start": 8,
+        "duration": 1,
+        "finish": 9,
+        "predecessors": "A3",
+        "discipline": "Procurement & expediting",
+        "hours": 433.0,
+        "cost_musd": 0.19
+      },
+      {
+        "id": "B5",
+        "phase": "B Procurement",
+        "name": "Compressor kit manufacture and FAT",
+        "start": 9,
+        "duration": 22,
+        "finish": 31,
+        "predecessors": "B1",
+        "discipline": "Mechanical",
+        "hours": 2292.0,
+        "cost_musd": 0.99
+      },
+      {
+        "id": "B6",
+        "phase": "B Procurement",
+        "name": "HIPPS manufacture and FAT",
+        "start": 9,
+        "duration": 12,
+        "finish": 21,
+        "predecessors": "B2",
+        "discipline": "Electrical & instrumentation",
+        "hours": 1324.0,
+        "cost_musd": 0.57
+      },
+      {
+        "id": "B7",
+        "phase": "B Procurement",
+        "name": "Internals manufacture",
+        "start": 9,
+        "duration": 14,
+        "finish": 23,
+        "predecessors": "B3",
+        "discipline": "Mechanical",
+        "hours": 1783.0,
+        "cost_musd": 0.77
+      },
+      {
+        "id": "B8",
+        "phase": "B Procurement",
+        "name": "Water package manufacture and FAT",
+        "start": 9,
+        "duration": 16,
+        "finish": 25,
+        "predecessors": "B4",
+        "discipline": "Mechanical",
+        "hours": 2088.0,
+        "cost_musd": 0.9
+      },
+      {
+        "id": "C1",
+        "phase": "C Readiness",
+        "name": "Offshore survey and work-pack development",
+        "start": 26,
+        "duration": 4,
+        "finish": 30,
+        "predecessors": "A6",
+        "discipline": "Piping",
+        "hours": 1528.0,
+        "cost_musd": 0.66
+      },
+      {
+        "id": "C2",
+        "phase": "C Readiness",
+        "name": "Isolation, gas-free and permit plan",
+        "start": 28,
+        "duration": 3,
+        "finish": 31,
+        "predecessors": "C1",
+        "discipline": "Safety & risk",
+        "hours": 662.0,
+        "cost_musd": 0.29
+      },
+      {
+        "id": "C3",
+        "phase": "C Readiness",
+        "name": "Logistics, marine spread and materials load-out",
+        "start": 28,
+        "duration": 4,
+        "finish": 32,
+        "predecessors": "B5,B6,B7,B8",
+        "discipline": "Project engineering & controls",
+        "hours": 866.0,
+        "cost_musd": 0.37
+      },
+      {
+        "id": "D1",
+        "phase": "D Shutdown",
+        "name": "Shutdown start, isolation and gas-free",
+        "start": 32,
+        "duration": 0.5,
+        "finish": 32.5,
+        "predecessors": "C2,C3",
+        "discipline": "Safety & risk",
+        "hours": 408.0,
+        "cost_musd": 0.18
+      },
+      {
+        "id": "D2",
+        "phase": "D Shutdown",
+        "name": "Compressor re-rate installation",
+        "start": 32.5,
+        "duration": 3,
+        "finish": 35.5,
+        "predecessors": "D1",
+        "discipline": "Mechanical",
+        "hours": 1936.0,
+        "cost_musd": 0.84
+      },
+      {
+        "id": "D3",
+        "phase": "D Shutdown",
+        "name": "Separator internals replacement",
+        "start": 32.5,
+        "duration": 3,
+        "finish": 35.5,
+        "predecessors": "D1",
+        "discipline": "Mechanical",
+        "hours": 1324.0,
+        "cost_musd": 0.57
+      },
+      {
+        "id": "D4",
+        "phase": "D Shutdown",
+        "name": "HIPPS installation and loop test",
+        "start": 32.5,
+        "duration": 2,
+        "finish": 34.5,
+        "predecessors": "D1",
+        "discipline": "Electrical & instrumentation",
+        "hours": 968.0,
+        "cost_musd": 0.42
+      },
+      {
+        "id": "D5",
+        "phase": "D Shutdown",
+        "name": "Produced-water package installation",
+        "start": 32.5,
+        "duration": 3.5,
+        "finish": 36.0,
+        "predecessors": "D1",
+        "discipline": "Piping",
+        "hours": 2292.0,
+        "cost_musd": 0.99
+      },
+      {
+        "id": "D6",
+        "phase": "D Shutdown",
+        "name": "Tie-ins, leak test and reinstatement",
+        "start": 34.5,
+        "duration": 1.5,
+        "finish": 36.0,
+        "predecessors": "D2,D3,D4,D5",
+        "discipline": "Piping",
+        "hours": 1630.0,
+        "cost_musd": 0.7
+      },
+      {
+        "id": "D7",
+        "phase": "D Shutdown",
+        "name": "Commissioning and first gas",
+        "start": 35.5,
+        "duration": 1.5,
+        "finish": 37.0,
+        "predecessors": "D6",
+        "discipline": "QA / commissioning",
+        "hours": 968.0,
+        "cost_musd": 0.42
+      },
+      {
+        "id": "E1",
+        "phase": "E Ramp-up",
+        "name": "Performance test and ramp-up",
+        "start": 36,
+        "duration": 2,
+        "finish": 38,
+        "predecessors": "D7",
+        "discipline": "QA / commissioning",
+        "hours": 611.0,
+        "cost_musd": 0.26
+      },
+      {
+        "id": "E2",
+        "phase": "E Ramp-up",
+        "name": "Operating procedures, training and MOC close-out",
+        "start": 36,
+        "duration": 4,
+        "finish": 40,
+        "predecessors": "D7",
+        "discipline": "Safety & risk",
+        "hours": 764.0,
+        "cost_musd": 0.33
+      },
+      {
+        "id": "F1",
+        "phase": "F Close-out",
+        "name": "Close-out, lessons learned and benefits realisation",
+        "start": 40,
+        "duration": 2,
+        "finish": 42,
+        "predecessors": "E1,E2",
+        "discipline": "Project engineering & controls",
+        "hours": 408.0,
+        "cost_musd": 0.18
+      }
+    ],
+    "phases": [
+      "A Design",
+      "B Procurement",
+      "C Readiness",
+      "D Shutdown",
+      "E Ramp-up",
+      "F Close-out"
+    ],
+    "phase_colours": {
+      "A Design": "#2a78d6",
+      "B Procurement": "#1baf7a",
+      "C Readiness": "#eda100",
+      "D Shutdown": "#eb6834",
+      "E Ramp-up": "#7d5ba6",
+      "F Close-out": "#5a5751"
+    },
+    "weeks": 44,
+    "histogram_hours": [
+      408.0,
+      408.0,
+      407.0,
+      802.0,
+      1439.0,
+      1031.0,
+      1031.0,
+      993.0,
+      2776.0,
+      1466.0,
+      930.0,
+      472.0,
+      472.0,
+      472.0,
+      472.0,
+      472.0,
+      472.0,
+      472.0,
+      472.0,
+      472.0,
+      472.0,
+      362.0,
+      362.0,
+      235.0,
+      235.0,
+      104.0,
+      486.0,
+      486.0,
+      923.0,
+      923.0,
+      541.0,
+      216.0,
+      1521.0,
+      2226.0,
+      2527.0,
+      2608.0,
+      1142.0,
+      496.0,
+      191.0,
+      191.0,
+      204.0,
+      204.0,
+      0.0,
+      0.0
+    ],
+    "cumulative_hours": [
+      408.0,
+      815.0,
+      1222.0,
+      2024.0,
+      3463.0,
+      4495.0,
+      5526.0,
+      6519.0,
+      9296.0,
+      10761.0,
+      11692.0,
+      12164.0,
+      12636.0,
+      13109.0,
+      13581.0,
+      14054.0,
+      14526.0,
+      14998.0,
+      15471.0,
+      15943.0,
+      16415.0,
+      16778.0,
+      17140.0,
+      17374.0,
+      17609.0,
+      17713.0,
+      18199.0,
+      18685.0,
+      19609.0,
+      20532.0,
+      21074.0,
+      21290.0,
+      22811.0,
+      25036.0,
+      27563.0,
+      30171.0,
+      31313.0,
+      31809.0,
+      32000.0,
+      32191.0,
+      32395.0,
+      32599.0,
+      32599.0,
+      32599.0
+    ],
+    "peak_week_hours": 2776.0,
+    "total_planned_hours": 32599.0,
+    "shutdown": {
+      "start": 32,
+      "end": 36
+    },
+    "milestones": [
+      {
+        "milestone": "Design freeze / AFC",
+        "week": 11
+      },
+      {
+        "milestone": "Compressor PO",
+        "week": 8
+      },
+      {
+        "milestone": "All vendor FATs complete",
+        "week": 31
+      },
+      {
+        "milestone": "Shutdown start",
+        "week": 32
+      },
+      {
+        "milestone": "First gas",
+        "week": 36
+      },
+      {
+        "milestone": "Ramp-up complete",
+        "week": 38
+      },
+      {
+        "milestone": "Close-out",
+        "week": 42
+      }
+    ]
+  },
+  "deliverables": [
+    {
+      "id": "AZ-FEED-08-Report",
+      "title": "FEED engineering report",
+      "rev": "B",
+      "format": "DOCX / PDF"
+    },
+    {
+      "id": "AZ-FEED-08-DEXPI-PFD-001",
+      "title": "Process flow diagram (DEXPI 2.0 Process exchange + drawing)",
+      "rev": "B",
+      "format": "XML / SVG / PDF"
+    },
+    {
+      "id": "AZ-FEED-08-PID-001",
+      "title": "Simplified P&ID",
+      "rev": "B",
+      "format": "SVG / PDF"
+    },
+    {
+      "id": "AZ-FEED-08-BFD-001",
+      "title": "Block flow diagram",
+      "rev": "B",
+      "format": "SVG / PDF"
+    },
+    {
+      "id": "AZ-FEED-08-SCH-001",
+      "title": "Implementation schedule",
+      "rev": "B",
+      "format": "SVG / PDF"
+    },
+    {
+      "id": "AZ-FEED-08-Workbook",
+      "title": "Calculation and estimate workbook",
+      "rev": "B",
+      "format": "XLSX"
+    },
+    {
+      "id": "AZ-FEED-08-HAZOP",
+      "title": "Independent HAZOP worksheet and close-out",
+      "rev": "B",
+      "format": "XLSX / report section"
+    },
+    {
+      "id": "AZ-FEED-08-Calc",
+      "title": "Calculation dossier (reproducible Python model)",
+      "rev": "B",
+      "format": "PY / JSON"
+    }
+  ],
+  "design_basis": {
+    "design_life_years": 20.0,
+    "design_pressure_hp_barg": 66.0,
+    "design_temperature_hp_c": 100.0,
+    "export_pressure_barg": 90.0,
+    "sales_gas_mmscfd": 137.08,
+    "condensate_bpd": 2936.0,
+    "produced_water_bpd": 2782.0,
+    "water_cut_pct": 48.7,
+    "cgr_bbl_per_mmscf": 21.42,
+    "shutdown_weeks": 4,
+    "dehydration": "Existing TEG dehydration is outside the debottlenecking battery limits and is assumed adequate; its capacity at 161.8 MMscfd and 3 lb/MMscfd is a HAZOP action.",
+    "flash_gas": "Stock-tank flash gas is routed to the fuel-gas system, not the 90 bara sales header.",
+    "level_protection": "1oo2 LAHH/LSHH on V-101 to ESD; LCV-102 fail-closed; PSV-102/103/104 on the let-down and water package (HAZOP actions)."
+  },
+  "water_package": {
+    "capacity_bpd": 6000,
+    "current_bpd": 2782.0,
+    "utilisation_pct": 92.7,
+    "coalescer_required": true,
+    "interface_settling_s": 17.1,
+    "settling_criterion_s": 60.0,
+    "retention_min": 7.83
+  },
+  "relief_summary": {
+    "blocked_outlet_kg_s": 42.63,
+    "hipps_kg_s": 32.7,
+    "flare_utilisation_hipps_pct": 69.9,
+    "psv_required_in2": 3.6,
+    "psv_fitted_in2": 6.38,
+    "radiation_distance_hipps_m": 64.0
+  },
+  "economics": {
+    "npv_musd": 24.78,
+    "capex_musd": 36.0,
+    "payback_year": 1,
+    "gas_pv_musd": 72.4,
+    "cond_pv_musd": 25.8
+  }
+}
