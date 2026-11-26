@@ -469,10 +469,12 @@ Five sections, and the difference between them is the point:
 - [`pvt.black_oil_correlations`](./pvt/black_oil_correlations.md) — Black-oil correlation table
 - [`pvt.constant_mass_expansion`](./pvt/constant_mass_expansion.md) — Constant mass expansion
 - [`pvt.constant_volume_depletion`](./pvt/constant_volume_depletion.md) — Constant volume depletion
+- [`pvt.cvd_material_balance`](./pvt/cvd_material_balance.md) — CVD material balance
 - [`pvt.decline_curve`](./pvt/decline_curve.md) — Decline-curve analysis
 - [`pvt.differential_liberation`](./pvt/differential_liberation.md) — Differential liberation
 - [`pvt.fetkovich_aquifer`](./pvt/fetkovich_aquifer.md) — Fetkovich aquifer
 - [`pvt.gas_correlations`](./pvt/gas_correlations.md) — Gas correlation table
+- [`pvt.gas_density_consistency`](./pvt/gas_density_consistency.md) — Gas-density consistency
 - [`pvt.gas_material_balance`](./pvt/gas_material_balance.md) — Gas material balance
 - [`pvt.generalized_material_balance`](./pvt/generalized_material_balance.md) — Generalized material balance
 - [`pvt.mmp`](./pvt/mmp.md) — Minimum miscibility pressure
@@ -481,6 +483,7 @@ Five sections, and the difference between them is the point:
 - [`pvt.regression`](./pvt/regression.md) — PVT multi-target regression
 - [`pvt.relative_permeability`](./pvt/relative_permeability.md) — Relative permeability
 - [`pvt.saturation_test`](./pvt/saturation_test.md) — Saturation test
+- [`pvt.separator_path`](./pvt/separator_path.md) — Separator path
 - [`pvt.separator_test`](./pvt/separator_test.md) — Separator test
 - [`pvt.swelling_test`](./pvt/swelling_test.md) — Swelling test
 - [`pvt.tune_to_saturation`](./pvt/tune_to_saturation.md) — Plus-molar-mass saturation tuning

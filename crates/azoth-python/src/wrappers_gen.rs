@@ -10153,6 +10153,42 @@ pub fn constant_volume_depletion(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// CVD material balance.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (component_names, observations, vapor_compositions, balance_tolerance, minimum_liquid_moles))]
+#[pyo3(
+    text_signature = "(component_names, observations, vapor_compositions, balance_tolerance, minimum_liquid_moles)"
+)]
+pub fn cvd_material_balance(
+    py: Python<'_>,
+    component_names: Vec<String>,
+    observations: Vec<crate::records_gen::CvdObservation>,
+    vapor_compositions: Vec<Vec<f64>>,
+    balance_tolerance: f64,
+    minimum_liquid_moles: f64,
+) -> PyResult<crate::transport_gen::PyCvdMaterialBalanceResult> {
+    let observations_records: Vec<azoth_pvt::cvd_material_balance::CvdObservation> = observations
+        .into_iter()
+        .map(|row| azoth_pvt::cvd_material_balance::CvdObservation {
+            pressure: row.pressure,
+            gas_z: row.gas_z,
+            liquid_volume_fraction: row.liquid_volume_fraction,
+            cumulative_produced: row.cumulative_produced,
+        })
+        .collect();
+    azoth_pvt::cvd_material_balance::cvd_material_balance(
+        &component_names,
+        &observations_records,
+        &vapor_compositions,
+        balance_tolerance,
+        minimum_liquid_moles,
+    )
+    .map(|r| crate::transport_gen::PyCvdMaterialBalanceResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Decline-curve analysis.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -10343,6 +10379,39 @@ pub fn gas_correlations(
         .collect();
     azoth_pvt::gas_correlations::gas_correlations(&queries_records)
         .map(|r| crate::transport_gen::PyGasCorrelationsResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
+/// Gas-density consistency.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (observations))]
+#[pyo3(text_signature = "(observations)")]
+pub fn gas_density_consistency(
+    py: Python<'_>,
+    observations: Vec<crate::records_gen::GasDensityObservation>,
+) -> PyResult<crate::transport_gen::PyGasDensityConsistencyResult> {
+    let observations_records: Vec<azoth_pvt::gas_density_consistency::GasDensityObservation> =
+        observations
+            .into_iter()
+            .map(
+                |row| azoth_pvt::gas_density_consistency::GasDensityObservation {
+                    pressure: row.pressure,
+                    pressure_bound: row.pressure_bound,
+                    temperature: row.temperature,
+                    temperature_bound: row.temperature_bound,
+                    compressibility: row.compressibility,
+                    compressibility_bound: row.compressibility_bound,
+                    molar_mass: row.molar_mass,
+                    molar_mass_bound: row.molar_mass_bound,
+                    density: row.density,
+                    density_bound: row.density_bound,
+                },
+            )
+            .collect();
+    azoth_pvt::gas_density_consistency::gas_density_consistency(&observations_records)
+        .map(|r| crate::transport_gen::PyGasDensityConsistencyResult::from(&r))
         .map_err(|e| to_pyerr(py, e))
 }
 
@@ -10807,6 +10876,68 @@ pub fn saturation_test(
         temperature_search_max.map(kelvins),
     )
     .map(|r| crate::transport_gen::PySaturationTestResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Separator path.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, pressures, temperatures, eos, mixing_rule, volume_correction, multiphase))]
+#[pyo3(
+    text_signature = "(components, pressures, temperatures, eos, mixing_rule, volume_correction, multiphase)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn separator_path(
+    py: Python<'_>,
+    components: Vec<crate::records_gen::FluidComponent>,
+    pressures: Vec<f64>,
+    temperatures: Vec<f64>,
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
+    volume_correction: Option<bool>,
+    multiphase: Option<bool>,
+) -> PyResult<crate::transport_gen::PySeparatorPathResult> {
+    let components_records: Vec<azoth_characterization::component_row::FluidComponent> = components
+        .into_iter()
+        .map(
+            |row| azoth_characterization::component_row::FluidComponent {
+                fluid: row.fluid,
+                name: row.name,
+                pseudo_component: row.pseudo_component,
+                moles: row.moles,
+                molar_mass: row.molar_mass,
+                density: row.density,
+                normal_boiling_point: row.normal_boiling_point,
+                critical_temperature: row.critical_temperature,
+                critical_pressure: row.critical_pressure,
+                acentric_factor: row.acentric_factor,
+                critical_volume: row.critical_volume,
+                racket_z: row.racket_z,
+                racket_z_cpa: row.racket_z_cpa,
+                parachor: row.parachor,
+                critical_viscosity: row.critical_viscosity,
+                triple_point_temperature: row.triple_point_temperature,
+                heat_of_fusion: row.heat_of_fusion,
+                ideal_gas_enthalpy_of_formation: row.ideal_gas_enthalpy_of_formation,
+                cp_a: row.cp_a,
+                cp_b: row.cp_b,
+                cp_c: row.cp_c,
+                cp_d: row.cp_d,
+                attractive_m: row.attractive_m,
+            },
+        )
+        .collect();
+    azoth_pvt::separator_path::separator_path(
+        &components_records,
+        &pressures.iter().map(|v| pascals(*v)).collect::<Vec<_>>(),
+        &temperatures.iter().map(|v| kelvins(*v)).collect::<Vec<_>>(),
+        eos,
+        mixing_rule,
+        volume_correction,
+        multiphase,
+    )
+    .map(|r| crate::transport_gen::PySeparatorPathResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 

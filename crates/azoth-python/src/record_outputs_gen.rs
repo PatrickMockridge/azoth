@@ -1236,6 +1236,78 @@ impl From<&azoth_pvt::constant_volume_depletion::CvdPoint> for PyCvdPoint {
     }
 }
 
+/// The reconstructed stages, one per observation, in the caller's order.
+#[pyclass(frozen, skip_from_py_object, module = "azoth._core", name = "CvdStage")]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyCvdStage {
+    /// The total moles remaining per initial mole, `1 - cumulative_produced`.
+    #[pyo3(get)]
+    pub total_moles: f64,
+    /// The vapor moles per initial mole.
+    #[pyo3(get)]
+    pub vapor_moles: f64,
+    /// The liquid moles per initial mole, the total minus the vapor.
+    #[pyo3(get)]
+    pub liquid_moles: f64,
+    /// The moles withdrawn at this stage per initial mole.
+    #[pyo3(get)]
+    pub stage_withdrawn_moles: f64,
+    /// The liquid component sum minus the liquid amount; zero by construction where the accounting closes.
+    #[pyo3(get)]
+    pub component_closure: f64,
+    /// The remaining component sum minus the total moles.
+    #[pyo3(get)]
+    pub remaining_closure: f64,
+    /// The produced component sum minus the cumulative production.
+    #[pyo3(get)]
+    pub produced_closure: f64,
+    /// The vapor amount times the composition sum, minus the vapor amount.
+    #[pyo3(get)]
+    pub vapor_closure: f64,
+    /// The liquid resolution state; only `resolved` has a derivable composition.
+    #[pyo3(get)]
+    pub liquid_state: String,
+    /// Whether this stage's accounting closed and its liquid state is physically admissible.
+    #[pyo3(get)]
+    pub compatible: bool,
+}
+
+#[pymethods]
+impl PyCvdStage {
+    fn __repr__(&self) -> String {
+        format!(
+            "CvdStage(total_moles={}, vapor_moles={}, liquid_moles={}, stage_withdrawn_moles={}, component_closure={}, remaining_closure={}, produced_closure={}, vapor_closure={}, liquid_state={}, compatible={:?})",
+            self.total_moles,
+            self.vapor_moles,
+            self.liquid_moles,
+            self.stage_withdrawn_moles,
+            self.component_closure,
+            self.remaining_closure,
+            self.produced_closure,
+            self.vapor_closure,
+            self.liquid_state,
+            self.compatible
+        )
+    }
+}
+
+impl From<&azoth_pvt::cvd_material_balance::CvdStage> for PyCvdStage {
+    fn from(row: &azoth_pvt::cvd_material_balance::CvdStage) -> Self {
+        Self {
+            total_moles: row.total_moles,
+            vapor_moles: row.vapor_moles,
+            liquid_moles: row.liquid_moles,
+            stage_withdrawn_moles: row.stage_withdrawn_moles,
+            component_closure: row.component_closure,
+            remaining_closure: row.remaining_closure,
+            produced_closure: row.produced_closure,
+            vapor_closure: row.vapor_closure,
+            liquid_state: row.liquid_state.as_str().to_string(),
+            compatible: row.compatible,
+        }
+    }
+}
+
 /// One row per evaluated segment, in the profile's order.
 #[pyclass(
     frozen,
@@ -2612,6 +2684,70 @@ impl From<&azoth_process::models::fmea_worksheet::FmeaRankedEntry> for PyFmeaRan
             detection: row.detection,
             rpn: row.rpn,
             mitigation: row.mitigation.clone(),
+        }
+    }
+}
+
+/// One row per observation, in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "GasDensityRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyGasDensityRow {
+    /// The density implied by the nominal values.
+    #[pyo3(get)]
+    pub implied_density: PyQty,
+    /// The conservative lower end of the implied interval.
+    #[pyo3(get)]
+    pub implied_lower: PyQty,
+    /// The conservative upper end of the implied interval.
+    #[pyo3(get)]
+    pub implied_upper: PyQty,
+    /// The observed nominal density minus the implied nominal.
+    #[pyo3(get)]
+    pub observed_minus_implied: PyQty,
+    /// Whether the observed interval overlaps the implied one, endpoints included.
+    #[pyo3(get)]
+    pub compatible: bool,
+}
+
+#[pymethods]
+impl PyGasDensityRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "GasDensityRow(implied_density={:?}, implied_lower={:?}, implied_upper={:?}, observed_minus_implied={:?}, compatible={:?})",
+            self.implied_density,
+            self.implied_lower,
+            self.implied_upper,
+            self.observed_minus_implied,
+            self.compatible
+        )
+    }
+}
+
+impl From<&azoth_pvt::gas_density_consistency::GasDensityRow> for PyGasDensityRow {
+    fn from(row: &azoth_pvt::gas_density_consistency::GasDensityRow) -> Self {
+        Self {
+            implied_density: PyQty {
+                magnitude_si: row.implied_density,
+                unit: "kg/m**3".to_string(),
+            },
+            implied_lower: PyQty {
+                magnitude_si: row.implied_lower,
+                unit: "kg/m**3".to_string(),
+            },
+            implied_upper: PyQty {
+                magnitude_si: row.implied_upper,
+                unit: "kg/m**3".to_string(),
+            },
+            observed_minus_implied: PyQty {
+                magnitude_si: row.observed_minus_implied,
+                unit: "kg/m**3".to_string(),
+            },
+            compatible: row.compatible,
         }
     }
 }

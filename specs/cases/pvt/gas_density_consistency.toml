@@ -1,0 +1,49 @@
+model = "pvt.gas_density_consistency"
+[[cases]]
+id = "duvernay_table18"
+tolerance = 1.0e-12
+source = "The Duvernay Table 18 nine-row set at the report's printed precision: eight rows overlap and `Psat` does not. From `PvtGasDensityConsistencyTest.publicPrimaryDataPreservesOneIncompatibleRow`."
+[cases.inputs]
+observations = [
+  { pressure = 32136463.743456047, pressure_bound = 3447.378646584, temperature = 379.15, temperature_bound = 0.5, compressibility = 0.922, compressibility_bound = 0.0005, molar_mass = 0.03018, molar_mass_bound = 5e-06, density = 339.0, density_bound = 0.5 },
+  { pressure = 30688564.71189077, pressure_bound = 3447.378646584, temperature = 379.15, temperature_bound = 0.5, compressibility = 0.897, compressibility_bound = 0.0005, molar_mass = 0.02987, molar_mass_bound = 5e-06, density = 324.0, density_bound = 0.5 },
+  { pressure = 28268504.9019888, pressure_bound = 3447.378646584, temperature = 379.15, temperature_bound = 0.5, compressibility = 0.861, compressibility_bound = 0.0005, molar_mass = 0.02893, molar_mass_bound = 5e-06, density = 302.0, density_bound = 0.5 },
+  { pressure = 25517496.742014766, pressure_bound = 3447.378646584, temperature = 379.15, temperature_bound = 0.5, compressibility = 0.828, compressibility_bound = 0.0005, molar_mass = 0.02755, molar_mass_bound = 5e-06, density = 270.0, density_bound = 0.5 },
+  { pressure = 22070118.095430765, pressure_bound = 3447.378646584, temperature = 379.15, temperature_bound = 0.5, compressibility = 0.813, compressibility_bound = 0.0005, molar_mass = 0.02595, molar_mass_bound = 5e-06, density = 224.0, density_bound = 0.5 },
+  { pressure = 17926368.9622368, pressure_bound = 3447.378646584, temperature = 379.15, temperature_bound = 0.5, compressibility = 0.813, compressibility_bound = 0.0005, molar_mass = 0.02456, molar_mass_bound = 5e-06, density = 172.0, density_bound = 0.5 },
+  { pressure = 14478990.315652799, pressure_bound = 3447.378646584, temperature = 379.15, temperature_bound = 0.5, compressibility = 0.826, compressibility_bound = 0.0005, molar_mass = 0.02384, molar_mass_bound = 5e-06, density = 133.0, density_bound = 0.5 },
+  { pressure = 11376349.533727199, pressure_bound = 3447.378646584, temperature = 379.15, temperature_bound = 0.5, compressibility = 0.848, compressibility_bound = 0.0005, molar_mass = 0.02311, molar_mass_bound = 5e-06, density = 98.0, density_bound = 0.5 },
+  { pressure = 8963184.4811184, pressure_bound = 3447.378646584, temperature = 379.15, temperature_bound = 0.5, compressibility = 0.874, compressibility_bound = 0.0005, molar_mass = 0.02314, molar_mass_bound = 5e-06, density = 75.0, density_bound = 0.5 },
+]
+[cases.expected]
+rows = [
+  { implied_density = 333.6884347909451, implied_lower = 332.9774398725011, implied_upper = 334.40161473750067, observed_minus_implied = 5.311565209054891, compatible = false },
+  { implied_density = 324.1709631539674, implied_lower = 323.4731671969709, implied_upper = 324.87091710797654, observed_minus_implied = -0.17096315396742057, compatible = true },
+  { implied_density = 301.3025980046301, implied_lower = 300.642497266766, implied_upper = 301.9647615431257, observed_minus_implied = 0.6974019953698871, compatible = true },
+  { implied_density = 269.3296018115178, implied_lower = 268.72747169585284, implied_upper = 269.93363515170614, observed_minus_implied = 0.6703981884821815, compatible = true },
+  { implied_density = 223.46331045296884, implied_lower = 222.95403825275116, implied_upper = 223.97420637614317, observed_minus_implied = 0.536689547031159, compatible = true },
+  { implied_density = 171.7848667508742, implied_lower = 171.38531087421018, implied_upper = 172.18570518999707, observed_minus_implied = 0.2151332491258131, compatible = true },
+  { implied_density = 132.56205744875533, implied_lower = 132.2481394891714, implied_upper = 132.8769869507279, observed_minus_implied = 0.4379425512446744, compatible = true },
+  { implied_density = 98.34714907653012, implied_lower = 98.1087719771743, implied_upper = 98.58629742111923, observed_minus_implied = -0.3471490765301155, compatible = true },
+  { implied_density = 75.27816287269633, implied_lower = 75.09091001031672, implied_upper = 75.46602393648239, observed_minus_implied = -0.27816287269632767, compatible = true },
+]
+[[cases]]
+id = "analytic_limits"
+tolerance = 1.0e-12
+source = "The class test's point, touching-interval, gap, dilute and sixteen-corner states. From `PvtGasDensityConsistencyTest.analyticPointAndClosedIntervalLimits` and `intervalBoundsEncloseIndependentDecimalCorners`."
+[cases.inputs]
+observations = [
+  { pressure = 831446.261815324, pressure_bound = 0.0, temperature = 100.0, temperature_bound = 0.0, compressibility = 1.0, compressibility_bound = 0.0, molar_mass = 0.02, molar_mass_bound = 0.0, density = 20.0, density_bound = 0.0 },
+  { pressure = 831446.261815324, pressure_bound = 0.0, temperature = 100.0, temperature_bound = 0.0, compressibility = 1.0, compressibility_bound = 0.0, molar_mass = 0.02, molar_mass_bound = 0.0, density = 21.0, density_bound = 1.0 },
+  { pressure = 831446.261815324, pressure_bound = 0.0, temperature = 100.0, temperature_bound = 0.0, compressibility = 1.0, compressibility_bound = 0.0, molar_mass = 0.02, molar_mass_bound = 0.0, density = 21.0, density_bound = 0.99 },
+  { pressure = 1e-06, pressure_bound = 0.0, temperature = 100.0, temperature_bound = 0.0, compressibility = 1.0, compressibility_bound = 0.0, molar_mass = 0.02, molar_mass_bound = 0.0, density = 2.4054471008545208e-11, density_bound = 1e-25 },
+  { pressure = 20000000.0, pressure_bound = 100000.0, temperature = 350.0, temperature_bound = 0.5, compressibility = 0.9, compressibility_bound = 0.01, molar_mass = 0.025, molar_mass_bound = 0.0001, density = 200.0, density_bound = 100.0 },
+]
+[cases.expected]
+rows = [
+  { implied_density = 20.000000000000004, implied_lower = 19.999999999999986, implied_upper = 20.000000000000018, observed_minus_implied = -3.552713678800501e-15, compatible = true },
+  { implied_density = 20.000000000000004, implied_lower = 19.999999999999986, implied_upper = 20.000000000000018, observed_minus_implied = 0.9999999999999964, compatible = true },
+  { implied_density = 20.000000000000004, implied_lower = 19.999999999999986, implied_upper = 20.000000000000018, observed_minus_implied = 0.9999999999999964, compatible = false },
+  { implied_density = 2.405447100854521e-11, implied_lower = 2.4054471008545195e-11, implied_upper = 2.4054471008545228e-11, observed_minus_implied = -3.2311742677852644e-27, compatible = true },
+  { implied_density = 190.9085000678191, implied_lower = 186.84815929275638, implied_upper = 195.07355883237946, observed_minus_implied = 9.09149993218091, compatible = true },
+]

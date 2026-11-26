@@ -24,10 +24,12 @@ from azoth.core.result import (
     BlackOilCorrelationsResult,
     ConstantMassExpansionResult,
     ConstantVolumeDepletionResult,
+    CvdMaterialBalanceResult,
     DeclineCurveResult,
     DifferentialLiberationResult,
     FetkovichAquiferResult,
     GasCorrelationsResult,
+    GasDensityConsistencyResult,
     GasMaterialBalanceResult,
     GeneralizedMaterialBalanceResult,
     MmpResult,
@@ -36,6 +38,7 @@ from azoth.core.result import (
     RegressionResult,
     RelativePermeabilityResult,
     SaturationTestResult,
+    SeparatorPathResult,
     SeparatorTestResult,
     SwellingTestResult,
     TuneToSaturationResult,
@@ -47,10 +50,12 @@ from azoth.pvt import layers as layers
 _BLACK_OIL_CORRELATIONS = "pvt.black_oil_correlations"
 _CONSTANT_MASS_EXPANSION = "pvt.constant_mass_expansion"
 _CONSTANT_VOLUME_DEPLETION = "pvt.constant_volume_depletion"
+_CVD_MATERIAL_BALANCE = "pvt.cvd_material_balance"
 _DECLINE_CURVE = "pvt.decline_curve"
 _DIFFERENTIAL_LIBERATION = "pvt.differential_liberation"
 _FETKOVICH_AQUIFER = "pvt.fetkovich_aquifer"
 _GAS_CORRELATIONS = "pvt.gas_correlations"
+_GAS_DENSITY_CONSISTENCY = "pvt.gas_density_consistency"
 _GAS_MATERIAL_BALANCE = "pvt.gas_material_balance"
 _GENERALIZED_MATERIAL_BALANCE = "pvt.generalized_material_balance"
 _MMP = "pvt.mmp"
@@ -59,6 +64,7 @@ _PROPERTY_SWEEP = "pvt.property_sweep"
 _REGRESSION = "pvt.regression"
 _RELATIVE_PERMEABILITY = "pvt.relative_permeability"
 _SATURATION_TEST = "pvt.saturation_test"
+_SEPARATOR_PATH = "pvt.separator_path"
 _SEPARATOR_TEST = "pvt.separator_test"
 _SWELLING_TEST = "pvt.swelling_test"
 _TUNE_TO_SATURATION = "pvt.tune_to_saturation"
@@ -69,10 +75,12 @@ __all__ = [
     "black_oil_correlations",
     "constant_mass_expansion",
     "constant_volume_depletion",
+    "cvd_material_balance",
     "decline_curve",
     "differential_liberation",
     "fetkovich_aquifer",
     "gas_correlations",
+    "gas_density_consistency",
     "gas_material_balance",
     "generalized_material_balance",
     "layers",
@@ -82,6 +90,7 @@ __all__ = [
     "regression",
     "relative_permeability",
     "saturation_test",
+    "separator_path",
     "separator_test",
     "swelling_test",
     "tune_to_saturation",
@@ -187,6 +196,85 @@ def constant_volume_depletion(
         eos=eos,
         mixing_rule=mixing_rule,
         volume_correction=volume_correction,
+    )
+
+
+def cvd_material_balance(
+    component_names: Sequence[str],
+    observations: Sequence[Mapping[str, Any]],
+    vapor_compositions: Sequence[Sequence[float]],
+    balance_tolerance: float,
+    minimum_liquid_moles: float,
+) -> CvdMaterialBalanceResult:
+    """The constant-volume-depletion accounting of one experiment.
+
+    ``observations`` is the saturation reference followed by the depletion rows, each with a
+    pressure in Pa, a vapor Z, a liquid volume fraction and the cumulative production, both
+    fractions of the initial mole. ``vapor_compositions`` is one composition per observation,
+    in ``component_names`` order; each row must already sum to one. The vapor inventory is
+    ``(p/p_ref)(Z_ref/Z)(1-V_l)`` and the liquid is the remainder, so the produced, remaining
+    and liquid component amounts are signed inventory, not an EOS result.
+
+    The four closures decide a row's compatibility, and ``liquid_state`` separates an absent
+    liquid from one too small to resolve and one whose accounting contradicts itself.
+
+    Returns:
+        One ``stages`` row per observation, the produced/remaining/liquid component matrices,
+        and whether every stage closed.
+
+    Raises:
+        InvalidInputError: for an empty or duplicate component set, fewer than two
+            observations, a row outside its range, a composition that does not already sum
+            to one, a first row that is not the all-vapor reference, pressures that do not
+            strictly decrease, a cumulative production that decreases, or invalid limits.
+
+    See :func:`azoth.pvt.reference.cvd_material_balance.cvd_material_balance`.
+    """
+    return resolve(_CVD_MATERIAL_BALANCE)(  # type: ignore[no-any-return]
+        component_names=component_names,
+        observations=observations,
+        vapor_compositions=vapor_compositions,
+        balance_tolerance=balance_tolerance,
+        minimum_liquid_moles=minimum_liquid_moles,
+    )
+
+
+def separator_path(
+    components: Sequence[Mapping[str, Any]],
+    pressures: Sequence[Any],
+    temperatures: Sequence[Any],
+    *,
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+    multiphase: bool | None = None,
+) -> SeparatorPathResult:
+    """A staged separator path onto its declared final volume basis.
+
+    ``pressures`` and ``temperatures`` are one entry per stage, strictly decreasing in
+    pressure; the last pair is the declared final volume basis, not another stage. Each
+    stage flashes the carried fluid, the gas leaves and is flashed at the final basis, and
+    the oil and aqueous phases carry forward. The products are corrected volumes.
+
+    Returns:
+        The final pressure and temperature, the gas/oil/aqueous volumes, the 3xN component
+        amounts, and the gas/oil ratio - absent where there is no oil phase.
+
+    Raises:
+        InvalidInputError: for no stages, a non-positive or non-finite pressure or
+            temperature, pressures that are not strictly decreasing, an unsupported product
+            phase, a component balance that does not close, or a non-finite volume.
+
+    See :func:`azoth.pvt.reference.separator_path.separator_path`.
+    """
+    return resolve(_SEPARATOR_PATH)(  # type: ignore[no-any-return]
+        components=components,
+        pressures=pressures,
+        temperatures=temperatures,
+        eos=eos,
+        mixing_rule=mixing_rule,
+        volume_correction=volume_correction,
+        multiphase=multiphase,
     )
 
 
@@ -618,6 +706,34 @@ def decline_curve(
         end_index=end_index,
         history_time=history_time,
         history_rate=history_rate,
+    )
+
+
+def gas_density_consistency(
+    observations: Sequence[Mapping[str, Any]],
+) -> GasDensityConsistencyResult:
+    """The gas-density identity over observed intervals.
+
+    ``observations`` is one record per gas-phase state: pressure in Pa, temperature in K,
+    the compressibility factor, molar mass in kg/mol and the observed density in kg/m3,
+    each with its nonnegative absolute bound. The implied density is ``p M / (Z R T)`` with
+    ``R = 8.31446261815324``, and each arithmetic step rounds its endpoints outward, so a
+    row's interval encloses every corner of the inputs. A row is compatible iff the observed
+    interval overlaps the implied one, endpoints included.
+
+    Returns:
+        One ``rows`` record per observation with the implied nominal and bounds, the
+        observed-minus-implied difference and the row's verdict, and whether every row is
+        compatible.
+
+    Raises:
+        InvalidInputError: for no observations, a non-positive or non-finite nominal value,
+            a negative or unrepresentable bound, or an unrepresentable implied interval.
+
+    See :func:`azoth.pvt.reference.gas_density_consistency.gas_density_consistency`.
+    """
+    return resolve(_GAS_DENSITY_CONSISTENCY)(  # type: ignore[no-any-return]
+        observations=observations,
     )
 
 

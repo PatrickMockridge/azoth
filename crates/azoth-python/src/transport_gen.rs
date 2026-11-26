@@ -17,35 +17,36 @@ use crate::record_outputs_gen::{
     PyActivityCoefficientRow, PyAlarpEvaluationResult, PyAppliedStandardRow, PyBlackOilResultRow,
     PyBrineMixingPointRow, PyBubbleTransferZoneReleaseStation, PyCcePoint,
     PyCharacterizationComponent, PyChemicalWarningRow, PyComponentSelectiveReleaseStation,
-    PyConsequenceOutcomeResult, PyCostBomRow, PyCostEstimationResultRow, PyCvdPoint,
+    PyConsequenceOutcomeResult, PyCostBomRow, PyCostEstimationResultRow, PyCvdPoint, PyCvdStage,
     PyDepositionSegmentRow, PyDepressurizationPoint, PyDisciplineCostLine, PyDlePoint,
     PyDriftFluxReleaseStation, PyEnvelopePoint, PyEnvelopeQuery, PyEnvelopeSummary,
     PyEquilibriumSoundSpeedSample, PyEquipmentCostResultRow, PyEquipmentMtoRow,
     PyEquipmentQualityFlag, PyEscalationItemResult, PyEsdContribution, PyEventTreeOutcome,
     PyFetkovichState, PyFiniteRateReleaseStation, PyFittedParameterRow, PyFlowlineScaleSegment,
-    PyFmeaRankedEntry, PyGasResultRow, PyHazopPopulationRow, PyHazopTemplateDeviation,
-    PyHeatExchangerMechanicalType, PyHeaterInstrument, PyHeaterMechanicalType,
-    PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIdealGasFannoReleaseStation,
-    PyIdealGasReleaseStation, PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic,
-    PyLeakBlowdownPoint, PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier,
-    PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet, PyMmpPoint,
-    PyMultiVesselContributionRow, PyMultiVesselProfileRow, PyNaceIssueRow,
-    PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment, PyOpenDrainResult, PyOperatingCostLine,
-    PyP002FindingResult, PyPerformanceAssessment, PyPerformanceFinding, PyPerformanceInstrument,
-    PyPerformanceSif, PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation,
-    PyProcessCostEquipmentResult, PyProcessCostFlag, PyProcessCostMtoRow, PyProjectCostLine,
-    PyPropertyPoint, PyPulsationModeResult, PyRanzMarshallReleaseStation,
-    PyRealGasFannoReleaseStation, PyRegisterFinding, PyRegressionObjectiveRow,
-    PyRelativePermeabilityRow, PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment,
-    PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem,
-    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
-    PyScenarioIndexRow, PySelfHeatingTimePoint, PySeparatorStageResult,
-    PySettleOutCompartmentResult, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
-    PySts0131FindingResult, PySubFraction, PySwellingPoint, PyTopsidesBreakdownLine,
-    PyTopsidesCapitalLine, PyTopsidesFlag, PyTopsidesMtoRow, PyTopsidesProjectLine,
-    PyTopsidesProjectSummaryLine, PyTopsidesSummaryLine, PyTopsidesWeightLine, PyTr3001Finding,
-    PyTrappedInventorySegmentResult, PyTypeCostLine, PyVesselFillingPoint, PyVesselRuptureStep,
-    PyWaterMixingResult, PyWaterResultRow, PyZoneRatingRow,
+    PyFmeaRankedEntry, PyGasDensityRow, PyGasResultRow, PyHazopPopulationRow,
+    PyHazopTemplateDeviation, PyHeatExchangerMechanicalType, PyHeaterInstrument,
+    PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
+    PyIdealGasFannoReleaseStation, PyIdealGasReleaseStation, PyIncrementalZoneRow, PyKComponent,
+    PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLegacyScreeningReleaseStation,
+    PyLopaLayerContribution, PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow,
+    PyMinimalCutSet, PyMmpPoint, PyMultiVesselContributionRow, PyMultiVesselProfileRow,
+    PyNaceIssueRow, PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment, PyOpenDrainResult,
+    PyOperatingCostLine, PyP002FindingResult, PyPerformanceAssessment, PyPerformanceFinding,
+    PyPerformanceInstrument, PyPerformanceSif, PyPipeFireRupturePoint,
+    PyPrescribedSlipReleaseStation, PyProcessCostEquipmentResult, PyProcessCostFlag,
+    PyProcessCostMtoRow, PyProjectCostLine, PyPropertyPoint, PyPulsationModeResult,
+    PyRanzMarshallReleaseStation, PyRealGasFannoReleaseStation, PyRegisterFinding,
+    PyRegressionObjectiveRow, PyRelativePermeabilityRow, PyReliefDisposalRow,
+    PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage, PyReviewVerdict,
+    PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem, PySafeChartMissingDevice,
+    PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow,
+    PySelfHeatingTimePoint, PySeparatorStageResult, PySettleOutCompartmentResult, PySilIssue,
+    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
+    PySwellingPoint, PyTopsidesBreakdownLine, PyTopsidesCapitalLine, PyTopsidesFlag,
+    PyTopsidesMtoRow, PyTopsidesProjectLine, PyTopsidesProjectSummaryLine, PyTopsidesSummaryLine,
+    PyTopsidesWeightLine, PyTr3001Finding, PyTrappedInventorySegmentResult, PyTypeCostLine,
+    PyVesselFillingPoint, PyVesselRuptureStep, PyWaterMixingResult, PyWaterResultRow,
+    PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -30516,6 +30517,64 @@ impl From<&azoth_pvt::constant_volume_depletion::ConstantVolumeDepletionResult>
         }
     }
 }
+/// Result of `pvt.cvd_material_balance`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "CvdMaterialBalanceResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyCvdMaterialBalanceResult {
+    /// The reconstructed stages, one per observation, in the caller's order.
+    #[pyo3(get)]
+    pub stages: Vec<PyCvdStage>,
+    /// The cumulative produced component amount per initial mole.
+    #[pyo3(get)]
+    pub produced_component_moles: Vec<Vec<f64>>,
+    /// The remaining component amount per initial mole, signed.
+    #[pyo3(get)]
+    pub remaining_component_moles: Vec<Vec<f64>>,
+    /// The liquid component amount per initial mole, signed; the composition is this divided by `liquid_moles` where the state is `resolved`.
+    #[pyo3(get)]
+    pub liquid_component_moles: Vec<Vec<f64>>,
+    /// Whether every stage is compatible.
+    #[pyo3(get)]
+    pub compatible: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyCvdMaterialBalanceResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "CvdMaterialBalanceResult(stages={:?}, produced_component_moles={:?}, remaining_component_moles={:?}, liquid_component_moles={:?}, compatible={:?}, {} warning(s))",
+            self.stages,
+            self.produced_component_moles,
+            self.remaining_component_moles,
+            self.liquid_component_moles,
+            self.compatible,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::cvd_material_balance::CvdMaterialBalanceResult>
+    for PyCvdMaterialBalanceResult
+{
+    fn from(r: &azoth_pvt::cvd_material_balance::CvdMaterialBalanceResult) -> Self {
+        Self {
+            stages: r.stages.iter().map(PyCvdStage::from).collect(),
+            produced_component_moles: r.produced_component_moles.clone(),
+            remaining_component_moles: r.remaining_component_moles.clone(),
+            liquid_component_moles: r.liquid_component_moles.clone(),
+            compatible: r.compatible,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `pvt.decline_curve`, transported.
 #[pyclass(
     frozen,
@@ -30832,6 +30891,49 @@ impl From<&azoth_pvt::gas_correlations::GasCorrelationsResult> for PyGasCorrelat
     fn from(r: &azoth_pvt::gas_correlations::GasCorrelationsResult) -> Self {
         Self {
             queries: r.queries.iter().map(PyGasResultRow::from).collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.gas_density_consistency`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "GasDensityConsistencyResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyGasDensityConsistencyResult {
+    /// One row per observation, in caller order.
+    #[pyo3(get)]
+    pub rows: Vec<PyGasDensityRow>,
+    /// Whether every row is compatible.
+    #[pyo3(get)]
+    pub all_compatible: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyGasDensityConsistencyResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "GasDensityConsistencyResult(rows={:?}, all_compatible={:?}, {} warning(s))",
+            self.rows,
+            self.all_compatible,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::gas_density_consistency::GasDensityConsistencyResult>
+    for PyGasDensityConsistencyResult
+{
+    fn from(r: &azoth_pvt::gas_density_consistency::GasDensityConsistencyResult) -> Self {
+        Self {
+            rows: r.rows.iter().map(PyGasDensityRow::from).collect(),
+            all_compatible: r.all_compatible,
             warnings: transport(&r.warnings),
         }
     }
@@ -31364,6 +31466,86 @@ impl From<&azoth_pvt::saturation_test::SaturationTestResult> for PySaturationTes
                 magnitude_si: v,
                 unit: "K".to_string(),
             }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.separator_path`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SeparatorPathResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySeparatorPathResult {
+    /// The final volume-basis pressure, echoed.
+    #[pyo3(get)]
+    pub final_pressure: PyQty,
+    /// The final volume-basis temperature, echoed.
+    #[pyo3(get)]
+    pub final_temperature: PyQty,
+    /// The corrected product volumes at the final basis; an absent phase is zero.
+    #[pyo3(get)]
+    pub volumes: Vec<PyQty>,
+    /// The product component amounts at the final basis; an absent phase is zero.
+    #[pyo3(get)]
+    pub component_moles: Vec<Vec<PyQty>>,
+    /// The gas volume over the oil volume at the final basis; absent when no oil phase is present.
+    #[pyo3(get)]
+    pub gas_oil_ratio: Option<f64>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PySeparatorPathResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SeparatorPathResult(final_pressure={:?}, final_temperature={:?}, volumes={:?}, component_moles={:?}, gas_oil_ratio={:?}, {} warning(s))",
+            self.final_pressure,
+            self.final_temperature,
+            self.volumes,
+            self.component_moles,
+            self.gas_oil_ratio,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::separator_path::SeparatorPathResult> for PySeparatorPathResult {
+    fn from(r: &azoth_pvt::separator_path::SeparatorPathResult) -> Self {
+        Self {
+            final_pressure: PyQty {
+                magnitude_si: r.final_pressure,
+                unit: "Pa".to_string(),
+            },
+            final_temperature: PyQty {
+                magnitude_si: r.final_temperature,
+                unit: "K".to_string(),
+            },
+            volumes: r
+                .volumes
+                .iter()
+                .map(|v| PyQty {
+                    magnitude_si: *v,
+                    unit: "m**3".to_string(),
+                })
+                .collect(),
+            component_moles: r
+                .component_moles
+                .iter()
+                .map(|row| {
+                    row.iter()
+                        .map(|v| PyQty {
+                            magnitude_si: *v,
+                            unit: "mol".to_string(),
+                        })
+                        .collect()
+                })
+                .collect(),
+            gas_oil_ratio: r.gas_oil_ratio,
             warnings: transport(&r.warnings),
         }
     }

@@ -194,8 +194,9 @@ def test_the_block_exists_for_every_registered_id() -> None:
     # minimum miscibility pressure; 392: the property sweep; 393: the PVT regression;
     # 394: the plus-molar-mass saturation tuning; 395: the Van Everdingen-Hurst aquifer;
     # 396: the Fetkovich aquifer; 397: the generalized material balance; 398: the relative
-    # permeability table.
-    assert len(registered) == 398
+    # permeability table; 399: the CVD material balance; 400: the gas-density consistency;
+    # 401: the separator path.
+    assert len(registered) == 401
 
 
 def test_the_rust_table_carries_exactly_the_same_ids() -> None:

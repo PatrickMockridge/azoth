@@ -1,0 +1,78 @@
+id = "pvt.gas_density_consistency"
+name = "Gas-density consistency"
+kind = "direct"
+assumptions = [
+    "**the identity is `rho = p M / (Z R T)`** with `R = 8.31446261815324` J/(mol K), the class's exact literal.\n",
+    "**every quantity is a closed interval `[value - bound, value + bound]`** with a nonnegative absolute half-width, not an inferred standard deviation; a zero bound is a point.\n",
+    "**each arithmetic step rounds its endpoint outward**, `nextUp`/`nextDown` after the multiplication and after each of the three divisions, unconditionally, so even a point interval gains one ulp at each step.\n",
+    "**the lower endpoint is floored at the smallest positive subnormal**, the class's `Double.MIN_VALUE`.\n",
+    "**a row is compatible iff the observed interval overlaps the implied interval**, endpoints included; the report is compatible iff every row is.\n",
+    "**a composition, phase or EOS is not involved**: this is an identity check on observed numbers, so an incompatible row is a result rather than a refusal.\n",
+]
+references = [
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/util/PvtGasDensityConsistency.java` at commit b40bb113 is the port source.",
+    "`validation/neqsim/captures/pvt_gas_density_consistency.tsv` - the Duvernay Table 18 nine-row set with the class's printed-precision bounds, and the point, touching, gap, dilute and corner states.",
+]
+[source]
+standard = "NeqSim pvtsimulation/util/PvtGasDensityConsistency.java"
+edition = "The outward-rounded interval propagation of the gas-density identity, the lower-endpoint floor and the closed-interval overlap test."
+[inputs]
+[inputs.observations]
+type = "record_list"
+row_type = "GasDensityObservation"
+description = "One gas-phase state per row, each quantity with its nonnegative absolute bound.\n"
+[inputs.observations.fields.pressure]
+unit = "Pa"
+description = "The pressure's nominal value.\n"
+[inputs.observations.fields.pressure_bound]
+unit = "Pa"
+description = "The pressure's absolute half-width, zero for a point.\n"
+[inputs.observations.fields.temperature]
+unit = "K"
+description = "The temperature's nominal value.\n"
+[inputs.observations.fields.temperature_bound]
+unit = "K"
+description = "The temperature's absolute half-width, zero for a point.\n"
+[inputs.observations.fields.compressibility]
+unit = "dimensionless"
+description = "The compressibility factor's nominal value.\n"
+[inputs.observations.fields.compressibility_bound]
+unit = "dimensionless"
+description = "The compressibility factor's absolute half-width, zero for a point.\n"
+[inputs.observations.fields.molar_mass]
+unit = "kg/mol"
+description = "The molar mass's nominal value.\n"
+[inputs.observations.fields.molar_mass_bound]
+unit = "kg/mol"
+description = "The molar mass's absolute half-width, zero for a point.\n"
+[inputs.observations.fields.density]
+unit = "kg/m**3"
+description = "The observed density's nominal value.\n"
+[inputs.observations.fields.density_bound]
+unit = "kg/m**3"
+description = "The observed density's absolute half-width, zero for a point.\n"
+[outputs]
+[outputs.rows]
+type = "record_list"
+description = "One row per observation, in caller order.\n"
+[outputs.rows.fields.implied_density]
+unit = "kg/m**3"
+description = "The density implied by the nominal values.\n"
+[outputs.rows.fields.implied_lower]
+unit = "kg/m**3"
+description = "The conservative lower end of the implied interval.\n"
+[outputs.rows.fields.implied_upper]
+unit = "kg/m**3"
+description = "The conservative upper end of the implied interval.\n"
+[outputs.rows.fields.observed_minus_implied]
+unit = "kg/m**3"
+description = "The observed nominal density minus the implied nominal.\n"
+[outputs.rows.fields.compatible]
+type = "boolean"
+description = "Whether the observed interval overlaps the implied one, endpoints included.\n"
+[outputs.all_compatible]
+type = "boolean"
+description = "Whether every row is compatible.\n"
+[implementations]
+python = "azoth.pvt.gas_density_consistency"
+rust = "azoth_pvt::gas_density_consistency"

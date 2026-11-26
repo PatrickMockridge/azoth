@@ -44,10 +44,13 @@ import neqsim.pvtsimulation.simulation.ViscositySim;
 import neqsim.pvtsimulation.simulation.WaxFractionSim;
 import neqsim.pvtsimulation.simulation.SolutionGasWaterRatio;
 import neqsim.pvtsimulation.util.BlackOilCorrelations;
+import neqsim.pvtsimulation.util.CvdMaterialBalance;
 import neqsim.pvtsimulation.util.DeclineCurveAnalysis;
 import neqsim.pvtsimulation.util.BlackOilUnits;
 import neqsim.pvtsimulation.util.GasPseudoCriticalProperties;
 import neqsim.pvtsimulation.util.GasPseudoPressure;
+import neqsim.pvtsimulation.util.PvtGasDensityConsistency;
+import neqsim.pvtsimulation.util.PvtSeparatorPath;
 import neqsim.pvtsimulation.util.SaturationPressureCorrelation;
 import neqsim.pvtsimulation.util.WaterPropertyCorrelations;
 import neqsim.pvtsimulation.util.ZFactorCorrelations;
@@ -57,6 +60,7 @@ import neqsim.statistics.parameterfitting.nonlinearparameterfitting.LevenbergMar
 import neqsim.statistics.parameterfitting.nonlinearparameterfitting.LevenbergMarquardtResult;
 import neqsim.thermo.component.ComponentInterface;
 import neqsim.thermo.system.SystemInterface;
+import neqsim.thermo.system.SystemPrEos;
 import neqsim.thermo.system.SystemSrkEos;
 import neqsim.thermodynamicoperations.ThermodynamicOperations;
 
@@ -745,6 +749,226 @@ public final class PvtProbe {
     line("gor_at_optimum", best.getGorAtOptimum());
     line("bo_at_optimum", best.getBoAtOptimum());
     value("api_at_optimum", best.getApiAtOptimum());
+  }
+
+  // The CVD accounting state: the class's analytic binary and ternary paths, the published
+  // NS-1 Table 1 (11 components, seven rows), and the liquid-state limits. No EOS and no
+  // flash; the probe supplies the observations and prints the reconstructed inventories.
+  private static double sum(double[] values) {
+    double total = 0.0;
+    for (double value : values) total += value;
+    return total;
+  }
+
+  private static void cvdAccounting(String block, String[] names, double[] pressuresPa,
+      double[] gasZ, double[] liquidVolumes, double[] cumulative, double[][] vapor,
+      double balanceTolerance, double minimumLiquidMoles) {
+    System.out.println("[" + block + "]");
+    System.out.println("components=" + names.length);
+    for (int j = 0; j < names.length; j++) {
+      System.out.println("component_" + j + "_name=" + names[j]);
+    }
+    CvdMaterialBalance.Observation[] rows = new CvdMaterialBalance.Observation[pressuresPa.length];
+    for (int k = 0; k < rows.length; k++) {
+      rows[k] = new CvdMaterialBalance.Observation("row-" + k, pressuresPa[k], gasZ[k],
+          liquidVolumes[k], cumulative[k], vapor[k]);
+    }
+    CvdMaterialBalance report = new CvdMaterialBalance("synthetic", "probe", "probe", 350.0,
+        names, rows, balanceTolerance, minimumLiquidMoles, null);
+    line("observation_count", report.getObservationCount());
+    line("compatible", report.isCompatible() ? 1.0 : 0.0);
+    for (int k = 0; k < rows.length; k++) {
+      CvdMaterialBalance.Stage stage = report.getStage(k);
+      String at = "stage_" + k + "_";
+      line(at + "total_moles", stage.getTotalRemainingMoles());
+      line(at + "vapor_moles", stage.getVaporMoles());
+      line(at + "liquid_moles", stage.getLiquidMoles());
+      line(at + "stage_withdrawn_moles", stage.getStageWithdrawnMoles());
+      line(at + "component_closure", sum(stage.getLiquidComponentMoles()) - stage.getLiquidMoles());
+      line(at + "remaining_closure", sum(stage.getRemainingComponentMoles())
+          - stage.getTotalRemainingMoles());
+      line(at + "produced_closure", sum(stage.getProducedComponentMoles()) - cumulative[k]);
+      line(at + "vapor_closure", stage.getVaporMoles() * sum(vapor[k]) - stage.getVaporMoles());
+      System.out.println(at + "liquid_state=" + stage.getLiquidState().name().toLowerCase(java.util.Locale.ROOT));
+      System.out.println(at + "compatible=" + ((Boolean) field(stage, "compatible") ? 1 : 0));
+      double[] produced = stage.getProducedComponentMoles();
+      double[] remaining = stage.getRemainingComponentMoles();
+      double[] liquid = stage.getLiquidComponentMoles();
+      for (int j = 0; j < names.length; j++) {
+        line(at + "component_" + j + "_produced_moles", produced[j]);
+        line(at + "component_" + j + "_remaining_moles", remaining[j]);
+        line(at + "component_" + j + "_liquid_moles", liquid[j]);
+      }
+    }
+  }
+
+  private static void cvdMaterialBalance() {
+    System.out.println("cvd_material_balance");
+    cvdAccounting("analytic_binary", new String[] {"A", "B"},
+        new double[] {100.0e5, 50.0e5, 25.0e5}, new double[] {1.0, 1.0, 1.0},
+        new double[] {0.0, 0.2, 0.2}, new double[] {0.0, 0.2, 0.4},
+        new double[][] {{0.8, 0.2}, {0.9, 0.1}, {0.9, 0.1}}, 1.0e-12, 1.0e-8);
+
+    cvdAccounting("analytic_ternary", new String[] {"component-0", "component-1", "component-2"},
+        new double[] {100.0e5, 100.0e5 * 5.0 / 9.0, 100.0e5 * 3.0 / 8.0},
+        new double[] {1.0, 1.0, 1.0}, new double[] {0.0, 0.1, 0.2},
+        new double[] {0.0, 0.2, 0.3},
+        new double[][] {{0.48, 0.33, 0.19}, {0.6, 0.3, 0.1}, {0.65, 0.3, 0.05}}, 1.0e-12, 1.0e-8);
+
+    // Whitson-Torp NS-1 Table 1: psia, Z, cumulative percent, liquid volume percent, and
+    // eleven vapor analyses in percent.
+    String[] ns1Names = {"CO2", "N2", "C1", "C2", "C3", "iC4", "nC4", "iC5", "nC5", "C6", "C7+"};
+    double[][] ns1 = {
+        {6764.7, 1.238, 0.000, 0.0, 2.37, 0.31, 73.19, 7.80, 3.55, 0.71, 1.45, 0.64, 0.68, 1.09, 8.21},
+        {5514.7, 1.089, 9.024, 14.1, 2.40, 0.32, 75.56, 7.83, 3.47, 0.67, 1.37, 0.59, 0.62, 0.97, 6.20},
+        {4314.7, 0.972, 21.744, 19.7, 2.45, 0.33, 77.89, 7.87, 3.40, 0.65, 1.31, 0.55, 0.58, 0.88, 4.09},
+        {3114.7, 0.913, 38.674, 21.6, 2.50, 0.34, 79.33, 7.92, 3.41, 0.64, 1.30, 0.53, 0.56, 0.83, 2.64},
+        {2114.7, 0.914, 55.686, 21.3, 2.53, 0.34, 79.62, 8.04, 3.53, 0.66, 1.33, 0.54, 0.57, 0.82, 2.02},
+        {1214.7, 0.937, 72.146, 20.2, 2.57, 0.34, 78.90, 8.40, 3.74, 0.72, 1.44, 0.59, 0.61, 0.85, 1.84},
+        {714.7, 0.960, 81.301, 19.3, 2.60, 0.33, 77.80, 8.70, 3.91, 0.78, 1.56, 0.64, 0.66, 0.90, 2.12}};
+    double[] ns1Pressure = new double[ns1.length];
+    double[] ns1Z = new double[ns1.length];
+    double[] ns1Cumulative = new double[ns1.length];
+    double[] ns1Liquid = new double[ns1.length];
+    double[][] ns1Vapor = new double[ns1.length][ns1Names.length];
+    for (int k = 0; k < ns1.length; k++) {
+      ns1Pressure[k] = ns1[k][0] * 6894.757293168;
+      ns1Z[k] = ns1[k][1];
+      ns1Cumulative[k] = ns1[k][2] / 100.0;
+      ns1Liquid[k] = ns1[k][3] / 100.0;
+      for (int j = 0; j < ns1Names.length; j++) ns1Vapor[k][j] = ns1[k][j + 4] / 100.0;
+    }
+    cvdAccounting("ns1_table1", ns1Names, ns1Pressure, ns1Z, ns1Liquid, ns1Cumulative, ns1Vapor,
+        1.0e-12, 1.0e-8);
+
+    cvdAccounting("gas_only", new String[] {"A"}, new double[] {100.0, 50.0},
+        new double[] {1.0, 1.0}, new double[] {0.0, 0.0}, new double[] {0.0, 0.5},
+        new double[][] {{1.0}, {1.0}}, 1.0e-12, 1.0e-8);
+
+    cvdAccounting("vanishing_liquid", new String[] {"A"}, new double[] {100.0, 50.0},
+        new double[] {1.0, 1.0}, new double[] {0.0, 0.2}, new double[] {0.0, 0.6 - 1.0e-10},
+        new double[][] {{1.0}, {1.0}}, 1.0e-12, 1.0e-8);
+
+    cvdAccounting("negative_component", new String[] {"A", "B"},
+        new double[] {100.0e5, 50.0e5}, new double[] {1.0, 1.0}, new double[] {0.0, 0.2},
+        new double[] {0.0, 0.2}, new double[][] {{0.2, 0.8}, {0.9, 0.1}}, 1.0e-12, 1.0e-8);
+  }
+
+  // The gas-density identity: rho = p M / (Z R T) with outward-rounded interval endpoints.
+  private static double[] densityRow(String id, double p, double pBound, double t, double tBound,
+      double z, double zBound, double m, double mBound, double density, double densityBound) {
+    PvtGasDensityConsistency.Observation row = new PvtGasDensityConsistency.Observation(id, "probe",
+        "probe", "probe", new PvtGasDensityConsistency.Quantity(p, pBound),
+        new PvtGasDensityConsistency.Quantity(t, tBound), new PvtGasDensityConsistency.Quantity(z, zBound),
+        new PvtGasDensityConsistency.Quantity(m, mBound),
+        new PvtGasDensityConsistency.Quantity(density, densityBound));
+    return new double[] {row.getImpliedDensityKgPerM3(), row.getImpliedLowerKgPerM3(),
+        row.getImpliedUpperKgPerM3(), density - row.getImpliedDensityKgPerM3(),
+        row.isCompatible() ? 1.0 : 0.0};
+  }
+
+  private static void densityRows(String block, double[][] rows, String[] ids) {
+    System.out.println("[" + block + "]");
+    for (int k = 0; k < ids.length; k++) {
+      try {
+        double[] row = densityRow(ids[k], rows[k][0], rows[k][1], rows[k][2], rows[k][3],
+            rows[k][4], rows[k][5], rows[k][6], rows[k][7], rows[k][8], rows[k][9]);
+        String at = "row_" + k + "_";
+        line(at + "implied_density", row[0]);
+        line(at + "implied_lower", row[1]);
+        line(at + "implied_upper", row[2]);
+        line(at + "observed_minus_implied", row[3]);
+        line(at + "compatible", row[4]);
+      } catch (RuntimeException error) {
+        System.out.println("row_" + k + "_refused=" + error.getMessage().replace('\n', ' '));
+      }
+    }
+  }
+
+  private static void gasDensityConsistency() {
+    System.out.println("gas_density_consistency");
+    double psi = 6894.757293168;
+    String[] duvernayIds = {"Psat", "Step1", "Step2", "Step3", "Step4", "Step5", "Step6",
+        "Step7", "Step8"};
+    double[][] duvernay = {
+        {4661 * psi, 0.5 * psi, 379.15, 0.5, 0.922, 0.0005, 0.03018, 0.000005, 339.0, 0.5},
+        {4451 * psi, 0.5 * psi, 379.15, 0.5, 0.897, 0.0005, 0.02987, 0.000005, 324.0, 0.5},
+        {4100 * psi, 0.5 * psi, 379.15, 0.5, 0.861, 0.0005, 0.02893, 0.000005, 302.0, 0.5},
+        {3701 * psi, 0.5 * psi, 379.15, 0.5, 0.828, 0.0005, 0.02755, 0.000005, 270.0, 0.5},
+        {3201 * psi, 0.5 * psi, 379.15, 0.5, 0.813, 0.0005, 0.02595, 0.000005, 224.0, 0.5},
+        {2600 * psi, 0.5 * psi, 379.15, 0.5, 0.813, 0.0005, 0.02456, 0.000005, 172.0, 0.5},
+        {2100 * psi, 0.5 * psi, 379.15, 0.5, 0.826, 0.0005, 0.02384, 0.000005, 133.0, 0.5},
+        {1650 * psi, 0.5 * psi, 379.15, 0.5, 0.848, 0.0005, 0.02311, 0.000005, 98.0, 0.5},
+        {1300 * psi, 0.5 * psi, 379.15, 0.5, 0.874, 0.0005, 0.02314, 0.000005, 75.0, 0.5}};
+    densityRows("duvernay_table18", duvernay, duvernayIds);
+
+    String[] analyticIds = {"point_20", "touching_21_1", "gap_21_099", "dilute", "corners"};
+    double[][] analytic = {
+        {831446.261815324, 0.0, 100.0, 0.0, 1.0, 0.0, 0.02, 0.0, 20.0, 0.0},
+        {831446.261815324, 0.0, 100.0, 0.0, 1.0, 0.0, 0.02, 0.0, 21.0, 1.0},
+        {831446.261815324, 0.0, 100.0, 0.0, 1.0, 0.0, 0.02, 0.0, 21.0, 0.99},
+        {1.0e-6, 0.0, 100.0, 0.0, 1.0, 0.0, 0.02, 0.0, 2.4054471008545208e-11, 1.0e-25},
+        {20.0e6, 1.0e5, 350.0, 0.5, 0.9, 0.01, 0.025, 0.0001, 200.0, 100.0}};
+    densityRows("analytic", analytic, analyticIds);
+  }
+
+  // The separator path: the class's own four states, on the PR mixture its test builds.
+  private static SystemInterface pathSample() {
+    SystemInterface fluid = new SystemPrEos(350.0, 100.0);
+    fluid.addComponent("methane", 70.0);
+    fluid.addComponent("ethane", 10.0);
+    fluid.addComponent("propane", 5.0);
+    fluid.addComponent("n-decane", 15.0);
+    fluid.setMixingRule("classic");
+    return fluid;
+  }
+
+  private static void separatorPath(String block, SystemInterface feed, double[] pressuresBara,
+      double[] temperatures) {
+    System.out.println("[" + block + "]");
+    PvtSeparatorPath.Result result = new PvtSeparatorPath(pressuresBara, temperatures, "probe")
+        .separate(feed);
+    line("final_pressure_pa", result.getFinalPressureBara() * 1.0e5);
+    line("final_temperature_k", result.getFinalTemperatureK());
+    double[] volumes = result.getVolumesM3();
+    line("gas_volume_m3", volumes[0]);
+    line("oil_volume_m3", volumes[1]);
+    line("aqueous_volume_m3", volumes[2]);
+    if (volumes[1] > 0.0) {
+      line("gas_oil_ratio", result.getGasOilRatio());
+    } else {
+      System.out.println("gas_oil_ratio=absent");
+    }
+    String[] names = result.getComponentNames();
+    double[][] components = result.getComponentMoles();
+    for (int p = 0; p < 3; p++) {
+      for (int j = 0; j < names.length; j++) {
+        line("phase_" + p + "_" + names[j] + "_moles", components[p][j]);
+      }
+    }
+  }
+
+  private static void separatorPath() {
+    System.out.println("separator_path");
+    separatorPath("one_stage_stock_tank", pathSample(), new double[] {1.01325},
+        new double[] {288.15});
+    separatorPath("two_stage_offgas", pathSample(), new double[] {20.0, 1.01325},
+        new double[] {400.0, 288.15});
+    SystemInterface threePhase = pathSample();
+    threePhase.addComponent("water", 10.0);
+    threePhase.setMixingRule("classic");
+    threePhase.setMultiPhaseCheck(true);
+    separatorPath("three_phase", threePhase, new double[] {10.0, 1.01325},
+        new double[] {310.0, 288.15});
+    SystemInterface gas = new SystemPrEos(300.0, 10.0);
+    gas.addComponent("methane", 100.0);
+    gas.setMixingRule("classic");
+    separatorPath("gas_only", gas, new double[] {1.01325}, new double[] {288.15});
+    System.out.println("[declarations]");
+    refusal("refused_increasing_pressure", () -> new PvtSeparatorPath(
+        new double[] {10.0, 20.0}, new double[] {300.0, 288.15}, "invalid"));
+    refusal("refused_nonfinite_temperature", () -> new PvtSeparatorPath(
+        new double[] {1.0}, new double[] {Double.NaN}, "invalid"));
   }
 
   private static void swellingBlock(String block, String[] oilNames, double[] oilMoles,
@@ -1793,6 +2017,15 @@ public final class PvtProbe {
         break;
       case "relperm":
         relperm();
+        break;
+      case "cvd_mb":
+        cvdMaterialBalance();
+        break;
+      case "density_consistency":
+        gasDensityConsistency();
+        break;
+      case "separator_path":
+        separatorPath();
         break;
       default:
         System.err.println("unknown subcommand: " + which);

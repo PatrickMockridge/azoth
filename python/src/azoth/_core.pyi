@@ -1192,6 +1192,14 @@ class BlackOilQuery(TypedDict):
     molar_mass: float | None
     z: float | None
 
+class CvdObservation(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    pressure: float
+    gas_z: float
+    liquid_volume_fraction: float
+    cumulative_produced: float
+
 class FetkovichInterval(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -1215,6 +1223,20 @@ class GasQuery(TypedDict):
     tpr: float | None
     ppr: float | None
     molar_mass: float | None
+
+class GasDensityObservation(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    pressure: float
+    pressure_bound: float
+    temperature: float
+    temperature_bound: float
+    compressibility: float
+    compressibility_bound: float
+    molar_mass: float
+    molar_mass_bound: float
+    density: float
+    density_bound: float
 
 class MaterialBalanceObservation(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
@@ -2564,6 +2586,21 @@ class CvdPoint:
     liquid_volume_relative_to_vsat: float | None
 
 @final
+class CvdStage:
+    """The reconstructed stages, one per observation, in the caller's order."""
+
+    total_moles: float
+    vapor_moles: float
+    liquid_moles: float
+    stage_withdrawn_moles: float
+    component_closure: float
+    remaining_closure: float
+    produced_closure: float
+    vapor_closure: float
+    liquid_state: str
+    compatible: bool
+
+@final
 class DlePoint:
     """one row per pressure."""
 
@@ -2604,6 +2641,16 @@ class GasResultRow:
     gas_fvf: float | None
     pseudo_pressure: float | None
     h2s_fraction: float | None
+
+@final
+class GasDensityRow:
+    """One row per observation, in caller order."""
+
+    implied_density: Qty
+    implied_lower: Qty
+    implied_upper: Qty
+    observed_minus_implied: Qty
+    compatible: bool
 
 @final
 class MmpPoint:
@@ -6991,6 +7038,15 @@ class ConstantVolumeDepletionResult:
     warnings: list[Warning]
 
 @final
+class CvdMaterialBalanceResult:
+    stages: list[CvdStage]
+    produced_component_moles: list[list[float]]
+    remaining_component_moles: list[list[float]]
+    liquid_component_moles: list[list[float]]
+    compatible: bool
+    warnings: list[Warning]
+
+@final
 class DeclineCurveResult:
     time: list[float] | None
     rate: list[float] | None
@@ -7041,6 +7097,12 @@ class FetkovichAquiferResult:
 @final
 class GasCorrelationsResult:
     queries: list[GasResultRow]
+    warnings: list[Warning]
+
+@final
+class GasDensityConsistencyResult:
+    rows: list[GasDensityRow]
+    all_compatible: bool
     warnings: list[Warning]
 
 @final
@@ -7119,6 +7181,15 @@ class RelativePermeabilityResult:
 class SaturationTestResult:
     saturation_pressure: Qty | None
     saturation_temperature: Qty | None
+    warnings: list[Warning]
+
+@final
+class SeparatorPathResult:
+    final_pressure: Qty
+    final_temperature: Qty
+    volumes: list[Qty]
+    component_moles: list[list[Qty]]
+    gas_oil_ratio: float | None
     warnings: list[Warning]
 
 @final
@@ -11304,6 +11375,13 @@ def constant_volume_depletion(
     mixing_rule: str | None = None,
     volume_correction: bool | None = None,
 ) -> ConstantVolumeDepletionResult: ...
+def cvd_material_balance(
+    component_names: list[str],
+    observations: list[CvdObservation],
+    vapor_compositions: list[list[float]],
+    balance_tolerance: float,
+    minimum_liquid_moles: float,
+) -> CvdMaterialBalanceResult: ...
 def decline_curve(
     calculation: str,
     qi: float | None = None,
@@ -11346,6 +11424,9 @@ def fetkovich_aquifer(
     initial_water_volume: float | None = None,
 ) -> FetkovichAquiferResult: ...
 def gas_correlations(queries: list[GasQuery]) -> GasCorrelationsResult: ...
+def gas_density_consistency(
+    observations: list[GasDensityObservation],
+) -> GasDensityConsistencyResult: ...
 def gas_material_balance(
     calculation: str,
     pressure: list[float] | None = None,
@@ -11474,6 +11555,15 @@ def saturation_test(
     temperature_search_min: float | None = None,
     temperature_search_max: float | None = None,
 ) -> SaturationTestResult: ...
+def separator_path(
+    components: list[FluidComponent],
+    pressures: list[float],
+    temperatures: list[float],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+    multiphase: bool | None = None,
+) -> SeparatorPathResult: ...
 def separator_test(
     components: list[FluidComponent],
     mode: str,

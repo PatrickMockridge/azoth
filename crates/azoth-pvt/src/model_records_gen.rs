@@ -14,10 +14,12 @@ use azoth_core::{CalcResult, Warning};
 use crate::black_oil_correlations::BlackOilCorrelationsResult;
 use crate::constant_mass_expansion::ConstantMassExpansionResult;
 use crate::constant_volume_depletion::ConstantVolumeDepletionResult;
+use crate::cvd_material_balance::CvdMaterialBalanceResult;
 use crate::decline_curve::DeclineCurveResult;
 use crate::differential_liberation::DifferentialLiberationResult;
 use crate::fetkovich_aquifer::FetkovichAquiferResult;
 use crate::gas_correlations::GasCorrelationsResult;
+use crate::gas_density_consistency::GasDensityConsistencyResult;
 use crate::gas_material_balance::GasMaterialBalanceResult;
 use crate::generalized_material_balance::GeneralizedMaterialBalanceResult;
 use crate::mmp::MmpResult;
@@ -26,6 +28,7 @@ use crate::property_sweep::PropertySweepResult;
 use crate::regression::RegressionResult;
 use crate::relative_permeability::RelativePermeabilityResult;
 use crate::saturation_test::SaturationTestResult;
+use crate::separator_path::SeparatorPathResult;
 use crate::separator_test::SeparatorTestResult;
 use crate::swelling_test::SwellingTestResult;
 use crate::tune_to_saturation::TuneToSaturationResult;
@@ -67,6 +70,22 @@ impl CalcResult for ConstantVolumeDepletionResult {
         "cumulative_moles_removed",
         "k_values",
         "points",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for CvdMaterialBalanceResult {
+    const CALC_ID: &'static str = "pvt.cvd_material_balance";
+    const FIELDS: &'static [&'static str] = &[
+        "stages",
+        "produced_component_moles",
+        "remaining_component_moles",
+        "liquid_component_moles",
+        "compatible",
         "warnings",
     ];
 
@@ -143,6 +162,15 @@ impl CalcResult for FetkovichAquiferResult {
 impl CalcResult for GasCorrelationsResult {
     const CALC_ID: &'static str = "pvt.gas_correlations";
     const FIELDS: &'static [&'static str] = &["queries", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for GasDensityConsistencyResult {
+    const CALC_ID: &'static str = "pvt.gas_density_consistency";
+    const FIELDS: &'static [&'static str] = &["rows", "all_compatible", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings
@@ -261,6 +289,22 @@ impl CalcResult for SaturationTestResult {
     const CALC_ID: &'static str = "pvt.saturation_test";
     const FIELDS: &'static [&'static str] =
         &["saturation_pressure", "saturation_temperature", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for SeparatorPathResult {
+    const CALC_ID: &'static str = "pvt.separator_path";
+    const FIELDS: &'static [&'static str] = &[
+        "final_pressure",
+        "final_temperature",
+        "volumes",
+        "component_moles",
+        "gas_oil_ratio",
+        "warnings",
+    ];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

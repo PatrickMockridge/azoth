@@ -408,6 +408,16 @@ NO_INTERIOR: dict[str, str] = {
         "the answer is the interval schedule's states; the march's intermediate branches are "
         "the method, not a state a capture names"
     ),
+    "pvt.cvd_material_balance": (
+        "each row is the reconstructed accounting; its closures are outputs, not an interior"
+    ),
+    "pvt.gas_density_consistency": (
+        "each row is the propagated interval and its verdict; no state lies between them"
+    ),
+    "pvt.separator_path": (
+        "the answer is the final-basis products; the per-stage flashes are the method and no "
+        "capture names them"
+    ),
     "pvt.generalized_material_balance": (
         "each call is one regression's answer; the scaled matrix and its residual columns are "
         "the fit's method, not a state a capture names"

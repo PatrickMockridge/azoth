@@ -1,0 +1,148 @@
+model = "pvt.cvd_material_balance"
+[[cases]]
+id = "analytic_binary"
+tolerance = 1e-12
+source = "The class test's analytic binary path: the saturation reference, then two withdrawals of 0.2 with 20 percent liquid volume. From `CvdMaterialBalanceTest.analyticBinaryConservesEveryComponentAcrossTheWholePath`."
+[cases.inputs]
+component_names = ["A", "B"]
+observations = [
+  { pressure = 10000000.0, gas_z = 1.0, liquid_volume_fraction = 0.0, cumulative_produced = 0.0 },
+  { pressure = 5000000.0, gas_z = 1.0, liquid_volume_fraction = 0.2, cumulative_produced = 0.2 },
+  { pressure = 2500000.0, gas_z = 1.0, liquid_volume_fraction = 0.2, cumulative_produced = 0.4 },
+]
+vapor_compositions = [
+  [0.8, 0.2],
+  [0.9, 0.1],
+  [0.9, 0.1],
+]
+balance_tolerance = 1e-12
+minimum_liquid_moles = 1e-08
+[cases.expected]
+stages = [
+  { total_moles = 1.0, vapor_moles = 1.0, liquid_moles = 0.0, stage_withdrawn_moles = 0.0, component_closure = 0.0, remaining_closure = 0.0, produced_closure = 0.0, vapor_closure = 0.0, liquid_state = "absent", compatible = true },
+  { total_moles = 0.8, vapor_moles = 0.4, liquid_moles = 0.4, stage_withdrawn_moles = 0.2, component_closure = -1.1102230246251565e-16, remaining_closure = 0.0, produced_closure = 0.0, vapor_closure = 0.0, liquid_state = "resolved", compatible = true },
+  { total_moles = 0.6, vapor_moles = 0.2, liquid_moles = 0.39999999999999997, stage_withdrawn_moles = 0.2, component_closure = 5.551115123125783e-17, remaining_closure = 0.0, produced_closure = 0.0, vapor_closure = 0.0, liquid_state = "resolved", compatible = true },
+]
+[[cases]]
+id = "analytic_ternary"
+tolerance = 1e-12
+source = "The class test's rational ternary path at unit pressure scale: one order of the three components. From `CvdMaterialBalanceTest.ternaryInventoryReferenceSurvivesOrderAndPressureScaling`."
+[cases.inputs]
+component_names = ["component-0", "component-1", "component-2"]
+observations = [
+  { pressure = 10000000.0, gas_z = 1.0, liquid_volume_fraction = 0.0, cumulative_produced = 0.0 },
+  { pressure = 5555555.555555556, gas_z = 1.0, liquid_volume_fraction = 0.1, cumulative_produced = 0.2 },
+  { pressure = 3750000.0, gas_z = 1.0, liquid_volume_fraction = 0.2, cumulative_produced = 0.3 },
+]
+vapor_compositions = [
+  [0.48, 0.33, 0.19],
+  [0.6, 0.3, 0.1],
+  [0.65, 0.3, 0.05],
+]
+balance_tolerance = 1e-12
+minimum_liquid_moles = 1e-08
+[cases.expected]
+stages = [
+  { total_moles = 1.0, vapor_moles = 1.0, liquid_moles = 0.0, stage_withdrawn_moles = 0.0, component_closure = 0.0, remaining_closure = 0.0, produced_closure = 0.0, vapor_closure = 0.0, liquid_state = "absent", compatible = true },
+  { total_moles = 0.8, vapor_moles = 0.5, liquid_moles = 0.30000000000000004, stage_withdrawn_moles = 0.2, component_closure = -5.551115123125783e-17, remaining_closure = 0.0, produced_closure = 0.0, vapor_closure = -5.551115123125783e-17, liquid_state = "resolved", compatible = true },
+  { total_moles = 0.7, vapor_moles = 0.30000000000000004, liquid_moles = 0.3999999999999999, stage_withdrawn_moles = 0.09999999999999998, component_closure = 5.551115123125783e-17, remaining_closure = 1.1102230246251565e-16, produced_closure = 5.551115123125783e-17, vapor_closure = 0.0, liquid_state = "resolved", compatible = true },
+]
+[[cases]]
+id = "ns1_table1"
+tolerance = 1e-12
+source = "The published Whitson-Torp NS-1 Table 1: seven pressures, eleven vapor analyses, cumulative production and liquid volume in percent. From `CvdMaterialBalanceTest.primaryTableReproducesPublishedCalculationButRetainsExperimentalDiscrepancy`."
+[cases.inputs]
+component_names = ["CO2", "N2", "C1", "C2", "C3", "iC4", "nC4", "iC5", "nC5", "C6", "C7+"]
+observations = [
+  { pressure = 46640964.66109356, gas_z = 1.238, liquid_volume_fraction = 0.0, cumulative_produced = 0.0 },
+  { pressure = 38022518.04463357, gas_z = 1.089, liquid_volume_fraction = 0.141, cumulative_produced = 0.09024 },
+  { pressure = 29748809.29283197, gas_z = 0.972, liquid_volume_fraction = 0.197, cumulative_produced = 0.21744 },
+  { pressure = 21475100.541030366, gas_z = 0.913, liquid_volume_fraction = 0.216, cumulative_produced = 0.38674 },
+  { pressure = 14580343.247862367, gas_z = 0.914, liquid_volume_fraction = 0.213, cumulative_produced = 0.55686 },
+  { pressure = 8375061.68401117, gas_z = 0.937, liquid_volume_fraction = 0.202, cumulative_produced = 0.72146 },
+  { pressure = 4927683.037427169, gas_z = 0.96, liquid_volume_fraction = 0.193, cumulative_produced = 0.81301 },
+]
+vapor_compositions = [
+  [0.0237, 0.0031, 0.7319, 0.078, 0.0355, 0.0071, 0.0145, 0.0064, 0.0068, 0.0109, 0.0821],
+  [0.024, 0.0032, 0.7556, 0.0783, 0.0347, 0.0067, 0.0137, 0.0059, 0.0062, 0.0097, 0.062],
+  [0.0245, 0.0033, 0.7789, 0.0787, 0.034, 0.0065, 0.0131, 0.0055, 0.0058, 0.0088, 0.0409],
+  [0.025, 0.0034, 0.7933, 0.0792, 0.0341, 0.0064, 0.013, 0.0053, 0.0056, 0.0083, 0.0264],
+  [0.0253, 0.0034, 0.7962, 0.0804, 0.0353, 0.0066, 0.0133, 0.0054, 0.0057, 0.0082, 0.0202],
+  [0.0257, 0.0034, 0.789, 0.084, 0.0374, 0.0072, 0.0144, 0.0059, 0.0061, 0.0085, 0.0184],
+  [0.026, 0.0033, 0.778, 0.087, 0.0391, 0.0078, 0.0156, 0.0064, 0.0066, 0.009, 0.0212],
+]
+balance_tolerance = 1e-12
+minimum_liquid_moles = 1e-08
+[cases.expected]
+stages = [
+  { total_moles = 1.0, vapor_moles = 1.0, liquid_moles = 0.0, stage_withdrawn_moles = 0.0, component_closure = 0.0, remaining_closure = 0.0, produced_closure = 0.0, vapor_closure = 0.0, liquid_state = "absent", compatible = true },
+  { total_moles = 0.90976, vapor_moles = 0.7960847035527147, liquid_moles = 0.11367529644728536, stage_withdrawn_moles = 0.09023999999999999, component_closure = -8.326672684688674e-17, remaining_closure = 0.0, produced_closure = 0.0, vapor_closure = 2.220446049250313e-16, liquid_state = "resolved", compatible = true },
+  { total_moles = 0.78256, vapor_moles = 0.6523369645352743, liquid_moles = 0.1302230354647257, stage_withdrawn_moles = 0.1272, component_closure = -1.1102230246251565e-16, remaining_closure = 0.0, produced_closure = 0.0, vapor_closure = 0.0, liquid_state = "resolved", compatible = true },
+  { total_moles = 0.61326, vapor_moles = 0.4894784897393792, liquid_moles = 0.12378151026062084, stage_withdrawn_moles = 0.16929999999999998, component_closure = 5.551115123125783e-17, remaining_closure = 1.1102230246251565e-16, produced_closure = 0.0, vapor_closure = 0.0, liquid_state = "resolved", compatible = true },
+  { total_moles = 0.44314, vapor_moles = 0.3332340759870093, liquid_moles = 0.10990592401299065, stage_withdrawn_moles = 0.17012000000000005, component_closure = 0.0, remaining_closure = 0.0, produced_closure = -1.1102230246251565e-16, vapor_closure = 0.0, liquid_state = "resolved", compatible = true },
+  { total_moles = 0.27854, vapor_moles = 0.18932346106638492, liquid_moles = 0.08921653893361509, stage_withdrawn_moles = 0.16459999999999997, component_closure = 6.938893903907228e-17, remaining_closure = 1.1102230246251565e-16, produced_closure = -1.1102230246251565e-16, vapor_closure = -2.7755575615628914e-17, liquid_state = "resolved", compatible = true },
+  { total_moles = 0.18699, vapor_moles = 0.10995074772347627, liquid_moles = 0.07703925227652372, stage_withdrawn_moles = 0.09155000000000002, component_closure = 5.551115123125783e-17, remaining_closure = 5.551115123125783e-17, produced_closure = 0.0, vapor_closure = 0.0, liquid_state = "resolved", compatible = true },
+]
+[[cases]]
+id = "gas_only"
+tolerance = 1e-12
+source = "A single component at zero liquid volume: both rows are an absent liquid, and the accounting closes. From `CvdMaterialBalanceTest.absentAndVanishingLiquidHaveExplicitLimits`."
+[cases.inputs]
+component_names = ["A"]
+observations = [
+  { pressure = 100.0, gas_z = 1.0, liquid_volume_fraction = 0.0, cumulative_produced = 0.0 },
+  { pressure = 50.0, gas_z = 1.0, liquid_volume_fraction = 0.0, cumulative_produced = 0.5 },
+]
+vapor_compositions = [
+  [1.0],
+  [1.0],
+]
+balance_tolerance = 1e-12
+minimum_liquid_moles = 1e-08
+[cases.expected]
+stages = [
+  { total_moles = 1.0, vapor_moles = 1.0, liquid_moles = 0.0, stage_withdrawn_moles = 0.0, component_closure = 0.0, remaining_closure = 0.0, produced_closure = 0.0, vapor_closure = 0.0, liquid_state = "absent", compatible = true },
+  { total_moles = 0.5, vapor_moles = 0.5, liquid_moles = 0.0, stage_withdrawn_moles = 0.5, component_closure = 0.0, remaining_closure = 0.0, produced_closure = 0.0, vapor_closure = 0.0, liquid_state = "absent", compatible = true },
+]
+[[cases]]
+id = "vanishing_liquid"
+tolerance = 1e-12
+source = "A positive liquid volume whose amount is 1e-10, below the resolution floor: the state is unresolved and the report incompatible. From the same test."
+[cases.inputs]
+component_names = ["A"]
+observations = [
+  { pressure = 100.0, gas_z = 1.0, liquid_volume_fraction = 0.0, cumulative_produced = 0.0 },
+  { pressure = 50.0, gas_z = 1.0, liquid_volume_fraction = 0.2, cumulative_produced = 0.5999999999 },
+]
+vapor_compositions = [
+  [1.0],
+  [1.0],
+]
+balance_tolerance = 1e-12
+minimum_liquid_moles = 1e-08
+[cases.expected]
+stages = [
+  { total_moles = 1.0, vapor_moles = 1.0, liquid_moles = 0.0, stage_withdrawn_moles = 0.0, component_closure = 0.0, remaining_closure = 0.0, produced_closure = 0.0, vapor_closure = 0.0, liquid_state = "absent", compatible = true },
+  { total_moles = 0.40000000010000003, vapor_moles = 0.4, liquid_moles = 1.000000082740371e-10, stage_withdrawn_moles = 0.5999999999, component_closure = 0.0, remaining_closure = 0.0, produced_closure = 0.0, vapor_closure = 0.0, liquid_state = "unresolved", compatible = false },
+]
+[[cases]]
+id = "negative_component"
+tolerance = 1e-12
+source = "A closed total that hides a negative component: the liquid component is -0.34 and the state is inconsistent. From `CvdMaterialBalanceTest.negativeComponentsCannotPassByTotalClosureOrClipping`."
+[cases.inputs]
+component_names = ["A", "B"]
+observations = [
+  { pressure = 10000000.0, gas_z = 1.0, liquid_volume_fraction = 0.0, cumulative_produced = 0.0 },
+  { pressure = 5000000.0, gas_z = 1.0, liquid_volume_fraction = 0.2, cumulative_produced = 0.2 },
+]
+vapor_compositions = [
+  [0.2, 0.8],
+  [0.9, 0.1],
+]
+balance_tolerance = 1e-12
+minimum_liquid_moles = 1e-08
+[cases.expected]
+stages = [
+  { total_moles = 1.0, vapor_moles = 1.0, liquid_moles = 0.0, stage_withdrawn_moles = 0.0, component_closure = 0.0, remaining_closure = 0.0, produced_closure = 0.0, vapor_closure = 0.0, liquid_state = "absent", compatible = true },
+  { total_moles = 0.8, vapor_moles = 0.4, liquid_moles = 0.4, stage_withdrawn_moles = 0.2, component_closure = -1.1102230246251565e-16, remaining_closure = 0.0, produced_closure = 0.0, vapor_closure = 0.0, liquid_state = "inconsistent", compatible = false },
+]

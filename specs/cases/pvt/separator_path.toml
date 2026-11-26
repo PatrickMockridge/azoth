@@ -1,0 +1,79 @@
+model = "pvt.separator_path"
+[[cases]]
+id = "one_stage_stock_tank"
+tolerance = 1.0e-6
+source = "The class test's one-stage stock tank on a 70/10/5/15 methane/ethane/propane/nC10 PR mixture at 100 bara and 350 K. From `PvtSeparatorPathTest.oneStageMatchesIndependentFlash`."
+[cases.inputs]
+components = [
+  { fluid = 0.0, name = "methane", pseudo_component = false, moles = 70.0 },
+  { fluid = 0.0, name = "ethane", pseudo_component = false, moles = 10.0 },
+  { fluid = 0.0, name = "propane", pseudo_component = false, moles = 5.0 },
+  { fluid = 0.0, name = "nC10", pseudo_component = false, moles = 15.0 },
+]
+pressures = [101325.0]
+temperatures = [288.15]
+eos = "pr"
+mixing_rule = "classic"
+[cases.expected]
+final_pressure = 101325.0
+final_temperature = 288.15
+volumes = [1.998425076249661, 0.002925770637213811, 0.0]
+gas_oil_ratio = 683.0422900657537
+[[cases]]
+id = "two_stage_offgas"
+tolerance = 1.0e-6
+source = "The class test's first stage at 20 bara and 400 K, then the final basis at 1.01325 bara and 288.15 K, where the offgas condensate is retained in the final oil. From `PvtSeparatorPathTest.retainsCondensateFromOffgas`."
+[cases.inputs]
+components = [
+  { fluid = 0.0, name = "methane", pseudo_component = false, moles = 70.0 },
+  { fluid = 0.0, name = "ethane", pseudo_component = false, moles = 10.0 },
+  { fluid = 0.0, name = "propane", pseudo_component = false, moles = 5.0 },
+  { fluid = 0.0, name = "nC10", pseudo_component = false, moles = 15.0 },
+]
+pressures = [2000000.0, 101325.0]
+temperatures = [400.0, 288.15]
+eos = "pr"
+mixing_rule = "classic"
+[cases.expected]
+final_pressure = 101325.0
+final_temperature = 288.15
+volumes = [1.9949580169411532, 0.0029378272171125736, 0.0]
+gas_oil_ratio = 679.059001605236
+[[cases]]
+id = "three_phase"
+tolerance = 1.0e-6
+source = "The class test's three-phase water state: the same mixture plus 10 mol of water at 10 bara and 310 K, then the final basis, with the multiphase check on. From `PvtSeparatorPathTest.conservesWaterAndBothHydrocarbonProducts`."
+[cases.inputs]
+components = [
+  { fluid = 0.0, name = "methane", pseudo_component = false, moles = 70.0 },
+  { fluid = 0.0, name = "ethane", pseudo_component = false, moles = 10.0 },
+  { fluid = 0.0, name = "propane", pseudo_component = false, moles = 5.0 },
+  { fluid = 0.0, name = "nC10", pseudo_component = false, moles = 15.0 },
+  { fluid = 0.0, name = "water", pseudo_component = false, moles = 10.0 },
+]
+pressures = [1000000.0, 101325.0]
+temperatures = [310.0, 288.15]
+eos = "pr"
+mixing_rule = "classic"
+multiphase = true
+[cases.expected]
+final_pressure = 101325.0
+final_temperature = 288.15
+volumes = [1.9991516042825292, 0.002972364838855056, 0.00016961244605850567]
+gas_oil_ratio = 672.5794822188096
+[[cases]]
+id = "gas_only"
+tolerance = 1.0e-6
+source = "Methane alone at the standard basis: no oil phase exists, the volumes close, and the gas/oil ratio is absent rather than NaN. From `PvtSeparatorPathTest.retainsDeclaredStandardBasisAndUndefinedRatio`."
+[cases.inputs]
+components = [
+  { fluid = 0.0, name = "methane", pseudo_component = false, moles = 100.0 },
+]
+pressures = [101325.0]
+temperatures = [288.15]
+eos = "pr"
+mixing_rule = "classic"
+[cases.expected]
+final_pressure = 101325.0
+final_temperature = 288.15
+volumes = [2.3590611078040036, 0.0, 0.0]

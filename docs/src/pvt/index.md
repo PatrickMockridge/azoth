@@ -16,10 +16,12 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`pvt.black_oil_correlations`](./black_oil_correlations.md) | `black_oil_correlation_dispatch` | NeqSim pvtsimulation/util/BlackOilCorrelations.java and SaturationPressureCorrelation.java |
 | [`pvt.constant_mass_expansion`](./constant_mass_expansion.md) | `direct composition` | NeqSim pvtsimulation/simulation/ConstantMassExpansion.java |
 | [`pvt.constant_volume_depletion`](./constant_volume_depletion.md) | `direct composition` | NeqSim pvtsimulation/simulation/ConstantVolumeDepletion.java |
+| [`pvt.cvd_material_balance`](./cvd_material_balance.md) | `direct composition` | NeqSim pvtsimulation/util/CvdMaterialBalance.java |
 | [`pvt.decline_curve`](./decline_curve.md) | `direct composition` | NeqSim pvtsimulation/util/DeclineCurveAnalysis.java |
 | [`pvt.differential_liberation`](./differential_liberation.md) | `direct composition` | NeqSim pvtsimulation/simulation/DifferentialLiberation.java |
 | [`pvt.fetkovich_aquifer`](./fetkovich_aquifer.md) | `fetkovich_exact_ramp_march` | NeqSim pvtsimulation/reservoirproperties/materialbalance/FetkovichAquifer.java |
 | [`pvt.gas_correlations`](./gas_correlations.md) | `gas_correlation_dispatch` | NeqSim pvtsimulation/util/ZFactorCorrelations.java, GasPseudoCriticalProperties.java, GasPseudoPressure.java and reservoirproperties/CompositionEstimation.java |
+| [`pvt.gas_density_consistency`](./gas_density_consistency.md) | `direct composition` | NeqSim pvtsimulation/util/PvtGasDensityConsistency.java |
 | [`pvt.gas_material_balance`](./gas_material_balance.md) | `direct composition` | NeqSim reservoirproperties/materialbalance/GasMaterialBalance.java |
 | [`pvt.generalized_material_balance`](./generalized_material_balance.md) | `scaled_least_squares_condition_gate` | NeqSim pvtsimulation/reservoirproperties/materialbalance/GeneralizedMaterialBalance.java |
 | [`pvt.mmp`](./mmp.md) | `direct composition` | NeqSim pvtsimulation/simulation/MMPCalculator.java |
@@ -28,6 +30,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`pvt.regression`](./regression.md) | `levenberg_marquardt` | NeqSim pvtsimulation/regression/PVTRegression.java |
 | [`pvt.relative_permeability`](./relative_permeability.md) | `direct composition` | NeqSim pvtsimulation/reservoirproperties/relpermeability/RelativePermeabilityGenerator.java |
 | [`pvt.saturation_test`](./saturation_test.md) | `direct composition` | NeqSim pvtsimulation/simulation/SaturationPressure.java and SaturationTemperature.java |
+| [`pvt.separator_path`](./separator_path.md) | `direct composition` | NeqSim pvtsimulation/util/PvtSeparatorPath.java |
 | [`pvt.separator_test`](./separator_test.md) | `direct composition` | NeqSim pvtsimulation/simulation/{GOR,SeparatorTest,MultiStageSeparatorTest}.java |
 | [`pvt.swelling_test`](./swelling_test.md) | `direct composition` | NeqSim pvtsimulation/simulation/SwellingTest.java |
 | [`pvt.tune_to_saturation`](./tune_to_saturation.md) | `plus_molar_mass_search` | NeqSim pvtsimulation/modeltuning/TuneToSaturation.java |
