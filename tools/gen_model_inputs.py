@@ -431,9 +431,7 @@ def format_rust(text: str, generator: str) -> str:
 NON_UNIT_MODELS = {
     "pvt.black_oil_correlations": "the black-oil correlation table over scalars, not a unit",
     "pvt.gas_correlations": "the gas correlation table over scalars, not a unit",
-    "pvt.gas_density_consistency": (
-        "the gas-density identity over observed intervals, not a unit"
-    ),
+    "pvt.gas_density_consistency": ("the gas-density identity over observed intervals, not a unit"),
     "pvt.water_correlations": "the water correlation table over scalars, not a unit",
     "pvt.decline_curve": "a production forecast over scalars and vectors, not a unit",
     "pvt.gas_material_balance": "a material balance over scalars and histories, not a unit",
@@ -442,9 +440,7 @@ NON_UNIT_MODELS = {
     "pvt.constant_mass_expansion": "a laboratory CCE over a fluid, not a unit",
     "pvt.differential_liberation": "a laboratory DLE over a fluid, not a unit",
     "pvt.constant_volume_depletion": "a laboratory CVD over a fluid, not a unit",
-    "pvt.cvd_material_balance": (
-        "the CVD component accounting over observations, not a unit"
-    ),
+    "pvt.cvd_material_balance": ("the CVD component accounting over observations, not a unit"),
     "pvt.separator_path": "a staged separator path over a fluid, not a unit",
     "pvt.separator_test": "a separator train over a fluid, not a unit",
     "pvt.swelling_test": "a gas-injection swelling experiment over a fluid, not a unit",

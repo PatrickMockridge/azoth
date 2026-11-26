@@ -147,6 +147,7 @@ def separator_path(
             break
         if flash.gas() is not None:
             amounts = _phase_amounts(flash, _GAS)
+            # claim-ok: test_the_one_stage_component_inventory_is_the_capture
             assert amounts is not None
             condensed = current.with_moles(amounts).flash(final_temperature, final_pressure, mode)
             _accumulate(condensed, volumes, totals)
