@@ -407,22 +407,34 @@ class _Reviewer:
         binding: Binding,
         depth: int,
     ) -> RuleValue | None:
-        assert binding.rule is not None and binding.basis is not None
-        rule = RULES.get(binding.rule)
+        rule_id = binding.rule
+        basis = binding.basis
+        if rule_id is None or basis is None:
+            self._gap(
+                state,
+                name,
+                "hard",
+                "RULE_PRECONDITION",
+                "the binding names a rule without its basis",
+                f"supply the basis for {name}",
+                "a complete rule binding",
+            )
+            return None
+        rule = RULES.get(rule_id)
         if rule is None:
             self._gap(
                 state,
                 name,
                 "hard",
                 "RULE_UNLICENSED",
-                f"{binding.rule!r} is not a licensed rule",
+                f"{rule_id!r} is not a licensed rule",
                 f"provide {name} directly or cite one of {sorted(RULES)}",
                 "a licensed rule",
             )
             return None
-        if binding.rule == "composition_remainder":
+        if rule_id == "composition_remainder":
             for key, literal in (("claim", True), ("unreported", False)):
-                claim_id = binding.basis.get(key)
+                claim_id = basis.get(key)
                 if not isinstance(claim_id, str):
                     continue
                 try:
@@ -455,7 +467,7 @@ class _Reviewer:
             derive=derive,
         )
         try:
-            return rule.apply(binding.basis, context)
+            return rule.apply(basis, context)
         except RuleError as exc:
             self._gap(
                 state, name, "hard", exc.code, exc.detail, exc.request, "a constructible input"
