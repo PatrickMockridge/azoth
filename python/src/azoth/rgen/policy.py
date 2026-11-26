@@ -40,6 +40,9 @@ DIAGNOSTIC_FIELDS: Final[frozenset[str]] = frozenset(
         "net_charge_moles",
         "reaction_log_residual",
         "residual",
+        # `pvt.generalized_material_balance`'s observed-minus-fitted ledger.
+        "residuals",
+        "rms_residual",
         "tm",
         "top_specification_residual",
     }
