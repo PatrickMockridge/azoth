@@ -15,6 +15,11 @@ renders the tables and figures, and CI re-executes them so they cannot stop runn
 | [`07-field-development-design.ipynb`](07-field-development-design.ipynb) | the selected three-stage platform, its export-line hydraulics on both routes, CAPEX and OPEX, a production DCF and the sensitivity behind the recommendation. |
 | [`08-offshore-debottlenecking.ipynb`](08-offshore-debottlenecking.ipynb) | ten years of production, the capacity chain that binds, the relief and flare checks, the fix packages and their ten-year incremental DCF, and the shutdown schedule. |
 
+The FEED follow-on to notebook 08 is
+[`case-studies/azoth-feed-08`](../case-studies/azoth-feed-08/README.md): equipment, materials,
+manhours, cost, a DEXPI PFD, an engineering report, a project plan and an independent HAZOP
+close-out.
+
 ## Run them
 
 Python 3.12 or later:

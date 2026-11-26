@@ -254,6 +254,8 @@ spec files as the code.
   [the DeepSeek Harness chapter](docs/src/agentic/harness.md); [`agents/README.md`](agents/README.md)
   and [`agents/deepseek/README.md`](agents/deepseek/README.md) hold the setup and the HAZOP team.
 - **Build on the agentic layer** — [`CLAUDE.md`](CLAUDE.md) and [`AGENTS.md`](AGENTS.md).
+- **Read a case study** — [`case-studies/README.md`](case-studies/README.md) indexes the
+  DeepSeek Harness FEED study built on notebook 08.
 
 ## Licence
 
