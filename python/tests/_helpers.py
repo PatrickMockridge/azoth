@@ -102,6 +102,14 @@ _DIAGNOSTIC_FIELDS: frozenset[str] = frozenset(
         # contract's `1e-7` and `1e-5` are what the model claims and the case records them
         # as such; between the two kernels what is being compared is rounding.
         "max_material_balance_residual",
+        # `pvt.cvd_material_balance`'s four accounting closures. Each is a difference of
+        # inventories that cancel to rounding - of order `1e-17` - so a relative
+        # comparison divides by the vanishing quantity. The model declares no solver
+        # tolerance; the comparison's own tolerance is the absolute bound they are held to.
+        "component_closure",
+        "remaining_closure",
+        "produced_closure",
+        "vapor_closure",
         "max_log_fugacity_residual",
         # The element balance less the inlet's, per element: **zero by conservation**, so what
         # crosses between two kernels is the rounding of the same cancellation - `-1.7e-16`
@@ -518,6 +526,27 @@ def assert_results_equal(
                     at = f"{context}.{field}[{index}].{name}"
                     if va is None or vb is None:
                         assert va is None and vb is None, f"{at}: one side is absent"
+                    elif name in _DIAGNOSTIC_FIELDS:
+                        # A row can carry a residual, and the reason the scalar branch
+                        # checks a diagnostic first applies one level down: its own value
+                        # is a cancellation, so a relative comparison has no meaning.
+                        left_value = (
+                            float(va.to_base_units().magnitude)
+                            if isinstance(va, pint.Quantity)
+                            else float(va)
+                        )
+                        right_value = (
+                            float(vb.to_base_units().magnitude)
+                            if isinstance(vb, pint.Quantity)
+                            else float(vb)
+                        )
+                        _assert_diagnostic(
+                            left_value,
+                            right_value,
+                            diagnostic_bound if diagnostic_bound is not None else tolerance,
+                            at,
+                            tolerance,
+                        )
                     elif isinstance(va, pint.Quantity):
                         assert isinstance(vb, pint.Quantity), f"{at}: one side is a bare number"
                         assert_close(

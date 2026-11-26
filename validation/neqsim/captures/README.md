@@ -3382,8 +3382,8 @@ own strings, and a Class 4 or coarser basis adds its not-detailed flag after the
 
 ### The PVT laboratory captures
 
-`PvtProbe` against the pin: twenty subcommands, one capture each, in the id's SI units and
-with absent fields omitted. Compile once, then run each:
+`PvtProbe` against the pin: twenty-three subcommands, one capture each, in the id's SI
+units and with absent fields omitted. Compile once, then run each:
 
 ```bash
 ../../tools/gated.sh javac -proc:none -cp neqsim-b40bb11.jar -d . PvtProbe.java
@@ -3401,7 +3401,20 @@ with absent fields omitted. Compile once, then run each:
 ../../tools/gated.sh java -cp .:neqsim-b40bb11.jar PvtProbe fetkovich > captures/pvt_fetkovich_aquifer.tsv
 ../../tools/gated.sh java -cp .:neqsim-b40bb11.jar PvtProbe generalized_mb > captures/pvt_generalized_material_balance.tsv
 ../../tools/gated.sh java -cp .:neqsim-b40bb11.jar PvtProbe relperm > captures/pvt_relative_permeability.tsv
+../../tools/gated.sh java -cp .:neqsim-b40bb11.jar PvtProbe cvd_mb > captures/pvt_cvd_material_balance.tsv
+../../tools/gated.sh java -cp .:neqsim-b40bb11.jar PvtProbe density_consistency > captures/pvt_gas_density_consistency.tsv
+../../tools/gated.sh java -cp .:neqsim-b40bb11.jar PvtProbe separator_path > captures/pvt_separator_path.tsv
 ```
+
+The evidence captures are the classes' own states. The CVD accounting is the analytic
+binary and ternary paths, the published Whitson-Torp NS-1 Table 1 (seven rows, eleven
+components), and the absent/unresolved/negative limits; `temperatureK` is a class field
+no formula reads, so the capture does not state it as an input. The gas-density identity is
+the Duvernay Table 18 nine-row set with the class's printed-precision bounds (eight
+compatible, `Psat` not) plus the point, touching-interval, gap, dilute and sixteen-corner
+cases. The separator path is the class test's PR mixture at one stage, two stages with
+offgas condensation, three phases with water, and methane alone (whose gas/oil ratio is
+absent). Its pressures are bara at the class boundary and Pa in the id's.
 
 The four reservoir-property captures are the classes' own test states: the aquifer's
 dimensionless-pressure kernel at the independent-reference times and its Carter-Tracy

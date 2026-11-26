@@ -358,10 +358,12 @@
 //!   - specs/models/pvt/black_oil_correlations.toml
 //!   - specs/models/pvt/constant_mass_expansion.toml
 //!   - specs/models/pvt/constant_volume_depletion.toml
+//!   - specs/models/pvt/cvd_material_balance.toml
 //!   - specs/models/pvt/decline_curve.toml
 //!   - specs/models/pvt/differential_liberation.toml
 //!   - specs/models/pvt/fetkovich_aquifer.toml
 //!   - specs/models/pvt/gas_correlations.toml
+//!   - specs/models/pvt/gas_density_consistency.toml
 //!   - specs/models/pvt/gas_material_balance.toml
 //!   - specs/models/pvt/generalized_material_balance.toml
 //!   - specs/models/pvt/mmp.toml
@@ -370,6 +372,7 @@
 //!   - specs/models/pvt/regression.toml
 //!   - specs/models/pvt/relative_permeability.toml
 //!   - specs/models/pvt/saturation_test.toml
+//!   - specs/models/pvt/separator_path.toml
 //!   - specs/models/pvt/separator_test.toml
 //!   - specs/models/pvt/swelling_test.toml
 //!   - specs/models/pvt/tune_to_saturation.toml
@@ -6857,6 +6860,21 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "thermodynamic_temperature",
     ),
     ("pvt.constant_volume_depletion", "pressures", "pressure"),
+    (
+        "pvt.cvd_material_balance",
+        "vapor_compositions",
+        "dimensionless",
+    ),
+    (
+        "pvt.cvd_material_balance",
+        "balance_tolerance",
+        "dimensionless",
+    ),
+    (
+        "pvt.cvd_material_balance",
+        "minimum_liquid_moles",
+        "dimensionless",
+    ),
     ("pvt.decline_curve", "qi", "dimensionless"),
     ("pvt.decline_curve", "di", "dimensionless"),
     ("pvt.decline_curve", "b", "dimensionless"),
@@ -7027,6 +7045,12 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     (
         "pvt.saturation_test",
         "temperature_search_max",
+        "thermodynamic_temperature",
+    ),
+    ("pvt.separator_path", "pressures", "pressure"),
+    (
+        "pvt.separator_path",
+        "temperatures",
         "thermodynamic_temperature",
     ),
     ("pvt.separator_test", "reservoir_pressure", "pressure"),

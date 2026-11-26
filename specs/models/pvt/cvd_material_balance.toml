@@ -1,0 +1,107 @@
+id = "pvt.cvd_material_balance"
+name = "CVD material balance"
+kind = "direct"
+assumptions = [
+    "**the reconstruction is the class's and needs no EOS**: the vapor inventory is `(p/p_ref)(Z_ref/Z)(1-V_l)` on a one-initial-mole basis, and the liquid is the remainder.\n",
+    "**the saturation reference is the first observation**, which must state zero liquid volume and zero cumulative production; pressures then strictly decrease and cumulative production does not.\n",
+    "**produced, remaining and liquid component amounts are signed**: a negative component is retained as the diagnostic it is, never clipped, and it makes the row incompatible.\n",
+    "**the four closures are published**: component sum minus liquid, remaining sum minus total, produced sum minus cumulative production, and the vapor amount times the composition sum minus itself.\n",
+    "**the liquid state separates absent from unresolved and inconsistent**: an absent liquid requires zero liquid volume and every liquid component within the tolerance; a liquid at or below the resolution floor is unresolved and incompatible.\n",
+    "**a vapor composition that does not already sum to one is refused**, as the class refuses it; nothing is normalised.\n",
+    "**the class's cell temperature and its sample, experiment and data-use references are read by no formula**, so the id declares none of them.\n",
+]
+references = [
+    "Whitson, C. H. & Torp, S. B. (1983). \"Evaluating Constant-Volume Depletion Data.\" Journal of Petroleum Technology 35(3), 610-620. DOI 10.2118/10067-PA.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/util/CvdMaterialBalance.java` at commit b40bb113 is the port source.",
+    "`validation/neqsim/captures/pvt_cvd_material_balance.tsv` - the analytic binary and ternary paths, the published NS-1 Table 1, and the absent, unresolved and inconsistent states.",
+]
+[source]
+standard = "NeqSim pvtsimulation/util/CvdMaterialBalance.java"
+edition = "The vapor inventory from the pressure and Z ratios, the produced/remaining/liquid component accounting, the four closures and the liquid-state resolution; the class's temperature and provenance strings are read by no formula."
+[inputs]
+[inputs.component_names]
+type = "vector_string"
+description = "The component identities, in every composition and inventory row's order, without duplicates.\n"
+[inputs.observations]
+type = "record_list"
+row_type = "CvdObservation"
+description = "The saturation reference followed by the depletion rows, at strictly decreasing pressures and nondecreasing cumulative production.\n"
+[inputs.observations.fields.pressure]
+unit = "Pa"
+description = "The post-withdrawal cell pressure.\n"
+[inputs.observations.fields.gas_z]
+unit = "dimensionless"
+description = "The equilibrium vapor compressibility factor.\n"
+[inputs.observations.fields.liquid_volume_fraction]
+unit = "dimensionless"
+description = "The liquid volume per initial saturated cell volume, in `[0, 1)`.\n"
+[inputs.observations.fields.cumulative_produced]
+unit = "dimensionless"
+description = "The cumulative withdrawn moles per initial mole, in `[0, 1)`.\n"
+[inputs.vapor_compositions]
+type = "matrix"
+unit = "dimensionless"
+shape = "one row per observation, one column per component name"
+description = "The equilibrium and withdrawn vapor mole fractions, each row already summing to one within `1e-10`.\n"
+[inputs.balance_tolerance]
+unit = "dimensionless"
+description = "The absolute inventory tolerance per initial mole, in `[0, 1)` and below the resolution floor.\n"
+[inputs.minimum_liquid_moles]
+unit = "dimensionless"
+description = "The minimum resolved liquid amount per initial mole, above the tolerance and at most one.\n"
+[outputs]
+[outputs.stages]
+type = "record_list"
+description = "The reconstructed stages, one per observation, in the caller's order.\n"
+[outputs.stages.fields.total_moles]
+unit = "dimensionless"
+description = "The total moles remaining per initial mole, `1 - cumulative_produced`.\n"
+[outputs.stages.fields.vapor_moles]
+unit = "dimensionless"
+description = "The vapor moles per initial mole.\n"
+[outputs.stages.fields.liquid_moles]
+unit = "dimensionless"
+description = "The liquid moles per initial mole, the total minus the vapor.\n"
+[outputs.stages.fields.stage_withdrawn_moles]
+unit = "dimensionless"
+description = "The moles withdrawn at this stage per initial mole.\n"
+[outputs.stages.fields.component_closure]
+unit = "dimensionless"
+description = "The liquid component sum minus the liquid amount; zero by construction where the accounting closes.\n"
+[outputs.stages.fields.remaining_closure]
+unit = "dimensionless"
+description = "The remaining component sum minus the total moles.\n"
+[outputs.stages.fields.produced_closure]
+unit = "dimensionless"
+description = "The produced component sum minus the cumulative production.\n"
+[outputs.stages.fields.vapor_closure]
+unit = "dimensionless"
+description = "The vapor amount times the composition sum, minus the vapor amount.\n"
+[outputs.stages.fields.liquid_state]
+type = "enum"
+values = ["absent", "resolved", "unresolved", "inconsistent"]
+description = "The liquid resolution state; only `resolved` has a derivable composition.\n"
+[outputs.stages.fields.compatible]
+type = "boolean"
+description = "Whether this stage's accounting closed and its liquid state is physically admissible.\n"
+[outputs.produced_component_moles]
+type = "matrix"
+unit = "dimensionless"
+shape = "one row per observation, one column per component name"
+description = "The cumulative produced component amount per initial mole.\n"
+[outputs.remaining_component_moles]
+type = "matrix"
+unit = "dimensionless"
+shape = "one row per observation, one column per component name"
+description = "The remaining component amount per initial mole, signed.\n"
+[outputs.liquid_component_moles]
+type = "matrix"
+unit = "dimensionless"
+shape = "one row per observation, one column per component name"
+description = "The liquid component amount per initial mole, signed; the composition is this divided by `liquid_moles` where the state is `resolved`.\n"
+[outputs.compatible]
+type = "boolean"
+description = "Whether every stage is compatible.\n"
+[implementations]
+python = "azoth.pvt.cvd_material_balance"
+rust = "azoth_pvt::cvd_material_balance"

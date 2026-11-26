@@ -93,7 +93,9 @@ from azoth.core.result import (
     CostEstimationResult,
     CostEstimationResultRow,
     CriticalPointResult,
+    CvdMaterialBalanceResult,
     CvdPoint,
+    CvdStage,
     DarcyWeisbachResult,
     DeadheadVerdict,
     DeclineCurveResult,
@@ -172,6 +174,8 @@ from azoth.core.result import (
     FurstElectrolytePhaseResult,
     GasBlowbyResult,
     GasCorrelationsResult,
+    GasDensityConsistencyResult,
+    GasDensityRow,
     GasDispersionResult,
     GasMaterialBalanceResult,
     GasResultRow,
@@ -431,6 +435,7 @@ from azoth.core.result import (
     SelfHeatingVerdict,
     SemenovSelfHeatingResult,
     SeparatorCapacityAssessmentResult,
+    SeparatorPathResult,
     SeparatorPerformanceResult,
     SeparatorResult,
     SeparatorStageResult,
@@ -655,6 +660,7 @@ __all__ = [
     "costald_molar_volume",
     "crane_k_factors",
     "critical_point",
+    "cvd_material_balance",
     "darcy_weisbach",
     "de_waard_milliams_corrosion",
     "decline_curve",
@@ -709,6 +715,7 @@ __all__ = [
     "furst_electrolyte_phase",
     "gas_blowby",
     "gas_correlations",
+    "gas_density_consistency",
     "gas_dispersion",
     "gas_material_balance",
     "gas_scrubber",
@@ -894,6 +901,7 @@ __all__ = [
     "semenov_self_heating",
     "separator",
     "separator_capacity_assessment",
+    "separator_path",
     "separator_performance",
     "separator_test",
     "set_heavy_tbp_to_plus",
@@ -10548,6 +10556,26 @@ def constant_volume_depletion(components: Sequence[Mapping[str, Any]], *, pressu
     )
 
 
+def cvd_material_balance(component_names: Sequence[str], observations: Sequence[Mapping[str, Any]], vapor_compositions: Sequence[Sequence[float]], balance_tolerance: float, minimum_liquid_moles: float) -> CvdMaterialBalanceResult:
+    """``pvt.cvd_material_balance``, computed in Rust."""
+    spec = _models_gen.model("pvt.cvd_material_balance")
+    result = _core.cvd_material_balance(
+        list(component_names),
+        input_records_to_si(spec, "observations", observations),
+        [list(row) for row in vapor_compositions],
+        balance_tolerance,
+        minimum_liquid_moles,
+    )
+    return CvdMaterialBalanceResult(
+        stages=tuple(CvdStage(total_moles=c.total_moles, vapor_moles=c.vapor_moles, liquid_moles=c.liquid_moles, stage_withdrawn_moles=c.stage_withdrawn_moles, component_closure=c.component_closure, remaining_closure=c.remaining_closure, produced_closure=c.produced_closure, vapor_closure=c.vapor_closure, liquid_state=c.liquid_state, compatible=c.compatible) for c in result.stages),
+        produced_component_moles=tuple(tuple(row) for row in result.produced_component_moles),
+        remaining_component_moles=tuple(tuple(row) for row in result.remaining_component_moles),
+        liquid_component_moles=tuple(tuple(row) for row in result.liquid_component_moles),
+        compatible=result.compatible,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def decline_curve(calculation: str, *, qi: float | None=None, di: float | None=None, b: float | None=None, t: float | None=None, q_limit: float | None=None, d_nominal: float | None=None, d_effective: float | None=None, q1: float | None=None, t1: float | None=None, q2: float | None=None, t2: float | None=None, q3: float | None=None, t3: float | None=None, t_start: float | None=None, t_end: float | None=None, t_step: float | None=None, t_current: float | None=None, a: float | None=None, m: float | None=None, start_index: float | None=None, end_index: float | None=None, history_time: Sequence[float] | None=None, history_rate: Sequence[float] | None=None) -> DeclineCurveResult:
     """``pvt.decline_curve``, computed in Rust."""
     result = _core.decline_curve(
@@ -10656,6 +10684,19 @@ def gas_correlations(queries: Sequence[Mapping[str, Any]]) -> GasCorrelationsRes
     )
     return GasCorrelationsResult(
         queries=tuple(GasResultRow(calculation=c.calculation, temperature=None if c.temperature is None else from_si(c.temperature.magnitude_si, c.temperature.unit), pressure=None if c.pressure is None else from_si(c.pressure.magnitude_si, c.pressure.unit), factor=c.factor, density=None if c.density is None else from_si(c.density.magnitude_si, c.density.unit), gas_fvf=c.gas_fvf, pseudo_pressure=c.pseudo_pressure, h2s_fraction=c.h2s_fraction) for c in result.queries),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def gas_density_consistency(observations: Sequence[Mapping[str, Any]]) -> GasDensityConsistencyResult:
+    """``pvt.gas_density_consistency``, computed in Rust."""
+    spec = _models_gen.model("pvt.gas_density_consistency")
+    result = _core.gas_density_consistency(
+        input_records_to_si(spec, "observations", observations),
+    )
+    return GasDensityConsistencyResult(
+        rows=tuple(GasDensityRow(implied_density=from_si(c.implied_density.magnitude_si, c.implied_density.unit), implied_lower=from_si(c.implied_lower.magnitude_si, c.implied_lower.unit), implied_upper=from_si(c.implied_upper.magnitude_si, c.implied_upper.unit), observed_minus_implied=from_si(c.observed_minus_implied.magnitude_si, c.observed_minus_implied.unit), compatible=c.compatible) for c in result.rows),
+        all_compatible=result.all_compatible,
         warnings=_warnings(result.warnings),
     )
 
@@ -10892,6 +10933,28 @@ def saturation_test(components: Sequence[Mapping[str, Any]], mode: str, *, eos: 
     return SaturationTestResult(
         saturation_pressure=None if result.saturation_pressure is None else from_si(result.saturation_pressure.magnitude_si, result.saturation_pressure.unit),
         saturation_temperature=None if result.saturation_temperature is None else from_si(result.saturation_temperature.magnitude_si, result.saturation_temperature.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def separator_path(components: Sequence[Mapping[str, Any]], pressures: Sequence[Any], temperatures: Sequence[Any], *, eos: str | None=None, mixing_rule: str | None=None, volume_correction: bool | None=None, multiphase: bool | None=None) -> SeparatorPathResult:
+    """``pvt.separator_path``, computed in Rust."""
+    spec = _models_gen.model("pvt.separator_path")
+    result = _core.separator_path(
+        input_records_to_si(spec, "components", components),
+        [_si(spec, "pressures", v) for v in pressures],
+        [_si(spec, "temperatures", v) for v in temperatures],
+        eos,
+        mixing_rule,
+        volume_correction,
+        multiphase,
+    )
+    return SeparatorPathResult(
+        final_pressure=from_si(result.final_pressure.magnitude_si, result.final_pressure.unit),
+        final_temperature=from_si(result.final_temperature.magnitude_si, result.final_temperature.unit),
+        volumes=tuple(from_si(q.magnitude_si, q.unit) for q in result.volumes),
+        component_moles=tuple(tuple(from_si(v.magnitude_si, v.unit) for v in row) for row in result.component_moles),
+        gas_oil_ratio=result.gas_oil_ratio,
         warnings=_warnings(result.warnings),
     )
 

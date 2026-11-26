@@ -674,7 +674,7 @@ a claim nothing holds.
   currency dimension is added; the JSON adapters, the reports and the serialization remain
   session surface. Held to four captures and the class's own tests.
 
-- **The PVT simulation package's core is ported, as twenty ids.** The six correlation and
+- **The PVT simulation package's core is ported, as twenty-three ids.** The six correlation and
   reservoir ids are `pvt.black_oil_correlations` (the `BlackOilCorrelations`/
   `SaturationPressureCorrelation` table with the two classes' conversion literals kept apart
   and the `_p_sat` clamp), `pvt.gas_correlations` (the Z-factor, pseudo-critical and
@@ -699,16 +699,30 @@ a claim nothing holds.
   extrema and the finite-inventory refusal), **`pvt.generalized_material_balance`** (the
   four fits over the column-scaled least squares with the condition gate and the published
   residuals) and **`pvt.relative_permeability`** (the Corey and LET tables in the four
-  Eclipse forms). The AQUTAB and Eclipse-keyword texts are session surface, not results.
+  Eclipse forms). **The three evidence ids are `pvt.cvd_material_balance`** (the vapor
+  inventory from the pressure and Z ratios, the signed produced/remaining/liquid components,
+  the four closures and the liquid-state resolution), **`pvt.gas_density_consistency`** (the
+  outward-rounded gas-density interval and the closed-interval overlap test) and
+  **`pvt.separator_path`** (the staged cascade whose offgas is flashed at the final basis,
+  with the corrected volumes and the `1e-8` component balance). The AQUTAB and
+  Eclipse-keyword texts are session surface, not results.
   **The classes' own contradictions travel with the arithmetic**: the
   `_p_sat` Vasquez-Beggs exponent's opposite sign, the BlackOil Glaso's specific-gravity
   divisor, the gas-FVF standard state's 288.71 K, the CCE's midpoint saturation state and
   `1e5` Bg, the separator train's one-stage-lagged stage density, and the MMP's Celsius
-  temperature. **Owed with the class**: the evidence/history/calibration layer
-  (`DepletionSnapshot`, `CvdMaterialBalance`, `PvtGasDensityConsistency`, `PvtSeparatorPath`,
-  `PVTFluidStudy`, `CalibratedPvtModel`, `CompositionalReservoirHistory`,
-  `DepletionPvtHistoryGenerator`, `MaterialBalancePvtHistory`, `ReservoirHistoryEnsemble`),
-  the five regression parameters this port does not carry (the plus-molar-mass multiplier,
+  temperature. **Owed with the class, and why**: `CalibratedPvtModel` holds two live fluid
+  checkpoints and JSON provenance, and its only id-shaped piece is a private comparison whose
+  vectors mix dimensionless properties with kg/m3 ones; `MaterialBalancePvtHistory` stores a
+  `CalibratedPvtModel` it never reads, so its arithmetic is row alignment plus the ported
+  `pvt.generalized_material_balance`; `DepletionPvtHistoryGenerator` composes CCE/CVD/DLE with
+  serialized `SystemInterface` snapshots and a path file; `CompositionalReservoirHistory` is
+  blocked on `SimpleReservoir`, a 1,121-line `ProcessEquipmentBaseClass` with producer streams
+  and `runTransient`, which is an equipment object rather than a fluid plus flash;
+  `ReservoirHistoryEnsemble` is blocked on that replay; `PVTFluidStudy` is JSON capture, Java
+  serialization, native snapshots and E300 export/audit, with its simulate methods dispatching
+  to ported ids; and `DepletionSnapshot` is a data holder whose arithmetic already sits inside
+  the three laboratory ids that use it. **Also owed**: the five regression parameters this
+  port does not carry (the plus-molar-mass multiplier,
   the gamma shape and minimum molecular weight, and the LBC and Pedersen viscosity
   parameters), the regression's separator experiment, `pvtsimulation/util/parameterfitting/`,
   `BlackOilTableValidator.validate`, `SlimTubeSim`, the reports (`PVTReportGenerator`,

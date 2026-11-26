@@ -376,10 +376,12 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyBlackOilCorrelationsResult>()?;
     m.add_class::<crate::transport_gen::PyConstantMassExpansionResult>()?;
     m.add_class::<crate::transport_gen::PyConstantVolumeDepletionResult>()?;
+    m.add_class::<crate::transport_gen::PyCvdMaterialBalanceResult>()?;
     m.add_class::<crate::transport_gen::PyDeclineCurveResult>()?;
     m.add_class::<crate::transport_gen::PyDifferentialLiberationResult>()?;
     m.add_class::<crate::transport_gen::PyFetkovichAquiferResult>()?;
     m.add_class::<crate::transport_gen::PyGasCorrelationsResult>()?;
+    m.add_class::<crate::transport_gen::PyGasDensityConsistencyResult>()?;
     m.add_class::<crate::transport_gen::PyGasMaterialBalanceResult>()?;
     m.add_class::<crate::transport_gen::PyGeneralizedMaterialBalanceResult>()?;
     m.add_class::<crate::transport_gen::PyMmpResult>()?;
@@ -388,6 +390,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyRegressionResult>()?;
     m.add_class::<crate::transport_gen::PyRelativePermeabilityResult>()?;
     m.add_class::<crate::transport_gen::PySaturationTestResult>()?;
+    m.add_class::<crate::transport_gen::PySeparatorPathResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorTestResult>()?;
     m.add_class::<crate::transport_gen::PySwellingTestResult>()?;
     m.add_class::<crate::transport_gen::PyTuneToSaturationResult>()?;
@@ -431,6 +434,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyCostBomRow>()?;
     m.add_class::<crate::record_outputs_gen::PyCostEstimationResultRow>()?;
     m.add_class::<crate::record_outputs_gen::PyCvdPoint>()?;
+    m.add_class::<crate::record_outputs_gen::PyCvdStage>()?;
     m.add_class::<crate::record_outputs_gen::PyDepositionSegmentRow>()?;
     m.add_class::<crate::record_outputs_gen::PyDepressurizationPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyDisciplineCostLine>()?;
@@ -451,6 +455,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyFittedParameterRow>()?;
     m.add_class::<crate::record_outputs_gen::PyFlowlineScaleSegment>()?;
     m.add_class::<crate::record_outputs_gen::PyFmeaRankedEntry>()?;
+    m.add_class::<crate::record_outputs_gen::PyGasDensityRow>()?;
     m.add_class::<crate::record_outputs_gen::PyGasResultRow>()?;
     m.add_class::<crate::record_outputs_gen::PyHazopPopulationRow>()?;
     m.add_class::<crate::record_outputs_gen::PyHazopTemplateDeviation>()?;
@@ -1394,6 +1399,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         crate::wrappers_gen::constant_volume_depletion,
         m
     )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::cvd_material_balance,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::decline_curve, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::differential_liberation,
@@ -1401,6 +1410,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::fetkovich_aquifer, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_correlations, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::gas_density_consistency,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::gas_material_balance,
         m
@@ -1421,6 +1434,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::saturation_test, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::separator_path, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::separator_test, m)?)?;
     m.add_function(wrap_pyfunction!(crate::pvt::swelling_test, m)?)?;
     m.add_function(wrap_pyfunction!(

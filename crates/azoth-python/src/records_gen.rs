@@ -340,6 +340,19 @@ pub struct CostEstimationQuery {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct CvdObservation {
+    #[pyo3(item)]
+    pub pressure: f64,
+    #[pyo3(item)]
+    pub gas_z: f64,
+    #[pyo3(item)]
+    pub liquid_volume_fraction: f64,
+    #[pyo3(item)]
+    pub cumulative_produced: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct DepositMass {
     #[pyo3(item)]
     pub mechanism: String,
@@ -849,6 +862,31 @@ pub struct FmeaEntry {
     pub detection: f64,
     #[pyo3(item)]
     pub mitigation: Option<String>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct GasDensityObservation {
+    #[pyo3(item)]
+    pub pressure: f64,
+    #[pyo3(item)]
+    pub pressure_bound: f64,
+    #[pyo3(item)]
+    pub temperature: f64,
+    #[pyo3(item)]
+    pub temperature_bound: f64,
+    #[pyo3(item)]
+    pub compressibility: f64,
+    #[pyo3(item)]
+    pub compressibility_bound: f64,
+    #[pyo3(item)]
+    pub molar_mass: f64,
+    #[pyo3(item)]
+    pub molar_mass_bound: f64,
+    #[pyo3(item)]
+    pub density: f64,
+    #[pyo3(item)]
+    pub density_bound: f64,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.

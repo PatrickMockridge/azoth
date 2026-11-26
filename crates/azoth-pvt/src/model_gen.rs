@@ -4,10 +4,12 @@
 //!   - specs/models/pvt/black_oil_correlations.toml
 //!   - specs/models/pvt/constant_mass_expansion.toml
 //!   - specs/models/pvt/constant_volume_depletion.toml
+//!   - specs/models/pvt/cvd_material_balance.toml
 //!   - specs/models/pvt/decline_curve.toml
 //!   - specs/models/pvt/differential_liberation.toml
 //!   - specs/models/pvt/fetkovich_aquifer.toml
 //!   - specs/models/pvt/gas_correlations.toml
+//!   - specs/models/pvt/gas_density_consistency.toml
 //!   - specs/models/pvt/gas_material_balance.toml
 //!   - specs/models/pvt/generalized_material_balance.toml
 //!   - specs/models/pvt/mmp.toml
@@ -16,6 +18,7 @@
 //!   - specs/models/pvt/regression.toml
 //!   - specs/models/pvt/relative_permeability.toml
 //!   - specs/models/pvt/saturation_test.toml
+//!   - specs/models/pvt/separator_path.toml
 //!   - specs/models/pvt/separator_test.toml
 //!   - specs/models/pvt/swelling_test.toml
 //!   - specs/models/pvt/tune_to_saturation.toml
@@ -3130,6 +3133,1363 @@ pub static CONSTANT_VOLUME_DEPLETION_SPEC: ModelSpec = ModelSpec {
     algorithm: None,
     checks: CONSTANT_VOLUME_DEPLETION_CHECKS,
     cases: CONSTANT_VOLUME_DEPLETION_CASES,
+};
+
+static CVD_MATERIAL_BALANCE_CHECKS: &[SpecCheck] = &[];
+
+static CVD_MATERIAL_BALANCE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "analytic_binary",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("balance_tolerance", 1e-12),
+            ("minimum_liquid_moles", 1e-08),
+        ],
+        flags: &[],
+        lists: &[("component_names", &["A", "B"])],
+        strings: &[],
+        vectors: &[],
+        matrices: &[("vapor_compositions", &[0.8, 0.2, 0.9, 0.1, 0.9, 0.1])],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "observations",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(10000000.0),
+                    },
+                    RecordField {
+                        name: "gas_z",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "liquid_volume_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cumulative_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(5000000.0),
+                    },
+                    RecordField {
+                        name: "gas_z",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "liquid_volume_fraction",
+                        value: FieldValue::Number(0.2),
+                    },
+                    RecordField {
+                        name: "cumulative_produced",
+                        value: FieldValue::Number(0.2),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(2500000.0),
+                    },
+                    RecordField {
+                        name: "gas_z",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "liquid_volume_fraction",
+                        value: FieldValue::Number(0.2),
+                    },
+                    RecordField {
+                        name: "cumulative_produced",
+                        value: FieldValue::Number(0.4),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "stages",
+            &[
+                &[
+                    RecordField {
+                        name: "total_moles",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "vapor_moles",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "liquid_moles",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "stage_withdrawn_moles",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "component_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "remaining_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "produced_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "vapor_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "liquid_state",
+                        value: FieldValue::Name("absent"),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "total_moles",
+                        value: FieldValue::Number(0.8),
+                    },
+                    RecordField {
+                        name: "vapor_moles",
+                        value: FieldValue::Number(0.4),
+                    },
+                    RecordField {
+                        name: "liquid_moles",
+                        value: FieldValue::Number(0.4),
+                    },
+                    RecordField {
+                        name: "stage_withdrawn_moles",
+                        value: FieldValue::Number(0.2),
+                    },
+                    RecordField {
+                        name: "component_closure",
+                        value: FieldValue::Number(-1.1102230246251565e-16),
+                    },
+                    RecordField {
+                        name: "remaining_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "produced_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "vapor_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "liquid_state",
+                        value: FieldValue::Name("resolved"),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "total_moles",
+                        value: FieldValue::Number(0.6),
+                    },
+                    RecordField {
+                        name: "vapor_moles",
+                        value: FieldValue::Number(0.2),
+                    },
+                    RecordField {
+                        name: "liquid_moles",
+                        value: FieldValue::Number(0.39999999999999997),
+                    },
+                    RecordField {
+                        name: "stage_withdrawn_moles",
+                        value: FieldValue::Number(0.2),
+                    },
+                    RecordField {
+                        name: "component_closure",
+                        value: FieldValue::Number(5.551115123125783e-17),
+                    },
+                    RecordField {
+                        name: "remaining_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "produced_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "vapor_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "liquid_state",
+                        value: FieldValue::Name("resolved"),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "analytic_ternary",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("balance_tolerance", 1e-12),
+            ("minimum_liquid_moles", 1e-08),
+        ],
+        flags: &[],
+        lists: &[(
+            "component_names",
+            &["component-0", "component-1", "component-2"],
+        )],
+        strings: &[],
+        vectors: &[],
+        matrices: &[(
+            "vapor_compositions",
+            &[0.48, 0.33, 0.19, 0.6, 0.3, 0.1, 0.65, 0.3, 0.05],
+        )],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "observations",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(10000000.0),
+                    },
+                    RecordField {
+                        name: "gas_z",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "liquid_volume_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cumulative_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(5555555.555555556),
+                    },
+                    RecordField {
+                        name: "gas_z",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "liquid_volume_fraction",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "cumulative_produced",
+                        value: FieldValue::Number(0.2),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(3750000.0),
+                    },
+                    RecordField {
+                        name: "gas_z",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "liquid_volume_fraction",
+                        value: FieldValue::Number(0.2),
+                    },
+                    RecordField {
+                        name: "cumulative_produced",
+                        value: FieldValue::Number(0.3),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "stages",
+            &[
+                &[
+                    RecordField {
+                        name: "total_moles",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "vapor_moles",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "liquid_moles",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "stage_withdrawn_moles",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "component_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "remaining_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "produced_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "vapor_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "liquid_state",
+                        value: FieldValue::Name("absent"),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "total_moles",
+                        value: FieldValue::Number(0.8),
+                    },
+                    RecordField {
+                        name: "vapor_moles",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "liquid_moles",
+                        value: FieldValue::Number(0.30000000000000004),
+                    },
+                    RecordField {
+                        name: "stage_withdrawn_moles",
+                        value: FieldValue::Number(0.2),
+                    },
+                    RecordField {
+                        name: "component_closure",
+                        value: FieldValue::Number(-5.551115123125783e-17),
+                    },
+                    RecordField {
+                        name: "remaining_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "produced_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "vapor_closure",
+                        value: FieldValue::Number(-5.551115123125783e-17),
+                    },
+                    RecordField {
+                        name: "liquid_state",
+                        value: FieldValue::Name("resolved"),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "total_moles",
+                        value: FieldValue::Number(0.7),
+                    },
+                    RecordField {
+                        name: "vapor_moles",
+                        value: FieldValue::Number(0.30000000000000004),
+                    },
+                    RecordField {
+                        name: "liquid_moles",
+                        value: FieldValue::Number(0.3999999999999999),
+                    },
+                    RecordField {
+                        name: "stage_withdrawn_moles",
+                        value: FieldValue::Number(0.09999999999999998),
+                    },
+                    RecordField {
+                        name: "component_closure",
+                        value: FieldValue::Number(5.551115123125783e-17),
+                    },
+                    RecordField {
+                        name: "remaining_closure",
+                        value: FieldValue::Number(1.1102230246251565e-16),
+                    },
+                    RecordField {
+                        name: "produced_closure",
+                        value: FieldValue::Number(5.551115123125783e-17),
+                    },
+                    RecordField {
+                        name: "vapor_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "liquid_state",
+                        value: FieldValue::Name("resolved"),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "ns1_table1",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("balance_tolerance", 1e-12),
+            ("minimum_liquid_moles", 1e-08),
+        ],
+        flags: &[],
+        lists: &[(
+            "component_names",
+            &[
+                "CO2", "N2", "C1", "C2", "C3", "iC4", "nC4", "iC5", "nC5", "C6", "C7+",
+            ],
+        )],
+        strings: &[],
+        vectors: &[],
+        matrices: &[(
+            "vapor_compositions",
+            &[
+                0.0237, 0.0031, 0.7319, 0.078, 0.0355, 0.0071, 0.0145, 0.0064, 0.0068, 0.0109,
+                0.0821, 0.024, 0.0032, 0.7556, 0.0783, 0.0347, 0.0067, 0.0137, 0.0059, 0.0062,
+                0.0097, 0.062, 0.0245, 0.0033, 0.7789, 0.0787, 0.034, 0.0065, 0.0131, 0.0055,
+                0.0058, 0.0088, 0.0409, 0.025, 0.0034, 0.7933, 0.0792, 0.0341, 0.0064, 0.013,
+                0.0053, 0.0056, 0.0083, 0.0264, 0.0253, 0.0034, 0.7962, 0.0804, 0.0353, 0.0066,
+                0.0133, 0.0054, 0.0057, 0.0082, 0.0202, 0.0257, 0.0034, 0.789, 0.084, 0.0374,
+                0.0072, 0.0144, 0.0059, 0.0061, 0.0085, 0.0184, 0.026, 0.0033, 0.778, 0.087,
+                0.0391, 0.0078, 0.0156, 0.0064, 0.0066, 0.009, 0.0212,
+            ],
+        )],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "observations",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(46640964.66109356),
+                    },
+                    RecordField {
+                        name: "gas_z",
+                        value: FieldValue::Number(1.238),
+                    },
+                    RecordField {
+                        name: "liquid_volume_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cumulative_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(38022518.04463357),
+                    },
+                    RecordField {
+                        name: "gas_z",
+                        value: FieldValue::Number(1.089),
+                    },
+                    RecordField {
+                        name: "liquid_volume_fraction",
+                        value: FieldValue::Number(0.141),
+                    },
+                    RecordField {
+                        name: "cumulative_produced",
+                        value: FieldValue::Number(0.09024),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(29748809.29283197),
+                    },
+                    RecordField {
+                        name: "gas_z",
+                        value: FieldValue::Number(0.972),
+                    },
+                    RecordField {
+                        name: "liquid_volume_fraction",
+                        value: FieldValue::Number(0.197),
+                    },
+                    RecordField {
+                        name: "cumulative_produced",
+                        value: FieldValue::Number(0.21744),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(21475100.541030366),
+                    },
+                    RecordField {
+                        name: "gas_z",
+                        value: FieldValue::Number(0.913),
+                    },
+                    RecordField {
+                        name: "liquid_volume_fraction",
+                        value: FieldValue::Number(0.216),
+                    },
+                    RecordField {
+                        name: "cumulative_produced",
+                        value: FieldValue::Number(0.38674),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(14580343.247862367),
+                    },
+                    RecordField {
+                        name: "gas_z",
+                        value: FieldValue::Number(0.914),
+                    },
+                    RecordField {
+                        name: "liquid_volume_fraction",
+                        value: FieldValue::Number(0.213),
+                    },
+                    RecordField {
+                        name: "cumulative_produced",
+                        value: FieldValue::Number(0.55686),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(8375061.68401117),
+                    },
+                    RecordField {
+                        name: "gas_z",
+                        value: FieldValue::Number(0.937),
+                    },
+                    RecordField {
+                        name: "liquid_volume_fraction",
+                        value: FieldValue::Number(0.202),
+                    },
+                    RecordField {
+                        name: "cumulative_produced",
+                        value: FieldValue::Number(0.72146),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(4927683.037427169),
+                    },
+                    RecordField {
+                        name: "gas_z",
+                        value: FieldValue::Number(0.96),
+                    },
+                    RecordField {
+                        name: "liquid_volume_fraction",
+                        value: FieldValue::Number(0.193),
+                    },
+                    RecordField {
+                        name: "cumulative_produced",
+                        value: FieldValue::Number(0.81301),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "stages",
+            &[
+                &[
+                    RecordField {
+                        name: "total_moles",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "vapor_moles",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "liquid_moles",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "stage_withdrawn_moles",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "component_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "remaining_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "produced_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "vapor_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "liquid_state",
+                        value: FieldValue::Name("absent"),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "total_moles",
+                        value: FieldValue::Number(0.90976),
+                    },
+                    RecordField {
+                        name: "vapor_moles",
+                        value: FieldValue::Number(0.7960847035527147),
+                    },
+                    RecordField {
+                        name: "liquid_moles",
+                        value: FieldValue::Number(0.11367529644728536),
+                    },
+                    RecordField {
+                        name: "stage_withdrawn_moles",
+                        value: FieldValue::Number(0.09023999999999999),
+                    },
+                    RecordField {
+                        name: "component_closure",
+                        value: FieldValue::Number(-8.326672684688674e-17),
+                    },
+                    RecordField {
+                        name: "remaining_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "produced_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "vapor_closure",
+                        value: FieldValue::Number(2.220446049250313e-16),
+                    },
+                    RecordField {
+                        name: "liquid_state",
+                        value: FieldValue::Name("resolved"),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "total_moles",
+                        value: FieldValue::Number(0.78256),
+                    },
+                    RecordField {
+                        name: "vapor_moles",
+                        value: FieldValue::Number(0.6523369645352743),
+                    },
+                    RecordField {
+                        name: "liquid_moles",
+                        value: FieldValue::Number(0.1302230354647257),
+                    },
+                    RecordField {
+                        name: "stage_withdrawn_moles",
+                        value: FieldValue::Number(0.1272),
+                    },
+                    RecordField {
+                        name: "component_closure",
+                        value: FieldValue::Number(-1.1102230246251565e-16),
+                    },
+                    RecordField {
+                        name: "remaining_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "produced_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "vapor_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "liquid_state",
+                        value: FieldValue::Name("resolved"),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "total_moles",
+                        value: FieldValue::Number(0.61326),
+                    },
+                    RecordField {
+                        name: "vapor_moles",
+                        value: FieldValue::Number(0.4894784897393792),
+                    },
+                    RecordField {
+                        name: "liquid_moles",
+                        value: FieldValue::Number(0.12378151026062084),
+                    },
+                    RecordField {
+                        name: "stage_withdrawn_moles",
+                        value: FieldValue::Number(0.16929999999999998),
+                    },
+                    RecordField {
+                        name: "component_closure",
+                        value: FieldValue::Number(5.551115123125783e-17),
+                    },
+                    RecordField {
+                        name: "remaining_closure",
+                        value: FieldValue::Number(1.1102230246251565e-16),
+                    },
+                    RecordField {
+                        name: "produced_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "vapor_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "liquid_state",
+                        value: FieldValue::Name("resolved"),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "total_moles",
+                        value: FieldValue::Number(0.44314),
+                    },
+                    RecordField {
+                        name: "vapor_moles",
+                        value: FieldValue::Number(0.3332340759870093),
+                    },
+                    RecordField {
+                        name: "liquid_moles",
+                        value: FieldValue::Number(0.10990592401299065),
+                    },
+                    RecordField {
+                        name: "stage_withdrawn_moles",
+                        value: FieldValue::Number(0.17012000000000005),
+                    },
+                    RecordField {
+                        name: "component_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "remaining_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "produced_closure",
+                        value: FieldValue::Number(-1.1102230246251565e-16),
+                    },
+                    RecordField {
+                        name: "vapor_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "liquid_state",
+                        value: FieldValue::Name("resolved"),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "total_moles",
+                        value: FieldValue::Number(0.27854),
+                    },
+                    RecordField {
+                        name: "vapor_moles",
+                        value: FieldValue::Number(0.18932346106638492),
+                    },
+                    RecordField {
+                        name: "liquid_moles",
+                        value: FieldValue::Number(0.08921653893361509),
+                    },
+                    RecordField {
+                        name: "stage_withdrawn_moles",
+                        value: FieldValue::Number(0.16459999999999997),
+                    },
+                    RecordField {
+                        name: "component_closure",
+                        value: FieldValue::Number(6.938893903907228e-17),
+                    },
+                    RecordField {
+                        name: "remaining_closure",
+                        value: FieldValue::Number(1.1102230246251565e-16),
+                    },
+                    RecordField {
+                        name: "produced_closure",
+                        value: FieldValue::Number(-1.1102230246251565e-16),
+                    },
+                    RecordField {
+                        name: "vapor_closure",
+                        value: FieldValue::Number(-2.7755575615628914e-17),
+                    },
+                    RecordField {
+                        name: "liquid_state",
+                        value: FieldValue::Name("resolved"),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "total_moles",
+                        value: FieldValue::Number(0.18699),
+                    },
+                    RecordField {
+                        name: "vapor_moles",
+                        value: FieldValue::Number(0.10995074772347627),
+                    },
+                    RecordField {
+                        name: "liquid_moles",
+                        value: FieldValue::Number(0.07703925227652372),
+                    },
+                    RecordField {
+                        name: "stage_withdrawn_moles",
+                        value: FieldValue::Number(0.09155000000000002),
+                    },
+                    RecordField {
+                        name: "component_closure",
+                        value: FieldValue::Number(5.551115123125783e-17),
+                    },
+                    RecordField {
+                        name: "remaining_closure",
+                        value: FieldValue::Number(5.551115123125783e-17),
+                    },
+                    RecordField {
+                        name: "produced_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "vapor_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "liquid_state",
+                        value: FieldValue::Name("resolved"),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "gas_only",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("balance_tolerance", 1e-12),
+            ("minimum_liquid_moles", 1e-08),
+        ],
+        flags: &[],
+        lists: &[("component_names", &["A"])],
+        strings: &[],
+        vectors: &[],
+        matrices: &[("vapor_compositions", &[1.0, 1.0])],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "observations",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "gas_z",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "liquid_volume_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cumulative_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(50.0),
+                    },
+                    RecordField {
+                        name: "gas_z",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "liquid_volume_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cumulative_produced",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "stages",
+            &[
+                &[
+                    RecordField {
+                        name: "total_moles",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "vapor_moles",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "liquid_moles",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "stage_withdrawn_moles",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "component_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "remaining_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "produced_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "vapor_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "liquid_state",
+                        value: FieldValue::Name("absent"),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "total_moles",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "vapor_moles",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "liquid_moles",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "stage_withdrawn_moles",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "component_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "remaining_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "produced_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "vapor_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "liquid_state",
+                        value: FieldValue::Name("absent"),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "vanishing_liquid",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("balance_tolerance", 1e-12),
+            ("minimum_liquid_moles", 1e-08),
+        ],
+        flags: &[],
+        lists: &[("component_names", &["A"])],
+        strings: &[],
+        vectors: &[],
+        matrices: &[("vapor_compositions", &[1.0, 1.0])],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "observations",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "gas_z",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "liquid_volume_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cumulative_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(50.0),
+                    },
+                    RecordField {
+                        name: "gas_z",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "liquid_volume_fraction",
+                        value: FieldValue::Number(0.2),
+                    },
+                    RecordField {
+                        name: "cumulative_produced",
+                        value: FieldValue::Number(0.5999999999),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "stages",
+            &[
+                &[
+                    RecordField {
+                        name: "total_moles",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "vapor_moles",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "liquid_moles",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "stage_withdrawn_moles",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "component_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "remaining_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "produced_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "vapor_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "liquid_state",
+                        value: FieldValue::Name("absent"),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "total_moles",
+                        value: FieldValue::Number(0.40000000010000003),
+                    },
+                    RecordField {
+                        name: "vapor_moles",
+                        value: FieldValue::Number(0.4),
+                    },
+                    RecordField {
+                        name: "liquid_moles",
+                        value: FieldValue::Number(1.000000082740371e-10),
+                    },
+                    RecordField {
+                        name: "stage_withdrawn_moles",
+                        value: FieldValue::Number(0.5999999999),
+                    },
+                    RecordField {
+                        name: "component_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "remaining_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "produced_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "vapor_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "liquid_state",
+                        value: FieldValue::Name("unresolved"),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "negative_component",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("balance_tolerance", 1e-12),
+            ("minimum_liquid_moles", 1e-08),
+        ],
+        flags: &[],
+        lists: &[("component_names", &["A", "B"])],
+        strings: &[],
+        vectors: &[],
+        matrices: &[("vapor_compositions", &[0.2, 0.8, 0.9, 0.1])],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "observations",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(10000000.0),
+                    },
+                    RecordField {
+                        name: "gas_z",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "liquid_volume_fraction",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cumulative_produced",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(5000000.0),
+                    },
+                    RecordField {
+                        name: "gas_z",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "liquid_volume_fraction",
+                        value: FieldValue::Number(0.2),
+                    },
+                    RecordField {
+                        name: "cumulative_produced",
+                        value: FieldValue::Number(0.2),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "stages",
+            &[
+                &[
+                    RecordField {
+                        name: "total_moles",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "vapor_moles",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "liquid_moles",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "stage_withdrawn_moles",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "component_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "remaining_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "produced_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "vapor_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "liquid_state",
+                        value: FieldValue::Name("absent"),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "total_moles",
+                        value: FieldValue::Number(0.8),
+                    },
+                    RecordField {
+                        name: "vapor_moles",
+                        value: FieldValue::Number(0.4),
+                    },
+                    RecordField {
+                        name: "liquid_moles",
+                        value: FieldValue::Number(0.4),
+                    },
+                    RecordField {
+                        name: "stage_withdrawn_moles",
+                        value: FieldValue::Number(0.2),
+                    },
+                    RecordField {
+                        name: "component_closure",
+                        value: FieldValue::Number(-1.1102230246251565e-16),
+                    },
+                    RecordField {
+                        name: "remaining_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "produced_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "vapor_closure",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "liquid_state",
+                        value: FieldValue::Name("inconsistent"),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+            ],
+        )],
+    },
+];
+
+/// Registry entry for `pvt.cvd_material_balance`.
+pub static CVD_MATERIAL_BALANCE_SPEC: ModelSpec = ModelSpec {
+    id: "pvt.cvd_material_balance",
+    kind: "direct",
+    algorithm: None,
+    checks: CVD_MATERIAL_BALANCE_CHECKS,
+    cases: CVD_MATERIAL_BALANCE_CASES,
 };
 
 static DECLINE_CURVE_CHECKS: &[SpecCheck] = &[];
@@ -6896,6 +8256,970 @@ pub static GAS_CORRELATIONS_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&GAS_CORRELATIONS_ALGORITHM),
     checks: GAS_CORRELATIONS_CHECKS,
     cases: GAS_CORRELATIONS_CASES,
+};
+
+static GAS_DENSITY_CONSISTENCY_CHECKS: &[SpecCheck] = &[];
+
+static GAS_DENSITY_CONSISTENCY_CASES: &[TestCase] = &[
+    TestCase {
+        id: "duvernay_table18",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "observations",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(32136463.743456047),
+                    },
+                    RecordField {
+                        name: "pressure_bound",
+                        value: FieldValue::Number(3447.378646584),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(379.15),
+                    },
+                    RecordField {
+                        name: "temperature_bound",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "compressibility",
+                        value: FieldValue::Number(0.922),
+                    },
+                    RecordField {
+                        name: "compressibility_bound",
+                        value: FieldValue::Number(0.0005),
+                    },
+                    RecordField {
+                        name: "molar_mass",
+                        value: FieldValue::Number(0.03018),
+                    },
+                    RecordField {
+                        name: "molar_mass_bound",
+                        value: FieldValue::Number(5e-06),
+                    },
+                    RecordField {
+                        name: "density",
+                        value: FieldValue::Number(339.0),
+                    },
+                    RecordField {
+                        name: "density_bound",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(30688564.71189077),
+                    },
+                    RecordField {
+                        name: "pressure_bound",
+                        value: FieldValue::Number(3447.378646584),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(379.15),
+                    },
+                    RecordField {
+                        name: "temperature_bound",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "compressibility",
+                        value: FieldValue::Number(0.897),
+                    },
+                    RecordField {
+                        name: "compressibility_bound",
+                        value: FieldValue::Number(0.0005),
+                    },
+                    RecordField {
+                        name: "molar_mass",
+                        value: FieldValue::Number(0.02987),
+                    },
+                    RecordField {
+                        name: "molar_mass_bound",
+                        value: FieldValue::Number(5e-06),
+                    },
+                    RecordField {
+                        name: "density",
+                        value: FieldValue::Number(324.0),
+                    },
+                    RecordField {
+                        name: "density_bound",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(28268504.9019888),
+                    },
+                    RecordField {
+                        name: "pressure_bound",
+                        value: FieldValue::Number(3447.378646584),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(379.15),
+                    },
+                    RecordField {
+                        name: "temperature_bound",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "compressibility",
+                        value: FieldValue::Number(0.861),
+                    },
+                    RecordField {
+                        name: "compressibility_bound",
+                        value: FieldValue::Number(0.0005),
+                    },
+                    RecordField {
+                        name: "molar_mass",
+                        value: FieldValue::Number(0.02893),
+                    },
+                    RecordField {
+                        name: "molar_mass_bound",
+                        value: FieldValue::Number(5e-06),
+                    },
+                    RecordField {
+                        name: "density",
+                        value: FieldValue::Number(302.0),
+                    },
+                    RecordField {
+                        name: "density_bound",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(25517496.742014766),
+                    },
+                    RecordField {
+                        name: "pressure_bound",
+                        value: FieldValue::Number(3447.378646584),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(379.15),
+                    },
+                    RecordField {
+                        name: "temperature_bound",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "compressibility",
+                        value: FieldValue::Number(0.828),
+                    },
+                    RecordField {
+                        name: "compressibility_bound",
+                        value: FieldValue::Number(0.0005),
+                    },
+                    RecordField {
+                        name: "molar_mass",
+                        value: FieldValue::Number(0.02755),
+                    },
+                    RecordField {
+                        name: "molar_mass_bound",
+                        value: FieldValue::Number(5e-06),
+                    },
+                    RecordField {
+                        name: "density",
+                        value: FieldValue::Number(270.0),
+                    },
+                    RecordField {
+                        name: "density_bound",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(22070118.095430765),
+                    },
+                    RecordField {
+                        name: "pressure_bound",
+                        value: FieldValue::Number(3447.378646584),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(379.15),
+                    },
+                    RecordField {
+                        name: "temperature_bound",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "compressibility",
+                        value: FieldValue::Number(0.813),
+                    },
+                    RecordField {
+                        name: "compressibility_bound",
+                        value: FieldValue::Number(0.0005),
+                    },
+                    RecordField {
+                        name: "molar_mass",
+                        value: FieldValue::Number(0.02595),
+                    },
+                    RecordField {
+                        name: "molar_mass_bound",
+                        value: FieldValue::Number(5e-06),
+                    },
+                    RecordField {
+                        name: "density",
+                        value: FieldValue::Number(224.0),
+                    },
+                    RecordField {
+                        name: "density_bound",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(17926368.9622368),
+                    },
+                    RecordField {
+                        name: "pressure_bound",
+                        value: FieldValue::Number(3447.378646584),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(379.15),
+                    },
+                    RecordField {
+                        name: "temperature_bound",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "compressibility",
+                        value: FieldValue::Number(0.813),
+                    },
+                    RecordField {
+                        name: "compressibility_bound",
+                        value: FieldValue::Number(0.0005),
+                    },
+                    RecordField {
+                        name: "molar_mass",
+                        value: FieldValue::Number(0.02456),
+                    },
+                    RecordField {
+                        name: "molar_mass_bound",
+                        value: FieldValue::Number(5e-06),
+                    },
+                    RecordField {
+                        name: "density",
+                        value: FieldValue::Number(172.0),
+                    },
+                    RecordField {
+                        name: "density_bound",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(14478990.315652799),
+                    },
+                    RecordField {
+                        name: "pressure_bound",
+                        value: FieldValue::Number(3447.378646584),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(379.15),
+                    },
+                    RecordField {
+                        name: "temperature_bound",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "compressibility",
+                        value: FieldValue::Number(0.826),
+                    },
+                    RecordField {
+                        name: "compressibility_bound",
+                        value: FieldValue::Number(0.0005),
+                    },
+                    RecordField {
+                        name: "molar_mass",
+                        value: FieldValue::Number(0.02384),
+                    },
+                    RecordField {
+                        name: "molar_mass_bound",
+                        value: FieldValue::Number(5e-06),
+                    },
+                    RecordField {
+                        name: "density",
+                        value: FieldValue::Number(133.0),
+                    },
+                    RecordField {
+                        name: "density_bound",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(11376349.533727199),
+                    },
+                    RecordField {
+                        name: "pressure_bound",
+                        value: FieldValue::Number(3447.378646584),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(379.15),
+                    },
+                    RecordField {
+                        name: "temperature_bound",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "compressibility",
+                        value: FieldValue::Number(0.848),
+                    },
+                    RecordField {
+                        name: "compressibility_bound",
+                        value: FieldValue::Number(0.0005),
+                    },
+                    RecordField {
+                        name: "molar_mass",
+                        value: FieldValue::Number(0.02311),
+                    },
+                    RecordField {
+                        name: "molar_mass_bound",
+                        value: FieldValue::Number(5e-06),
+                    },
+                    RecordField {
+                        name: "density",
+                        value: FieldValue::Number(98.0),
+                    },
+                    RecordField {
+                        name: "density_bound",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(8963184.4811184),
+                    },
+                    RecordField {
+                        name: "pressure_bound",
+                        value: FieldValue::Number(3447.378646584),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(379.15),
+                    },
+                    RecordField {
+                        name: "temperature_bound",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "compressibility",
+                        value: FieldValue::Number(0.874),
+                    },
+                    RecordField {
+                        name: "compressibility_bound",
+                        value: FieldValue::Number(0.0005),
+                    },
+                    RecordField {
+                        name: "molar_mass",
+                        value: FieldValue::Number(0.02314),
+                    },
+                    RecordField {
+                        name: "molar_mass_bound",
+                        value: FieldValue::Number(5e-06),
+                    },
+                    RecordField {
+                        name: "density",
+                        value: FieldValue::Number(75.0),
+                    },
+                    RecordField {
+                        name: "density_bound",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "rows",
+            &[
+                &[
+                    RecordField {
+                        name: "implied_density",
+                        value: FieldValue::Number(333.6884347909451),
+                    },
+                    RecordField {
+                        name: "implied_lower",
+                        value: FieldValue::Number(332.9774398725011),
+                    },
+                    RecordField {
+                        name: "implied_upper",
+                        value: FieldValue::Number(334.40161473750067),
+                    },
+                    RecordField {
+                        name: "observed_minus_implied",
+                        value: FieldValue::Number(5.311565209054891),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "implied_density",
+                        value: FieldValue::Number(324.1709631539674),
+                    },
+                    RecordField {
+                        name: "implied_lower",
+                        value: FieldValue::Number(323.4731671969709),
+                    },
+                    RecordField {
+                        name: "implied_upper",
+                        value: FieldValue::Number(324.87091710797654),
+                    },
+                    RecordField {
+                        name: "observed_minus_implied",
+                        value: FieldValue::Number(-0.17096315396742057),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "implied_density",
+                        value: FieldValue::Number(301.3025980046301),
+                    },
+                    RecordField {
+                        name: "implied_lower",
+                        value: FieldValue::Number(300.642497266766),
+                    },
+                    RecordField {
+                        name: "implied_upper",
+                        value: FieldValue::Number(301.9647615431257),
+                    },
+                    RecordField {
+                        name: "observed_minus_implied",
+                        value: FieldValue::Number(0.6974019953698871),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "implied_density",
+                        value: FieldValue::Number(269.3296018115178),
+                    },
+                    RecordField {
+                        name: "implied_lower",
+                        value: FieldValue::Number(268.72747169585284),
+                    },
+                    RecordField {
+                        name: "implied_upper",
+                        value: FieldValue::Number(269.93363515170614),
+                    },
+                    RecordField {
+                        name: "observed_minus_implied",
+                        value: FieldValue::Number(0.6703981884821815),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "implied_density",
+                        value: FieldValue::Number(223.46331045296884),
+                    },
+                    RecordField {
+                        name: "implied_lower",
+                        value: FieldValue::Number(222.95403825275116),
+                    },
+                    RecordField {
+                        name: "implied_upper",
+                        value: FieldValue::Number(223.97420637614317),
+                    },
+                    RecordField {
+                        name: "observed_minus_implied",
+                        value: FieldValue::Number(0.536689547031159),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "implied_density",
+                        value: FieldValue::Number(171.7848667508742),
+                    },
+                    RecordField {
+                        name: "implied_lower",
+                        value: FieldValue::Number(171.38531087421018),
+                    },
+                    RecordField {
+                        name: "implied_upper",
+                        value: FieldValue::Number(172.18570518999707),
+                    },
+                    RecordField {
+                        name: "observed_minus_implied",
+                        value: FieldValue::Number(0.2151332491258131),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "implied_density",
+                        value: FieldValue::Number(132.56205744875533),
+                    },
+                    RecordField {
+                        name: "implied_lower",
+                        value: FieldValue::Number(132.2481394891714),
+                    },
+                    RecordField {
+                        name: "implied_upper",
+                        value: FieldValue::Number(132.8769869507279),
+                    },
+                    RecordField {
+                        name: "observed_minus_implied",
+                        value: FieldValue::Number(0.4379425512446744),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "implied_density",
+                        value: FieldValue::Number(98.34714907653012),
+                    },
+                    RecordField {
+                        name: "implied_lower",
+                        value: FieldValue::Number(98.1087719771743),
+                    },
+                    RecordField {
+                        name: "implied_upper",
+                        value: FieldValue::Number(98.58629742111923),
+                    },
+                    RecordField {
+                        name: "observed_minus_implied",
+                        value: FieldValue::Number(-0.3471490765301155),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "implied_density",
+                        value: FieldValue::Number(75.27816287269633),
+                    },
+                    RecordField {
+                        name: "implied_lower",
+                        value: FieldValue::Number(75.09091001031672),
+                    },
+                    RecordField {
+                        name: "implied_upper",
+                        value: FieldValue::Number(75.46602393648239),
+                    },
+                    RecordField {
+                        name: "observed_minus_implied",
+                        value: FieldValue::Number(-0.27816287269632767),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "analytic_limits",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "observations",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(831446.261815324),
+                    },
+                    RecordField {
+                        name: "pressure_bound",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "temperature_bound",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "compressibility",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "compressibility_bound",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "molar_mass",
+                        value: FieldValue::Number(0.02),
+                    },
+                    RecordField {
+                        name: "molar_mass_bound",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "density",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "density_bound",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(831446.261815324),
+                    },
+                    RecordField {
+                        name: "pressure_bound",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "temperature_bound",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "compressibility",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "compressibility_bound",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "molar_mass",
+                        value: FieldValue::Number(0.02),
+                    },
+                    RecordField {
+                        name: "molar_mass_bound",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "density",
+                        value: FieldValue::Number(21.0),
+                    },
+                    RecordField {
+                        name: "density_bound",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(831446.261815324),
+                    },
+                    RecordField {
+                        name: "pressure_bound",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "temperature_bound",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "compressibility",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "compressibility_bound",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "molar_mass",
+                        value: FieldValue::Number(0.02),
+                    },
+                    RecordField {
+                        name: "molar_mass_bound",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "density",
+                        value: FieldValue::Number(21.0),
+                    },
+                    RecordField {
+                        name: "density_bound",
+                        value: FieldValue::Number(0.99),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(1e-06),
+                    },
+                    RecordField {
+                        name: "pressure_bound",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "temperature_bound",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "compressibility",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "compressibility_bound",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "molar_mass",
+                        value: FieldValue::Number(0.02),
+                    },
+                    RecordField {
+                        name: "molar_mass_bound",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "density",
+                        value: FieldValue::Number(2.4054471008545208e-11),
+                    },
+                    RecordField {
+                        name: "density_bound",
+                        value: FieldValue::Number(1e-25),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(20000000.0),
+                    },
+                    RecordField {
+                        name: "pressure_bound",
+                        value: FieldValue::Number(100000.0),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(350.0),
+                    },
+                    RecordField {
+                        name: "temperature_bound",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "compressibility",
+                        value: FieldValue::Number(0.9),
+                    },
+                    RecordField {
+                        name: "compressibility_bound",
+                        value: FieldValue::Number(0.01),
+                    },
+                    RecordField {
+                        name: "molar_mass",
+                        value: FieldValue::Number(0.025),
+                    },
+                    RecordField {
+                        name: "molar_mass_bound",
+                        value: FieldValue::Number(0.0001),
+                    },
+                    RecordField {
+                        name: "density",
+                        value: FieldValue::Number(200.0),
+                    },
+                    RecordField {
+                        name: "density_bound",
+                        value: FieldValue::Number(100.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "rows",
+            &[
+                &[
+                    RecordField {
+                        name: "implied_density",
+                        value: FieldValue::Number(20.000000000000004),
+                    },
+                    RecordField {
+                        name: "implied_lower",
+                        value: FieldValue::Number(19.999999999999986),
+                    },
+                    RecordField {
+                        name: "implied_upper",
+                        value: FieldValue::Number(20.000000000000018),
+                    },
+                    RecordField {
+                        name: "observed_minus_implied",
+                        value: FieldValue::Number(-3.552713678800501e-15),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "implied_density",
+                        value: FieldValue::Number(20.000000000000004),
+                    },
+                    RecordField {
+                        name: "implied_lower",
+                        value: FieldValue::Number(19.999999999999986),
+                    },
+                    RecordField {
+                        name: "implied_upper",
+                        value: FieldValue::Number(20.000000000000018),
+                    },
+                    RecordField {
+                        name: "observed_minus_implied",
+                        value: FieldValue::Number(0.9999999999999964),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "implied_density",
+                        value: FieldValue::Number(20.000000000000004),
+                    },
+                    RecordField {
+                        name: "implied_lower",
+                        value: FieldValue::Number(19.999999999999986),
+                    },
+                    RecordField {
+                        name: "implied_upper",
+                        value: FieldValue::Number(20.000000000000018),
+                    },
+                    RecordField {
+                        name: "observed_minus_implied",
+                        value: FieldValue::Number(0.9999999999999964),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "implied_density",
+                        value: FieldValue::Number(2.405447100854521e-11),
+                    },
+                    RecordField {
+                        name: "implied_lower",
+                        value: FieldValue::Number(2.4054471008545195e-11),
+                    },
+                    RecordField {
+                        name: "implied_upper",
+                        value: FieldValue::Number(2.4054471008545228e-11),
+                    },
+                    RecordField {
+                        name: "observed_minus_implied",
+                        value: FieldValue::Number(-3.2311742677852644e-27),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "implied_density",
+                        value: FieldValue::Number(190.9085000678191),
+                    },
+                    RecordField {
+                        name: "implied_lower",
+                        value: FieldValue::Number(186.84815929275638),
+                    },
+                    RecordField {
+                        name: "implied_upper",
+                        value: FieldValue::Number(195.07355883237946),
+                    },
+                    RecordField {
+                        name: "observed_minus_implied",
+                        value: FieldValue::Number(9.09149993218091),
+                    },
+                    RecordField {
+                        name: "compatible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+            ],
+        )],
+    },
+];
+
+/// Registry entry for `pvt.gas_density_consistency`.
+pub static GAS_DENSITY_CONSISTENCY_SPEC: ModelSpec = ModelSpec {
+    id: "pvt.gas_density_consistency",
+    kind: "direct",
+    algorithm: None,
+    checks: GAS_DENSITY_CONSISTENCY_CHECKS,
+    cases: GAS_DENSITY_CONSISTENCY_CASES,
 };
 
 static GAS_MATERIAL_BALANCE_CHECKS: &[SpecCheck] = &[];
@@ -11414,6 +13738,387 @@ pub static SATURATION_TEST_SPEC: ModelSpec = ModelSpec {
     cases: SATURATION_TEST_CASES,
 };
 
+static SEPARATOR_PATH_CHECKS: &[SpecCheck] = &[];
+
+static SEPARATOR_PATH_CASES: &[TestCase] = &[
+    TestCase {
+        id: "one_stage_stock_tank",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("eos", "pr"), ("mixing_rule", "classic")],
+        vectors: &[("pressures", &[101325.0]), ("temperatures", &[288.15])],
+        matrices: &[],
+        expected: &[
+            ("final_pressure", 101325.0),
+            ("final_temperature", 288.15),
+            ("gas_oil_ratio", 683.0422900657537),
+        ],
+        expected_vectors: &[("volumes", &[1.998425076249661, 0.002925770637213811, 0.0])],
+        expected_strings: &[],
+        records: &[(
+            "components",
+            &[
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("methane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(70.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("ethane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(10.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("propane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(5.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("nC10"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(15.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "two_stage_offgas",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("eos", "pr"), ("mixing_rule", "classic")],
+        vectors: &[
+            ("pressures", &[2000000.0, 101325.0]),
+            ("temperatures", &[400.0, 288.15]),
+        ],
+        matrices: &[],
+        expected: &[
+            ("final_pressure", 101325.0),
+            ("final_temperature", 288.15),
+            ("gas_oil_ratio", 679.059001605236),
+        ],
+        expected_vectors: &[("volumes", &[1.9949580169411532, 0.0029378272171125736, 0.0])],
+        expected_strings: &[],
+        records: &[(
+            "components",
+            &[
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("methane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(70.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("ethane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(10.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("propane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(5.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("nC10"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(15.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "three_phase",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[],
+        flags: &[("multiphase", true)],
+        lists: &[],
+        strings: &[("eos", "pr"), ("mixing_rule", "classic")],
+        vectors: &[
+            ("pressures", &[1000000.0, 101325.0]),
+            ("temperatures", &[310.0, 288.15]),
+        ],
+        matrices: &[],
+        expected: &[
+            ("final_pressure", 101325.0),
+            ("final_temperature", 288.15),
+            ("gas_oil_ratio", 672.5794822188096),
+        ],
+        expected_vectors: &[(
+            "volumes",
+            &[
+                1.9991516042825292,
+                0.002972364838855056,
+                0.00016961244605850567,
+            ],
+        )],
+        expected_strings: &[],
+        records: &[(
+            "components",
+            &[
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("methane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(70.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("ethane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(10.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("propane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(5.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("nC10"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(15.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("water"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(10.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "gas_only",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("eos", "pr"), ("mixing_rule", "classic")],
+        vectors: &[("pressures", &[101325.0]), ("temperatures", &[288.15])],
+        matrices: &[],
+        expected: &[("final_pressure", 101325.0), ("final_temperature", 288.15)],
+        expected_vectors: &[("volumes", &[2.3590611078040036, 0.0, 0.0])],
+        expected_strings: &[],
+        records: &[(
+            "components",
+            &[&[
+                RecordField {
+                    name: "fluid",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("methane"),
+                },
+                RecordField {
+                    name: "pseudo_component",
+                    value: FieldValue::Flag(false),
+                },
+                RecordField {
+                    name: "moles",
+                    value: FieldValue::Number(100.0),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+];
+
+/// Registry entry for `pvt.separator_path`.
+pub static SEPARATOR_PATH_SPEC: ModelSpec = ModelSpec {
+    id: "pvt.separator_path",
+    kind: "direct",
+    algorithm: None,
+    checks: SEPARATOR_PATH_CHECKS,
+    cases: SEPARATOR_PATH_CASES,
+};
+
 static SEPARATOR_TEST_CHECKS: &[SpecCheck] = &[];
 
 static SEPARATOR_TEST_CASES: &[TestCase] = &[
@@ -13906,10 +16611,12 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &BLACK_OIL_CORRELATIONS_SPEC,
     &CONSTANT_MASS_EXPANSION_SPEC,
     &CONSTANT_VOLUME_DEPLETION_SPEC,
+    &CVD_MATERIAL_BALANCE_SPEC,
     &DECLINE_CURVE_SPEC,
     &DIFFERENTIAL_LIBERATION_SPEC,
     &FETKOVICH_AQUIFER_SPEC,
     &GAS_CORRELATIONS_SPEC,
+    &GAS_DENSITY_CONSISTENCY_SPEC,
     &GAS_MATERIAL_BALANCE_SPEC,
     &GENERALIZED_MATERIAL_BALANCE_SPEC,
     &MMP_SPEC,
@@ -13918,6 +16625,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &REGRESSION_SPEC,
     &RELATIVE_PERMEABILITY_SPEC,
     &SATURATION_TEST_SPEC,
+    &SEPARATOR_PATH_SPEC,
     &SEPARATOR_TEST_SPEC,
     &SWELLING_TEST_SPEC,
     &TUNE_TO_SATURATION_SPEC,

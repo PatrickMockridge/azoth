@@ -36,6 +36,7 @@ from azoth.core.record_outputs_gen import (
     CostBomRow,
     CostEstimationResultRow,
     CvdPoint,
+    CvdStage,
     DepositionSegmentRow,
     DepressurizationPoint,
     DisciplineCostLine,
@@ -56,6 +57,7 @@ from azoth.core.record_outputs_gen import (
     FittedParameterRow,
     FlowlineScaleSegment,
     FmeaRankedEntry,
+    GasDensityRow,
     GasResultRow,
     HazopPopulationRow,
     HazopTemplateDeviation,
@@ -12339,6 +12341,31 @@ class ConstantVolumeDepletionResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class CvdMaterialBalanceResult(_HasWarnings):
+    """Result of ``pvt.cvd_material_balance``."""
+
+    CALC_ID: ClassVar[str] = "pvt.cvd_material_balance"
+
+    #: The reconstructed stages, one per observation, in the caller's order.
+    stages: tuple[CvdStage, ...]
+
+    #: The cumulative produced component amount per initial mole.
+    produced_component_moles: tuple[tuple[float, ...], ...]
+
+    #: The remaining component amount per initial mole, signed.
+    remaining_component_moles: tuple[tuple[float, ...], ...]
+
+    #: The liquid component amount per initial mole, signed; the composition is this divided by `liquid_moles` where the state is `resolved`.
+    liquid_component_moles: tuple[tuple[float, ...], ...]
+
+    #: Whether every stage is compatible.
+    compatible: bool
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class DeclineCurveResult(_HasWarnings):
     """Result of ``pvt.decline_curve``."""
 
@@ -12484,6 +12511,22 @@ class GasCorrelationsResult(_HasWarnings):
 
     #: one row per input row, in caller order; only the fields the calculation answers are present.
     queries: tuple[GasResultRow, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class GasDensityConsistencyResult(_HasWarnings):
+    """Result of ``pvt.gas_density_consistency``."""
+
+    CALC_ID: ClassVar[str] = "pvt.gas_density_consistency"
+
+    #: One row per observation, in caller order.
+    rows: tuple[GasDensityRow, ...]
+
+    #: Whether every row is compatible.
+    all_compatible: bool
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -12702,6 +12745,31 @@ class SaturationTestResult(_HasWarnings):
 
     #: the upper saturation temperature in temperature mode.
     saturation_temperature: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SeparatorPathResult(_HasWarnings):
+    """Result of ``pvt.separator_path``."""
+
+    CALC_ID: ClassVar[str] = "pvt.separator_path"
+
+    #: The final volume-basis pressure, echoed.
+    final_pressure: Q
+
+    #: The final volume-basis temperature, echoed.
+    final_temperature: Q
+
+    #: The corrected product volumes at the final basis; an absent phase is zero.
+    volumes: tuple[Q, ...]
+
+    #: The product component amounts at the final basis; an absent phase is zero.
+    component_moles: tuple[tuple[Q, ...], ...]
+
+    #: The gas volume over the oil volume at the final basis; absent when no oil phase is present.
+    gas_oil_ratio: float | None
 
     #: Caveats.
     warnings: tuple[Warning, ...]

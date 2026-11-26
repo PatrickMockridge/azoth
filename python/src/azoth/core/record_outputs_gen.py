@@ -488,6 +488,41 @@ class CvdPoint:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class CvdStage:
+    """The reconstructed stages, one per observation, in the caller's order."""
+
+    #: The total moles remaining per initial mole, `1 - cumulative_produced`.
+    total_moles: float
+
+    #: The vapor moles per initial mole.
+    vapor_moles: float
+
+    #: The liquid moles per initial mole, the total minus the vapor.
+    liquid_moles: float
+
+    #: The moles withdrawn at this stage per initial mole.
+    stage_withdrawn_moles: float
+
+    #: The liquid component sum minus the liquid amount; zero by construction where the accounting closes.
+    component_closure: float
+
+    #: The remaining component sum minus the total moles.
+    remaining_closure: float
+
+    #: The produced component sum minus the cumulative production.
+    produced_closure: float
+
+    #: The vapor amount times the composition sum, minus the vapor amount.
+    vapor_closure: float
+
+    #: The liquid resolution state; only `resolved` has a derivable composition.
+    liquid_state: str
+
+    #: Whether this stage's accounting closed and its liquid state is physically admissible.
+    compatible: bool
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class DepositionSegmentRow:
     """One row per evaluated segment, in the profile's order."""
 
@@ -990,6 +1025,26 @@ class FmeaRankedEntry:
 
     #: the recommended mitigation, echoed; absent when it is.
     mitigation: str | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class GasDensityRow:
+    """One row per observation, in caller order."""
+
+    #: The density implied by the nominal values.
+    implied_density: Q
+
+    #: The conservative lower end of the implied interval.
+    implied_lower: Q
+
+    #: The conservative upper end of the implied interval.
+    implied_upper: Q
+
+    #: The observed nominal density minus the implied nominal.
+    observed_minus_implied: Q
+
+    #: Whether the observed interval overlaps the implied one, endpoints included.
+    compatible: bool
 
 
 @dataclass(frozen=True, slots=True, eq=False)

@@ -23,8 +23,11 @@ TIGHT_IDS = frozenset(
     {
         "pvt.saturation_test",
         "pvt.constant_mass_expansion",
+        "pvt.cvd_material_balance",
         "pvt.differential_liberation",
+        "pvt.gas_density_consistency",
         "pvt.constant_volume_depletion",
+        "pvt.separator_path",
         "pvt.separator_test",
         "pvt.swelling_test",
         "pvt.mmp",
