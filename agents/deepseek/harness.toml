@@ -15,6 +15,10 @@ max_tasks = 256
 [plugin]
 timeout_ms = 120000
 max_output_bytes = 4194304
+# Advisory in this tranche: a refused dossier still runs if its values are present,
+# and the result's intake block says so. Flip to true to stop a refused target before
+# the kernel; nothing else changes.
+require_dossier = false
 
 # The providers every launch mounts. The model selector chooses among them;
 # `--provider` sets the session default, and `--model` overrides the id.
@@ -87,6 +91,33 @@ hazop = [
   "azoth-prose-english",
 ]
 
+# The same shape as the HAZOP subset; the procedure itself is harness-only.
+intake = [
+  "azoth-run-calculation",
+  "azoth-keycard",
+  "azoth-units-vocabulary",
+  "azoth-provenance-verification",
+  "azoth-final-report-writing-style",
+  "azoth-prose-english",
+]
+
+[studies.hazop]
+root = "chair"
+roles = ["chair", "process", "safety", "scribe"]
+skill = "azoth-hazop"
+description = "Run a HAZOP as an azoth team: nodes and guidewords, deviation, cause, consequence and safeguard, recorded on the DeepSeek Harness Team board. USE WHEN: a HAZOP, a node-and-guideword study, or a process-safety review is to be run."
+requires_flowsheet = true
+web_only = true
+
+[studies.intake]
+root = "intake-clerk"
+roles = ["intake-clerk", "intake-reader", "intake-assessor", "intake-auditor"]
+skill = "azoth-intake"
+description = "Review the supplied evidence before a calculation: sources, claims, bindings, hard and soft gaps, and the data requests. USE WHEN: a prompt or document supplies inputs to an azoth calculation, or a calculation's basis must be audited."
+requires_flowsheet = false
+web_only = true
+root_asks_user = true
+
 [presets.engineer]
 id = "azoth-engineer"
 order = 5
@@ -111,3 +142,23 @@ prompt = "prompts/safety.md"
 id = "azoth-scribe"
 order = 13
 prompt = "prompts/scribe.md"
+
+[presets.intake-clerk]
+id = "azoth-intake-clerk"
+order = 20
+prompt = "prompts/intake-clerk.md"
+
+[presets.intake-reader]
+id = "azoth-intake-reader"
+order = 21
+prompt = "prompts/intake-reader.md"
+
+[presets.intake-assessor]
+id = "azoth-intake-assessor"
+order = 22
+prompt = "prompts/intake-assessor.md"
+
+[presets.intake-auditor]
+id = "azoth-intake-auditor"
+order = 23
+prompt = "prompts/intake-auditor.md"

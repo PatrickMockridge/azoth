@@ -10,6 +10,7 @@ from typing import Any
 
 import pytest
 
+from azoth._models_gen import MODELS
 from azoth.harness.cli import main
 
 
@@ -24,7 +25,7 @@ def test_version_reports_the_registry_and_backend(capsys: pytest.CaptureFixture[
     assert code == 0
     assert document["kind"] == "version"
     assert document["calcs"] == 98
-    assert document["models"] == 300
+    assert document["models"] == len(MODELS)
     assert document["backend"] in ("python", "rust")
 
 

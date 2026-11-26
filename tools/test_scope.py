@@ -497,6 +497,9 @@ NAMESPACE_TESTS: dict[str, tuple[str, ...]] = {
     # The calculation bridge is a consumer of the public result surface, not a
     # calculation: its tests are the only thing a change to it reaches.
     "harness": (f"{TESTS}/harness",),
+    # The intake review is a consumer of the public result surface too: it constructs
+    # inputs and never computes a calculation of its own.
+    "intake": (f"{TESTS}/intake",),
 }
 
 #: module directly under `python/src/azoth/` (not a namespace) -> the tests that name it.
@@ -710,6 +713,7 @@ ROOT_CLAIMS: dict[str, Claim] = {
         files=(f"{TESTS}/test_launch_dsh.py",),
         jobs=("dsh-plugin",),
     ),
+    "agents/intake/": Claim(files=(f"{TESTS}/intake",)),
     "agents/": Claim(inert="prompt-layer prose; no test reads it"),
     ".opencode/": Claim(inert="an export target for the agent definitions; no test reads it"),
     ".editorconfig": Claim(inert="editor settings; no test reads it"),

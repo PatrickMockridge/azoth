@@ -1,6 +1,6 @@
 # HAZOP orchestrator
 
-The first agent: four roles chaining the `safety` and `process` skills through the
+One of the two agents: four roles chaining the `safety` and `process` skills through the
 HAZOP pipeline `guideword → deviation → cause → consequence → safeguard`, specified
 in [`docs/src/agentic/orchestration.md`](../../docs/src/agentic/orchestration.md).
 

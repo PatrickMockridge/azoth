@@ -1,0 +1,85 @@
+schema = "azoth.intake/1"
+id = "gas-analysis"
+
+[[sources]]
+id = "S-1"
+kind = "prompt"
+locator = "user message, HP gas analysis"
+rank = 2
+status = "used"
+covers = ["components", "z", "P", "T"]
+excerpt = """
+Gas analysis, Table 1 — methane 90.0, ethane 4.0, propane 2.0, n-butane 1.5,
+n-pentane 1.0, n-hexane 0.5 mol%; balance n-heptane (C7), not separately analysed;
+components methane ethane propane n-butane n-pentane n-hexane n-heptane;
+the table is at 50 barg and the caption states 300 K.
+"""
+
+[[sources]]
+id = "S-2"
+kind = "file"
+locator = "laboratory pressure report"
+rank = 1
+status = "blocked"
+covers = ["P"]
+excerpt = "The laboratory pressure report was referenced but not retrieved."
+
+[[claims]]
+id = "C-1"
+value = [90.0, 4.0, 2.0, 1.5, 1.0, 0.5]
+unit = "mol%"
+quote = "methane 90.0, ethane 4.0, propane 2.0, n-butane 1.5, n-pentane 1.0, n-hexane 0.5"
+source = "S-1"
+rung = "vendor gas analysis"
+rungs_above = [
+  { rung = "laboratory composition report", outcome = "blocked" },
+]
+
+[[claims]]
+id = "C-2"
+value = "n-heptane is not separately analysed"
+quote = "balance n-heptane (C7), not separately analysed"
+source = "S-1"
+
+[[claims]]
+id = "C-3"
+value = ["methane", "ethane", "propane", "n-butane", "n-pentane", "n-hexane", "n-heptane"]
+quote = "components methane ethane propane n-butane n-pentane n-hexane n-heptane"
+source = "S-1"
+
+[[claims]]
+id = "C-4"
+value = 50.0
+unit = "barg"
+quote = "50 barg"
+source = "S-1"
+
+[[claims]]
+id = "C-5"
+value = 300.0
+unit = "K"
+quote = "300 K"
+source = "S-1"
+
+[[targets]]
+id = "eos.pt_flash"
+
+[[targets.inputs]]
+name = "components"
+claim = "C-3"
+
+[[targets.inputs]]
+name = "P"
+claim = "C-4"
+
+[[targets.inputs]]
+name = "T"
+claim = "C-5"
+
+[[targets.inputs]]
+name = "z"
+rule = "composition_remainder"
+[targets.inputs.basis]
+claim = "C-1"
+unreported = "C-2"
+component = "n-heptane"

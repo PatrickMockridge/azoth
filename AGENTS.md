@@ -5,9 +5,10 @@ azoth is a chemical-engineering calculation library with an agentic layer on top
 - **Skills** (90) live in [`skills/`](skills/README.md): self-contained specialisms,
   each a `SKILL.md`. To load them into a tool, run `python tools/export_skills.py
   --target <dsh|claude|opencode>`; the default, `all`, writes all three.
-- **Orchestration** is in [`agents/README.md`](agents/README.md). The one agent is a
-  HAZOP team of four roles, defined in `agents/hazop/README.md` and exported to
-  `.claude/agents/` and `.opencode/agents/`; run `/hazop` to start a study.
+- **Orchestration** is in [`agents/README.md`](agents/README.md). Two agents run: a HAZOP
+  team of four roles (`agents/hazop/README.md`) and an intake team of four roles
+  (`agents/intake/README.md`), exported to `.claude/agents/` and `.opencode/agents/`;
+  run `/hazop` or `/intake` to start one.
 
 Setup, from a checkout:
 

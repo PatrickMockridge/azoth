@@ -5,9 +5,10 @@ heat transfer) with an agentic layer on top.
 
 - **Skills** (90) live in `skills/`, each a `SKILL.md`. To load them into Claude Code,
   run `python tools/export_skills.py --target claude` (writes `.claude/skills/`).
-- **Orchestration** is in `agents/README.md`. The one agent is a HAZOP team of four
-  roles, defined in `agents/hazop/README.md` and exported to `.claude/agents/` and
-  `.opencode/agents/`; run `/hazop` to start a study.
+- **Orchestration** is in `agents/README.md`. Two agents run: a HAZOP team of four roles
+  (`agents/hazop/README.md`) and an intake team of four roles (`agents/intake/README.md`),
+  exported to `.claude/agents/` and `.opencode/agents/`; run `/hazop` or `/intake` to start
+  one.
 - **Runtime**: `python tools/launch_dsh.py` starts DeepSeek Harness with the skills, the
   engineering persona, the calculation plugin and the demo flowsheet; `--check` is the
   read-only probe, and a launch requires `--permission-mode read-only|workspace-write`.

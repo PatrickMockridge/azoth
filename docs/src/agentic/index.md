@@ -12,11 +12,14 @@ The layer is native to the repository rather than an external project. Skills li
 [`tools/validate_skills.py`](../../../tools/validate_skills.py) holds every skill to the
 shape.
 
-**The one agent is HAZOP** — a team of four roles (chair, process, safety, scribe) chained
-through `guideword → deviation → cause → consequence → safeguard`. Its definition is
-[`agents/hazop/README.md`](../../../agents/hazop/README.md), exported to `.claude/agents/`
-and `.opencode/agents/`; the formal statement of a team as a composition of role-processes
-is [Orchestration](./orchestration.md).
+**Two agents run.** HAZOP is a team of four roles (chair, process, safety, scribe) chained
+through `guideword → deviation → cause → consequence → safeguard`; its definition is
+[`agents/hazop/README.md`](../../../agents/hazop/README.md). Intake is a team of four roles
+(clerk, reader, assessor, auditor) chained through
+`source → claim → binding → verdict → request`, and its definition is
+[`agents/intake/README.md`](../../../agents/intake/README.md). Both are exported to
+`.claude/agents/` and `.opencode/agents/`; the formal statement of a team as a composition
+of role-processes is [Orchestration](./orchestration.md).
 
 ## Run it
 
@@ -27,9 +30,9 @@ python tools/launch_dsh.py web --permission-mode read-only
 
 The launcher exports the skills to `.dsh/skills/`, pins the checkout as the DSH workspace,
 generates the overlay, and mounts the engineering preset, the welcome card, the calculation
-plugin and the demo flowsheet. `--check` is the read-only probe; `--study hazop` (web
-profile) enables the four role presets and Agent Teams; `--persona software` uses DSH's
-coding preset. DeepSeek, OpenAI, Anthropic, Kimi and MiniMax routes are mounted for the
+plugin and the demo flowsheet. `--check` is the read-only probe; `--study hazop` and
+`--study intake` (web profile) enable the four role presets and Agent Teams; `--persona
+software` uses DSH's coding preset. DeepSeek, OpenAI, Anthropic, Kimi and MiniMax routes are mounted for the
 model selector; `--provider` sets the default.
 [DeepSeek Harness](./harness.md) is the interface reference — modes, flags, the tools the
 model is handed, the bridge's JSON envelopes and the check report — and

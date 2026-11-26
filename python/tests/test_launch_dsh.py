@@ -108,6 +108,24 @@ def _root(tmp_path: Path) -> Path:
                 "",
                 "[skills]",
                 'hazop = ["azoth-test"]',
+                'intake = ["azoth-test"]',
+                "",
+                "[studies.hazop]",
+                'root = "chair"',
+                'roles = ["chair", "process", "safety", "scribe"]',
+                'skill = "azoth-hazop"',
+                'description = "Run a HAZOP test team."',
+                "requires_flowsheet = true",
+                "web_only = true",
+                "",
+                "[studies.intake]",
+                'root = "intake-clerk"',
+                'roles = ["intake-clerk", "intake-reader", "intake-assessor", "intake-auditor"]',
+                'skill = "azoth-intake"',
+                'description = "Review supplied claims."',
+                "requires_flowsheet = false",
+                "web_only = true",
+                "root_asks_user = true",
                 "",
                 "[presets.engineer]",
                 'id = "azoth-engineer"',
@@ -134,14 +152,45 @@ def _root(tmp_path: Path) -> Path:
                 "order = 13",
                 'prompt = "prompts/scribe.md"',
                 "",
+                "[presets.intake-clerk]",
+                'id = "azoth-intake-clerk"',
+                "order = 20",
+                'prompt = "prompts/intake-clerk.md"',
+                "",
+                "[presets.intake-reader]",
+                'id = "azoth-intake-reader"',
+                "order = 21",
+                'prompt = "prompts/intake-reader.md"',
+                "",
+                "[presets.intake-assessor]",
+                'id = "azoth-intake-assessor"',
+                "order = 22",
+                'prompt = "prompts/intake-assessor.md"',
+                "",
+                "[presets.intake-auditor]",
+                'id = "azoth-intake-auditor"',
+                "order = 23",
+                'prompt = "prompts/intake-auditor.md"',
+                "",
             ]
         ),
         encoding="utf-8",
     )
-    (harness / "skills" / "azoth-hazop.md").write_bytes(
-        (ROOT / "agents" / "deepseek" / "skills" / "azoth-hazop.md").read_bytes()
-    )
-    for name in ("engineer", "chair", "process", "safety", "scribe"):
+    for skill in ("azoth-hazop", "azoth-intake"):
+        (harness / "skills" / f"{skill}.md").write_bytes(
+            (ROOT / "agents" / "deepseek" / "skills" / f"{skill}.md").read_bytes()
+        )
+    for name in (
+        "engineer",
+        "chair",
+        "process",
+        "safety",
+        "scribe",
+        "intake-clerk",
+        "intake-reader",
+        "intake-assessor",
+        "intake-auditor",
+    ):
         (harness / "prompts" / f"{name}.md").write_bytes(
             (ROOT / "agents" / "deepseek" / "prompts" / f"{name}.md").read_bytes()
         )
@@ -288,6 +337,34 @@ def test_study_overlay_wires_the_team_and_four_presets(tmp_path: Path) -> None:
         assert _find(rows, f"preset-{preset}") is not None
 
 
+def test_intake_study_overlay_wires_the_clerk_and_three_roles(tmp_path: Path) -> None:
+    rows = _rows(_root(tmp_path), "--study", "intake")
+    team = _find(rows, "agent-team")
+    assert team is not None
+    assert team["config"]["defaultEnabled"] is True
+    registry = _find(rows, "agent-preset-registry")
+    assert registry is not None
+    assert registry["config"]["default"] == "azoth-intake-clerk"
+    assert _find(rows, "azoth-ui") is None
+    assert _find(rows, "preset-azoth-engineer") is None
+    clerk = _find(rows, "preset-azoth-intake-clerk")
+    assert clerk is not None
+    plugins = {plugin["id"]: plugin for plugin in clerk["config"]["plugins"]}
+    assert plugins["tool-subagent"]["config"]["allowedAgentPresets"] == [
+        "azoth-intake-reader",
+        "azoth-intake-assessor",
+        "azoth-intake-auditor",
+    ]
+    assert "tool-ask-user" in plugins
+    for preset in (
+        "azoth-intake-clerk",
+        "azoth-intake-reader",
+        "azoth-intake-assessor",
+        "azoth-intake-auditor",
+    ):
+        assert _find(rows, f"preset-{preset}") is not None
+
+
 def test_headless_study_is_refused(tmp_path: Path) -> None:
     root = _root(tmp_path)
     with pytest.raises(SystemExit, match="web profile"):
@@ -326,12 +403,13 @@ def test_render_yaml_quotes_names_and_keeps_prompts_as_blocks(tmp_path: Path) ->
 def test_skill_export_writes_a_manifest_and_removes_a_stale_entry(tmp_path: Path) -> None:
     root = _root(tmp_path)
     args, config = _args(root, "--skills", "hazop")
-    assert launch_dsh.export_skills_for_launch(args, config) == 2
+    assert launch_dsh.export_skills_for_launch(args, config) == 3
     skills = root / ".dsh" / "skills"
     assert (skills / "azoth-test.md").is_file()
     assert (skills / "azoth-hazop.md").is_file()
+    assert (skills / "azoth-intake.md").is_file()
     manifest = json.loads((skills / ".manifest.json").read_text())
-    assert set(manifest["skills"]) == {"azoth-test", "azoth-hazop"}
+    assert set(manifest["skills"]) == {"azoth-test", "azoth-hazop", "azoth-intake"}
 
     stale = skills / "old-skill.md"
     stale.write_text("# old\n", encoding="utf-8")

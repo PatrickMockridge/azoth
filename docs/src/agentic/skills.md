@@ -79,9 +79,10 @@ Every `SKILL.md` carries these headings, in this order:
 ## Skill vs agent
 
 A **skill** is a reusable method or body of knowledge. An **agent** is an
-orchestrator that chains skills and carries no method of its own. The one agent today is
-the HAZOP team under [`agents/hazop/`](../../../agents/hazop/README.md); its formal
-statement is [Orchestration](./orchestration.md).
+orchestrator that chains skills and carries no method of its own. Two agents run today:
+the HAZOP team under [`agents/hazop/`](../../../agents/hazop/README.md) and the intake team
+under [`agents/intake/`](../../../agents/intake/README.md); their formal statement is
+[Orchestration](./orchestration.md).
 
 ## The skills today
 

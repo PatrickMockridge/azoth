@@ -41,6 +41,37 @@ class InputTooLarge(HarnessError):
     kind = "InputTooLarge"
 
 
+class DossierInvalid(HarnessInputError):
+    """A dossier that cannot be read as one, so there is nothing to review."""
+
+    kind = "DossierInvalid"
+
+
+class DossierRequired(HarnessError):
+    """A run that requires a dossier and was given none."""
+
+    exit_code = 3
+    kind = "DossierRequired"
+
+
+class TargetMismatch(UndefinedInput):
+    """A dossier with no target, or more than one, for the id being run."""
+
+    kind = "TargetMismatch"
+
+
+class InputsMismatch(UndefinedInput):
+    """Run-time inputs that are not the values the dossier constructed."""
+
+    kind = "InputsMismatch"
+
+
+class IntakeRefused(UndefinedInput):
+    """A refused dossier under the strict mode, stopped before the kernel."""
+
+    kind = "IntakeRefused"
+
+
 class OutputTooLarge(HarnessError):
     """A result above the bridge's output cap."""
 
