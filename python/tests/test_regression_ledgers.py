@@ -90,9 +90,9 @@ def test_the_cce_ledgers_are_near_zero_at_the_capture_fit() -> None:
                 temperature=373.15,
                 pressures=(2.5e7, 2.0e7, 1.5e7),
                 relative_volumes=(
-                    0.9980317970636378,
-                    1.1028215960619943,
-                    1.3009108004036105,
+                    0.9977467494220793,
+                    1.1177723544056017,
+                    1.344662536647291,
                 ),
             ),
         )
@@ -115,9 +115,9 @@ def test_the_dle_ledgers_are_near_zero_at_the_capture_fit() -> None:
                 temperature=323.15,
                 pressures=(2.5e7, 1.5e7, 8.0e6),
                 rs=(
-                    124.11323743589683,
-                    117.87406453877271,
-                    54.85724347826862,
+                    124.46822441360351,
+                    118.19000000135856,
+                    54.98240543625079,
                 ),
                 bo=(
                     1.297774285932201,
@@ -148,15 +148,15 @@ def test_the_cce_fit_recovers_the_capture_parameter() -> None:
                 temperature=373.15,
                 pressures=(2.5e7, 2.0e7, 1.5e7),
                 relative_volumes=(
-                    0.9980317970636378,
-                    1.1028215960619943,
-                    1.3009108004036105,
+                    0.9977467494220793,
+                    1.1177723544056017,
+                    1.344662536647291,
                 ),
             ),
         )
     )
     result = fit(rows, parameters=parameters, data=data, max_iterations=6)
-    assert result.values[0] == pytest.approx(1.029994778729241, abs=1e-4)
+    assert result.values[0] == pytest.approx(1.029999988314205, abs=1e-4)
     assert result.standard_errors[0] > 0.0
 
 
@@ -168,14 +168,14 @@ def test_the_dle_fit_recovers_the_capture_parameter() -> None:
             DleExperiment(
                 temperature=323.15,
                 pressures=(2.5e7, 1.5e7, 8.0e6),
-                rs=(124.11323743589683, 117.87406453877271, 54.85724347826862),
+                rs=(124.46822441360351, 118.19000000135856, 54.98240543625079),
                 bo=(1.297774285932201, 1.3196221126198664, 1.1668447141587335),
                 oil_density=(657.1251440903429, 642.5894780343832, 684.8946122783024),
             ),
         )
     )
     result = fit(rows, parameters=parameters, data=data, max_iterations=6)
-    assert result.values[0] == pytest.approx(0.14999999104346481, abs=1e-6)
+    assert result.values[0] == pytest.approx(0.149999991032325, abs=1e-6)
 
 
 def test_a_zero_weight_is_refused() -> None:
