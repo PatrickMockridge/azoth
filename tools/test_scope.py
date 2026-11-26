@@ -456,6 +456,7 @@ NAMESPACE_TESTS: dict[str, tuple[str, ...]] = {
         f"{TESTS}/test_process_layer_diff.py",
         f"{TESTS}/test_designer_report.py",
         f"{TESTS}/test_mechanical_report.py",
+        f"{TESTS}/test_equipment_cost_estimate.py",
     ),
     "reactions": (f"{TESTS}/test_reaction_tables.py",),
     "characterization": (
@@ -473,6 +474,10 @@ NAMESPACE_TESTS: dict[str, tuple[str, ...]] = {
         f"{TESTS}/test_decline_curve.py",
         f"{TESTS}/test_gas_material_balance.py",
         f"{TESTS}/test_oil_material_balance.py",
+        f"{TESTS}/test_constant_mass_expansion.py",
+        f"{TESTS}/test_differential_liberation.py",
+        f"{TESTS}/test_regression_ledgers.py",
+        f"{TESTS}/test_regression_params.py",
     ),
     # Nothing imports `azoth.standards` by name: its ids reach their tests through the
     # registration sweeps, which is what a standards change is verified by.
@@ -707,7 +712,7 @@ ROOT_CLAIMS: dict[str, Claim] = {
     "LICENSE-CC-BY-4.0": Claim(inert="a licence; no test reads it"),
     "CODE_OF_CONDUCT.md": Claim(inert="community prose; no test reads it"),
     "SECURITY.md": Claim(inert="community prose; no test reads it"),
-    "NOTICE": Claim(inert="attribution prose; no test reads it"),
+    "NOTICE": Claim(files=(f"{TESTS}/test_manifest_citations.py",)),
 }
 
 #: Files directly under `python/src/azoth/` that are not modules and reach no test.
@@ -1033,6 +1038,14 @@ def claims(path: str) -> Claim:
             return Claim(tools=("check_notebooks",), jobs=("notebooks",))
         return Claim(tools=(Path(path).stem,))
 
+    if path == "databank/README.md":
+        # The page states the vendored revision, and the citation test reads it.
+        return Claim(
+            files=(f"{TESTS}/test_manifest_citations.py",),
+            data=True,
+            jobs=("wheel-data",),
+        )
+
     if parts[0] in ("databank", "data"):
         # The databank is packaged into the wheel, which is what `wheel-data` builds and checks.
         return Claim(data=True, jobs=("wheel-data",))
@@ -1241,12 +1254,17 @@ def specs_claim(path: str, parts: list[str]) -> Claim:
     """A path under `specs/`: a model, a calc, a case, or one of the id-less trees."""
     if len(parts) >= 3 and parts[1] in ("models", "calcs"):
         found = declared_id(ROOT / path)
-        return Claim(ids=tuple(found), namespaces=(parts[2],))
+        return Claim(
+            ids=tuple(found),
+            namespaces=(parts[2],),
+            files=(f"{TESTS}/test_manifest_citations.py",),
+        )
     if len(parts) >= 3 and parts[1] == "cases":
         found = declared_id(ROOT / path)
         return Claim(
             ids=tuple(found),
             namespaces=tuple(sorted({i.split(".")[0] for i in found})),
+            files=(f"{TESTS}/test_manifest_citations.py",),
             jobs=("validation",),
         )
     for prefix, claim in SPEC_TREES:
