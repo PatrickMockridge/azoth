@@ -29,7 +29,8 @@ The launcher exports the skills to `.dsh/skills/`, pins the checkout as the DSH 
 generates the overlay, and mounts the engineering preset, the welcome card, the calculation
 plugin and the demo flowsheet. `--check` is the read-only probe; `--study hazop` (web
 profile) enables the four role presets and Agent Teams; `--persona software` uses DSH's
-coding preset.
+coding preset. DeepSeek, OpenAI, Anthropic, Kimi and MiniMax routes are mounted for the
+model selector; `--provider` sets the default.
 [DeepSeek Harness](./harness.md) is the interface reference — modes, flags, the tools the
 model is handed, the bridge's JSON envelopes and the check report — and
 [`agents/deepseek/README.md`](../../../agents/deepseek/README.md) is the setup page.

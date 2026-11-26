@@ -15,8 +15,8 @@ const CARD = {
     'FEED here means Front-End Engineering Design. The demo flowsheet is loaded; ' +
     'results are screening values, not design deliverables.',
   setup:
-    'First run: save the DeepSeek API key on Settings → Models, or launch with ' +
-    'DEEPSEEK_API_KEY set.',
+    'First run: save your model provider’s API key on Settings → Models, then choose ' +
+    'the provider and model in the composer’s model menu.',
 }
 
 const CARD_STYLE = {

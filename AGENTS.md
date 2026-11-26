@@ -20,7 +20,9 @@ python tools/launch_dsh.py headless --permission-mode read-only "Size a pump for
 
 The launcher exports the skills, pins the checkout as DSH's workspace, loads the demo
 flowsheet, and mounts the engineering persona, the calculation plugin and the flowsheet MCP
-server; `--persona software` uses DSH's coding preset instead. The
+server; `--persona software` uses DSH's coding preset instead. It mounts DeepSeek, OpenAI,
+Anthropic, Kimi and MiniMax routes for the model selector; `--provider` sets the default
+and `--model` the id. The
 [DeepSeek Harness chapter](docs/src/agentic/harness.md) is the interface reference — modes,
 flags, the tools the model is handed, the bridge's JSON envelopes and the check report —
 and [`agents/deepseek/README.md`](agents/deepseek/README.md) has the setup and caveats.
