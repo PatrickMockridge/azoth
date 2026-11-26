@@ -234,6 +234,15 @@ subagents. The chair creates a task per node × guideword and sequences the pipe
 worksheet. [Orchestration](./orchestration.md) states the formal composition; the
 execution is a mapping of it, not a proof.
 
+## Worked output
+
+[`case-studies/`](../../../case-studies/README.md) holds complete engineering packages produced
+through the harness. The first, [`azoth-feed-08`](../../../case-studies/azoth-feed-08/README.md),
+is the notebook-08 offshore-debottlenecking FEED follow-on: equipment, materials, manhours, cost,
+a DEXPI PFD, reports, a project plan and an independent HAZOP close-out. Its README records the
+prompts, the 23-minute and 7-minute rounds, and the roughly half-hour, roughly 12-million-token
+session.
+
 ## Security and limits
 
 A launch requires `--permission-mode read-only` or `workspace-write`; there is no default.
