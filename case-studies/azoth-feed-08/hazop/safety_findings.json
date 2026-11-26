@@ -1,0 +1,518 @@
+{
+  "nodes": [
+    {
+      "node": 1,
+      "name": "HP inlet, SDV-101 and HIPPS (wellhead choke to V-101)",
+      "safeguards": [
+        {
+          "safeguard": "HIPPS SIL-3 loop (new scope): 2 x PT in 1oo2, SIL-3 logic solver, SDV-101 10 in, PFD 1e-4, proof test 12 months, HFT 1, DC 0.6, partial-stroke test, <2 s closure",
+          "type": "trip",
+          "adequate": false,
+          "gap": "PFD 1e-4 is a library determination (process.nog070_sil_determination, partially_verified), not a device-specific IEC 61511 verification: no failure rates, CCF beta, systematic capability, demand rate or proof-test effectiveness are reported. The final element is a single SDV-101 with no redundant actuator or solenoid, so the loop PFD is likely dominated by the valve. The P&ID places both PTs upstream of SDV-101 (wellhead side), where they cannot protect the 66 barg downstream section. Trip setpoint, deadband and response time are not stated."
+        },
+        {
+          "safeguard": "PSV-101 relief (existing): P orifice 6.38 in2 fitted, set 66 barg, to the existing flare",
+          "type": "relief",
+          "adequate": true,
+          "gap": "Orifice is adequate for the vessel: 5.53 in2 required at +18% (86.7% of fitted capacity). But the flare it relieves to is overloaded at 107.5% without the HIPPS credit, and the PSV inlet dP and built-up back pressure are not calculated."
+        },
+        {
+          "safeguard": "Wellhead choke pressure control upstream of the battery limit; no PIC or PSH on V-101 within the battery limit",
+          "type": "BPCS",
+          "adequate": false,
+          "gap": "HP separator pressure is set only by the upstream choke. There is no independent BPCS high-pressure alarm or trip on V-101, so the SIL-3 HIPPS is the sole high-pressure protection and a single SIF failure leaves the PSV as the only barrier."
+        },
+        {
+          "safeguard": "ESD and depressurisation: no BDV or blowdown on V-101 or the HP inlet spool; HIPPS logic solver interfaces to the existing ESD system",
+          "type": "trip",
+          "adequate": false,
+          "gap": "No ESD cause and effect, ESD level, valve fail-safe position or depressurisation path is defined. The 66 barg inlet inventory cannot be blown down independently of PSV-101, and a fire on the HP inlet has no positive isolation plus depressurisation response."
+        },
+        {
+          "safeguard": "Fire and gas detection and F&G-to-ESD action for the HP inlet and HIPPS area",
+          "type": "alarm",
+          "adequate": false,
+          "gap": "No F&G philosophy, detector coverage or F&G cause and effect is documented anywhere in the basis or report. A gas release at the HP inlet flanges or the HIPPS spool has no identified detection or executive action."
+        },
+        {
+          "safeguard": "HIPPS bypass and proof-test control under permit and management of change",
+          "type": "procedure",
+          "adequate": false,
+          "gap": "Only a narrative requirement exists ('strict permit control for the life of the modification'). There is no written SIL-3 bypass procedure, independent approval, time limit, compensating measure, key-lock or BPCS bypass alarm. A 12-month in-service proof test puts the plant on the no-credit relief case, which at +18% gas is 50.31 kg/s and 107.5% of flare capacity."
+        },
+        {
+          "safeguard": "Passive: SDV-101 316L body / duplex trim, 100 barg design, 10 in ANSI 900; PIR 50 mm insulation on V-101",
+          "type": "passive",
+          "adequate": false,
+          "gap": "No fireproofing of the SDV actuator, cabling or supports is specified, and the PIR insulation is not stated to be fire-rated. A fire on the HP inlet can disable the final element when it is needed."
+        },
+        {
+          "safeguard": "Management of change for the changed relief basis; operating procedures and training for HIPPS",
+          "type": "human",
+          "adequate": false,
+          "gap": "MOC is stated as a requirement but no approved MOC record for the 35% relief-credit change exists. Operators have no procedure for a HIPPS trip, a degraded-relief case or operation with the flare at 91.1% and rising."
+        }
+      ],
+      "risk": "high",
+      "comment": "The 66 barg inlet is protected by a SIL-3 SIF whose PFD is asserted rather than verified, whose PT taps appear on the wrong side of SDV-101 on the P&ID, and whose bypass/proof-test case overloads the flare (107.5% at +18%). The PSV is adequately sized, so the vessel is not immediately at risk, but the safety case and the 35% credit are not yet demonstrated."
+    },
+    {
+      "node": 2,
+      "name": "V-101 HP three-phase separator (including water draw-off)",
+      "safeguards": [
+        {
+          "safeguard": "LIC-101 oil level to LV-101 (BPCS)",
+          "type": "BPCS",
+          "adequate": false,
+          "gap": "Single 1oo1 level transmitter and valve, no independent LAHH/LSHH trip to ESD and no stated valve fail-safe position. High level carries oil into the MP stage and compression; low level allows gas blowby to V-102."
+        },
+        {
+          "safeguard": "LIC-102 water interface to LCV-102 (BPCS)",
+          "type": "BPCS",
+          "adequate": false,
+          "gap": "Interface settling is 17.09 s against the class 60 s criterion, so the interface is not controllable in this vessel; no interface-specific measurement (RF/conductance) or boot is specified. LCV-102 fail-open admits 60 bara gas into the 25 barg produced-water package; fail-closed carries water into the oil and condensate."
+        },
+        {
+          "safeguard": "PSV-101 relief (existing): 6.38 in2 P orifice, set 66 barg",
+          "type": "relief",
+          "adequate": true,
+          "gap": "Set pressure equals the 66 barg vessel design pressure, with normal operation at 60 bara (90.9% of set): any pressure excursion lifts the PSV. Inlet dP and back pressure are unverified, and there is no spare PSV, so PSV maintenance leaves the HIPPS as the only barrier."
+        },
+        {
+          "safeguard": "Separator internals change (new scope): inlet device, vane pack, revised weir/interface control, K 0.11 to 0.14 m/s",
+          "type": "passive",
+          "adequate": false,
+          "gap": "K 0.14 m/s is a vendor expectation, not a guaranteed result. The vessel is already at 99.8% gas load, and the internals change does not fix the 17.09 s interface duty, level swell/foam or the rise to 57% water cut."
+        },
+        {
+          "safeguard": "Fire case relief: 0.54 kg/s screened, PIR insulation and drainage assumed",
+          "type": "relief",
+          "adequate": false,
+          "gap": "The 0.54 kg/s fire case is only 1.3% of the blocked-outlet case and appears to rely on PIR insulation and drainage that are not specified as fire-rated. There is no depressurisation, so a fire with PSV-101 isolated has no relief path."
+        },
+        {
+          "safeguard": "Independent high-high level or pressure trips to ESD on V-101",
+          "type": "trip",
+          "adequate": false,
+          "gap": "No LAHH, LSHH or PSHH independent of the HIPPS or the LIC loops, and no ESD valve on the oil or water draw-off. The only level protection is the modulating BPCS loop."
+        },
+        {
+          "safeguard": "Fire and gas detection on the vessel, flanges and water draw-off",
+          "type": "alarm",
+          "adequate": false,
+          "gap": "No gas or fire detection is identified for the HP separator area and no F&G-to-ESD action is defined."
+        },
+        {
+          "safeguard": "Operating procedures: interface control, water-cut sampling, retention monitoring",
+          "type": "procedure",
+          "adequate": false,
+          "gap": "No interface-control procedure, sampling frequency or response to a rising interface is documented. The coalescer is treated as the fix but is downstream and is not yet sized for 6,000 bbl/d."
+        }
+      ],
+      "risk": "high",
+      "comment": "The vessel is at 99.8% gas load with 17.09 s interface settling against a 60 s criterion, single-loop level/interface control and no independent trips. LCV-102 fail-open is a credible 60 bara-to-25 barg gas-blowby path. The vessel is both the first capacity limit and the least instrumented item on the platform."
+    },
+    {
+      "node": 3,
+      "name": "MP let-down: VLV-102 and V-102",
+      "safeguards": [
+        {
+          "safeguard": "VLV-102 / LV-101 let-down control (BPCS) from 60 to 10 bara",
+          "type": "BPCS",
+          "adequate": false,
+          "gap": "Single let-down valve. Failure open overpressures V-102, and no independent high-pressure trip, ESD valve or PSV is identified for V-102."
+        },
+        {
+          "safeguard": "V-102 overpressure relief",
+          "type": "relief",
+          "adequate": false,
+          "gap": "The basis gives V-102 only as '10 bara, existing' and states no design pressure; the study provides no PSV for it. If the design pressure is 10 barg, a VLV-102 failure open is a credible vessel rupture."
+        },
+        {
+          "safeguard": "V-102 level and interface control; liquid carryover protection to the MP compressor",
+          "type": "BPCS",
+          "adequate": false,
+          "gap": "No level/interface control or high-level trip is shown for V-102, so liquid carryover to the MP gas compressor is uncontrolled."
+        },
+        {
+          "safeguard": "MP gas suction check valve / ESDV to the 90 bara header",
+          "type": "trip",
+          "adequate": false,
+          "gap": "No check valve or ESDV is shown on the MP gas line to the 90 bara header. A compressor trip can reverse flow from 90 bara into V-102, overpressuring it through the suction line."
+        },
+        {
+          "safeguard": "Fire and gas detection and ESD for the MP let-down area",
+          "type": "alarm",
+          "adequate": false,
+          "gap": "No gas detection, fire detection or ESD action is identified for the MP let-down area."
+        },
+        {
+          "safeguard": "V-102 mechanical integrity: existing carbon steel, 3 mm corrosion allowance",
+          "type": "passive",
+          "adequate": false,
+          "gap": "The corrosion allowance addresses CO2 wall loss, not a 60 bara overpressure; the design pressure is not stated and no relief or trip protects the vessel."
+        },
+        {
+          "safeguard": "Let-down valve proof-test and maintenance procedure",
+          "type": "procedure",
+          "adequate": false,
+          "gap": "No proof-test interval, bypass procedure or partial-stroke test is specified for VLV-102, which is the single point of overpressure for V-102."
+        }
+      ],
+      "risk": "high",
+      "comment": "Risk is high until V-102's design pressure and relief are confirmed. The credible deviation (VLV-102 fails open) puts 60 bara into a 10 bara vessel with no identified PSV, trip or diverse barrier, which is a potential loss-of-containment scenario outside the study's single-PSV-101 scope. Downgrade to medium if a correctly sized PSV and a 66 barg design pressure are confirmed."
+    },
+    {
+      "node": 4,
+      "name": "LP let-down and stock tank: VLV-103, V-103, E-104, V-104",
+      "safeguards": [
+        {
+          "safeguard": "VLV-103 let-down control (BPCS) from 10 to 2 bara",
+          "type": "BPCS",
+          "adequate": false,
+          "gap": "Single valve. Failure open overpressures V-103 and the 1.013 bara stock tank, with no independent trip or PSV identified."
+        },
+        {
+          "safeguard": "V-103 overpressure relief",
+          "type": "relief",
+          "adequate": false,
+          "gap": "No design pressure or PSV is stated for V-103; relief for the MP/LP let-down is not in the study scope."
+        },
+        {
+          "safeguard": "V-104 stock tank vent and flash-gas route to sales gas",
+          "type": "passive",
+          "adequate": false,
+          "gap": "V-104 is a 1.013 bara atmospheric stock tank; a blocked vent or let-down failure overpressures it. V-104 is also used as the tag for the new hydrocyclone, a tag conflict that would confuse the cause and effect."
+        },
+        {
+          "safeguard": "P-101 condensate pump and 30 barg condensate export line",
+          "type": "BPCS",
+          "adequate": false,
+          "gap": "20.4 kW absorbed on a 42 kW driver, but no minimum-flow protection, no PSV on the condensate line and no blocked-discharge trip; deadhead or a blocked export overpressures the line."
+        },
+        {
+          "safeguard": "E-104 cooler and LP gas temperature control",
+          "type": "BPCS",
+          "adequate": false,
+          "gap": "No temperature control, cooler duty or failure-mode data for E-104 is given; the cooler is in the node but not assessed."
+        },
+        {
+          "safeguard": "Fire and gas detection and ESD for the LP and stock-tank area",
+          "type": "alarm",
+          "adequate": false,
+          "gap": "No detection or ESD action is identified for the LP separator, stock tank or condensate pump area."
+        },
+        {
+          "safeguard": "Stock-tank vent/blanketing and condensate export procedure",
+          "type": "procedure",
+          "adequate": false,
+          "gap": "No vent/blanketing procedure, no routine VLV-103 proof test and no condensate-line overpressure response is documented."
+        }
+      ],
+      "risk": "medium",
+      "comment": "Pressures and inventories are lower than nodes 1-3, but the let-down failure path to a 1 atm stock tank, the absent V-103/V-104 relief data and the V-104 tag conflict are unresolved. Escalates to high if V-103 and V-104 are not designed for the upstream pressure."
+    },
+    {
+      "node": 5,
+      "name": "Compression: K-101, K-102 A/B/C, K-103 A-E, inter/aftercoolers, sales gas mixer",
+      "safeguards": [
+        {
+          "safeguard": "K-101 export compressor re-rate (new scope): +18% capacity, revised impellers/bundle, driver re-rate to 2.7 MW",
+          "type": "BPCS",
+          "adequate": false,
+          "gap": "At well potential the compressor absorbs 2,689 kW against a 2,300 kW driver (116.9%), and the driver re-rate/replacement is not defined. The basis says 1 stage, the datasheet and report say 2 stages, and no revised surge curve, impeller stress, rotor-dynamic or torsional study is reported."
+        },
+        {
+          "safeguard": "Anti-surge control, recycle valve and recycle cooler",
+          "type": "BPCS",
+          "adequate": false,
+          "gap": "No anti-surge valve, recycle cooler sizing or surge test is described for the re-rated impellers; the existing anti-surge system and its cooler are not assessed against the new curve."
+        },
+        {
+          "safeguard": "Overspeed trip and protection",
+          "type": "trip",
+          "adequate": false,
+          "gap": "No independent overspeed trip, API 617 trip test, coupling/gearbox check or overspeed setting is reported after the driver re-rate."
+        },
+        {
+          "safeguard": "Compressor high-pressure trip and ESDV/SSIV on the 90 bara discharge",
+          "type": "trip",
+          "adequate": false,
+          "gap": "The compressor high-pressure trip is the only identified barrier for a blocked export line; its setpoint, independence and test interval are not stated, and no ESDV isolates the discharge or the 15 km export line."
+        },
+        {
+          "safeguard": "Aftercooler E-101 and TIC-101 discharge temperature control",
+          "type": "BPCS",
+          "adequate": false,
+          "gap": "Cooler duty rises from 3,885 to 4,630 kW (+19%); cooling-medium capacity and the single TIC-101 loop are not confirmed for the new duty, and a cooler failure has no high-temperature trip."
+        },
+        {
+          "safeguard": "Dry gas seals, lube oil, seal gas and utility supply",
+          "type": "passive",
+          "adequate": false,
+          "gap": "The 100 barg casing and dry gas seals contain pressure, but seal-gas/lube-oil dependency is not assessed and there is no loss-of-utilities matrix for power, instrument air, cooling water or seal gas."
+        },
+        {
+          "safeguard": "Fire and gas detection and fire suppression in the compressor enclosure",
+          "type": "alarm",
+          "adequate": false,
+          "gap": "No gas detection, fire suppression or ESD action for the compressor enclosure is documented."
+        },
+        {
+          "safeguard": "Commissioning procedure: surge and performance test, revised operating procedures",
+          "type": "procedure",
+          "adequate": false,
+          "gap": "A compressor surge/performance test is mentioned, but there is no revised operating procedure, alarm/trip setpoint update or response to a recycle failure for the new curve."
+        }
+      ],
+      "risk": "high",
+      "comment": "The re-rate leaves the machine at 116.9% of its existing driver with no surge, overspeed, torsional or utility-failure case reported, and the stage count is inconsistent between documents. Loss of power, seal gas or a recycle failure is a credible route to surge/overspeed and a high-energy trip."
+    },
+    {
+      "node": 6,
+      "name": "Produced-water package: V-104 hydrocyclone, V-105 coalescer, P-102",
+      "safeguards": [
+        {
+          "safeguard": "Existing produced-water plant, 3,000 bbl/d",
+          "type": "BPCS",
+          "adequate": false,
+          "gap": "Running at 2,782 bbl/d (92.7%) before the upgrade and facing a water cut rising from 48.7% to 57%; no redundancy and no overboard-quality monitoring. It is the hidden capacity limit."
+        },
+        {
+          "safeguard": "V-104 hydrocyclone (new scope): 2 x 50% at 6,000 bbl/d, 25 barg, Super Duplex liners",
+          "type": "passive",
+          "adequate": true,
+          "gap": "2 x 50% gives maintenance redundancy, but performance at 60% turndown, at 57% water cut and with a varying reject rate is vendor-stated, not modeled, and the reject stream destination is not defined."
+        },
+        {
+          "safeguard": "V-105 coalescer (new scope): 1.2 m ID x 2.2 m T/T, 6.5 min retention claimed",
+          "type": "passive",
+          "adequate": false,
+          "gap": "The datasheet volume is about 2.49 m3, which gives 3.76 min at 39.7 m3/h (6,000 bbl/d), not the stated 6.5 min (6.5 min needs about 4.3 m3). It is undersized for the 17.09 s interface duty and has no standby."
+        },
+        {
+          "safeguard": "P-102 treated-water pump (new scope): 15 kW, API 610 OH1",
+          "type": "BPCS",
+          "adequate": false,
+          "gap": "The datasheet is 18.4 m3/h at 60 m, which is the current 2,782 bbl/d duty, not the 39.7 m3/h required for 6,000 bbl/d in the basis. A single pump with no standby caps the package at about 3,000 bbl/d."
+        },
+        {
+          "safeguard": "Oil-in-water analyser, overboard valve interlock and automatic diversion to slop",
+          "type": "alarm",
+          "adequate": false,
+          "gap": "No OIW analyser, no automatic diversion and no overboard valve interlock is specified; the regulatory OIW limit is not stated, so bypass or a coalescer upset sends oily water overboard unmonitored."
+        },
+        {
+          "safeguard": "Package overpressure protection: PSV or high-pressure trip on V-104/V-105/P-102",
+          "type": "relief",
+          "adequate": false,
+          "gap": "V-104, V-105 and P-102 are 25 barg design downstream of a 60 bara source. An LCV-102 fail-open gas blowby has no PSV, high-pressure trip or ESD action on the package."
+        },
+        {
+          "safeguard": "Loss of P-102 and water backup protection: LSHH on the water boot / V-101 interface",
+          "type": "trip",
+          "adequate": false,
+          "gap": "No LSHH on the water boot or V-101 interface and no automatic ESD on loss of P-102; water backs up into the HP separator and then into the oil and gas outlets."
+        },
+        {
+          "safeguard": "Package bypass and permit procedure; materials 316L/Super Duplex",
+          "type": "procedure",
+          "adequate": false,
+          "gap": "No procedure for bypassing the package, no slop/closed-drain route and no permit control; a bypass sends oily water overboard. The 316L/Super Duplex selection is appropriate for wet CO2 service, but oxygen, sulfate and chloride effects are outside the study."
+        }
+      ],
+      "risk": "high",
+      "comment": "The package as datasheeted cannot deliver 6,000 bbl/d: P-102 is 18.4 m3/h against 39.7 m3/h required and V-105 gives 3.8 min against a 6.5 min claim. It has no standby pump, no OIW analyser, no overboard interlock and no overpressure protection against a 60 bara gas blowby. The water package is the project's hidden enabler and its safety case is the weakest."
+    },
+    {
+      "node": 7,
+      "name": "Relief: PSV-101 and flare",
+      "safeguards": [
+        {
+          "safeguard": "PSV-101 (existing): conventional P orifice, 6.38 in2 fitted, set 66 barg, 4 in inlet x 6 in outlet",
+          "type": "relief",
+          "adequate": true,
+          "gap": "6.38 in2 against 5.53 in2 required at +18% (86.7%), so the vessel and pipeline are protected without the credit. But no inlet-line dP is calculated (process.psv_sizing has no inlet-line input; the 4 in inlet carries 42.6-50.3 kg/s), the 'constant back pressure 1.5 bar' is a normal header value rather than the built-up back pressure at 91-107.5% flare load, and the set pressure equals the 66 barg design pressure with 72.6 bara accumulation. Single PSV, no spare."
+        },
+        {
+          "safeguard": "Existing flare and header: 46.34 kg/s design capacity",
+          "type": "relief",
+          "adequate": false,
+          "gap": "91.1% now, 107.5% at +18% without the credit, 69.9% with it; the HIPPS bypass/proof-test case is the 107.5% case. Radiation at 4.73 kW/m2 is 75.0 m now, 82.4 m at +18% and 64.0 m with HIPPS, and the sterile area is not verified against either contour; 1.58 kW/m2 personnel and 6.3 kW/m2 equipment contours are not reported."
+        },
+        {
+          "safeguard": "HIPPS relief credit (new scope): 35% reduction of the blocked-outlet case",
+          "type": "relief",
+          "adequate": false,
+          "gap": "The reduction from 50.31 to 32.70 kg/s is a study assumption, not a library result; no dynamic relief study, HIPPS closure transient, trapped-inventory or leakage model supports it. It is a relief-disposal credit, not a vessel-integrity credit: the PSV alone passes the +18% case at 86.7%."
+        },
+        {
+          "safeguard": "Flare and header +25% upgrade (fallback): 57.93 kg/s design, 86.0% at +18%",
+          "type": "relief",
+          "adequate": true,
+          "gap": "Technically adequate at 86.0% but not selected. The 82.4 m contour must still be verified against the sterile area, and the tie-in is hot work on a live flare header during the shutdown."
+        },
+        {
+          "safeguard": "Relief header and disposal network hydraulics",
+          "type": "relief",
+          "adequate": false,
+          "gap": "No header hydraulic or relief disposal network calculation is reported; the 1.5 bar back-pressure assumption and the 91-107.5% flare load are not reconciled."
+        },
+        {
+          "safeguard": "Flare pilots, ignition, purge and knock-out drum",
+          "type": "passive",
+          "adequate": false,
+          "gap": "No pilot/ignition reliability, purge, flame-out or knock-out drum assessment is given; loss of ignition on a 42-50 kg/s relief is not covered."
+        },
+        {
+          "safeguard": "PSV re-certification and flare radiation check before first relief",
+          "type": "procedure",
+          "adequate": false,
+          "gap": "Both are stated as requirements, but there is no relief valve register, inspection interval for the new duty, spare PSV or flare outage/impairment procedure."
+        },
+        {
+          "safeguard": "Passive fireproofing of the flare header, supports and PSV inlet",
+          "type": "passive",
+          "adequate": false,
+          "gap": "No fireproofing of the flare header, its supports or the PSV/PSV inlet is specified, so a fire can take out the relief path."
+        }
+      ],
+      "risk": "high",
+      "comment": "The flare is the relief gate. Without the unproven 35% credit the +18% case is 107.5% of flare capacity, the bypass/proof-test case is the same, and the radiation contour grows from 64.0 to 82.4 m. The PSV itself is adequately sized; the deficiency is the relief disposal and the evidence behind the credit."
+    },
+    {
+      "node": 8,
+      "name": "Export gas and condensate lines (battery limit to reception)",
+      "safeguards": [
+        {
+          "safeguard": "Export gas line (existing): 12 in X65, 12.7 mm WT, 3LPP, 100 barg design",
+          "type": "passive",
+          "adequate": true,
+          "gap": "100 barg design against 90 bara operating gives only 10% margin. There is no line overpressure protection at the reception end, no PSV/HIPPS and no ESDV/SSIV at the platform battery limit."
+        },
+        {
+          "safeguard": "Compressor high-pressure trip and ESD on the export gas line",
+          "type": "trip",
+          "adequate": false,
+          "gap": "The compressor trip is the sole identified barrier for a blocked export line; its setpoint, independence and test interval are not stated, and no ESDV isolates the 15 km line."
+        },
+        {
+          "safeguard": "Condensate export line (existing): 6 in X65, 7.1 mm WT, 30 barg design",
+          "type": "relief",
+          "adequate": false,
+          "gap": "30 barg design against 25 bara operating, but no PSV or blocked-outlet protection and no ESDV at the battery limit; P-101 deadhead can exceed the line rating."
+        },
+        {
+          "safeguard": "Corrosion and integrity management: 3LPP coating, 3 mm corrosion allowance",
+          "type": "passive",
+          "adequate": false,
+          "gap": "External 3LPP and 3 mm CA are specified, but internal CO2/wet-gas corrosion, water dew point and inhibition for the export lines are not addressed, and no pigging/integrity management is in scope."
+        },
+        {
+          "safeguard": "Leak detection and F&G coverage at the risers and battery limit",
+          "type": "alarm",
+          "adequate": false,
+          "gap": "No leak detection, no F&G coverage and no ESD action for the export line risers or the battery-limit area."
+        },
+        {
+          "safeguard": "NORSOK S-001 two-barrier check",
+          "type": "trip",
+          "adequate": false,
+          "gap": "The check in the report covers the 66 barg HP inlet/pipeline, not the 100 barg export gas line or the 30 barg condensate line; those lines have no equivalent two-barrier assessment."
+        },
+        {
+          "safeguard": "Pipeline overpressure shutdown, pigging and emergency depressurisation procedure",
+          "type": "procedure",
+          "adequate": false,
+          "gap": "No pipeline overpressure shutdown, pigging, integrity or emergency depressurisation procedure is defined; the 15 km lines are outside the study's operating procedures."
+        }
+      ],
+      "risk": "medium",
+      "comment": "The lines have pressure margin and the reception end has its own protection, but the platform has no ESDV/SSIV, no line relief and no two-barrier check for the export lines; the compressor trip is the only identified barrier. Escalates to high for the condensate line if P-101 deadhead exceeds 30 barg."
+    }
+  ],
+  "actions": [
+    {
+      "id": "A-01",
+      "finding": "The 35% HIPPS relief credit (50.31 to 32.70 kg/s) is the sole basis for the 36 MUSD HIPPS+water package over the 42 MUSD flare fallback, and no dynamic relief study or device-specific SIL verification supports it.",
+      "action": "Commission the dynamic relief study (HIPPS <2 s closure, trapped inventory, SDV leakage, PSV/flare response) and a device-specific SIL verification before booking the credit. If the credit is not proven at 35% or better, book 50.31 kg/s and select the +25% flare/header fallback; re-issue the PSV, flare and radiation basis under MOC.",
+      "owner": "Process/Safety (owner retains relief and SIL studies)",
+      "priority": "high"
+    },
+    {
+      "id": "A-02",
+      "finding": "HIPPS PFD 1e-4 / SIL 3 is asserted from a partially_verified library determination; the P&ID shows both PTs upstream of SDV-101, the final element is a single SDV, and no trip setpoint or response time is defined.",
+      "action": "Perform IEC 61508/61511 SIL verification with device failure rates, CCF beta, proof-test effectiveness, partial-stroke coverage and final-element PFD. Confirm the PT taps are downstream of SDV-101, define trip setpoint, deadband and response time, and re-derive the SIL target from a LOPA (the PSV already passes the +18% case at 86.7%, so the HIPPS benefit is flare capacity, not vessel integrity).",
+      "owner": "SIS/Instrumentation",
+      "priority": "high"
+    },
+    {
+      "id": "A-03",
+      "finding": "The HIPPS bypass/proof-test case overloads the flare: without the credit the +18% case is 50.31 kg/s at 107.5% of flare capacity, so any in-service bypass at full rate is outside the relief basis.",
+      "action": "Write a SIL-3 bypass and proof-test procedure with independent approval, time limit, key-lock, BPCS bypass alarm, compensating measures and a rate cap/curtailment that keeps the no-credit relief case within flare capacity. Prohibit bypass during the 4-week SIMOPS campaign and add the bypass case to the flare/relief study.",
+      "owner": "Operations/Safety",
+      "priority": "high"
+    },
+    {
+      "id": "A-04",
+      "finding": "PSV-101 inlet line pressure drop and built-up back pressure are not calculated; the conventional PSV assumes 1.5 bar constant back pressure while the flare runs at 91-107.5% of capacity.",
+      "action": "Perform the API 520 inlet/outlet hydraulic study at 42.63 and 50.31 kg/s: verify inlet dP at or below 3% of set, built-up back pressure at or below 10% (or fit balanced bellows), confirm the 66 barg set and 72.6 bara accumulation, and provide a spare PSV or an isolation/impairment procedure.",
+      "owner": "Piping/Relief",
+      "priority": "high"
+    },
+    {
+      "id": "A-05",
+      "finding": "Radiation at 4.73 kW/m2 is 64.0 m with HIPPS and 82.4 m without, but the sterile area, escape routes and temporary refuge are not verified against either contour and only the 4.73 kW/m2 contour is reported.",
+      "action": "Verify the 64.0 m and 82.4 m contours against the platform sterile area, escape routes and temporary refuge; add 1.58 kW/m2 personnel and 6.3 kW/m2 equipment contours; confirm flare tip exit velocity, ignition, purge and header hydraulics; select the fallback if the 82.4 m contour is not clear.",
+      "owner": "Safety/Layout",
+      "priority": "high"
+    },
+    {
+      "id": "A-06",
+      "finding": "V-101 has single-loop level/interface control with no independent LAHH/LSHH, 17.09 s settling against a 60 s criterion, and LCV-102 fail-open admits 60 bara gas into the 25 barg water package.",
+      "action": "Add independent 1oo2 LAHH/LSHH trips to ESD, interface-specific measurement (RF/conductance) and a boot/weir; define LCV-102 fail-safe as fail-closed; add a high-pressure trip and a PSV sized for gas blowby on V-104/V-105 (or raise their design pressure); confirm the 17.09 s duty is met by the coalescer, not the vessel.",
+      "owner": "Instrumentation/Process",
+      "priority": "high"
+    },
+    {
+      "id": "A-07",
+      "finding": "The produced-water package cannot deliver 6,000 bbl/d as datasheeted: P-102 is 18.4 m3/h against 39.7 m3/h required, and V-105 (2.49 m3) gives 3.76 min against a 6.5 min claim; there is no standby, OIW analyser or diversion.",
+      "action": "Re-size P-102 and V-105 for 6,000 bbl/d at 57% water cut and 60% turndown, provide 2 x 50% pumps and coalescer redundancy, add an OIW analyser with automatic diversion to slop and an overboard valve interlock, and write the package bypass/permit procedure.",
+      "owner": "Water package vendor/Process",
+      "priority": "high"
+    },
+    {
+      "id": "A-08",
+      "finding": "The K-101 re-rate leaves 2,689 kW against a 2,300 kW driver (116.9%) with no surge, overspeed, torsional or utility-failure case, and the 1-stage/2-stage description is inconsistent.",
+      "action": "Confirm the driver re-rate to 2.7 MW, issue the revised compressor curve with anti-surge valve and recycle cooler sizing, add an independent overspeed trip and API 617 test, perform torsional/lateral and impeller stress analysis, define dry-gas-seal and loss-of-utilities response, and confirm the 4,630 kW aftercooler duty.",
+      "owner": "Rotating equipment",
+      "priority": "high"
+    },
+    {
+      "id": "A-09",
+      "finding": "No F&G philosophy, ESD hierarchy, depressurisation/blowdown, fireproofing or temporary-refuge/escape-route assessment is documented for a manned platform.",
+      "action": "Produce the F&G and ESD cause and effect (ESD-1/2/3), add BDV/blowdown on V-101 and the HP inlet spool, ESDV/SSIV on the export gas and condensate lines, F&G coverage for the HP inlet, compressor and water package, fireproofing for structural steel/SDV/PSV/flare header, and a temporary-refuge and escape-route assessment.",
+      "owner": "Safety and risk",
+      "priority": "high"
+    },
+    {
+      "id": "A-10",
+      "finding": "The 4-week shutdown puts four parallel work fronts on a live hydrocarbon platform with 0.8 week commissioning and no SIMOPS matrix; the risk register rates a SIMOPS incident as Low.",
+      "action": "Produce a SIMOPS matrix and risk assessment (hot work, isolation, gas-freeing, dropped objects, flare outage, marine movements), an impairment register for PSV/ESD/HIPPS/F&G, a flare outage and emergency response plan, and re-baseline the schedule and commissioning duration before sanction.",
+      "owner": "Construction/Operations",
+      "priority": "medium"
+    }
+  ],
+  "top_findings": [
+    "The 35% HIPPS relief credit is an assumption, not a library result: it takes 50.31 kg/s to 32.70 kg/s and is the only reason the 36 MUSD HIPPS+water package beats the 42 MUSD flare fallback. No dynamic relief study or device-specific SIL verification supports it.",
+    "The relief basis fails during HIPPS bypass/proof test: without the credit the +18% blocked-outlet case is 50.31 kg/s, 107.5% of the 46.34 kg/s flare, and the 4.73 kW/m2 contour is 82.4 m instead of 64.0 m. A 12-month in-service proof test or any full-rate bypass is outside the design basis, not merely a permit issue.",
+    "The HIPPS SIL-3 claim is asserted, not verified: PFD 1e-4 comes from a partially_verified library determination with no failure rates, CCF or valve PFD, and the P&ID shows both PTs upstream of SDV-101. The PSV alone passes the +18% case at 86.7%, so the HIPPS benefit is flare capacity, not vessel integrity; the SIL target needs a LOPA.",
+    "PSV-101 inlet line pressure drop is not calculated: process.psv_sizing has no inlet-line input, and the conventional PSV's 'constant 1.5 bar back pressure' is a normal header value, not the built-up back pressure at 91-107.5% flare load. The API 520 3% inlet and 10% back-pressure rules are unverified on a 4 in inlet carrying 42.6-50.3 kg/s.",
+    "V-101 has no independent level/interface protection: single LIC-101/LCV-101 and LIC-102/LCV-102 loops, no LAHH/LSHH to ESD, 17.09 s interface settling against 60 s, and an LCV-102 fail-open path that admits 60 bara gas into 25 barg V-104/V-105 with no PSV.",
+    "The produced-water package cannot deliver 6,000 bbl/d as datasheeted: P-102 is 18.4 m3/h against 39.7 m3/h required, V-105 (2.49 m3) gives 3.76 min against a 6.5 min claim, and there is no standby pump, OIW analyser, overboard interlock or package overpressure protection.",
+    "The compressor re-rate leaves 2,689 kW against a 2,300 kW driver (116.9%) with no surge, overspeed, torsional or loss-of-utilities case, and the documents disagree on 1 versus 2 stages; a recycle or power failure is a credible route to surge/overspeed.",
+    "No fire and gas detection, ESD hierarchy, depressurisation/blowdown, fireproofing or temporary-refuge/escape-route assessment is documented for a manned platform, while the 4-week shutdown runs four parallel fronts on a live platform and rates SIMOPS risk as Low.",
+    "Let-down overpressure is unprotected: VLV-102 failure puts 60 bara into 10 bara V-102, and VLV-103 puts 10 bara into 2 bara V-103 and the 1.013 bara V-104; no PSVs or design pressures are stated for V-102/V-103/V-104, and V-104 is double-tagged as both stock tank and hydrocyclone.",
+    "The 0.54 kg/s fire case is only 1.3% of the blocked-outlet case and appears to rely on PIR insulation and drainage that are not stated to be fire-rated; with no depressurisation, a fire with PSV-101 isolated has no relief path."
+  ]
+}

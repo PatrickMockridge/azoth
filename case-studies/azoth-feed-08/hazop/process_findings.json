@@ -1,0 +1,742 @@
+[
+  {
+    "node": 1,
+    "guideword": "NO/NOT",
+    "parameter": "flow",
+    "deviation": "No flow through SDV-101 on a spurious HIPPS trip",
+    "causes": [
+      "1oo2 pressure transmitter drift or failure: a single PT reaching the trip threshold closes SDV-101, since 1oo2 has no 2oo3 voting",
+      "Plugged PT impulse tapping (hydrate, wax or iron-carbonate corrosion product) giving a false high signal",
+      "HIPPS logic-solver card or power-supply fault; partial-stroke test left in the tripped state",
+      "Common-cause impulse-line or root-valve isolation error during routine calibration"
+    ],
+    "consequences": [
+      "Instant loss of 137.1 MMscfd sales gas and 2,936 bbl/d condensate; all three compression trains lose HP feed",
+      "Wells continue to flow against a closed SDV-101 at up to 95 bara; flowline/wellhead cooldown and possible hydrate or wax deposition before restart",
+      "Restart needs full HIPPS reset and HP inlet repressurisation; the four-week shutdown plan assumes no unplanned trip"
+    ],
+    "severity": "S3",
+    "severity_reason": "A production and restart event on the whole export stream with no direct loss of containment, but repeated spurious trips push operators toward HIPPS bypass."
+  },
+  {
+    "node": 1,
+    "guideword": "NO/NOT",
+    "parameter": "pressure",
+    "deviation": "SDV-101 does not close on a HIPPS demand (failure to close)",
+    "causes": [
+      "Sand/condensate erosion of the 316L/Duplex trim or seat, so the valve passes the wellstream after the trip",
+      "Actuator spring or solenoid failure, or loss of instrument air, leaving the valve open",
+      "Proof testing limited to a partial-stroke test (about 80-90% travel); full-stroke closure is not proven between 12-month proof tests",
+      "Single final element: 1oo2 transmitters and HFT 1 do not give a redundant valve"
+    ],
+    "consequences": [
+      "V-101 and the 66 barg inlet pipeline are exposed to 95 bara wellhead pressure; the 72.6 bara maximum incidental pressure is exceeded",
+      "PSV-101 alone must pass the full 42.63 kg/s blocked-outlet case (91.1% of the flare now, 107.5% after the +18% re-rate)",
+      "Loss of containment at the HP separator or inlet spool with hydrocarbon jet-fire/explosion potential"
+    ],
+    "severity": "S4",
+    "severity_reason": "Failure of the only pressure barrier between a 95 bara wellstream and a 66 barg vessel and pipeline is major-accident potential."
+  },
+  {
+    "node": 1,
+    "guideword": "MORE",
+    "parameter": "pressure",
+    "deviation": "HP inlet pressure above the 66 barg design (wellhead up to 95 bara)",
+    "causes": [
+      "Well control or choke failure, or a surging well delivering close to the 95 bara shut-in pressure",
+      "The HIPPS trip setpoint is not stated in the basis, so the margin between trip and the 66 barg PSV set is undefined",
+      "PT calibration error or a blocked tapping reading low, delaying the trip"
+    ],
+    "consequences": [
+      "The inlet line and pipeline see up to 72.6 bara maximum incidental pressure, the NORSOK S-001 two-barrier case",
+      "If the trip is late the PSV lifts at 66 barg and the flare is at 91.1% now and 107.5% at the re-rated rate",
+      "V-101 shell and nozzles at 110% of design pressure with only 3 mm corrosion allowance on a ten-year-old SA-516-70N shell"
+    ],
+    "severity": "S4",
+    "severity_reason": "An undefined trip margin on the primary overpressure barrier can put a 66 barg vessel and pipeline above design pressure."
+  },
+  {
+    "node": 1,
+    "guideword": "MORE",
+    "parameter": "temperature",
+    "deviation": "Wellstream above 363 K (90 C) at SDV-101 and V-101",
+    "causes": [
+      "Hot well or reduced Joule-Thomson cooling as the choke is opened for rate",
+      "Inhibitor or chemical injection at higher temperature, or a workover returning hotter fluid"
+    ],
+    "consequences": [
+      "Only 10 K margin to the 100 C design temperature of SDV-101 and V-101",
+      "316L HIPPS seals, gaskets and wetted parts approach their limit, and the CO2 inhibition basis (0.15 mm/yr at 81 C) is no longer qualified"
+    ],
+    "severity": "S2",
+    "severity_reason": "A slow overtemperature that damages nothing immediately but invalidates the materials and corrosion basis."
+  },
+  {
+    "node": 1,
+    "guideword": "PART OF",
+    "parameter": "pressure",
+    "deviation": "Only one of the two HIPPS pressure transmitters is in service",
+    "causes": [
+      "1oo2 transmitters on a common impulse tapping or root valve, so a single plugging event disables both",
+      "One PT isolated for calibration without a bypass permit or a compensating trip",
+      "Diagnostic coverage of 0.6 leaves 40% of dangerous undetected failures"
+    ],
+    "consequences": [
+      "Protection degrades from SIL 3 (PFD 1e-4) to a single transmitter (order 1e-3), so the 35% relief credit cannot be claimed",
+      "PSV-101 becomes the only barrier, and its flare margin is already consumed"
+    ],
+    "severity": "S3",
+    "severity_reason": "A degraded but detectable protection state that only becomes a hazard if a pressure excursion coincides."
+  },
+  {
+    "node": 1,
+    "guideword": "OTHER THAN",
+    "parameter": "sequence",
+    "deviation": "HIPPS bypassed or proof-tested with the HP inlet live",
+    "causes": [
+      "The 12-month proof test and partial-stroke test are performed on a live train under a bypass permit",
+      "Bypass left in place after the test or after a nuisance trip",
+      "No independent high-pressure trip; the PSV is the only protection while bypassed"
+    ],
+    "consequences": [
+      "Zero SIL-3 protection above the 66 barg PSV set; a well surge then relies on a PSV and a flare already at 91.1%",
+      "A bypass left active converts every later overpressure into a PSV-only event without the 35% credit"
+    ],
+    "severity": "S4",
+    "severity_reason": "A defeated SIL-3 function on the primary overpressure barrier is a recognised major-accident precursor."
+  },
+  {
+    "node": 2,
+    "guideword": "MORE",
+    "parameter": "level",
+    "deviation": "HP interface level high: water into the oil outlet",
+    "causes": [
+      "LCV-102 stuck or plugged by scale or sand in the 8 in water draw-off",
+      "Interface level transmitter fouled by emulsion or wax",
+      "Water rate rising with the cut toward 57% while the weir and interface control are unchanged",
+      "The internals change (K 0.11 to 0.14) alters the flow field without re-tuning the interface control"
+    ],
+    "consequences": [
+      "Water is carried under with the oil into the two-phase V-102 and V-103, which have no water draw-off",
+      "Condensate export off-spec (BS&W) and water accumulation in the stock tank",
+      "At the extreme, water covers the gas outlet and carries over to K-101"
+    ],
+    "severity": "S3",
+    "severity_reason": "Water misrouting degrades product and can reach the compressors, but needs a second failure to become a release."
+  },
+  {
+    "node": 2,
+    "guideword": "LESS",
+    "parameter": "level",
+    "deviation": "HP interface level low: water carried under with the oil",
+    "causes": [
+      "LCV-102 fails open or is driven open by a faulty level signal",
+      "Oil-leg level control (LIC-101) draining the interface",
+      "Water draw-off above the incoming 2,782 bbl/d during a rate change"
+    ],
+    "consequences": [
+      "Water enters V-102 at 10 bara, flashes and accumulates with no boot, then is carried to K-102A or the stock tank",
+      "Water carryover to the compression suction, which has no knock-out drum, risks impeller erosion and seal damage"
+    ],
+    "severity": "S3",
+    "severity_reason": "Water to the compressor is a credible damage path; the low level is recoverable if the interface is detected."
+  },
+  {
+    "node": 2,
+    "guideword": "MORE",
+    "parameter": "flow",
+    "deviation": "HP gas rate above separator capacity (99.8% at K 0.11; 118.9% at 163.4 MMscfd)",
+    "causes": [
+      "Choke opened toward the 163.4 MMscfd well potential before the internals are changed",
+      "Vendor K 0.14 not achieved, leaving the cap near 137.4 MMscfd",
+      "Higher gas/oil ratio than the year-ten forecast as the C7+ fraction falls"
+    ],
+    "consequences": [
+      "Vane-pack flooding and liquid carryover to K-101; only 0.3 MMscfd of margin at the base case",
+      "After the internals change the cap is 174.9 MMscfd, so the 163.4 MMscfd potential sits at 93.4% with little margin"
+    ],
+    "severity": "S3",
+    "severity_reason": "Operation above the Souders-Brown limit causes carryover and compressor damage but is bounded by the 174.9 MMscfd cap."
+  },
+  {
+    "node": 2,
+    "guideword": "AS WELL AS",
+    "parameter": "composition",
+    "deviation": "Liquid (oil/water) carryover in the HP gas to K-101",
+    "causes": [
+      "Gas rate at or above the K factor; mist-eliminator damage or fouling",
+      "Foaming or emulsion at a 48.7% water cut and rising",
+      "High oil level covering the gas outlet during a level upset"
+    ],
+    "consequences": [
+      "There is no K-101 suction knock-out drum or coalescer: liquid reaches the impellers and dry-gas seals",
+      "Erosion, rotor imbalance and seal failure with a potential gas fire; sales gas contaminated",
+      "1,869 mol/s of HP gas is the whole export stream, so any trip loses the full rate"
+    ],
+    "severity": "S4",
+    "severity_reason": "Liquid carryover into a centrifugal compressor with no suction scrubber is a credible seal-failure and fire path."
+  },
+  {
+    "node": 2,
+    "guideword": "AS WELL AS",
+    "parameter": "composition",
+    "deviation": "Water cut above 48.7% drives retention below the 6.5 min minimum",
+    "causes": [
+      "Field water breakthrough to the 57% end-of-forecast cut",
+      "Emulsion or foam reducing the effective settling volume",
+      "Total liquid flow rising while the weir and interface setting stay fixed"
+    ],
+    "consequences": [
+      "Water retention of 7.83 min at 48.7% falls to about 6.7 min at 57%, cutting the margin from 1.3 min to about 0.2 min",
+      "Interface settling is already 17.09 s against a 60 s class check, so the coalescer carries the whole duty",
+      "Water carryover to the oil and condensate, and overboard oil in the produced water"
+    ],
+    "severity": "S3",
+    "severity_reason": "The separator is at its performance limit by design; the coalescer is the only barrier between this and routine carryover."
+  },
+  {
+    "node": 2,
+    "guideword": "OTHER THAN",
+    "parameter": "utility",
+    "deviation": "Loss of LIC-102 or instrument air, with LCV-102 failing open and gas blowing by to the 25 barg water package",
+    "causes": [
+      "Instrument-air loss with a fail-open or undefined fail position on LCV-102",
+      "LCV-102 seat or trim erosion after ten years, passing gas at a normal liquid level",
+      "Level transmitter failure driving the valve fully open"
+    ],
+    "consequences": [
+      "60 bara gas into V-104 and V-105 (25 barg design) and the 8 in ANSI 300 water line",
+      "Overpressure and rupture of the coalescer or hydrocyclone, with hydrocarbon release to the water deck",
+      "No PSV is shown on V-104 or V-105 in the basis"
+    ],
+    "severity": "S4",
+    "severity_reason": "A 60 bara source connected to a 25 barg package with no relief is a vessel-rupture scenario."
+  },
+  {
+    "node": 3,
+    "guideword": "MORE",
+    "parameter": "pressure",
+    "deviation": "V-102 overpressure above its 10 bara duty",
+    "causes": [
+      "VLV-102 fails open, passing 60 bara HP liquid and gas into V-102",
+      "K-102A trip or MP gas outlet blockage with the letdown still open",
+      "V-102 level control failure, or carryover blocking the gas outlet"
+    ],
+    "consequences": [
+      "V-102 (existing, 3 mm corrosion allowance) above its 10 bara design; its relief case is not in the basis, which specifies only PSV-101",
+      "Gas blowby to V-103 and the stock tank, or loss of containment at the MP vessel"
+    ],
+    "severity": "S3",
+    "severity_reason": "The MP vessel is probably protected by its own PSV, but that relief path is absent from the frozen basis, so the case is unverified."
+  },
+  {
+    "node": 3,
+    "guideword": "MORE",
+    "parameter": "level",
+    "deviation": "V-102 liquid level high with carryover to K-102A",
+    "causes": [
+      "VLV-102 overfeeding after a level or flow upset",
+      "LP letdown (VLV-103) restricted or V-103 backed up",
+      "Water accumulation from HP carry-under raising the apparent level"
+    ],
+    "consequences": [
+      "Liquid into K-102A, which has no suction scrubber: erosion, imbalance and seal damage on one of the three MP trains",
+      "MP gas rate to the sales mixer falls and the export compressor sees a changed flow split"
+    ],
+    "severity": "S3",
+    "severity_reason": "Local compressor damage and a train trip, recoverable if the level is caught before a slug."
+  },
+  {
+    "node": 3,
+    "guideword": "AS WELL AS",
+    "parameter": "composition",
+    "deviation": "Water carried into the two-phase MP and LP stages, which have no water draw-off",
+    "causes": [
+      "HP interface low or an emulsion passing water with the oil",
+      "V-102 and V-103 are two-phase by design, with no boot or water draw-off",
+      "An upset in the HP water draw-off (node 2) sending water with the oil"
+    ],
+    "consequences": [
+      "Water accumulates in V-102 and V-103 and is eventually carried to K-102A, K-103A or the stock tank",
+      "Condensate off-spec and water in the 6 in export line; up to 2,782 bbl/d can be misrouted",
+      "Corrosion of the carbon-steel MP and LP vessels and lines, where the 3 mm allowance and CO2 inhibition assume the water leaves at V-101"
+    ],
+    "severity": "S3",
+    "severity_reason": "The two-phase MP and LP design has no water sink, so any HP water slip propagates to the product and the compressors."
+  },
+  {
+    "node": 3,
+    "guideword": "OTHER THAN",
+    "parameter": "sequence",
+    "deviation": "Cold start after the four-week shutdown with hydrate or ice in VLV-102 and V-102",
+    "causes": [
+      "Wet gas (13.45 mol% water) at 10 bara entering a vessel at ambient -5 C",
+      "No hydrate inhibitor, and flow assurance is explicitly excluded from the basis",
+      "Restart before V-102 is warmed through"
+    ],
+    "consequences": [
+      "Hydrate or ice plug in the letdown or MP gas line, with overpressure upstream at VLV-102",
+      "Delayed first gas and a second depressurisation of the MP stage"
+    ],
+    "severity": "S3",
+    "severity_reason": "A startup transient that can plug the MP stage and delay first gas; recoverable but schedule-critical."
+  },
+  {
+    "node": 4,
+    "guideword": "MORE",
+    "parameter": "pressure",
+    "deviation": "Stock-tank flash gas routed to the 90 bara sales header without a compressor",
+    "causes": [
+      "V-104 at 1.013 bara is connected to the sales-gas mixer at 90 bara in the PFD, while the VRU and fourth stage are deferred",
+      "No flash-gas compressor in the scope, so the route is non-physical",
+      "Flash line blocked or undersized"
+    ],
+    "consequences": [
+      "The stock tank cannot vent to the sales header; it is back-pressured and the flash gas is vented or flared instead",
+      "Lost condensate and vapour recovery, plus a VOC emission source; the mass balance that gives 161.8 MMscfd depends on this stream"
+    ],
+    "severity": "S3",
+    "severity_reason": "A design-basis inconsistency that changes the product slate and creates a vent and overpressure path, but not an immediate release."
+  },
+  {
+    "node": 4,
+    "guideword": "MORE",
+    "parameter": "level",
+    "deviation": "V-104 stock tank overfill or LP liquid carryover",
+    "causes": [
+      "P-101 trip or condensate line backpressure stopping export",
+      "V-103 level high with liquid carryover through E-104",
+      "E-104 flooding or a blocked condensate flash line"
+    ],
+    "consequences": [
+      "2,936 bbl/d of condensate overflows to the deck or drain, creating fire and pollution risk",
+      "Liquid carryover to the flash-gas route and the sales header"
+    ],
+    "severity": "S3",
+    "severity_reason": "A large flammable liquid release on an offshore deck; ignition depends on the drain and hot-work state."
+  },
+  {
+    "node": 4,
+    "guideword": "LESS",
+    "parameter": "temperature",
+    "deviation": "E-104 outlet below 288 K with wax or ice in V-104 and the 6 in condensate line",
+    "causes": [
+      "Cooler over-performance at -5 C ambient or a colder letdown at VLV-103",
+      "Wet condensate (water carried under) freezing in the stock tank",
+      "A wax cloud point above 288 K for the gassier year-ten condensate"
+    ],
+    "consequences": [
+      "Wax or ice plugging the 15 km, 25 bara condensate line and losing condensate export",
+      "Overpressure upstream of the plug between P-101 and the blockage"
+    ],
+    "severity": "S3",
+    "severity_reason": "A blocked export line with a pump upstream can overpressure the 6 in line; blockage is recoverable but costly."
+  },
+  {
+    "node": 4,
+    "guideword": "AS WELL AS",
+    "parameter": "composition",
+    "deviation": "Free water in the stock tank and the condensate export",
+    "causes": [
+      "Water carry-under from V-101 through the two-phase MP and LP stages",
+      "No water draw-off on V-104, and E-104 condenses water at 288 K",
+      "An emulsion not broken by the HP internals change"
+    ],
+    "consequences": [
+      "Condensate off-spec (BS&W) at the 2,936-3,466 bbl/d export rate",
+      "Wet CO2 corrosion of the 6 in X65 line with 3 mm allowance, and reception penalties"
+    ],
+    "severity": "S3",
+    "severity_reason": "A product-quality and integrity issue on the condensate export line with no immediate safety consequence."
+  },
+  {
+    "node": 5,
+    "guideword": "LESS",
+    "parameter": "flow",
+    "deviation": "Compressor surge at low flow, including after the re-rate",
+    "causes": [
+      "Turndown to 60% of design, with new impellers moving the surge line and the antisurge recycle not re-tuned",
+      "K-101 trip while K-102 and K-103 continue to discharge into the 90 bara mixer",
+      "A blocked or restricted export line (node 8) raising discharge pressure"
+    ],
+    "consequences": [
+      "Surge cycles damage thrust bearings and dry-gas seals, and a seal failure releases HP gas",
+      "Trip of the export train, loss of 137.1-161.8 MMscfd, and a V-101 overpressure and flare event"
+    ],
+    "severity": "S3",
+    "severity_reason": "Surge is a credible machinery-damage and seal-leak path, and the re-rate changes the curve without a documented antisurge re-verification."
+  },
+  {
+    "node": 5,
+    "guideword": "MORE",
+    "parameter": "flow",
+    "deviation": "K-101 power above the driver (2,689 kW against 2,300 kW, 116.9%)",
+    "causes": [
+      "Well potential of 163.4 MMscfd reached before the driver re-rate is complete",
+      "Fouled intercoolers or aftercooler, or 35 C ambient, raising absorbed power",
+      "A higher gas molecular weight or a changed flow split from the MP and LP trains",
+      "Stage count is inconsistent: the basis says one stage, the datasheet and P&ID show two, so the re-rate curve is ambiguous"
+    ],
+    "consequences": [
+      "Driver overload trip or motor damage, losing the export train and triggering a V-101 overpressure event",
+      "The re-rate is the 22-week long-lead item, so the facility can be at 163.4 MMscfd on the old driver"
+    ],
+    "severity": "S3",
+    "severity_reason": "An overload trip is recoverable, but the sequence (trip to flare) is the same as a blocked outlet."
+  },
+  {
+    "node": 5,
+    "guideword": "LESS",
+    "parameter": "pressure",
+    "deviation": "K-101 suction below 60 bara",
+    "causes": [
+      "V-101 pressure low on turndown or after a HIPPS or SDV closure",
+      "K-101 surge or a restricted gas outlet",
+      "HP separator liquid level high, reducing the gas space"
+    ],
+    "consequences": [
+      "Compression ratio rises, discharge temperature and power rise, and the driver trips",
+      "V-101 liquid flashes, feeding two-phase flow to the compressor"
+    ],
+    "severity": "S3",
+    "severity_reason": "High-ratio operation is outside the re-rate envelope and couples directly to liquid carryover."
+  },
+  {
+    "node": 5,
+    "guideword": "REVERSE",
+    "parameter": "flow",
+    "deviation": "Reverse flow from the 90 bara sales mixer into a tripped K-102 or K-103 train",
+    "causes": [
+      "Discharge check-valve failure on a train that has tripped",
+      "Startup with the sales header already at 90 bara",
+      "K-102C or K-103E trip while the other trains hold the header"
+    ],
+    "consequences": [
+      "90 bara gas into intercoolers and compressor casings designed for 4-43 bara stage pressure",
+      "Rupture of a low-pressure intercooler or casing with gas release and fire"
+    ],
+    "severity": "S4",
+    "severity_reason": "Reverse flow into equipment rated far below 90 bara is a vessel-rupture scenario."
+  },
+  {
+    "node": 5,
+    "guideword": "AS WELL AS",
+    "parameter": "composition",
+    "deviation": "Liquid or water into K-101, K-102A or K-103A",
+    "causes": [
+      "Separator carryover (nodes 2 and 3); no suction knock-out drums on any train",
+      "Higher mist carryover at the K 0.14 gas velocity",
+      "Water from the two-phase MP and LP stages"
+    ],
+    "consequences": [
+      "Impeller erosion, imbalance, dry-gas-seal damage and a potential gas fire",
+      "Intercooler fouling and reduced capacity, forcing an unplanned train outage"
+    ],
+    "severity": "S3",
+    "severity_reason": "Liquid ingestion is a credible seal and impeller damage path; escalation to fire needs a seal failure."
+  },
+  {
+    "node": 5,
+    "guideword": "OTHER THAN",
+    "parameter": "utility",
+    "deviation": "Loss of power, instrument air or cooling to the three trains",
+    "causes": [
+      "Platform power failure or air-compressor trip",
+      "Cooling-medium loss, or 35 C ambient defeating the 313.15 K aftercooler approach",
+      "A common cause acting on the utilities shared by all three trains"
+    ],
+    "consequences": [
+      "All trains trip; V-101 overpressure and 42.63 kg/s to the flare, at 91.1% now and 107.5% after the re-rate",
+      "Loss of export and a black start, with the flare as the only pressure sink"
+    ],
+    "severity": "S4",
+    "severity_reason": "A total compression trip converts directly into the governing relief case on a flare that has no margin after the re-rate."
+  },
+  {
+    "node": 6,
+    "guideword": "NO/NOT",
+    "parameter": "flow",
+    "deviation": "No flow through the produced-water package (P-102 trip or blockage)",
+    "causes": [
+      "Single P-102 with no installed spare; a power or seal failure stops the only pump",
+      "Hydrocyclone liner or coalescer plugging by solids or scale, or reject-valve failure",
+      "The datasheet duty (18.4 m3/h) is the current 2,782 bbl/d, not the 39.7 m3/h needed for 6,000 bbl/d"
+    ],
+    "consequences": [
+      "Water backs up to V-101: only 7.83 min of water retention at 2,782 bbl/d (about 8 min) before the interface reaches the oil and gas outlet",
+      "Oil to the gas outlet and compressor, or water to the condensate; the facility must cut rate or trip"
+    ],
+    "severity": "S3",
+    "severity_reason": "The water plant is the hidden capacity link (92.7% now); its loss reaches the HP separator within minutes."
+  },
+  {
+    "node": 6,
+    "guideword": "MORE",
+    "parameter": "flow",
+    "deviation": "Water rate above package capacity, or one 50% hydrocyclone liner blocked",
+    "causes": [
+      "Water cut rising to 57% (about 3,250 bbl/d) with one of the two 50% liners out",
+      "Reject control valve failure or a surge from V-101",
+      "The old 3,000 bbl/d plant is already at 92.7% before the upgrade"
+    ],
+    "consequences": [
+      "Hydrocyclone and coalescer overload, oil-in-water above permit, and water backup to V-101",
+      "Before the upgrade the water plant caps gas at 147.8 MMscfd, stranding the compressor and flare capacity"
+    ],
+    "severity": "S3",
+    "severity_reason": "A capacity and quality exceedance with an environmental permit consequence, but no direct loss of containment."
+  },
+  {
+    "node": 6,
+    "guideword": "MORE",
+    "parameter": "temperature",
+    "deviation": "Produced water at 81 C against an 80 C package design",
+    "causes": [
+      "V-101 operates at 354.15 K (81 C) and there is no produced-water cooler",
+      "A hot well or reduced Joule-Thomson cooling raising the HP separator temperature"
+    ],
+    "consequences": [
+      "No design-temperature margin on V-104, V-105 and P-102",
+      "316L is at risk of chloride pitting or stress-corrosion cracking at 80 C in chloride-bearing produced water, and elastomer and gasket limits are reached"
+    ],
+    "severity": "S2",
+    "severity_reason": "A materials-integrity finding with a credible leak path on a 25 barg package, but slow-acting."
+  },
+  {
+    "node": 6,
+    "guideword": "AS WELL AS",
+    "parameter": "composition",
+    "deviation": "Oil carryover to overboard or reinjection water",
+    "causes": [
+      "Interface settling is 17.09 s against a 60 s class check, so the coalescer is the only barrier",
+      "Coalescer bypass or media damage, or an emulsion from the HP separator",
+      "Solids loading the coalescer"
+    ],
+    "consequences": [
+      "Oil-in-water permit exceedance on 2,782 bbl/d of produced water",
+      "Reinjection-well fouling and loss of disposal capacity"
+    ],
+    "severity": "S3",
+    "severity_reason": "An environmental permit breach and a disposal-capacity risk; the coalescer is mandatory for exactly this reason."
+  },
+  {
+    "node": 6,
+    "guideword": "REVERSE",
+    "parameter": "flow",
+    "deviation": "Reverse flow from the disposal or reinjection header into the 25 barg package",
+    "causes": [
+      "Disposal well shut-in or reinjection header pressure above 25 barg",
+      "P-102 discharge check-valve failure",
+      "No PSV on V-104 or V-105; the 8 in 316L line is ANSI 300"
+    ],
+    "consequences": [
+      "V-105 (25 barg design) overpressured from downstream, with coalescer rupture and produced-water and hydrocarbon release",
+      "In the extreme, backflow into V-101 through a failed LCV-102"
+    ],
+    "severity": "S4",
+    "severity_reason": "A 25 barg package with no relief and a higher-pressure downstream source is a rupture scenario."
+  },
+  {
+    "node": 7,
+    "guideword": "NO/NOT",
+    "parameter": "flow",
+    "deviation": "Loss of flare: flare or header out of service while HP is live",
+    "causes": [
+      "Flare tip and header replacement, the 25% fallback scope being a four-week tip and header job",
+      "Flare isolated with a blind or valve for maintenance while wells are online",
+      "Pilot fuel or purge loss, or header liquid blockage extinguishing the flare"
+    ],
+    "consequences": [
+      "PSV-101 has no disposal route, so V-101 exceeds 66 barg on a blocked outlet",
+      "The HIPPS becomes the only barrier, and its 35% credit assumes the flare exists"
+    ],
+    "severity": "S4",
+    "severity_reason": "Loss of the final relief path with a 60 bara gas inventory behind it is a classic major-accident scenario."
+  },
+  {
+    "node": 7,
+    "guideword": "NO/NOT",
+    "parameter": "flow",
+    "deviation": "PSV-101 inlet blocked (block valve closed, corrosion products, hydrate)",
+    "causes": [
+      "Inlet isolation valve left closed or car-sealed after PSV re-certification",
+      "Iron-carbonate or CO2 corrosion products, or hydrate and ice, in the 4 in inlet",
+      "PSV installed with a blind or a restricted inlet spool"
+    ],
+    "consequences": [
+      "PSV fails to lift; V-101 goes above 66 barg toward and beyond the 72.6 bara maximum incidental pressure",
+      "Loss of containment; the HIPPS is then the only barrier and is not a relief device"
+    ],
+    "severity": "S4",
+    "severity_reason": "An isolated or plugged PSV removes the second pressure barrier on a 66 barg vessel."
+  },
+  {
+    "node": 7,
+    "guideword": "LESS",
+    "parameter": "flow",
+    "deviation": "PSV outlet or header back pressure derates the conventional PSV",
+    "causes": [
+      "The 6 in PSV outlet must carry 42.63 kg/s at 1.5 barg, of order 40 m3/s, far above a 6 in tailpipe",
+      "Flare header at 91.1% now and 107.5% after the re-rate, with liquid in the header",
+      "A restricted or blocked tailpipe, or superimposed back pressure above the 1.5 bar design assumption"
+    ],
+    "consequences": [
+      "A conventional PSV loses capacity as back pressure rises: chattering, reduced lift, and V-101 overpressure",
+      "The 6.38 in2 orifice passes the mass, but the outlet rather than the orifice becomes the constraint"
+    ],
+    "severity": "S4",
+    "severity_reason": "The relief path downstream of the orifice is not demonstrated for the governing case, so the PSV may not relieve."
+  },
+  {
+    "node": 7,
+    "guideword": "MORE",
+    "parameter": "pressure",
+    "deviation": "PSV set pressure equals the vessel design (66 barg), with maximum incidental pressure at 72.6 bara",
+    "causes": [
+      "PSV set at design pressure by basis, with no margin for set-point drift",
+      "The blocked-outlet case takes V-101 to 72.6 bara, 110% of design",
+      "Back pressure or a slow-opening PSV adding to the accumulated pressure"
+    ],
+    "consequences": [
+      "Any set-point error or back pressure puts the 66 barg shell above design; relief at 110% is the maximum the code allows and leaves no margin on a ten-year-old shell with 3 mm allowance",
+      "Nozzle and flange leakage and fatigue at the PSV nozzle"
+    ],
+    "severity": "S3",
+    "severity_reason": "No immediate failure, but there is no pressure margin, so every relief event runs at the design limit."
+  },
+  {
+    "node": 7,
+    "guideword": "MORE",
+    "parameter": "flow",
+    "deviation": "Relief above the credited 32.70 kg/s when the HIPPS fails to close at the re-rated rate",
+    "causes": [
+      "SDV-101 fails to close (node 1), or the HIPPS is bypassed or its proof test overdue",
+      "The 35% credit is 0.65 x 50.31 kg/s (the +18% case) = 32.70 kg/s; it is only 23.3% below the current 42.63 kg/s case, so the credit is tied to the re-rate",
+      "Well potential at 163.4 MMscfd pushing the blocked-outlet case to 50.3 kg/s"
+    ],
+    "consequences": [
+      "50.3 kg/s is 107.5% of the 46.34 kg/s flare; radiation 82.4 m against 75.0 m now, beyond the sterile area the study did not verify",
+      "Flare flameout and liquid carryover, with a larger radiation contour"
+    ],
+    "severity": "S4",
+    "severity_reason": "The debottlenecked rate is only inside the flare limit because of the HIPPS credit; losing it overloads the flare."
+  },
+  {
+    "node": 7,
+    "guideword": "AS WELL AS",
+    "parameter": "flow",
+    "deviation": "Simultaneous relief from HP plus MP, LP or fire exceeds 46.34 kg/s",
+    "causes": [
+      "Shared flare header, with the HP blocked outlet coincident with a K-102 or K-103 trip or an MP or LP PSV lift",
+      "A fire in another area adding its relief load",
+      "No load-shedding or sequential blowdown philosophy in the basis"
+    ],
+    "consequences": [
+      "Flare above 100% with the HP case alone already at 91.1%; header back pressure rises and PSVs stall",
+      "The radiation contour expands beyond 82.4 m, with possible flameout"
+    ],
+    "severity": "S4",
+    "severity_reason": "A single relief case fills 91% of the flare; any coincidence overloads it."
+  },
+  {
+    "node": 7,
+    "guideword": "OTHER THAN",
+    "parameter": "sequence",
+    "deviation": "SIMOPS: flare-header hot work or tie-in during the four-week shutdown with HP live on another front",
+    "causes": [
+      "Four parallel work fronts, with header and tip work while wells and HP separation remain online",
+      "Isolation by a single blind or valve; the water-package tie-in at V-101 is also live",
+      "Hot-work permit over a hydrocarbon-bearing system"
+    ],
+    "consequences": [
+      "Ignition of a hydrocarbon release with the flare path removed (node 7 loss of flare)",
+      "Injury or fatality potential and loss of the relief path for the live HP train"
+    ],
+    "severity": "S4",
+    "severity_reason": "The shutdown is a SIMOPS campaign on a live platform; the risk register rates it low likelihood but the consequence is major."
+  },
+  {
+    "node": 8,
+    "guideword": "REVERSE",
+    "parameter": "flow",
+    "deviation": "Reverse flow from the 25 bara condensate line into the 1.013 bara stock tank",
+    "causes": [
+      "P-101 trip or check-valve failure on the 6 in export line",
+      "Reception pressure above 25 bara, or the line shut in at reception",
+      "No non-return protection specified at the battery limit"
+    ],
+    "consequences": [
+      "Near-atmospheric V-104 overpressured by up to 25 bara, with tank rupture and a 2,936 bbl/d condensate release and fire",
+      "Reverse flow also carries water and wax back into the tank"
+    ],
+    "severity": "S4",
+    "severity_reason": "A 25 bara line connected back to an atmospheric tank through a check valve is a tank-rupture scenario."
+  },
+  {
+    "node": 8,
+    "guideword": "MORE",
+    "parameter": "pressure",
+    "deviation": "Reception or export-line pressure above 90 bara",
+    "causes": [
+      "Downstream reception shut-in or compression raising the line pressure",
+      "Line blockage or hydrate, with thermal expansion of a blocked-in 15 km line",
+      "Reverse flow into the platform 90 bara system (design 100 barg)"
+    ],
+    "consequences": [
+      "K-101 driven toward surge or stonewall, with the sales mixer and discharge line above 90 bara",
+      "Overpressure of the 12 in X65 line (100 barg design) or reverse flow through the compressor"
+    ],
+    "severity": "S3",
+    "severity_reason": "The 100 barg line has margin, but the compressor and the platform system are at their operating limit."
+  },
+  {
+    "node": 8,
+    "guideword": "AS WELL AS",
+    "parameter": "composition",
+    "deviation": "Water-saturated export gas: hydrate and corrosion in the 15 km line",
+    "causes": [
+      "No dehydration; the aftercooler at 313.15 K leaves the gas saturated at of order 15 kg/MMscf against a typical 3 kg/MMscf line specification",
+      "CO2 at 1.22 mol% in the vapour, and seabed cooldown to below 10 C at 60 bara reception",
+      "No hydrate or corrosion inhibitor downstream of the platform"
+    ],
+    "consequences": [
+      "Hydrate plug at 60 bara and low temperature, with loss of export and pressure build-up at the platform",
+      "Wet CO2 corrosion of X65 with 3 mm allowance over 15 km, and slugging or water dropout at reception"
+    ],
+    "severity": "S4",
+    "severity_reason": "A hydrate plug or a corrosion leak in a 15 km, 60-90 bara gas line is a major-accident and supply-loss scenario."
+  },
+  {
+    "node": 8,
+    "guideword": "PART OF",
+    "parameter": "flow",
+    "deviation": "Partial blockage (hydrate, wax, pig or debris) in the 12 in gas or 6 in condensate line",
+    "causes": [
+      "Hydrate or wax deposition, a stuck pig, or 3LPP and debris in the line",
+      "Partial isolation or a restricted reception valve"
+    ],
+    "consequences": [
+      "Backpressure rises, K-101 approaches surge, and the rate falls below 161.8 MMscfd",
+      "Overpressure between the blockage and the platform, and pig or line damage"
+    ],
+    "severity": "S3",
+    "severity_reason": "A partial blockage degrades rate and loads the compressor; escalation needs the line to fully block."
+  },
+  {
+    "node": 8,
+    "guideword": "OTHER THAN",
+    "parameter": "sequence",
+    "deviation": "Pipeline blowdown or pigging to the platform flare exceeds 46.34 kg/s",
+    "causes": [
+      "The 12 in by 15 km line at 60-90 bara holds of order 55 t of gas and its blowdown is routed to the flare",
+      "Pigging, depressurisation, or an emergency shutdown venting to the flare",
+      "No restriction or staged blowdown in the basis"
+    ],
+    "consequences": [
+      "Initial blowdown rate far above the 46.34 kg/s flare design, with flare overload and radiation beyond 82.4 m",
+      "Liquid carryover to the flare and possible flameout"
+    ],
+    "severity": "S4",
+    "severity_reason": "Routine pipeline depressurisation can exceed the flare design by a large factor, and the flare is the only sink."
+  }
+]

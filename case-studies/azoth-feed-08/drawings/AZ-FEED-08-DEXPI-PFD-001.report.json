@@ -1,0 +1,24 @@
+{
+  "export": {
+    "approval_status": "NOT_A_DEXPI_EV_CERTIFICATE",
+    "cae_round_trip": "QUALIFICATION_REQUIRED",
+    "converged": true,
+    "diagnostics": [],
+    "diagram_groups": 63,
+    "diagram_primitives": 189,
+    "semantic_valid": true,
+    "steps": 31,
+    "streams": 32
+  },
+  "validation": {
+    "diagnostics": [],
+    "valid": true
+  },
+  "bounds": {
+    "min_x": 0.0,
+    "min_y": 0.0,
+    "max_x": 3398.0,
+    "max_y": 674.0
+  },
+  "group_count": 63
+}

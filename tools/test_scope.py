@@ -697,6 +697,9 @@ ROOT_CLAIMS: dict[str, Claim] = {
     # dropped, so a diff that reaches them is a job that runs rather than a shrug.
     "ui/": Claim(jobs=("ui",)),
     "lean/": Claim(jobs=("lean-verify",)),
+    "case-studies/": Claim(
+        inert="a self-contained FEED case study; its build and model scripts are run by hand"
+    ),
     "AGENTS.md": Claim(inert="prompt-layer prose; no test reads it"),
     # The DeepSeek Harness overlay and role prompts are read by the launcher, so a change
     # to them reaches the launcher's test rather than being prompt-layer prose.

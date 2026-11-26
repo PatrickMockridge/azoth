@@ -1,0 +1,171 @@
+{
+  "meta": {
+    "basis": "AZ-FEED-08 Rev B frozen design",
+    "revision": "C",
+    "date": "2026-11-26",
+    "library": "0.1.4"
+  },
+  "sil": {
+    "as_designed": {
+      "architecture": "1oo2 PT / 1oo1 logic / 1oo1 SDV",
+      "proof_test_months": 12,
+      "pfd_pt": 0.00022417978800000002,
+      "pfd_logic": 0.00043799999999999997,
+      "pfd_sdv": 0.00438,
+      "pfd_total": 0.005042179788,
+      "achieved_sil": 2,
+      "verdict": "does not achieve the NOG-070 minimum SIL 3"
+    },
+    "closed_out": {
+      "architecture": "1oo2 PT / 1oo2 logic / 1oo2 SDV",
+      "proof_test_months": 6,
+      "assumptions": "vendor-certified lambda_DU <= 1e-7/h, beta <= 5 %, partial-stroke coverage",
+      "pfd_pt": 1.100771307e-05,
+      "pfd_logic": 1.100771307e-05,
+      "pfd_sdv": 1.100771307e-05,
+      "pfd_total": 3.302313921e-05,
+      "achieved_sil": 4,
+      "verdict": "meets the SIL 3 target; certificates are a purchase-order condition"
+    }
+  },
+  "psv_hydraulics": {
+    "4 in": {
+      "dP_bar": 10.932408323985321,
+      "dP_pct_set": 16.564255036341397,
+      "passes_3pct": false
+    },
+    "6 in": {
+      "dP_bar": 1.102000719903316,
+      "dP_pct_set": 1.6696980604595697,
+      "passes_3pct": true
+    },
+    "outlet": {
+      "gas_density_kg_m3": 1.2333151278600427,
+      "volumetric_m3_s": 40.79087506331144,
+      "velocity_6in_m_s": 2187.0960855356807,
+      "velocity_24in_m_s": 139.76010686776115,
+      "selected_outlet": "24 in (about 140 m/s, below 0.5 Mach)"
+    },
+    "verdict": "4 in inlet fails the API 520 3 % rule at 16.6 %; 6 in inlet passes at 1.7 %; outlet must be 24 in."
+  },
+  "psv_register": {
+    "restriction_mm": 10.0,
+    "rows": [
+      {
+        "tag": "PSV-102",
+        "leak_kg_s": 0.8531130604499982,
+        "set_bar": 12.0,
+        "required_in2": 0.4205623183160052,
+        "orifice": "G",
+        "note": "10 mm restriction; full valve failure is isolated by ESDV"
+      },
+      {
+        "tag": "PSV-103",
+        "leak_kg_s": 0.1619186009370848,
+        "set_bar": 4.0,
+        "required_in2": 0.21358554767332955,
+        "orifice": "F",
+        "note": "10 mm restriction; full valve failure is isolated by ESDV"
+      },
+      {
+        "tag": "PSV-104",
+        "leak_kg_s": 0.8531130604499982,
+        "set_bar": 25.0,
+        "required_in2": 0.20106115076250583,
+        "orifice": "F",
+        "note": "10 mm restriction; full valve failure is isolated by ESDV"
+      }
+    ],
+    "verdict": "PSVs sized for a 10 mm restricted leak; full Cv failure is unrelievable and is isolated by a new ESDV upstream."
+  },
+  "water": {
+    "water_mole_fraction": 0.000957826105839305,
+    "water_kg_per_mmscf": 20.664724876407405,
+    "spec_kg_per_mmscf": 1.3607771100000001,
+    "ratio_to_spec": 15.185973312269637,
+    "water_load_kg_h": 139.2785662064816,
+    "teg_circulation_m3_h": 5.571142648259264,
+    "reboiler_duty_kw": 27.85571324129632,
+    "verdict": "the gas is water-saturated at 313 K and 90 bara; the existing TEG must remove about 140 kg/h and meet 3 lb/MMscf."
+  },
+  "radiation": {
+    "contours_plus18": [
+      {
+        "threshold_kw_m2": 1.58,
+        "distance_m": 148.11060341199283
+      },
+      {
+        "threshold_kw_m2": 4.73,
+        "distance_m": 82.02648251273918
+      },
+      {
+        "threshold_kw_m2": 6.3,
+        "distance_m": 69.47886093048129
+      }
+    ],
+    "verdict": "4.73 kW/m2 sterile contour 82.4 m; 1.58 kW/m2 personnel contour 148.8 m requires access control; 6.3 kW/m2 equipment contour 69.8 m."
+  },
+  "economics": {
+    "Rev B \u2014 HIPPS credit (withdrawn)": {
+      "capex_musd": 36.0,
+      "npv_musd": 24.77907537403275,
+      "payback": 1
+    },
+    "Flare upgrade only": {
+      "capex_musd": 48.0,
+      "npv_musd": 13.52513097132801,
+      "payback": 2
+    },
+    "Rev C \u2014 flare + close-out scope": {
+      "capex_musd": 54.1,
+      "npv_musd": 7.804375899953101,
+      "payback": 2
+    }
+  },
+  "cost": {
+    "items": [
+      {
+        "item": "Rev B recommended package",
+        "musd": 36.0
+      },
+      {
+        "item": "Flare/header +25 % (relief basis without credit)",
+        "musd": 12.0
+      },
+      {
+        "item": "1oo2 final element and SIL-3 hardware",
+        "musd": 1.2
+      },
+      {
+        "item": "PSV-101 6 in inlet / 24 in outlet, PSV-102/103/104, ESDV-102/103, restrictors",
+        "musd": 1.8
+      },
+      {
+        "item": "F&G, ESD/BDV and cause-and-effect additions",
+        "musd": 1.0
+      },
+      {
+        "item": "TEG dehydration upgrade allowance",
+        "musd": 1.5
+      },
+      {
+        "item": "Driver 3.0 MW (10 % margin over 2.689 MW)",
+        "musd": 0.3
+      },
+      {
+        "item": "Sterile-area access, flare boom and survey allowance",
+        "musd": 0.3
+      }
+    ],
+    "total_musd": 54.1
+  },
+  "relief_basis": {
+    "full_case_kg_s": 50.30800329423098,
+    "credited_case_kg_s": 32.70020214125014,
+    "flare_pct_full_case_existing": 107.49641015907557,
+    "flare_pct_full_case_upgraded": 85.99712812726045,
+    "psv_required_in2": 5.5313282434555955,
+    "psv_fitted_in2": 6.38,
+    "decision": "withdraw the 35 % credit; book 50.31 kg/s and the +25 % flare upgrade"
+  }
+}

@@ -1,0 +1,383 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1189.0mm" height="841.0mm" viewBox="0 0 1189.0 841.0">
+<rect width="1189.0" height="841.0" fill="#ffffff"/>
+<rect x="16.00" y="16.00" width="1157.00" height="809.00" fill="none" stroke="#111111" stroke-width="0.7"/>
+<rect x="20.00" y="20.00" width="1149.00" height="801.00" fill="none" stroke="#111111" stroke-width="0.35"/>
+<g id="dexpi-drawing">
+<polyline points="63.28,245.01 71.40,245.01 71.40,224.72 25.41,224.72 25.41,245.01 33.53,245.01" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="33.53,245.01 31.16,243.83 31.16,246.19 33.53,245.01" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="48.40" y="247.87" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S1</text>
+<polyline points="76.81,245.01 92.36,245.01 92.36,245.01 107.92,245.01" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="107.92,245.01 105.55,243.83 105.55,246.19 107.92,245.01" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="92.36" y="247.87" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S2</text>
+<polyline points="151.20,245.01 165.06,245.01 165.06,245.01 178.93,245.01" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="178.93,245.01 176.56,243.83 176.56,246.19 178.93,245.01" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="165.06" y="247.87" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S3</text>
+<polyline points="76.81,245.01 84.92,245.01 84.92,157.09 25.41,157.09 25.41,177.38 33.53,177.38" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="33.53,177.38 31.16,176.20 31.16,178.56 33.53,177.38" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="55.17" y="214.05" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S4</text>
+<polyline points="76.81,177.38 90.67,177.38 90.67,177.38 104.54,177.38" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="104.54,177.38 102.17,176.20 102.17,178.56 104.54,177.38" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="90.67" y="180.24" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S5</text>
+<polyline points="147.82,177.38 163.37,177.38 163.37,177.38 178.93,177.38" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="178.93,177.38 176.56,176.20 176.56,178.56 178.93,177.38" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="163.37" y="180.24" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S6</text>
+<polyline points="222.21,177.38 236.07,177.38 236.07,177.38 249.94,177.38" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="249.94,177.38 247.57,176.20 247.57,178.56 249.94,177.38" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="236.07" y="180.24" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S7</text>
+<polyline points="293.22,177.38 307.08,177.38 307.08,177.38 320.94,177.38" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="320.94,177.38 318.58,176.20 318.58,178.56 320.94,177.38" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="307.08" y="180.24" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S8</text>
+<polyline points="364.23,177.38 378.09,177.38 378.09,177.38 391.95,177.38" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="391.95,177.38 389.59,176.20 389.59,178.56 391.95,177.38" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="378.09" y="180.24" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S9</text>
+<polyline points="435.24,177.38 449.10,177.38 449.10,177.38 462.96,177.38" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="462.96,177.38 460.60,176.20 460.60,178.56 462.96,177.38" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="449.10" y="180.24" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S10</text>
+<polyline points="506.25,177.38 520.11,177.38 520.11,177.38 533.97,177.38" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="533.97,177.38 531.61,176.20 531.61,178.56 533.97,177.38" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="520.11" y="180.24" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S11</text>
+<polyline points="147.82,177.38 155.93,177.38 155.93,82.70 25.41,82.70 25.41,102.99 33.53,102.99" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="33.53,102.99 31.16,101.81 31.16,104.17 33.53,102.99" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="90.67" y="143.04" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S12</text>
+<polyline points="76.81,102.99 90.67,102.99 90.67,102.99 104.54,102.99" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="104.54,102.99 102.17,101.81 102.17,104.17 104.54,102.99" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="90.67" y="105.85" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S13</text>
+<polyline points="147.82,102.99 163.37,102.99 163.37,102.99 178.93,102.99" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="178.93,102.99 176.56,101.81 176.56,104.17 178.93,102.99" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="163.37" y="105.85" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S14</text>
+<polyline points="222.21,102.99 236.07,102.99 236.07,102.99 249.94,102.99" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="249.94,102.99 247.57,101.81 247.57,104.17 249.94,102.99" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="236.07" y="105.85" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S15</text>
+<polyline points="293.22,102.99 307.08,102.99 307.08,102.99 320.94,102.99" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="320.94,102.99 318.58,101.81 318.58,104.17 320.94,102.99" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="307.08" y="105.85" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S16</text>
+<polyline points="364.23,102.99 378.09,102.99 378.09,102.99 391.95,102.99" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="391.95,102.99 389.59,101.81 389.59,104.17 391.95,102.99" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="378.09" y="105.85" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S17</text>
+<polyline points="435.24,102.99 449.10,102.99 449.10,102.99 462.96,102.99" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="462.96,102.99 460.60,101.81 460.60,104.17 462.96,102.99" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="449.10" y="105.85" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S18</text>
+<polyline points="506.25,102.99 520.11,102.99 520.11,102.99 533.97,102.99" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="533.97,102.99 531.61,101.81 531.61,104.17 533.97,102.99" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="520.11" y="105.85" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S19</text>
+<polyline points="577.25,102.99 591.12,102.99 591.12,102.99 604.98,102.99" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="604.98,102.99 602.62,101.81 602.62,104.17 604.98,102.99" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="591.12" y="105.85" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S20</text>
+<polyline points="648.26,102.99 662.13,102.99 662.13,102.99 675.99,102.99" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="675.99,102.99 673.62,101.81 673.62,104.17 675.99,102.99" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="662.13" y="105.85" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S21</text>
+<polyline points="719.27,102.99 733.14,102.99 733.14,102.99 747.00,102.99" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="747.00,102.99 744.63,101.81 744.63,104.17 747.00,102.99" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="733.14" y="105.85" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S22</text>
+<polyline points="790.28,102.99 804.15,102.99 804.15,102.99 818.01,102.99" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="818.01,102.99 815.64,101.81 815.64,104.17 818.01,102.99" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="804.15" y="105.85" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S23</text>
+<polyline points="147.82,102.99 525.18,102.99 525.18,102.99 902.55,102.99" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="902.55,102.99 900.18,101.81 900.18,104.17 902.55,102.99" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="525.18" y="105.85" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S24</text>
+<polyline points="945.83,102.99 959.69,102.99 959.69,102.99 973.56,102.99" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="973.56,102.99 971.19,101.81 971.19,104.17 973.56,102.99" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="959.69" y="105.85" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S25</text>
+<polyline points="222.21,245.01 636.77,245.01 636.77,245.01 1051.33,245.01" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="1051.33,245.01 1048.96,243.83 1048.96,246.19 1051.33,245.01" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="636.77" y="247.87" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S26</text>
+<polyline points="577.25,177.38 814.29,177.38 814.29,245.01 1051.33,245.01" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="1051.33,245.01 1048.96,243.83 1048.96,246.19 1051.33,245.01" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="814.29" y="214.05" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S27</text>
+<polyline points="861.29,102.99 956.31,102.99 956.31,245.01 1051.33,245.01" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="1051.33,245.01 1048.96,243.83 1048.96,246.19 1051.33,245.01" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="956.31" y="176.86" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S28</text>
+<polyline points="1016.84,102.99 1034.08,102.99 1034.08,69.18 1051.33,69.18" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="1051.33,69.18 1048.96,67.99 1048.96,70.36 1051.33,69.18" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="1034.08" y="88.94" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S29</text>
+<polyline points="1094.61,245.01 1110.16,245.01 1110.16,245.01 1125.72,245.01" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="1125.72,245.01 1123.35,243.83 1123.35,246.19 1125.72,245.01" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="1110.16" y="247.87" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S30</text>
+<polyline points="1016.84,102.99 1071.28,102.99 1071.28,69.18 1125.72,69.18" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="1125.72,69.18 1123.35,67.99 1123.35,70.36 1125.72,69.18" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="1071.28" y="88.94" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S31</text>
+<polyline points="76.81,245.01 84.92,245.01 84.92,224.72 25.41,224.72 25.41,278.82 33.53,278.82" fill="none" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<polygon points="33.53,278.82 31.16,277.64 31.16,280.01 33.53,278.82" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="55.17" y="264.77" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >S32</text>
+<polygon points="20.00,254.14 59.22,254.14 63.28,245.01 59.22,235.88 20.00,235.88 20.00,254.14" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="41.64" y="246.87" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >Wellstream</text>
+<text x="41.64" y="242.12" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >feed</text>
+<polygon points="1129.78,254.14 1169.00,254.14 1169.00,235.88 1129.78,235.88 1125.72,245.01 1129.78,254.14" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="1147.36" y="246.87" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >Sales gas</text>
+<text x="1147.36" y="242.12" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >product</text>
+<polygon points="1129.78,78.31 1169.00,78.31 1169.00,60.05 1129.78,60.05 1125.72,69.18 1129.78,78.31" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="1147.36" y="71.04" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >Condensate</text>
+<text x="1147.36" y="66.29" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >product</text>
+<polygon points="37.58,287.95 76.81,287.95 76.81,269.69 37.58,269.69 33.53,278.82 37.58,287.95" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="55.17" y="280.68" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >Produced water</text>
+<text x="55.17" y="275.93" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >product</text>
+<polygon points="1055.38,78.31 1094.61,78.31 1094.61,60.05 1055.38,60.05 1051.33,69.18 1055.38,78.31" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="1072.97" y="71.04" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >Fuel gas</text>
+<text x="1072.97" y="66.29" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >product</text>
+<polygon points="33.53,254.14 76.81,254.14 76.81,235.88 33.53,235.88 33.53,254.14" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="55.17" y="246.87" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >V-101</text>
+<text x="55.17" y="242.12" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >3-phase separator</text>
+<polygon points="107.92,254.14 151.20,254.14 151.20,235.88 107.92,235.88 107.92,254.14" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="129.56" y="246.87" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >K-101</text>
+<text x="129.56" y="242.12" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >compressor</text>
+<polygon points="178.93,254.14 222.21,254.14 222.21,235.88 178.93,235.88 178.93,254.14" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="200.57" y="246.87" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-101</text>
+<text x="200.57" y="242.12" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >cooler</text>
+<polygon points="33.53,186.51 76.81,186.51 76.81,168.25 33.53,168.25 33.53,186.51" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="55.17" y="179.24" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >VLV-102</text>
+<text x="55.17" y="174.49" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >throttling valve</text>
+<polygon points="104.54,186.51 147.82,186.51 147.82,168.25 104.54,168.25 104.54,186.51" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="126.18" y="179.24" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >V-102</text>
+<text x="126.18" y="174.49" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >2-phase separator</text>
+<polygon points="178.93,186.51 222.21,186.51 222.21,168.25 178.93,168.25 178.93,186.51" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="200.57" y="179.24" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >K-102A</text>
+<text x="200.57" y="174.49" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >compressor</text>
+<polygon points="249.94,186.51 293.22,186.51 293.22,168.25 249.94,168.25 249.94,186.51" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="271.58" y="179.24" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-102A</text>
+<text x="271.58" y="174.49" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >cooler</text>
+<polygon points="320.94,186.51 364.23,186.51 364.23,168.25 320.94,168.25 320.94,186.51" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="342.59" y="179.24" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >K-102B</text>
+<text x="342.59" y="174.49" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >compressor</text>
+<polygon points="391.95,186.51 435.24,186.51 435.24,168.25 391.95,168.25 391.95,186.51" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="413.60" y="179.24" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-102B</text>
+<text x="413.60" y="174.49" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >cooler</text>
+<polygon points="462.96,186.51 506.25,186.51 506.25,168.25 462.96,168.25 462.96,186.51" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="484.60" y="179.24" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >K-102C</text>
+<text x="484.60" y="174.49" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >compressor</text>
+<polygon points="533.97,186.51 577.25,186.51 577.25,168.25 533.97,168.25 533.97,186.51" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="555.61" y="179.24" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-102C</text>
+<text x="555.61" y="174.49" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >cooler</text>
+<polygon points="33.53,112.12 76.81,112.12 76.81,93.86 33.53,93.86 33.53,112.12" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="55.17" y="104.85" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >VLV-103</text>
+<text x="55.17" y="100.10" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >throttling valve</text>
+<polygon points="104.54,112.12 147.82,112.12 147.82,93.86 104.54,93.86 104.54,112.12" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="126.18" y="104.85" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >V-103</text>
+<text x="126.18" y="100.10" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >2-phase separator</text>
+<polygon points="178.93,112.12 222.21,112.12 222.21,93.86 178.93,93.86 178.93,112.12" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="200.57" y="104.85" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >K-103A</text>
+<text x="200.57" y="100.10" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >compressor</text>
+<polygon points="249.94,112.12 293.22,112.12 293.22,93.86 249.94,93.86 249.94,112.12" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="271.58" y="104.85" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-103A</text>
+<text x="271.58" y="100.10" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >cooler</text>
+<polygon points="320.94,112.12 364.23,112.12 364.23,93.86 320.94,93.86 320.94,112.12" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="342.59" y="104.85" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >K-103B</text>
+<text x="342.59" y="100.10" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >compressor</text>
+<polygon points="391.95,112.12 435.24,112.12 435.24,93.86 391.95,93.86 391.95,112.12" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="413.60" y="104.85" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-103B</text>
+<text x="413.60" y="100.10" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >cooler</text>
+<polygon points="462.96,112.12 506.25,112.12 506.25,93.86 462.96,93.86 462.96,112.12" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="484.60" y="104.85" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >K-103C</text>
+<text x="484.60" y="100.10" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >compressor</text>
+<polygon points="533.97,112.12 577.25,112.12 577.25,93.86 533.97,93.86 533.97,112.12" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="555.61" y="104.85" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-103C</text>
+<text x="555.61" y="100.10" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >cooler</text>
+<polygon points="604.98,112.12 648.26,112.12 648.26,93.86 604.98,93.86 604.98,112.12" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="626.62" y="104.85" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >K-103D</text>
+<text x="626.62" y="100.10" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >compressor</text>
+<polygon points="675.99,112.12 719.27,112.12 719.27,93.86 675.99,93.86 675.99,112.12" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="697.63" y="104.85" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-103D</text>
+<text x="697.63" y="100.10" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >cooler</text>
+<polygon points="747.00,112.12 790.28,112.12 790.28,93.86 747.00,93.86 747.00,112.12" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="768.64" y="104.85" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >K-103E</text>
+<text x="768.64" y="100.10" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >compressor</text>
+<polygon points="818.01,112.12 861.29,112.12 861.29,93.86 818.01,93.86 818.01,112.12" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="839.65" y="104.85" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-103E</text>
+<text x="839.65" y="100.10" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >cooler</text>
+<polygon points="902.55,112.12 945.83,112.12 945.83,93.86 902.55,93.86 902.55,112.12" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="924.19" y="104.85" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-104</text>
+<text x="924.19" y="100.10" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >cooler</text>
+<polygon points="973.56,112.12 1016.84,112.12 1016.84,93.86 973.56,93.86 973.56,112.12" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="995.20" y="104.85" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >V-104</text>
+<text x="995.20" y="100.10" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >2-phase separator</text>
+<polygon points="1051.33,254.14 1094.61,254.14 1094.61,235.88 1051.33,235.88 1051.33,254.14" fill="#ffffff" stroke="rgb(0,0,0)" stroke-width="0.46" stroke-linejoin="round"/>
+<text x="1072.97" y="246.87" font-size="3.38" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >M-101</text>
+<text x="1072.97" y="242.12" font-size="2.37" text-anchor="middle" fill="rgb(0,0,0)" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >mixer</text>
+</g>
+<text x="22.00" y="360.00" font-size="4.20" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >NOTES</text>
+<text x="22.00" y="369.00" font-size="2.90" text-anchor="start" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >1. Design case: year ten, 2,230 mol/s wet wellstream at 60 bara and 354.15 K (13.45 mol % water).</text>
+<text x="22.00" y="375.20" font-size="2.90" text-anchor="start" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >2. Recommended scope: HIPPS + produced-water upgrade with compressor re-rate and separator internals.</text>
+<text x="22.00" y="381.40" font-size="2.90" text-anchor="start" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >3. Sales gas 161.8 MMscfd at 90 bara; condensate about 3,470 bbl/d; produced water about 2,782 bbl/d.</text>
+<text x="22.00" y="387.60" font-size="2.90" text-anchor="start" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >4. Compression is staged at equal ratio no larger than 2.5 with intercooling to 313.15 K.</text>
+<text x="22.00" y="393.80" font-size="2.90" text-anchor="start" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >5. Relief case, HIPPS credit, PSV-101 and the flare are shown on P&amp;ID AZ-FEED-08-PID-001.</text>
+<text x="22.00" y="400.00" font-size="2.90" text-anchor="start" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >6. This drawing is generated from the DEXPI 2.0 process model in the same file set; tags per equipment list.</text>
+<text x="22.00" y="406.20" font-size="2.90" text-anchor="start" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >7. AACE Class 4/5 screening study. Not for construction. All azoth results are partially verified.</text>
+<text x="620.00" y="360.00" font-size="4.20" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >EQUIPMENT SCHEDULE</text>
+<line x1="620.00" y1="362.50" x2="1160.00" y2="362.50" stroke="#111111" stroke-width="0.4"/>
+<text x="620.00" y="368.00" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >E-101</text>
+<text x="678.00" y="368.00" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >HP gas aftercooler</text>
+<text x="890.00" y="368.00" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >E-102A</text>
+<text x="948.00" y="368.00" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >MP inter/aftercooler A</text>
+<text x="620.00" y="373.60" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >E-102B</text>
+<text x="678.00" y="373.60" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >MP inter/aftercooler B</text>
+<text x="890.00" y="373.60" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >E-102C</text>
+<text x="948.00" y="373.60" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >MP inter/aftercooler C</text>
+<text x="620.00" y="379.20" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >E-103A</text>
+<text x="678.00" y="379.20" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >LP inter/aftercooler A</text>
+<text x="890.00" y="379.20" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >E-103B</text>
+<text x="948.00" y="379.20" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >LP inter/aftercooler B</text>
+<text x="620.00" y="384.80" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >E-103C</text>
+<text x="678.00" y="384.80" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >LP inter/aftercooler C</text>
+<text x="890.00" y="384.80" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >E-103D</text>
+<text x="948.00" y="384.80" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >LP inter/aftercooler D</text>
+<text x="620.00" y="390.40" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >E-103E</text>
+<text x="678.00" y="390.40" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >LP inter/aftercooler E</text>
+<text x="890.00" y="390.40" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >E-104</text>
+<text x="948.00" y="390.40" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >LP liquid cooler</text>
+<text x="620.00" y="396.00" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >K-101</text>
+<text x="678.00" y="396.00" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >HP gas compressor</text>
+<text x="890.00" y="396.00" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >K-102A</text>
+<text x="948.00" y="396.00" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >MP gas compressor, stage A</text>
+<text x="620.00" y="401.60" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >K-102B</text>
+<text x="678.00" y="401.60" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >MP gas compressor, stage B</text>
+<text x="890.00" y="401.60" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >K-102C</text>
+<text x="948.00" y="401.60" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >MP gas compressor, stage C</text>
+<text x="620.00" y="407.20" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >K-103A</text>
+<text x="678.00" y="407.20" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >LP gas compressor, stage A</text>
+<text x="890.00" y="407.20" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >K-103B</text>
+<text x="948.00" y="407.20" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >LP gas compressor, stage B</text>
+<text x="620.00" y="412.80" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >K-103C</text>
+<text x="678.00" y="412.80" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >LP gas compressor, stage C</text>
+<text x="890.00" y="412.80" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >K-103D</text>
+<text x="948.00" y="412.80" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >LP gas compressor, stage D</text>
+<text x="620.00" y="418.40" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >K-103E</text>
+<text x="678.00" y="418.40" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >LP gas compressor, stage E</text>
+<text x="890.00" y="418.40" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >M-101</text>
+<text x="948.00" y="418.40" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >Sales gas mixer</text>
+<text x="620.00" y="424.00" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >V-101</text>
+<text x="678.00" y="424.00" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >HP 3-phase separator</text>
+<text x="890.00" y="424.00" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >V-102</text>
+<text x="948.00" y="424.00" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >MP separator</text>
+<text x="620.00" y="429.60" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >V-103</text>
+<text x="678.00" y="429.60" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >LP separator</text>
+<text x="890.00" y="429.60" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >V-104</text>
+<text x="948.00" y="429.60" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >Stock tank / condensate flash</text>
+<text x="620.00" y="435.20" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >VLV-102</text>
+<text x="678.00" y="435.20" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >HP oil let-down valve</text>
+<text x="890.00" y="435.20" font-size="2.90" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >VLV-103</text>
+<text x="948.00" y="435.20" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >MP liquid let-down valve</text>
+<line x1="620.00" y1="440.80" x2="1160.00" y2="440.80" stroke="#111111" stroke-width="0.4"/>
+<text x="22.00" y="470.00" font-size="4.20" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >KEY STREAMS</text>
+<text x="322.00" y="470.00" font-size="4.20" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >STREAM SUMMARY (continued)</text>
+<line x1="22.00" y1="472.50" x2="562.00" y2="472.50" stroke="#111111" stroke-width="0.4"/>
+<line x1="322.00" y1="472.50" x2="862.00" y2="472.50" stroke="#111111" stroke-width="0.4"/>
+<text x="22.00" y="478.00" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S1</text>
+<text x="38.00" y="478.00" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >Wellstream</text>
+<text x="257.00" y="478.00" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >191,092</text>
+<text x="22.00" y="482.80" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S2</text>
+<text x="38.00" y="482.80" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >V-101.vapour</text>
+<text x="257.00" y="482.80" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >153,482</text>
+<text x="22.00" y="487.60" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S3</text>
+<text x="38.00" y="487.60" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >K-101.outlet</text>
+<text x="257.00" y="487.60" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >153,482</text>
+<text x="22.00" y="492.40" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S4</text>
+<text x="38.00" y="492.40" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >V-101.light_liquid</text>
+<text x="257.00" y="492.40" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >19,179</text>
+<text x="22.00" y="497.20" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S5</text>
+<text x="38.00" y="497.20" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >VLV-102.outlet</text>
+<text x="257.00" y="497.20" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >19,179</text>
+<text x="22.00" y="502.00" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S6</text>
+<text x="38.00" y="502.00" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >V-102.vapour</text>
+<text x="257.00" y="502.00" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >2,560</text>
+<text x="22.00" y="506.80" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S7</text>
+<text x="38.00" y="506.80" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >K-102A.outlet</text>
+<text x="257.00" y="506.80" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >2,560</text>
+<text x="22.00" y="511.60" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S8</text>
+<text x="38.00" y="511.60" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-102A.outlet</text>
+<text x="257.00" y="511.60" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >2,560</text>
+<text x="22.00" y="516.40" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S9</text>
+<text x="38.00" y="516.40" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >K-102B.outlet</text>
+<text x="257.00" y="516.40" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >2,560</text>
+<text x="22.00" y="521.20" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S10</text>
+<text x="38.00" y="521.20" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-102B.outlet</text>
+<text x="257.00" y="521.20" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >2,560</text>
+<text x="22.00" y="526.00" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S11</text>
+<text x="38.00" y="526.00" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >K-102C.outlet</text>
+<text x="257.00" y="526.00" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >2,560</text>
+<text x="22.00" y="530.80" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S12</text>
+<text x="38.00" y="530.80" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >V-102.liquid</text>
+<text x="257.00" y="530.80" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >16,618</text>
+<text x="22.00" y="535.60" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S13</text>
+<text x="38.00" y="535.60" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >VLV-103.outlet</text>
+<text x="257.00" y="535.60" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >16,618</text>
+<text x="22.00" y="540.40" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S14</text>
+<text x="38.00" y="540.40" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >V-103.vapour</text>
+<text x="257.00" y="540.40" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >1,369</text>
+<text x="22.00" y="545.20" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S15</text>
+<text x="38.00" y="545.20" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >K-103A.outlet</text>
+<text x="257.00" y="545.20" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >1,369</text>
+<text x="22.00" y="550.00" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S16</text>
+<text x="38.00" y="550.00" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-103A.outlet</text>
+<text x="257.00" y="550.00" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >1,369</text>
+<text x="322.00" y="478.00" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S17</text>
+<text x="338.00" y="478.00" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >K-103B.outlet</text>
+<text x="557.00" y="478.00" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >1,369</text>
+<text x="322.00" y="482.80" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S18</text>
+<text x="338.00" y="482.80" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-103B.outlet</text>
+<text x="557.00" y="482.80" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >1,369</text>
+<text x="322.00" y="487.60" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S19</text>
+<text x="338.00" y="487.60" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >K-103C.outlet</text>
+<text x="557.00" y="487.60" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >1,369</text>
+<text x="322.00" y="492.40" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S20</text>
+<text x="338.00" y="492.40" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-103C.outlet</text>
+<text x="557.00" y="492.40" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >1,369</text>
+<text x="322.00" y="497.20" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S21</text>
+<text x="338.00" y="497.20" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >K-103D.outlet</text>
+<text x="557.00" y="497.20" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >1,369</text>
+<text x="322.00" y="502.00" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S22</text>
+<text x="338.00" y="502.00" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-103D.outlet</text>
+<text x="557.00" y="502.00" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >1,369</text>
+<text x="322.00" y="506.80" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S23</text>
+<text x="338.00" y="506.80" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >K-103E.outlet</text>
+<text x="557.00" y="506.80" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >1,369</text>
+<text x="322.00" y="511.60" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S24</text>
+<text x="338.00" y="511.60" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >V-103.liquid</text>
+<text x="557.00" y="511.60" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >15,250</text>
+<text x="322.00" y="516.40" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S25</text>
+<text x="338.00" y="516.40" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-104.outlet</text>
+<text x="557.00" y="516.40" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >15,250</text>
+<text x="322.00" y="521.20" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S26</text>
+<text x="338.00" y="521.20" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-101.outlet</text>
+<text x="557.00" y="521.20" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >153,482</text>
+<text x="322.00" y="526.00" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S27</text>
+<text x="338.00" y="526.00" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-102C.outlet</text>
+<text x="557.00" y="526.00" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >2,560</text>
+<text x="322.00" y="530.80" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S28</text>
+<text x="338.00" y="530.80" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >E-103E.outlet</text>
+<text x="557.00" y="530.80" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >1,369</text>
+<text x="322.00" y="535.60" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S29</text>
+<text x="338.00" y="535.60" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >V-104.vapour</text>
+<text x="557.00" y="535.60" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >0</text>
+<text x="322.00" y="540.40" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S30</text>
+<text x="338.00" y="540.40" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >M-101.product</text>
+<text x="557.00" y="540.40" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >157,411</text>
+<text x="322.00" y="545.20" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S31</text>
+<text x="338.00" y="545.20" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >V-104.liquid</text>
+<text x="557.00" y="545.20" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >15,250</text>
+<text x="322.00" y="550.00" font-size="2.80" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >S32</text>
+<text x="338.00" y="550.00" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >V-101.heavy_liquid</text>
+<text x="557.00" y="550.00" font-size="2.60" text-anchor="end" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >18,431</text>
+<line x1="22.00" y1="554.80" x2="562.00" y2="554.80" stroke="#111111" stroke-width="0.4"/>
+<line x1="322.00" y1="554.80" x2="862.00" y2="554.80" stroke="#111111" stroke-width="0.4"/>
+<rect x="839.00" y="709.00" width="330.00" height="112.00" fill="#ffffff" stroke="#111111" stroke-width="0.6"/>
+<line x1="839.00" y1="735.00" x2="1169.00" y2="735.00" stroke="#111111" stroke-width="0.4"/>
+<line x1="839.00" y1="761.00" x2="1169.00" y2="761.00" stroke="#111111" stroke-width="0.4"/>
+<line x1="839.00" y1="787.00" x2="1169.00" y2="787.00" stroke="#111111" stroke-width="0.4"/>
+<line x1="1029.00" y1="761.00" x2="1029.00" y2="787.00" stroke="#111111" stroke-width="0.4"/>
+<text x="843.00" y="716.00" font-size="2.80" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >azoth · FEED case study</text>
+<text x="843.00" y="727.00" font-size="5.60" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >PROCESS FLOW DIAGRAM</text>
+<text x="843.00" y="745.00" font-size="3.40" text-anchor="start" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >Debottlenecked separation and compression train</text>
+<text x="843.00" y="756.00" font-size="2.90" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >Offshore platform 60/10/2 · year ten · recommended scope</text>
+<text x="843.00" y="773.00" font-size="3.60" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >AZ-FEED-08-DEXPI-PFD-001</text>
+<text x="843.00" y="782.00" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >DEXPI 2.0 Process exchange · drawing embedded</text>
+<text x="1035.00" y="773.00" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >Rev</text>
+<text x="1035.00" y="782.00" font-size="4.20" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >B</text>
+<text x="843.00" y="798.00" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >Scale</text>
+<text x="869.00" y="798.00" font-size="3.20" text-anchor="start" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >1:3.0</text>
+<text x="917.00" y="798.00" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >Sheet</text>
+<text x="939.00" y="798.00" font-size="3.20" text-anchor="start" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >1 of 1</text>
+<text x="989.00" y="798.00" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >Date</text>
+<text x="1011.00" y="798.00" font-size="3.20" text-anchor="start" fill="#111111" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >2026-11-26</text>
+<text x="843.00" y="813.00" font-size="3.00" text-anchor="start" fill="#111111" font-weight="bold" font-family="Helvetica, Arial, sans-serif" >Status: Issued for FEED study · not for construction</text>
+<text x="1049.00" y="813.00" font-size="2.60" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >Checked / Approved</text>
+<text x="22.00" y="819.00" font-size="2.70" text-anchor="start" fill="#5a5751" font-weight="normal" font-family="Helvetica, Arial, sans-serif" >Rev A · conceptual selection.  Rev B · DEXPI PFD, materials, manhours and HAZOP added.</text>
+</svg>

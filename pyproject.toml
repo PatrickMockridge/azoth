@@ -158,6 +158,9 @@ src = ["python/src", "python/tests"]
 # by `gen_python_bridge.py --check`, which is the stronger comparison.
 extend-exclude = [
     "docs",
+    # The FEED case study's model and build scripts are the study's own working
+    # files, kept beside the artefacts they produced rather than library code.
+    "case-studies",
     "python/src/azoth/_core.pyi",
     "python/src/azoth/_rust_bridge_gen.py",
 ]

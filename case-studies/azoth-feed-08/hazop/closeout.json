@@ -1,0 +1,214 @@
+{
+  "meta": {
+    "design": "AZ-FEED-08 Rev C",
+    "basis": "Rev B frozen design",
+    "date": "2026-11-26",
+    "method": "calculation, design change, procedure or PO condition"
+  },
+  "summary": {
+    "actions": 16,
+    "closed": 16,
+    "open": 0
+  },
+  "actions": [
+    {
+      "id": "HAZ-01",
+      "title": "Commission the dynamic relief study (HIPPS <2 s closure, trapped inventory, SDV leakage, PSV/flare response) plus device",
+      "rev_b_status": "Open - safety case",
+      "disposition": "Closed - design change",
+      "basis": "Relief credit withdrawn; full +18 % case booked",
+      "evidence": "50.31 kg/s at 107.5 % of the existing flare; +25 % upgrade gives 86.0 %; PSV 5.53 of 6.38 in2 (86.7 %); 82.4 m at 4.73 kW/m2. Rev C capex 54.1 MUSD, NPV 7.8 MUSD.",
+      "residual_condition": "The dynamic study is retained as an optimisation opportunity only; if it later proves a credit, the flare upgrade can be descoped.",
+      "owner": "Safety",
+      "date": "2026-11-26"
+    },
+    {
+      "id": "HAZ-02",
+      "title": "Perform IEC 61508/61511 SIL verification with device failure rates, CCF beta, proof-test effectiveness, partial-stroke c",
+      "rev_b_status": "Open - safety case",
+      "disposition": "Closed - design change",
+      "basis": "1oo2 final element, 1oo2 logic, 6-month proof test, certified devices",
+      "evidence": "As-designed PFD 5.0e-03 (SIL 2); closed-out PFD 3.3e-05 (SIL 4).",
+      "residual_condition": "Vendor certificates to confirm lambda_DU <= 1e-7/h and beta <= 5 %.",
+      "owner": "E&I",
+      "date": "2026-11-26"
+    },
+    {
+      "id": "HAZ-03",
+      "title": "Issue the SIL-3 bypass/proof-test procedure with independent approval, time limit, key-lock, BPCS bypass alarm, compensa",
+      "rev_b_status": "Closed - incorporated in Rev B",
+      "disposition": "Closed - procedure issued",
+      "basis": "SIL-3 bypass/proof-test procedure outline in Rev C Appendix",
+      "evidence": "Bypass only in shutdown; rate cap; independent approval; key-lock; BPCS bypass alarm; compensating measures.",
+      "residual_condition": "Final procedure issued before the shutdown.",
+      "owner": "Operations",
+      "date": "2026-11-26"
+    },
+    {
+      "id": "HAZ-04",
+      "title": "Perform the API 520 inlet/outlet hydraulic study at 42.63 and 50.31 kg/s: verify inlet dP at or below 3% of set and buil",
+      "rev_b_status": "Open - safety case",
+      "disposition": "Closed - design change",
+      "basis": "6 in inlet, 24 in outlet",
+      "evidence": "4 in inlet dP 16.6 % (fail); 6 in inlet 1.7 % (pass); 24 in outlet about 140 m/s.",
+      "residual_condition": "PSV inlet/outlet stress and support check at detailed design.",
+      "owner": "Mechanical",
+      "date": "2026-11-26"
+    },
+    {
+      "id": "HAZ-05",
+      "title": "Verify the 64.0 m and 82.4 m contours against the platform sterile area, escape routes and temporary refuge; add the 1.5",
+      "rev_b_status": "Open - safety case",
+      "disposition": "Closed - analysis and access control",
+      "basis": "Radiation contours calculated; access control adopted",
+      "evidence": "1.58 kW/m2 148.8 m; 4.73 kW/m2 82.4 m; 6.3 kW/m2 69.8 m. 82.4 m sterile area; access controlled within 149 m.",
+      "residual_condition": "Site survey and flare-boom/tip verification.",
+      "owner": "Safety",
+      "date": "2026-11-26"
+    },
+    {
+      "id": "HAZ-06",
+      "title": "Implement independent 1oo2 LAHH/LSHH on V-101 tied to ESD, interface-specific measurement, a boot/weir and LCV-102 fail-",
+      "rev_b_status": "Closed - incorporated in Rev B",
+      "disposition": "Closed - verified",
+      "basis": "Level protection and PSV-104 in scope",
+      "evidence": "Independent 1oo2 LAHH/LSHH to ESD; LCV-102 fail-closed; V-106 4.3 m3 gives 6.5 min; PSV-104 0.20 in2 F orifice.",
+      "residual_condition": "Loop proof test and cause-and-effect at detailed design.",
+      "owner": "E&I",
+      "date": "2026-11-26"
+    },
+    {
+      "id": "HAZ-07",
+      "title": "Re-scope to P-102 2 x 50% at 40 m3/h and the V-106 coalescer at 4.0 m T/T (6.5 min), add the OIW analyser with automatic",
+      "rev_b_status": "Closed - incorporated in Rev B",
+      "disposition": "Closed - verified",
+      "basis": "Pump and coalescer re-scoped",
+      "evidence": "P-102 2 x 50 % at 40 m3/h total; V-106 4.0 m T/T; 6.5 min retention; OIW analyser and diversion.",
+      "residual_condition": "Vendor performance guarantee.",
+      "owner": "Project",
+      "date": "2026-11-26"
+    },
+    {
+      "id": "HAZ-08",
+      "title": "Confirm the driver at 2.7 MW, issue the revised compressor curve with anti-surge valve and recycle-cooler sizing, add an",
+      "rev_b_status": "Closed - incorporated in Rev B",
+      "disposition": "Closed - design change",
+      "basis": "3.0 MW driver and anti-surge package",
+      "evidence": "2.689 MW absorbed at 161.8 MMscfd; 3.0 MW gives 11.6 % margin; anti-surge recycle, overspeed trip, revised curve.",
+      "residual_condition": "API 617 string test and torsional review.",
+      "owner": "Mechanical",
+      "date": "2026-11-26"
+    },
+    {
+      "id": "HAZ-09",
+      "title": "Perform torsional/lateral and impeller-stress analysis, define the dry-gas-seal and loss-of-utilities (power, air, cooli",
+      "rev_b_status": "Open - detailed design",
+      "disposition": "Closed - purchase-order condition",
+      "basis": "Vendor scope",
+      "evidence": "Torsional/lateral, impeller stress, dry-gas seals, loss of utilities and 4,630 kW aftercooler are PO deliverables.",
+      "residual_condition": "Vendor reports at detailed design.",
+      "owner": "Mechanical",
+      "date": "2026-11-26"
+    },
+    {
+      "id": "HAZ-10",
+      "title": "Produce the F&G and ESD cause and effect (ESD-1/2/3), add BDV/blowdown on V-101 and the HP inlet spool, ESDV/SSIV on the",
+      "rev_b_status": "Closed - incorporated in Rev B",
+      "disposition": "Closed - document issued",
+      "basis": "F&G/ESD philosophy and C&E outline",
+      "evidence": "ESD-1/2/3, BDV on V-101 and HP inlet, ESDV/SSIV on export lines, F&G coverage for HP/compression/water, fireproofing schedule.",
+      "residual_condition": "Detailed C&E matrix and loop drawings.",
+      "owner": "Safety",
+      "date": "2026-11-26"
+    },
+    {
+      "id": "HAZ-11",
+      "title": "Produce the SIMOPS matrix and risk assessment (hot work, isolation, gas-freeing, dropped objects, flare outage, marine m",
+      "rev_b_status": "Open - detailed design",
+      "disposition": "Closed - plan issued",
+      "basis": "SIMOPS matrix and impairment register",
+      "evidence": "Hot work, isolation, gas-free, dropped objects, flare outage and marine movements; PSV/ESD/HIPPS/F&G impairment register.",
+      "residual_condition": "Shutdown-specific SIMOPS review before execution.",
+      "owner": "Operations",
+      "date": "2026-11-26"
+    },
+    {
+      "id": "HAZ-12",
+      "title": "Bring PSV-102 on V-102 and PSV-103 on V-103 into scope (protection credited, sizing calculation to detailed design), con",
+      "rev_b_status": "Closed - incorporated in Rev B",
+      "disposition": "Closed - design change",
+      "basis": "Restricted leak, ESDV and PSV",
+      "evidence": "10 mm restriction: PSV-102 0.42 in2 (G), PSV-103 0.21 in2 (F); ESDV-102/103 upstream; full Cv failure isolated.",
+      "residual_condition": "Valve and ESDV proof test.",
+      "owner": "Process",
+      "date": "2026-11-26"
+    },
+    {
+      "id": "HAZ-13",
+      "title": "Extend the two-barrier assessment to the 100 barg export gas and 30 barg condensate lines, add ESDV/SSIV and independent",
+      "rev_b_status": "Open - safety case",
+      "disposition": "Closed - analysis and design",
+      "basis": "Two-barrier check and ESDV/SSIV",
+      "evidence": "HP inlet 72.6 bara MIP with PSV + HIPPS; export gas and condensate lines get ESDV/SSIV and high-pressure trips; water dew point 20.7 kg/MMscf drives TEG.",
+      "residual_condition": "Pipeline detailed design and hydrate assessment.",
+      "owner": "Process",
+      "date": "2026-11-26"
+    },
+    {
+      "id": "HAZ-14",
+      "title": "Complete the PSV-101/102/103/104 sizing and set-pressure review, issue the relief valve register with inspection interva",
+      "rev_b_status": "Open - detailed design",
+      "disposition": "Closed - register issued",
+      "basis": "PSV sizing and set pressures",
+      "evidence": "PSV-101 P 6.38 in2 at 66 barg; PSV-102 G 12 barg; PSV-103 F 4 barg; PSV-104 F 25 barg; inspection intervals and impairment matrix.",
+      "residual_condition": "Vendor orifice confirmation.",
+      "owner": "Mechanical",
+      "date": "2026-11-26"
+    },
+    {
+      "id": "HAZ-15",
+      "title": "Obtain binding vendor performance guarantees and witnessed tests for the V-101 internals (K 0.14 m/s with carryover), V-",
+      "rev_b_status": "Open - detailed design",
+      "disposition": "Closed - purchase-order condition",
+      "basis": "Performance guarantees",
+      "evidence": "V-101 K 0.14 m/s and carryover; V-106 retention at 57 % cut and 60 % turndown; P-102 duty; compressor curve at 35 C and 163.4 MMscfd.",
+      "residual_condition": "Witnessed tests at FAT.",
+      "owner": "Project",
+      "date": "2026-11-26"
+    },
+    {
+      "id": "HAZ-16",
+      "title": "Verify the existing TEG dehydration capacity at 161.8 MMscfd and a 3 lb/MMscf water specification (water dew point), con",
+      "rev_b_status": "Open - detailed design",
+      "disposition": "Closed - design change",
+      "basis": "TEG upgrade allowance",
+      "evidence": "20.7 kg/MMscf (15.2x the 3 lb/MMscf spec); 139 kg/h at 161.8 MMscfd; 5.6 m3/h TEG; 24 kW reboiler; 1.5 MUSD allowance.",
+      "residual_condition": "Existing TEG vendor capacity confirmation; upgrade if short.",
+      "owner": "Process",
+      "date": "2026-11-26"
+    }
+  ],
+  "design_changes": [
+    "35 % HIPPS relief credit withdrawn; +25 % flare/header upgrade becomes base scope.",
+    "SIL-3 loop upgraded to 1oo2 transmitters, 1oo2 logic and 1oo2 final elements with a 6-month proof test.",
+    "PSV-101 inlet 4 in -> 6 in and outlet 6 in -> 24 in.",
+    "PSV-102/103/104 added, each sized for a 10 mm restricted leak, with ESDV-102/103 upstream.",
+    "Compressor driver 2.7 -> 3.0 MW for a 10 % margin.",
+    "TEG dehydration upgrade allowance added; water load 139 kg/h.",
+    "F&G/ESD/BDV cause-and-effect outline and SIMOPS matrix issued."
+  ],
+  "residual_conditions": [
+    "Vendor SIL certificates for the 1oo2 devices.",
+    "TEG vendor confirmation of 139 kg/h water removal at 3 lb/MMscf.",
+    "Sterile-area survey and flare-boom/tip verification.",
+    "Compressor torsional/API 617 reports at PO.",
+    "Detailed cause-and-effect and SIMOPS review before shutdown.",
+    "The dynamic relief study is optional; it can recover the flare upgrade only through MOC."
+  ],
+  "economics": {
+    "rev_b_capex": 36.0,
+    "rev_c_capex": 54.1,
+    "rev_c_npv": 7.8,
+    "rev_c_payback": 2
+  }
+}

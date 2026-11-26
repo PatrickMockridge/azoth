@@ -1,0 +1,162 @@
+[
+  {
+    "stream": "S1",
+    "source": "Wellstream",
+    "kg_per_h": 191091.54819318638
+  },
+  {
+    "stream": "S2",
+    "source": "V-101.vapour",
+    "kg_per_h": 153482.04394850132
+  },
+  {
+    "stream": "S3",
+    "source": "K-101.outlet",
+    "kg_per_h": 153482.04394850132
+  },
+  {
+    "stream": "S4",
+    "source": "V-101.light_liquid",
+    "kg_per_h": 19178.52875050475
+  },
+  {
+    "stream": "S5",
+    "source": "VLV-102.outlet",
+    "kg_per_h": 19178.52875050475
+  },
+  {
+    "stream": "S6",
+    "source": "V-102.vapour",
+    "kg_per_h": 2560.344535784654
+  },
+  {
+    "stream": "S7",
+    "source": "K-102A.outlet",
+    "kg_per_h": 2560.344535784654
+  },
+  {
+    "stream": "S8",
+    "source": "E-102A.outlet",
+    "kg_per_h": 2560.344535784654
+  },
+  {
+    "stream": "S9",
+    "source": "K-102B.outlet",
+    "kg_per_h": 2560.344535784654
+  },
+  {
+    "stream": "S10",
+    "source": "E-102B.outlet",
+    "kg_per_h": 2560.344535784654
+  },
+  {
+    "stream": "S11",
+    "source": "K-102C.outlet",
+    "kg_per_h": 2560.344535784654
+  },
+  {
+    "stream": "S12",
+    "source": "V-102.liquid",
+    "kg_per_h": 16618.184214720095
+  },
+  {
+    "stream": "S13",
+    "source": "VLV-103.outlet",
+    "kg_per_h": 16618.184214720095
+  },
+  {
+    "stream": "S14",
+    "source": "V-103.vapour",
+    "kg_per_h": 1368.5217770593406
+  },
+  {
+    "stream": "S15",
+    "source": "K-103A.outlet",
+    "kg_per_h": 1368.5217770593406
+  },
+  {
+    "stream": "S16",
+    "source": "E-103A.outlet",
+    "kg_per_h": 1368.5217770593406
+  },
+  {
+    "stream": "S17",
+    "source": "K-103B.outlet",
+    "kg_per_h": 1368.5217770593406
+  },
+  {
+    "stream": "S18",
+    "source": "E-103B.outlet",
+    "kg_per_h": 1368.5217770593406
+  },
+  {
+    "stream": "S19",
+    "source": "K-103C.outlet",
+    "kg_per_h": 1368.5217770593406
+  },
+  {
+    "stream": "S20",
+    "source": "E-103C.outlet",
+    "kg_per_h": 1368.5217770593406
+  },
+  {
+    "stream": "S21",
+    "source": "K-103D.outlet",
+    "kg_per_h": 1368.5217770593406
+  },
+  {
+    "stream": "S22",
+    "source": "E-103D.outlet",
+    "kg_per_h": 1368.5217770593406
+  },
+  {
+    "stream": "S23",
+    "source": "K-103E.outlet",
+    "kg_per_h": 1368.5217770593406
+  },
+  {
+    "stream": "S24",
+    "source": "V-103.liquid",
+    "kg_per_h": 15249.662437660752
+  },
+  {
+    "stream": "S25",
+    "source": "E-104.outlet",
+    "kg_per_h": 15249.662437660752
+  },
+  {
+    "stream": "S26",
+    "source": "E-101.outlet",
+    "kg_per_h": 153482.04394850132
+  },
+  {
+    "stream": "S27",
+    "source": "E-102C.outlet",
+    "kg_per_h": 2560.344535784654
+  },
+  {
+    "stream": "S28",
+    "source": "E-103E.outlet",
+    "kg_per_h": 1368.5217770593406
+  },
+  {
+    "stream": "S29",
+    "source": "V-104.vapour",
+    "kg_per_h": 0.0
+  },
+  {
+    "stream": "S30",
+    "source": "M-101.product",
+    "kg_per_h": 157410.9102613454
+  },
+  {
+    "stream": "S31",
+    "source": "V-104.liquid",
+    "kg_per_h": 15249.662437660752
+  },
+  {
+    "stream": "S32",
+    "source": "V-101.heavy_liquid",
+    "kg_per_h": 18430.975494279945
+  }
+]
