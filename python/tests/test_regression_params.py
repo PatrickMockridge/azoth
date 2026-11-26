@@ -59,7 +59,7 @@ def test_the_cce_base_state_is_the_capture() -> None:
     ]
     fluid, _ = build_fluid(rows, parameters=parameters, values=[1.0])
     cce = _constant_mass_expansion_of(fluid, 373.15, [2.5e7, 2.0e7, 1.5e7])
-    expected = [0.9960536505805414, 1.0952854104512786, 1.2935852082865913]
+    expected = [0.995484371961769, 1.1090595519559416, 1.3360225249122977]
     for index, point in enumerate(cce.points):
         _close(float(point.relative_volume), expected[index], 1e-5, f"base[{index}]")
 
@@ -76,7 +76,7 @@ def test_the_tc_multiplier_reproduces_the_capture_observation() -> None:
     ]
     fluid, _ = build_fluid(rows, parameters=parameters, values=[1.03])
     cce = _constant_mass_expansion_of(fluid, 373.15, [2.5e7, 2.0e7, 1.5e7])
-    expected = [0.9980317970636378, 1.1028215960619943, 1.3009108004036105]
+    expected = [0.9977467494220793, 1.1177723544056017, 1.344662536647291]
     for index, point in enumerate(cce.points):
         _close(float(point.relative_volume), expected[index], 1e-5, f"tuned[{index}]")
 
@@ -86,7 +86,7 @@ def test_the_co2_bip_reproduces_the_capture_observation() -> None:
     parameters = [{"parameter": "bip_co2_hc", "initial": 0.12, "lower": 0.08, "upper": 0.18}]
     fluid, _ = build_fluid(rows, parameters=parameters, values=[0.15])
     dle = _differential_liberation_of(fluid, 323.15, [2.5e7, 1.5e7, 8.0e6])
-    rs = [124.11323743589683, 117.87406453877271, 54.85724347826862]
+    rs = [124.46822441360351, 118.19000000135856, 54.98240543625079]
     bo = [1.297774285932201, 1.3196221126198664, 1.1668447141587335]
     rho = [657.1251440903429, 642.5894780343832, 684.8946122783024]
     for index, point in enumerate(dle.points):

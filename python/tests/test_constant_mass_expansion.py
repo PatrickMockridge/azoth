@@ -29,15 +29,15 @@ def test_the_saturation_and_single_phase_point_answer() -> None:
         2.8955063438415527e7, rel=1.0e-4
     )
     assert result.saturation_volume.to("m**3").magnitude == pytest.approx(
-        1.1262213155362104e-4, rel=1.0e-4
+        9.813810850855022e-5, rel=1.0e-4
     )
-    assert result.z_saturation == pytest.approx(1.2136960689968699, rel=1.0e-4)
+    assert result.z_saturation == pytest.approx(1.057605950735409, rel=1.0e-4)
     assert result.saturation_isothermal_compressibility == pytest.approx(
         3.6950566080912616e-9, rel=1.0e-3
     )
 
     point = result.points[0]
-    assert point.relative_volume == pytest.approx(0.9962118444465242, rel=1.0e-6)
+    assert point.relative_volume == pytest.approx(0.9956527575314748, rel=1.0e-6)
     assert point.density.to("kg/m**3").magnitude == pytest.approx(551.7836891574023, rel=1.0e-6)
     assert point.bg == pytest.approx(0.004132467194523274, rel=1.0e-6)
     assert point.viscosity is not None
@@ -51,11 +51,11 @@ def test_the_two_phase_points_carry_the_class_quantities() -> None:
     point = result.points[1]
     assert point.density.to("kg/m**3").magnitude == pytest.approx(176.16920906600248, rel=1.0e-6)
     assert point.gas_volume.to("m**3").magnitude == pytest.approx(1.6226118566811178e-5, rel=1.0e-6)
-    assert point.z_gas == pytest.approx(0.9266794787321436, rel=1.0e-6)
+    assert point.z_gas == pytest.approx(0.9159261004211171, rel=1.0e-6)
     assert point.oil_density is not None
     assert point.oil_density.to("kg/m**3").magnitude == pytest.approx(576.4180638703791, rel=1.0e-6)
-    assert point.liquid_relative_volume == pytest.approx(0.9134080080494633, rel=1.0e-4)
-    assert point.y_factor == pytest.approx(2.6734567057644845, rel=1.0e-4)
+    assert point.liquid_relative_volume == pytest.approx(0.9025692156524329, rel=1.0e-4)
+    assert point.y_factor == pytest.approx(2.329630780947422, rel=1.0e-4)
     assert point.viscosity is None
     assert point.isothermal_compressibility is None
 

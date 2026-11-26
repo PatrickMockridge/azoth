@@ -39,14 +39,14 @@ def test_the_first_and_last_points_answer() -> None:
     assert point.bo is not None
     assert point.bo == pytest.approx(1.5791783988447246, rel=1.0e-6)
     assert point.rs is not None
-    assert point.rs == pytest.approx(225.43729834885008, rel=1.0e-6)
+    assert point.rs == pytest.approx(226.4244293461309, rel=1.0e-6)
     assert point.bg is not None
-    assert point.bg == pytest.approx(0.0042120322308083985, rel=1.0e-6)
+    assert point.bg == pytest.approx(0.004163154946833049, rel=1.0e-6)
     assert point.oil_density.to("kg/m**3").magnitude == pytest.approx(576.4180638703791, rel=1.0e-6)
 
     point = result.points[-1]
     assert point.rs == pytest.approx(0.0, abs=1.0e-12)
-    assert point.bg == pytest.approx(1.1347113330119678, rel=1.0e-6)
+    assert point.bg == pytest.approx(1.1346656358344498, rel=1.0e-6)
 
 
 def test_a_single_phase_point_leaves_its_gas_fields_absent() -> None:

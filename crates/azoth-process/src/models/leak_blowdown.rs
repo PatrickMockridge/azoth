@@ -416,7 +416,7 @@ pub fn leak_blowdown(
                 break;
             }
             let mut sub_step = (sample_time - elapsed).min(SUBSTEP_MASS_FRACTION * mass / rate);
-            if !(sub_step > 0.0) || elapsed + sub_step <= elapsed {
+            if sub_step <= 0.0 || sub_step.is_nan() || elapsed + sub_step <= elapsed {
                 return Ok(failure_result(
                     &scenario,
                     diameter,
