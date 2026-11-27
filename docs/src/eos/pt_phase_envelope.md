@@ -58,13 +58,13 @@ not an equation, and both implementations read it from here.
 | `cricondentherm_pressure` | Pa | the pressure at the cricondentherm |
 | `critical_temperature` | K | the critical temperature, from `eos.critical_point` on the feed. On the validated case it is `0.21 K` from NeqSim's `374.3214 K`. |
 | `critical_pressure` | Pa | the critical pressure, from the same construction |
-| `iterations` | dimensionless | the number of continuation points traced |
-| `residual` | K | the gap between where the two branches stopped. They approach the critical point from opposite sides, so it is the width of the bracket they put around it - the trace's own statement that it reached the critical point. `NaN` when a branch ran into the pressure ceiling instead. |
+| `iterations` | dimensionless | the continuation points traced, or the flash count when the grid answered. |
+| `residual` | K | the gap between where the two branches stopped: the width of the bracket they put around the critical point. `NaN` when a branch ran into the pressure ceiling, or when the grid answered. |
 
 | Bound | On violation | Why |
 |---|---|---|
 | `P > 0` | raises | an absolute pressure; zero and below are not states |
-| `critical_pressure > 0` | raises | the critical pressure is a positive pressure, or the trace never reached the critical point |
+| `critical_pressure > 0` | warns `OUT_OF_VALID_RANGE` | a refused critical point reports NaN with a warning; the envelope's cricondenbar and cricondentherm do not depend on it |
 
 ## Assumptions
 
@@ -76,6 +76,8 @@ not an equation, and both implementations read it from here.
 - each branch stops at the critical region rather than continuing *through* the critical point onto the other branch as NeqSim does, so the two traces are independent and `residual` reports the bracket they put around the critical point.
 - the next point is predicted by a cubic through the last four converged points and the step size is clamped to at most 10 K and 10 bar per point.
 - the envelope is for mixtures; a single component's envelope is its vapour-pressure curve, which `eos.pure_saturation` computes.
+- **a failed continuation falls back to a direct-flash grid**: 40 isotherms on 150-500 K, 40 pressures on 1-400 bar, the boundary bisected, and the cricondenbar refined by a 0.5 K then 0.1 K scan. The grid reports no critical point; an unconverged flash is single phase and warns.
+- the critical fields are NaN when `eos.critical_point` refuses, and the warning carries the residual. A grid answer has no trace, so `residual` is NaN and `iterations` is the flash count.
 - no energy balance. The envelope is a phase-equilibrium locus, not a statement about how a stream got there.
 
 ## Cases

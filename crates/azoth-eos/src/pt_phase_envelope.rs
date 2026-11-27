@@ -38,12 +38,13 @@
 //! for its points.
 
 use azoth_core::units::{Pressure, kelvins, pascals};
-use azoth_core::{AzothError, Result, apply_checks};
+use azoth_core::{AzothError, Result, Warning, WarningCode, apply_checks};
 
 use crate::mixture::{Mixture, RootSide, normalise};
 use crate::model_gen;
 use crate::phase_boundary::{self, WILSON_CONSTANT};
-use crate::results::PtPhaseEnvelopeResult;
+use crate::pt_flash_check::pt_flash_check;
+use crate::results::{Phase, PtPhaseEnvelopeResult};
 
 /// The vapour fraction on the bubble branch: `x_i ~= z_i`, so the feed is liquid.
 ///
@@ -438,6 +439,7 @@ fn cubic_predict(history: &[Vec<f64>], speceq: usize, sny: f64) -> Vec<f64> {
 fn critical(mixture: &Mixture, z: &[f64]) -> Option<(f64, f64)> {
     crate::critical_point::critical_point(mixture, z)
         .ok()
+        .filter(|point| point.converged)
         .map(|point| (point.tc.value, point.pc.value))
 }
 
@@ -684,14 +686,182 @@ fn trace_branch(mixture: &Mixture, p: Pressure, z: &[f64], beta: f64) -> Result<
     })
 }
 
+//: The direct-flash fallback's window and resolution. The continuation is preferred; this
+//: is the answer when it cannot start or truncates on a trace heavy. NeqSim's
+//: `RobustPhaseEnvelope` uses the same construction.
+const GRID_T_MIN: f64 = 150.0;
+const GRID_T_MAX: f64 = 500.0;
+const GRID_T_STEPS: usize = 40;
+const GRID_P_MIN: f64 = 1.0e5;
+const GRID_P_MAX: f64 = 400.0e5;
+const GRID_P_STEPS: usize = 40;
+const GRID_BISECTIONS: usize = 16;
+const GRID_FLASH_TOLERANCE: f64 = 1.0e-6;
+
+fn two_phase_at(mixture: &Mixture, z: &[f64], t: f64, p: f64) -> bool {
+    match pt_flash_check(
+        mixture,
+        kelvins(t),
+        pascals(p),
+        z,
+        Some(GRID_FLASH_TOLERANCE),
+        Some(false),
+    ) {
+        Ok(flash) => {
+            flash.converged
+                && flash.phase == Phase::TwoPhase
+                && flash
+                    .vapour_fraction
+                    .is_some_and(|beta| 1.0e-9 < beta && beta < 1.0 - 1.0e-9)
+        }
+        Err(_) => false,
+    }
+}
+
+fn bisect_boundary(mixture: &Mixture, z: &[f64], t: f64, inside: f64, outside: f64) -> f64 {
+    let mut inside = inside;
+    let mut outside = outside;
+    for _ in 0..GRID_BISECTIONS {
+        let mid = 0.5 * (inside + outside);
+        if two_phase_at(mixture, z, t, mid) {
+            inside = mid;
+        } else {
+            outside = mid;
+        }
+    }
+    0.5 * (inside + outside)
+}
+
+fn boundaries_at(mixture: &Mixture, z: &[f64], t: f64, pressures: &[f64]) -> Option<(f64, f64)> {
+    let flags: Vec<bool> = pressures
+        .iter()
+        .map(|&p| two_phase_at(mixture, z, t, p))
+        .collect();
+    let first = flags.iter().position(|&f| f)?;
+    let last = flags.iter().rposition(|&f| f)?;
+    let lower = if first == 0 {
+        pressures[0]
+    } else {
+        bisect_boundary(mixture, z, t, pressures[first], pressures[first - 1])
+    };
+    let upper = if last == pressures.len() - 1 {
+        pressures[last]
+    } else {
+        bisect_boundary(mixture, z, t, pressures[last], pressures[last + 1])
+    };
+    Some((lower, upper))
+}
+
+fn robust_grid(mixture: &Mixture, z: &[f64]) -> Result<(BranchTrace, BranchTrace, u32)> {
+    let pressures: Vec<f64> = (0..GRID_P_STEPS)
+        .map(|i| GRID_P_MIN + (GRID_P_MAX - GRID_P_MIN) * i as f64 / (GRID_P_STEPS - 1) as f64)
+        .collect();
+    let step = (GRID_T_MAX - GRID_T_MIN) / (GRID_T_STEPS - 1) as f64;
+    let mut lower_t = Vec::new();
+    let mut lower_p = Vec::new();
+    let mut upper_t = Vec::new();
+    let mut upper_p = Vec::new();
+    let mut best_t = GRID_T_MIN;
+    let mut best_p = 0.0;
+    let mut last_two_phase_t: Option<f64> = None;
+
+    for i in 0..GRID_T_STEPS {
+        let t = GRID_T_MIN + i as f64 * step;
+        if let Some((lower, upper)) = boundaries_at(mixture, z, t, &pressures) {
+            lower_t.push(t);
+            lower_p.push(lower);
+            upper_t.push(t);
+            upper_p.push(upper);
+            last_two_phase_t = Some(t);
+            if upper > best_p {
+                best_t = t;
+                best_p = upper;
+            }
+        }
+    }
+
+    let last_two_phase_t = last_two_phase_t.ok_or(AzothError::SolverNotConverged {
+        iterations: 0,
+        residual: f64::NAN,
+        tolerance: f64::NAN,
+    })?;
+
+    let upper_only = |t: f64| boundaries_at(mixture, z, t, &pressures).map(|v| v.1);
+    let mut cricondenbar_t = best_t;
+    let mut cricondenbar_p = best_p;
+    for k in -6..=6 {
+        let t = best_t + 0.5 * f64::from(k);
+        if !(GRID_T_MIN..=GRID_T_MAX).contains(&t) {
+            continue;
+        }
+        if let Some(u) = upper_only(t) {
+            if u > cricondenbar_p {
+                cricondenbar_t = t;
+                cricondenbar_p = u;
+            }
+        }
+    }
+    let coarse_t = cricondenbar_t;
+    for k in -5..=5 {
+        let t = coarse_t + 0.1 * f64::from(k);
+        if !(GRID_T_MIN..=GRID_T_MAX).contains(&t) {
+            continue;
+        }
+        if let Some(u) = upper_only(t) {
+            if u > cricondenbar_p {
+                cricondenbar_t = t;
+                cricondenbar_p = u;
+            }
+        }
+    }
+    let cricondenbar = (cricondenbar_t, cricondenbar_p);
+
+    let mut cricondentherm_t = last_two_phase_t;
+    let mut cricondentherm_p = upper_only(last_two_phase_t).unwrap_or(cricondenbar_p);
+    if last_two_phase_t < GRID_T_MAX {
+        let mut a = last_two_phase_t;
+        let mut b = (last_two_phase_t + step).min(GRID_T_MAX);
+        for _ in 0..GRID_BISECTIONS {
+            let mid = 0.5 * (a + b);
+            if upper_only(mid).is_none() {
+                b = mid;
+            } else {
+                a = mid;
+            }
+        }
+        cricondentherm_t = a;
+        cricondentherm_p = upper_only(a).unwrap_or(cricondentherm_p);
+    }
+    let cricondentherm = (cricondentherm_t, cricondentherm_p);
+
+    let bubble = BranchTrace {
+        t: lower_t,
+        p: lower_p,
+        cricondenbar,
+        cricondentherm,
+        stopped: None,
+    };
+    let dew = BranchTrace {
+        t: upper_t,
+        p: upper_p,
+        cricondenbar,
+        cricondentherm,
+        stopped: None,
+    };
+    Ok((bubble, dew, (GRID_T_STEPS * GRID_P_STEPS) as u32))
+}
+
 /// The PT phase envelope of a mixture of composition `z`, traced upward from a low
-/// pressure towards the critical point on both the bubble and dew branches.
+/// pressure towards the critical point on both the bubble and dew branches. If the
+/// continuation does not converge, a direct-flash boundary grid answers the cricondenbar
+/// and cricondentherm; it reports no critical point.
 ///
 /// # Errors
 /// * [`AzothError::InvalidInput`] if the mixture has one component, or `z` is not a
 ///   composition.
 /// * [`AzothError::OutOfRange`] if `P` is not positive.
-/// * [`AzothError::SolverNotConverged`] if a branch's continuation hits its cap.
+/// * [`AzothError::SolverNotConverged`] if neither the continuation nor the grid finds a
+///   two-phase region.
 pub fn pt_phase_envelope(
     mixture: &Mixture,
     p: Pressure,
@@ -716,51 +886,75 @@ pub fn pt_phase_envelope(
     }
     phase_boundary::check_composition(z, n, "z")?;
 
-    let bubble = trace_branch(mixture, p, z, BUBBLE_BETA)?;
-    let dew = trace_branch(mixture, p, z, DEW_BETA)?;
+    let (bubble, dew, grid_used, grid_evaluations) = match (
+        trace_branch(mixture, p, z, BUBBLE_BETA),
+        trace_branch(mixture, p, z, DEW_BETA),
+    ) {
+        (Ok(bubble), Ok(dew)) => (bubble, dew, false, 0),
+        _ => {
+            let (bubble, dew, evaluations) = robust_grid(mixture, z)?;
+            (bubble, dew, true, evaluations)
+        }
+    };
+    if grid_used {
+        warnings.push(Warning::new(
+            WarningCode::SolverNotConverged,
+            format!(
+                "the Michelsen continuation did not converge; the envelope is the \
+                 direct-flash grid on {GRID_T_MIN:.0}-{GRID_T_MAX:.0} K and \
+                 {:.0}-{:.0} bar, which reports no critical point",
+                GRID_P_MIN / 1e5,
+                GRID_P_MAX / 1e5
+            ),
+        ));
+    }
 
-    let cricondenbar = if bubble.cricondenbar.1 >= dew.cricondenbar.1 {
+    let cricondenbar = if grid_used {
+        bubble.cricondenbar
+    } else if bubble.cricondenbar.1 >= dew.cricondenbar.1 {
         bubble.cricondenbar
     } else {
         dew.cricondenbar
     };
-    let cricondentherm = if bubble.cricondentherm.0 >= dew.cricondentherm.0 {
+    let cricondentherm = if grid_used {
+        bubble.cricondentherm
+    } else if bubble.cricondentherm.0 >= dew.cricondentherm.0 {
         bubble.cricondentherm
     } else {
         dew.cricondentherm
     };
 
     // **The critical point is computed, not read off the trace**, and it is one point: the two
-    // phases become one there, so a branch cannot have its own. It is computed only when a branch
-    // actually ran into the critical region; a trace that never got near it reports where it
-    // stopped rather than a critical point it never found.
-    let critical = if bubble.stopped.is_some() || dew.stopped.is_some() {
-        critical(mixture, z)
-    } else {
-        None
+    // phases become one there, so a branch cannot have its own. A failure is a documented
+    // refusal: the fields are NaN and the warning says so, rather than substituting the trace's
+    // endpoint for a point the model never found.
+    let critical = critical(mixture, z);
+    if critical.is_none() {
+        warnings.push(Warning::new(
+            WarningCode::SolverNotConverged,
+            "the mixture critical point did not converge; the critical fields are NaN. \
+             The envelope's cricondenbar and cricondentherm do not depend on it",
+        ));
     }
-    .or(bubble.stopped)
-    .or(dew.stopped)
-    .or_else(|| {
-        bubble
-            .t
-            .last()
-            .zip(bubble.p.last())
-            .map(|(&t, &pr)| (t, pr))
-    })
-    .unwrap_or((f64::NAN, f64::NAN));
+    let critical = critical.unwrap_or((f64::NAN, f64::NAN));
 
     // The residual is how far apart the two branches stopped. They approach the critical point
-    // from opposite sides, so the gap is the width of the bracket they put around it: the trace's
-    // own statement about whether it reached the critical point, and one the computed critical
-    // point above cannot make for it. A branch that ran into the pressure ceiling instead of the
-    // critical region has not met the other, and there is no gap to report.
-    let residual = match (bubble.stopped, dew.stopped) {
-        (Some((t_b, _)), Some((t_d, _))) => (t_b - t_d).abs(),
-        _ => f64::NAN,
+    // from opposite sides, so the gap is the width of the bracket they put around it. A grid
+    // answer has no trace and no bracket.
+    let residual = if grid_used {
+        f64::NAN
+    } else {
+        match (bubble.stopped, dew.stopped) {
+            (Some((t_b, _)), Some((t_d, _))) => (t_b - t_d).abs(),
+            _ => f64::NAN,
+        }
     };
 
-    let iterations = (bubble.t.len() + dew.t.len()) as u32;
+    let iterations = if grid_used {
+        grid_evaluations
+    } else {
+        (bubble.t.len() + dew.t.len()) as u32
+    };
     Ok(PtPhaseEnvelopeResult {
         dew_temperature: dew.t,
         dew_pressure: dew.p,

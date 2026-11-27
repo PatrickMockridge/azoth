@@ -168,6 +168,7 @@ from azoth.core.result_base import (
     OverallVerdict,
     PerformanceVerdict,
     Phase,
+    PhaseClass,
     PlusModel,
     ReliefPhase,
     RootStructure,
@@ -1137,6 +1138,9 @@ class CriticalPointResult(_HasWarnings):
 
     #: the critical compressibility, `pc vc/(R tc)`
     z_c: float
+
+    #: whether the nested Newton met its tolerance. False means the four state fields are NaN and the warning carries the residual; a critical point that was not reached is a refusal, not an exception.
+    converged: bool
 
     #: outer iterations the critical-point search took
     iterations: int
@@ -3317,6 +3321,55 @@ class PtFlashResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class PtFlashCheckResult(_HasWarnings):
+    """Result of ``eos.pt_flash_check``."""
+
+    CALC_ID: ClassVar[str] = "eos.pt_flash_check"
+
+    #: The vapour fraction, in `[0, 1]` for a two-phase split; outside that it is the negative-flash value and the feed is single phase. Absent where there is genuinely no vapour fraction.
+    vapour_fraction: float | None
+
+    #: liquid-phase mole fractions
+    x: tuple[float, ...]
+
+    #: vapour-phase mole fractions
+    y: tuple[float, ...]
+
+    #: `K_i = y_i / x_i = phi_i^L / phi_i^V`.
+    k: tuple[float, ...]
+
+    #: fugacity coefficients in the liquid phase, as logarithms.
+    ln_phi_liquid: tuple[float, ...]
+
+    #: fugacity coefficients in the vapour phase, as logarithms.
+    ln_phi_vapour: tuple[float, ...]
+
+    #: the liquid root of the cubic at the liquid composition.
+    z_liquid: float
+
+    #: the vapour root at the vapour composition.
+    z_vapour: float
+
+    #: the smallest `T / Tc_i` over the components.
+    min_t_over_tc: float
+
+    #: What the state is: `two_phase`, `all_liquid`, `all_vapour`, or `trivial` (the iteration converged to `x = y = z`).
+    phase: Phase
+
+    #: whether the iteration met its tolerance, or settled on a trivial or single-phase state by proof. False only when `strict = false` and the loop hit its cap; the split is then the last iterate, not a converged state.
+    converged: bool
+
+    #: outer steps taken.
+    iterations: int
+
+    #: the last step's convergence measure.
+    residual: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class PtPhaseEnvelopeResult(_HasWarnings):
     """Result of ``eos.pt_phase_envelope``."""
 
@@ -3352,10 +3405,10 @@ class PtPhaseEnvelopeResult(_HasWarnings):
     #: the critical pressure, from the same construction
     critical_pressure: Q
 
-    #: the number of continuation points traced
+    #: the continuation points traced, or the flash count when the grid answered.
     iterations: int
 
-    #: the gap between where the two branches stopped. They approach the critical point from opposite sides, so it is the width of the bracket they put around it - the trace's own statement that it reached the critical point. `NaN` when a branch ran into the pressure ceiling instead.
+    #: the gap between where the two branches stopped: the width of the bracket they put around the critical point. `NaN` when a branch ran into the pressure ceiling, or when the grid answered.
     residual: Q
 
     #: Caveats.
@@ -4189,6 +4242,64 @@ class StabilityTestResult(_HasWarnings):
 
     #: The smallest `T / Tc_i` over the components; a minimum above 0.9 means no component is well below its critical temperature.
     min_t_over_tc: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class StateAtTpResult(_HasWarnings):
+    """Result of ``eos.state_at_tp``."""
+
+    CALC_ID: ClassVar[str] = "eos.state_at_tp"
+
+    #: what the flash found.
+    phase: Phase
+
+    #: the screening label; see the assumptions.
+    phase_class: PhaseClass
+
+    #: whether the flash met its tolerance.
+    converged: bool
+
+    #: the vapour fraction where there is a split; absent for a single phase.
+    vapour_fraction: float | None
+
+    #: liquid-phase mole fractions; equal to the feed when single phase.
+    x: tuple[float, ...]
+
+    #: vapour-phase mole fractions; equal to the feed when single phase.
+    y: tuple[float, ...]
+
+    #: bulk molar mass.
+    molar_mass: Q
+
+    #: bulk molar volume, phase-fraction weighted.
+    molar_volume: Q
+
+    #: bulk mass density, the molar mass over the molar volume.
+    density: Q
+
+    #: bulk molar internal energy, `h - P v`.
+    internal_energy: Q
+
+    #: bulk molar enthalpy.
+    enthalpy: Q
+
+    #: bulk molar isobaric heat capacity.
+    cp: Q
+
+    #: bulk molar isochoric heat capacity.
+    cv: Q
+
+    #: bulk compressibility `P v / (R T)`.
+    compressibility: float
+
+    #: absent in this tranche; the caller uses `eos.equilibrium_sound_speed`.
+    system_sound_speed: Q | None
+
+    #: absent in this tranche; the caller uses the surface-tension model.
+    interface_tension: Q | None
 
     #: Caveats.
     warnings: tuple[Warning, ...]

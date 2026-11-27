@@ -312,6 +312,30 @@ class Phase(StrEnum):
     TRIVIAL = "trivial"
 
 
+class PhaseClass(StrEnum):
+    """How a state sits in the phase diagram, as a screening label.
+
+    ``Phase`` is the flash's own verdict. This is the caller-facing classification:
+    ``TWO_PHASE`` is the flash's split; ``SINGLE_PHASE_GAS`` and
+    ``SINGLE_PHASE_LIQUID`` are its single-phase verdicts; ``DENSE_SINGLE_PHASE`` and
+    ``DENSE_SUPERCRITICAL`` are azoth's labels for a state above the mixture's
+    pseudo-critical pressure (and, for the latter, temperature), where the flash's
+    ``all_vapour`` is the negative flash on a dense fluid rather than a vapour.
+    """
+
+    TWO_PHASE = "two_phase"
+
+    SINGLE_PHASE_GAS = "single_phase_gas"
+
+    SINGLE_PHASE_LIQUID = "single_phase_liquid"
+
+    DENSE_SINGLE_PHASE = "dense_single_phase"
+
+    DENSE_SUPERCRITICAL = "dense_supercritical"
+
+    UNDETERMINED = "undetermined"
+
+
 class _HasWarnings:
     """Shared warning accessors, mirroring ``CalcResult`` on the Rust side.
 

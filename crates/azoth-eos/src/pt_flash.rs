@@ -32,7 +32,14 @@ use crate::results::{Phase, PtFlashResult};
 /// The two schemes measure different things - the outer one the change in `ln K` and
 /// the fallback the step it took - so they carry their own stopping rules, and the
 /// comparison at the end has to be against the one that actually ran.
-fn settled_tolerance(algorithm: &azoth_core::ModelAlgorithm, from_newton: bool) -> f64 {
+fn settled_tolerance(
+    algorithm: &azoth_core::ModelAlgorithm,
+    from_newton: bool,
+    override_tolerance: Option<f64>,
+) -> f64 {
+    if let Some(tolerance) = override_tolerance {
+        return tolerance;
+    }
     match algorithm.fallback {
         Some(fallback) if from_newton => fallback.algorithm.tolerance,
         _ => algorithm.tolerance,
@@ -45,11 +52,16 @@ fn settled_tolerance(algorithm: &azoth_core::ModelAlgorithm, from_newton: bool) 
 /// renormalised** - silently rescaling a caller's composition would make their error
 /// invisible in a way that changes every number downstream.
 ///
+/// `tolerance` overrides the outer stopping tolerance (and the fallback's acceptance);
+/// `strict` is true when absent. `strict = false` returns the last iterate with
+/// `converged = false` and a `SOLVER_NOT_CONVERGED` warning on a cap. A non-finite
+/// K-value still raises under either setting: that is divergence, not a state.
+///
 /// # Errors
 /// * [`AzothError::OutOfRange`] if `T` or `P` is not positive.
 /// * [`AzothError::InvalidInput`] if `z` is the wrong length, has a negative entry,
-///   or does not sum to one.
-/// * [`AzothError::SolverNotConverged`] if the iteration hits its cap.
+///   does not sum to one, or `tolerance` is not finite and positive.
+/// * [`AzothError::SolverNotConverged`] if the iteration hits its cap under `strict`.
 /// * Propagates the kernels' range checks.
 ///
 /// # Example
@@ -66,12 +78,14 @@ fn settled_tolerance(algorithm: &azoth_core::ModelAlgorithm, from_newton: bool) 
 /// assert!((r.vapour_fraction.expect("a split has a vapour fraction") - 0.8422055475803881).abs() < 1e-9);
 /// # Ok::<(), azoth_core::AzothError>(())
 /// ```
-pub fn pt_flash(
+pub(crate) fn pt_flash_impl(
     mixture: &Mixture,
     t: ThermodynamicTemperature,
     p: Pressure,
     z: &[f64],
-) -> Result<PtFlashResult> {
+    tolerance: Option<f64>,
+    strict: Option<bool>,
+) -> Result<(PtFlashResult, bool)> {
     let spec = &model_gen::PT_FLASH_SPEC;
     let mut warnings = Vec::new();
 
@@ -128,6 +142,16 @@ pub fn pt_flash(
     warnings.extend(reduced.warnings.iter().cloned());
 
     let algorithm = algorithm_of(spec)?;
+    if let Some(value) = tolerance {
+        if !value.is_finite() || value <= 0.0 {
+            return Err(AzothError::invalid_input(
+                "tolerance",
+                format!("the outer tolerance is {value}; it must be finite and positive"),
+            ));
+        }
+    }
+    let effective_tolerance = tolerance.unwrap_or(algorithm.tolerance);
+    let strict_flag = strict.unwrap_or(true);
     let inner = algorithm.inner.ok_or_else(|| AzothError::InvalidInput {
         field: "algorithm.inner".to_string(),
         reason: format!(
@@ -180,7 +204,8 @@ pub fn pt_flash(
                 // handed over.
                 let (x, y) = flash_newton::split_at(z, &u);
                 k = y.iter().zip(&x).map(|(&yi, &xi)| yi / xi).collect();
-                if residual <= fallback.algorithm.tolerance {
+                let acceptance = tolerance.unwrap_or(fallback.algorithm.tolerance);
+                if residual <= acceptance {
                     break;
                 }
                 continue;
@@ -203,7 +228,7 @@ pub fn pt_flash(
             return Err(AzothError::SolverNotConverged {
                 iterations,
                 residual,
-                tolerance: algorithm.tolerance,
+                tolerance: effective_tolerance,
             });
         }
         let Some(bounds) = rachford_rice_bounds(&k) else {
@@ -231,10 +256,14 @@ pub fn pt_flash(
         u = flash_newton::vapour_moles(beta, &y);
         splits = beta > 0.0 && beta < 1.0;
 
-        if residual <= algorithm.tolerance {
+        if residual <= effective_tolerance {
             break;
         }
     }
+
+    let converged = settled.is_some()
+        || is_trivial(&k)
+        || residual <= settled_tolerance(algorithm, from_newton, tolerance);
 
     // Classify what the loop settled on. Re-evaluated once more at the converged
     // `K`, so the returned `beta`, `x`, `y` and `K` are one consistent state rather
@@ -255,11 +284,11 @@ pub fn pt_flash(
             warnings.push(single_phase_warning(phase));
             (None, z.to_vec(), z.to_vec(), phase)
         }
-        None if residual > settled_tolerance(algorithm, from_newton) => {
+        None if residual > settled_tolerance(algorithm, from_newton, tolerance) && strict_flag => {
             return Err(AzothError::SolverNotConverged {
                 iterations,
                 residual,
-                tolerance: settled_tolerance(algorithm, from_newton),
+                tolerance: settled_tolerance(algorithm, from_newton, tolerance),
             });
         }
         // The second-order scheme converged, and it converges on its own measure -
@@ -296,7 +325,7 @@ pub fn pt_flash(
                 let bounds = rachford_rice_bounds(&k).ok_or(AzothError::SolverNotConverged {
                     iterations,
                     residual,
-                    tolerance: algorithm.tolerance,
+                    tolerance: effective_tolerance,
                 })?;
                 let (beta, _) = rachford_rice(z, &k, bounds, inner.tolerance, inner.max_iterations);
                 let (x, y) = compositions(z, &k, beta);
@@ -313,22 +342,50 @@ pub fn pt_flash(
         }
     };
 
+    if !converged {
+        warnings.push(azoth_core::Warning::new(
+            azoth_core::WarningCode::SolverNotConverged,
+            format!(
+                "the flash stopped after {iterations} iterations at residual {residual:?} \
+                 against {:?}; the phase split is the last iterate, not a converged state",
+                settled_tolerance(algorithm, from_newton, tolerance)
+            ),
+        ));
+    }
+
     let liquid = mixture.phase_state(&reduced, &x, RootSide::Liquid)?;
     let vapour = mixture.phase_state(&reduced, &y, RootSide::Vapour)?;
 
-    Ok(PtFlashResult {
-        vapour_fraction: beta,
-        x,
-        y,
-        k,
-        ln_phi_liquid: liquid.ln_phi,
-        ln_phi_vapour: vapour.ln_phi,
-        z_liquid: liquid.z,
-        z_vapour: vapour.z,
-        min_t_over_tc,
-        phase,
-        iterations,
-        residual,
-        warnings,
-    })
+    Ok((
+        PtFlashResult {
+            vapour_fraction: beta,
+            x,
+            y,
+            k,
+            ln_phi_liquid: liquid.ln_phi,
+            ln_phi_vapour: vapour.ln_phi,
+            z_liquid: liquid.z,
+            z_vapour: vapour.z,
+            min_t_over_tc,
+            phase,
+            iterations,
+            residual,
+            warnings,
+        },
+        converged,
+    ))
+}
+
+/// The compatibility entry point for `eos.pt_flash`: the spec's tolerance and a cap
+/// that raises. `eos.pt_flash_check` is the diagnostic contract.
+///
+/// # Errors
+/// As [`pt_flash_impl`] with `tolerance = None` and `strict = Some(true)`.
+pub fn pt_flash(
+    mixture: &Mixture,
+    t: ThermodynamicTemperature,
+    p: Pressure,
+    z: &[f64],
+) -> Result<PtFlashResult> {
+    pt_flash_impl(mixture, t, p, z, None, None).map(|(result, _)| result)
 }

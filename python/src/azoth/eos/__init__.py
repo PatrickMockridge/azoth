@@ -183,6 +183,7 @@ from azoth.core.result import (
     PrsvKappaResult,
     PrZFactorResult,
     PsFlashResult,
+    PtFlashCheckResult,
     PtFlashResult,
     PtPhaseEnvelopeResult,
     PuFlashResult,
@@ -219,6 +220,7 @@ from azoth.core.result import (
     SrkPenelouxShiftResult,
     SrkZFactorResult,
     StabilityTestResult,
+    StateAtTpResult,
     StreamScaleAnalyzerResult,
     SurfCooldownResult,
     TbpFractionPropertiesResult,
@@ -368,6 +370,7 @@ __all__ = [
     "pr_z_factor",
     "prsv_kappa",
     "pt_flash",
+    "pt_flash_check",
     "pt_phase_envelope",
     "pu_flash",
     "pure_saturation",
@@ -394,6 +397,7 @@ __all__ = [
     "srk_peneloux_shift",
     "srk_z_factor",
     "stability_test",
+    "state_at_tp",
     "th_flash",
     "tp_flash_saft",
     "tp_multiflash",
@@ -527,7 +531,9 @@ _PV_FLASH = "eos.pv_flash"
 _PV_REFLUX_FLASH = "eos.pv_reflux_flash"
 _PVF_FLASH = "eos.pvf_flash"
 _PT_FLASH = "eos.pt_flash"
+_PT_FLASH_CHECK = "eos.pt_flash_check"
 _PT_PHASE_ENVELOPE = "eos.pt_phase_envelope"
+_STATE_AT_TP = "eos.state_at_tp"
 _MULTIFLASH_STABILITY_TEST = "eos.multiflash_stability_test"
 _STABILITY_TEST = "eos.stability_test"
 _TP_MULTIFLASH = "eos.tp_multiflash"
@@ -4499,6 +4505,80 @@ def pt_flash(mixture: Mixture, T: Q, P: Q, z: list[float]) -> PtFlashResult:
     See :func:`azoth.eos.reference.pt_flash`.
     """
     return resolve(_PT_FLASH)(mixture=mixture, T=T, P=P, z=z)  # type: ignore[no-any-return]
+
+
+def pt_flash_check(
+    mixture: Mixture,
+    T: Q,
+    P: Q,
+    z: list[float],
+    tolerance: float | None = None,
+    strict: bool | None = None,
+) -> PtFlashCheckResult:
+    """The two-phase flash with a settable tolerance and a convergence flag.
+
+    The arithmetic is :func:`pt_flash`'s. ``strict`` is true when absent: a cap raises.
+    ``strict=False`` returns the last iterate with ``converged=False`` and a
+    ``SOLVER_NOT_CONVERGED`` warning. ``tolerance`` overrides the spec's 1e-10.
+
+    This is the contract a time march needs; ``eos.pt_flash`` keeps its raising
+    contract so an existing caller sees no change.
+
+    Raises:
+        InvalidInputError: if ``z`` is malformed or ``tolerance`` is not finite and
+            positive.
+        OutOfRangeError: if ``T`` or ``P`` is not positive.
+        SolverNotConvergedError: if the iteration hits its cap under ``strict``.
+
+    See :func:`azoth.eos.reference.pt_flash_check.pt_flash_check`.
+    """
+    return resolve(_PT_FLASH_CHECK)(  # type: ignore[no-any-return]
+        mixture=mixture,
+        T=T,
+        P=P,
+        z=z,
+        tolerance=tolerance,
+        strict=strict,
+    )
+
+
+def state_at_tp(
+    mixture: Mixture,
+    ideal_gas: IdealGasModel,
+    T: Q,
+    P: Q,
+    z: list[float],
+    tolerance: float | None = None,
+    strict: bool | None = None,
+) -> StateAtTpResult:
+    """The split and the bulk volumetric and caloric properties at ``(T, P)``.
+
+    The flash is :func:`pt_flash_check`'s; the properties are evaluated at each
+    phase's own root and composition-weighted. ``phase_class`` is a screening label
+    from the mixture's Kay pseudo-critical point - ``dense_single_phase`` and
+    ``dense_supercritical`` distinguish the negative flash on a dense fluid from a
+    vapour, and do not locate the envelope.
+
+    ``ideal_gas`` carries the enthalpy datum; two states compared across different
+    ideal-gas models are not comparable.
+
+    Raises:
+        InvalidInputError: if the composition is malformed or a component has no
+            molar mass.
+        OutOfRangeError: if ``T`` or ``P`` is not positive.
+        SolverNotConvergedError: if the flash hits its cap under ``strict``.
+
+    See :func:`azoth.eos.reference.state_at_tp.state_at_tp`.
+    """
+    return resolve(_STATE_AT_TP)(  # type: ignore[no-any-return]
+        mixture=mixture,
+        ideal_gas=ideal_gas,
+        T=T,
+        P=P,
+        z=z,
+        tolerance=tolerance,
+        strict=strict,
+    )
 
 
 def pt_phase_envelope(mixture: Mixture, P: Q, z: list[float]) -> PtPhaseEnvelopeResult:

@@ -650,8 +650,87 @@ pub(crate) fn build_mixture_with_mass(
     alpha: &str,
     alpha_params: Option<&[Vec<f64>]>,
 ) -> PyResult<azoth_eos::Mixture> {
+    build_mixture_with_mass_impl(
+        py,
+        Tc,
+        Pc,
+        omega,
+        classes,
+        kij,
+        association,
+        molar_mass,
+        None,
+        None,
+        eos,
+        alpha,
+        alpha_params,
+    )
+}
+
+/// The same mixture, with the Peneloux translations the density needs.
+///
+/// The translations are component fields, and a mixture built without them reports an
+/// untranslated volume - a density that differs from the Python reference by the shift.
+/// Only the models that report a density need them at the boundary.
+#[allow(non_snake_case)] // `Tc` and `Pc` are the symbols in the chemistry
+#[allow(clippy::too_many_arguments)] // one parameter per component field the model reads
+pub(crate) fn build_mixture_with_mass_and_shift(
+    py: Python<'_>,
+    Tc: &[f64],
+    Pc: &[f64],
+    omega: &[f64],
+    classes: &[String],
+    kij: Vec<f64>,
+    association: &PyAssociationSpec,
+    molar_mass: &[f64],
+    volume_shift: &[f64],
+    volume_shift_srk: &[f64],
+    eos: &str,
+    alpha: &str,
+    alpha_params: Option<&[Vec<f64>]>,
+) -> PyResult<azoth_eos::Mixture> {
+    build_mixture_with_mass_impl(
+        py,
+        Tc,
+        Pc,
+        omega,
+        classes,
+        kij,
+        association,
+        molar_mass,
+        Some(volume_shift),
+        Some(volume_shift_srk),
+        eos,
+        alpha,
+        alpha_params,
+    )
+}
+
+#[allow(non_snake_case)] // the boundary's names, as every builder spells them
+#[allow(clippy::too_many_arguments)] // one parameter per component field the model reads
+fn build_mixture_with_mass_impl(
+    py: Python<'_>,
+    Tc: &[f64],
+    Pc: &[f64],
+    omega: &[f64],
+    classes: &[String],
+    kij: Vec<f64>,
+    association: &PyAssociationSpec,
+    molar_mass: &[f64],
+    volume_shift: Option<&[f64]>,
+    volume_shift_srk: Option<&[f64]>,
+    eos: &str,
+    alpha: &str,
+    alpha_params: Option<&[Vec<f64>]>,
+) -> PyResult<azoth_eos::Mixture> {
     let n = Tc.len();
-    if Pc.len() != n || omega.len() != n || classes.len() != n || molar_mass.len() != n {
+    if Pc.len() != n
+        || omega.len() != n
+        || classes.len() != n
+        || molar_mass.len() != n
+        || volume_shift.is_some_and(|values| values.len() != n)
+        || volume_shift_srk.is_some_and(|values| values.len() != n)
+    {
         return Err(pyo3::exceptions::PyValueError::new_err(format!(
             "Tc, Pc, omega, classes and molar_mass must be the same length; got {}, {}, {}, {} \
              and {}",
@@ -671,6 +750,12 @@ pub(crate) fn build_mixture_with_mass(
                 azoth_eos::Component::new(kelvins(Tc[i]), pascals(Pc[i]), omega[i])?
                     .with_molar_mass(Some(molar_mass[i]))
                     .with_class(classes[i].clone());
+            if let Some(values) = volume_shift {
+                component = component.with_volume_shift(values[i]);
+            }
+            if let Some(values) = volume_shift_srk {
+                component = component.with_volume_shift_srk(values[i]);
+            }
             if let Some(params) = alpha_params.and_then(|all| all.get(i)) {
                 component = component.with_alpha_params(params.clone());
             }
