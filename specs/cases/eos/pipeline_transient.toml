@@ -1,0 +1,34 @@
+model = "eos.pipeline_transient"
+[[cases]]
+id = "a_five_cell_methane_butane_line"
+tolerance = 1e-06
+source = "A 1 km, 0.1 m methane/butane line starting uniform at 300 K and 50 bara, closed at the inlet and held at 40 bara at the outlet. The initial conserved state is that state's `eos.state_at_tp` volume, composition and internal energy; the expected values are recorded from the reference kernel and held to the Rust kernel by the cross-implementation test."
+[cases.inputs]
+components = ["methane", "n-butane"]
+length = 1000.0
+diameter = 0.1
+cells = 5
+friction_factor = 0.01
+left_boundary = "closed"
+right_boundary = "constant_pressure"
+right_boundary_pressure = 4000000.0
+initial_component_density = [
+    [2216.805049331748, 1477.870032887832],
+    [2216.805049331748, 1477.870032887832],
+    [2216.805049331748, 1477.870032887832],
+    [2216.805049331748, 1477.870032887832],
+    [2216.805049331748, 1477.870032887832],
+]
+initial_momentum = [0.0, 0.0, 0.0, 0.0, 0.0]
+initial_total_energy = [
+    -30513185.583300006,
+    -30513185.583300006,
+    -30513185.583300006,
+    -30513185.583300006,
+    -30513185.583300006,
+]
+time_step = 0.05
+duration = 1.0
+cfl_number = 0.5
+[cases.expected]
+steps = 1

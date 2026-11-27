@@ -5417,6 +5417,86 @@ impl From<&azoth_process::models::pipe_fire_rupture::PipeFireRupturePoint>
     }
 }
 
+/// one row per accepted step, starting with the initial state.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PipelineTransientPoint"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPipelineTransientPoint {
+    /// the time at the row.
+    #[pyo3(get)]
+    pub time: PyQty,
+    /// the mass in the line.
+    #[pyo3(get)]
+    pub mass: PyQty,
+    /// the inlet-end pressure, from the first cell or the ghost.
+    #[pyo3(get)]
+    pub p_in: PyQty,
+    /// the outlet-end pressure, from the last cell or the ghost.
+    #[pyo3(get)]
+    pub p_out: PyQty,
+    /// the outlet-end temperature.
+    #[pyo3(get)]
+    pub t_out: PyQty,
+    /// the outlet-end vapour fraction.
+    #[pyo3(get)]
+    pub beta_out: f64,
+    /// the liquid volume in the line.
+    #[pyo3(get)]
+    pub liquid_inventory: PyQty,
+}
+
+#[pymethods]
+impl PyPipelineTransientPoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "PipelineTransientPoint(time={:?}, mass={:?}, p_in={:?}, p_out={:?}, t_out={:?}, beta_out={}, liquid_inventory={:?})",
+            self.time,
+            self.mass,
+            self.p_in,
+            self.p_out,
+            self.t_out,
+            self.beta_out,
+            self.liquid_inventory
+        )
+    }
+}
+
+impl From<&azoth_eos::results::PipelineTransientPoint> for PyPipelineTransientPoint {
+    fn from(row: &azoth_eos::results::PipelineTransientPoint) -> Self {
+        Self {
+            time: PyQty {
+                magnitude_si: row.time.value,
+                unit: "s".to_string(),
+            },
+            mass: PyQty {
+                magnitude_si: row.mass.value,
+                unit: "kg".to_string(),
+            },
+            p_in: PyQty {
+                magnitude_si: row.p_in.value,
+                unit: "Pa".to_string(),
+            },
+            p_out: PyQty {
+                magnitude_si: row.p_out.value,
+                unit: "Pa".to_string(),
+            },
+            t_out: PyQty {
+                magnitude_si: row.t_out.value,
+                unit: "K".to_string(),
+            },
+            beta_out: row.beta_out,
+            liquid_inventory: PyQty {
+                magnitude_si: row.liquid_inventory.value,
+                unit: "m**3".to_string(),
+            },
+        }
+    }
+}
+
 /// the base stations, with the opening's phase velocities partitioned. Empty on failure.
 #[pyclass(
     frozen,

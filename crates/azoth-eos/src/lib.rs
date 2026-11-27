@@ -173,6 +173,7 @@ pub mod phase_boundary;
 pub mod phase_transport;
 pub mod pipe_beggs_and_brills;
 pub mod pipeline_cooldown;
+pub mod pipeline_transient;
 pub mod pitzer_catalog;
 pub mod pitzer_electrostatic;
 pub mod pitzer_hydrate;
@@ -427,7 +428,8 @@ pub use results::{
     MollerupAlphaResult, NitricSulfuricAcidVaporPressureResult, NrtlActivityCoefficientsResult,
     ParachorMixtureSurfaceTensionResult, ParachorSurfaceTensionResult,
     ParahydrogenSolidPhaseResult, Phase, PhaseClass, PhaseTransportResult,
-    PipeBeggsAndBrillsResult, PipelineCooldownResult, PitzerDataset, PitzerPhaseResult,
+    PipeBeggsAndBrillsResult, PipelineCooldownResult, PipelineTransientPoint,
+    PipelineTransientResult, PitzerDataset, PitzerPhaseResult,
     Pr78KappaResult, PrAlphaAbResult, PrDaneshAlphaResult, PrDelft1998AlphaResult,
     PrDepartureResult, PrGassem2001AlphaResult, PrKappaResult, PrLeeKeslerAlphaResult,
     PrMassDensityResult, PrMolarVolumeResult, PrPenelouxShiftResult, PrZFactorResult,

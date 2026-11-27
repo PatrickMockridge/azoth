@@ -9,7 +9,7 @@ use azoth_core::units::{
     DiffusionCoefficient, DynamicViscosity, HeatTransfer, Length, Mass, MassDensity, MassRate,
     Molality, MolarConcentration, MolarEnergy, MolarHeatCapacity, MolarVolume, Pressure,
     SpecificHeatCapacity, SurfaceTension, TemperatureInterval, ThermalConductivity,
-    ThermodynamicTemperature, Time, Velocity,
+    ThermodynamicTemperature, Time, Velocity, Volume,
 };
 use azoth_core::{CalcResult, Warning};
 
@@ -2812,6 +2812,101 @@ impl CalcResult for UmrPruFlashResult {
         "converged",
         "iterations",
         "residual",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+/// One accepted step's scalars, for `eos.pipeline_transient`'s history.
+#[derive(Debug, Clone, PartialEq)]
+pub struct PipelineTransientPoint {
+    /// The time at the row.
+    #[serde(serialize_with = "scalar")]
+    pub time: Time,
+    /// The mass in the line.
+    #[serde(serialize_with = "scalar")]
+    pub mass: Mass,
+    /// The inlet-end pressure.
+    #[serde(serialize_with = "scalar")]
+    pub p_in: Pressure,
+    /// The outlet-end pressure.
+    #[serde(serialize_with = "scalar")]
+    pub p_out: Pressure,
+    /// The outlet-end temperature.
+    #[serde(serialize_with = "scalar")]
+    pub t_out: ThermodynamicTemperature,
+    /// The outlet-end vapour fraction.
+    #[serde(serialize_with = "scalar")]
+    pub beta_out: f64,
+    /// The liquid volume in the line.
+    #[serde(serialize_with = "scalar")]
+    pub liquid_inventory: Volume,
+}
+
+/// Result of `eos.pipeline_transient`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct PipelineTransientResult {
+    /// The component densities at the end of the stage.
+    pub final_component_density: Vec<Vec<f64>>,
+    /// The velocity at the end of the stage.
+    pub final_velocity: Vec<f64>,
+    /// The pressure at the end of the stage.
+    pub final_pressure: Vec<f64>,
+    /// The temperature at the end of the stage.
+    pub final_temperature: Vec<f64>,
+    /// The vapour fraction at the end of the stage.
+    pub final_vapour_fraction: Vec<f64>,
+    /// The mass density at the end of the stage.
+    pub final_density: Vec<f64>,
+    /// The liquid's share of each cell's volume.
+    pub final_liquid_volume_fraction: Vec<f64>,
+    /// The moles of each component that crossed the boundaries outward.
+    pub boundary_component_outflow: Vec<f64>,
+    /// The moles of each component in the line at the start.
+    pub initial_component_holdup: Vec<f64>,
+    /// The moles of each component in the line at the end.
+    pub final_component_holdup: Vec<f64>,
+    /// The mass that crossed the boundaries outward.
+    pub boundary_mass_outflow: f64,
+    /// The mass in the line at the start.
+    pub initial_mass: f64,
+    /// The mass in the line at the end.
+    pub final_mass: f64,
+    /// Accepted steps taken.
+    pub steps: u32,
+    /// Steps refused and retried at half the step.
+    pub rejections: u32,
+    /// The smallest step used.
+    pub min_time_step: f64,
+    /// One row per accepted step, the initial state first.
+    pub history: Vec<PipelineTransientPoint>,
+    /// Caveats.
+    pub warnings: Vec<Warning>,
+}
+
+impl CalcResult for PipelineTransientResult {
+    const CALC_ID: &'static str = "eos.pipeline_transient";
+    const FIELDS: &'static [&'static str] = &[
+        "final_component_density",
+        "final_velocity",
+        "final_pressure",
+        "final_temperature",
+        "final_vapour_fraction",
+        "final_density",
+        "final_liquid_volume_fraction",
+        "boundary_component_outflow",
+        "initial_component_holdup",
+        "final_component_holdup",
+        "boundary_mass_outflow",
+        "initial_mass",
+        "final_mass",
+        "steps",
+        "rejections",
+        "min_time_step",
+        "history",
         "warnings",
     ];
 

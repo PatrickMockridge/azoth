@@ -2029,6 +2029,32 @@ class PipeFireRupturePoint:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class PipelineTransientPoint:
+    """one row per accepted step, starting with the initial state."""
+
+    #: the time at the row.
+    time: Q
+
+    #: the mass in the line.
+    mass: Q
+
+    #: the inlet-end pressure, from the first cell or the ghost.
+    p_in: Q
+
+    #: the outlet-end pressure, from the last cell or the ghost.
+    p_out: Q
+
+    #: the outlet-end temperature.
+    t_out: Q
+
+    #: the outlet-end vapour fraction.
+    beta_out: float
+
+    #: the liquid volume in the line.
+    liquid_inventory: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class PrescribedSlipReleaseStation:
     """the base stations, with the opening's phase velocities partitioned. Empty on failure."""
 

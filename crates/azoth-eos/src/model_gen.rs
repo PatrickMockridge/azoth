@@ -66,6 +66,7 @@
 //!   - specs/models/eos/phase_transport.toml
 //!   - specs/models/eos/pipe_beggs_and_brills.toml
 //!   - specs/models/eos/pipeline_cooldown.toml
+//!   - specs/models/eos/pipeline_transient.toml
 //!   - specs/models/eos/pitzer_hydrate_formation_pressure.toml
 //!   - specs/models/eos/pitzer_hydrate_formation_temperature.toml
 //!   - specs/models/eos/pitzer_phase.toml
@@ -16606,6 +16607,190 @@ pub static PIPELINE_COOLDOWN_SPEC: ModelSpec = ModelSpec {
     cases: PIPELINE_COOLDOWN_CASES,
 };
 
+static PIPELINE_TRANSIENT_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "length",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a line's length is positive",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "diameter",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a diameter is positive",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "cells",
+            min: Some(2.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a finite-volume line needs at least two cells",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "time_step",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a step is positive",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "duration",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a stage advances a positive time",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "cfl_number",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: Some(1.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the CFL fraction is in (0, 1]",
+        },
+    },
+];
+
+static PIPELINE_TRANSIENT_CASES: &[TestCase] = &[TestCase {
+    id: "a_five_cell_methane_butane_line",
+    kind: "case",
+    property: None,
+    status: "active",
+    skip_reason: None,
+    tolerance: 1e-06,
+    numbers: &[
+        ("length", 1000.0),
+        ("diameter", 0.1),
+        ("cells", 5.0),
+        ("friction_factor", 0.01),
+        ("right_boundary_pressure", 4000000.0),
+        ("time_step", 0.05),
+        ("duration", 1.0),
+        ("cfl_number", 0.5),
+    ],
+    flags: &[],
+    lists: &[("components", &["methane", "n-butane"])],
+    strings: &[
+        ("left_boundary", "closed"),
+        ("right_boundary", "constant_pressure"),
+    ],
+    vectors: &[
+        ("initial_momentum", &[0.0, 0.0, 0.0, 0.0, 0.0]),
+        (
+            "initial_total_energy",
+            &[
+                -30513185.583300006,
+                -30513185.583300006,
+                -30513185.583300006,
+                -30513185.583300006,
+                -30513185.583300006,
+            ],
+        ),
+    ],
+    matrices: &[(
+        "initial_component_density",
+        &[
+            2216.805049331748,
+            1477.870032887832,
+            2216.805049331748,
+            1477.870032887832,
+            2216.805049331748,
+            1477.870032887832,
+            2216.805049331748,
+            1477.870032887832,
+            2216.805049331748,
+            1477.870032887832,
+        ],
+    )],
+    expected: &[("steps", 1.0)],
+    expected_vectors: &[],
+    expected_strings: &[],
+    records: &[],
+    expected_records: &[],
+}];
+
+static PIPELINE_TRANSIENT_INNER: ModelAlgorithm = ModelAlgorithm {
+    scheme: "vu_flash_newton_2x2",
+    convergence: "relative",
+    tolerance: 1e-08,
+    max_iterations: 100,
+    bracket: None,
+    initialisation: Some("ideal_gas"),
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+static PIPELINE_TRANSIENT_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "explicit_euler_hem_pipeline",
+    convergence: "absolute",
+    tolerance: 0.5,
+    max_iterations: 1000000,
+    bracket: None,
+    initialisation: Some("initial_profiles"),
+    initial_temperature: None,
+    inner: Some(&PIPELINE_TRANSIENT_INNER),
+    fallback: None,
+};
+
+/// Registry entry for `eos.pipeline_transient`.
+pub static PIPELINE_TRANSIENT_SPEC: ModelSpec = ModelSpec {
+    id: "eos.pipeline_transient",
+    kind: "procedure",
+    algorithm: Some(&PIPELINE_TRANSIENT_ALGORITHM),
+    checks: PIPELINE_TRANSIENT_CHECKS,
+    cases: PIPELINE_TRANSIENT_CASES,
+};
+
 static PITZER_HYDRATE_FORMATION_PRESSURE_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -30079,6 +30264,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &PHASE_TRANSPORT_SPEC,
     &PIPE_BEGGS_AND_BRILLS_SPEC,
     &PIPELINE_COOLDOWN_SPEC,
+    &PIPELINE_TRANSIENT_SPEC,
     &PITZER_HYDRATE_FORMATION_PRESSURE_SPEC,
     &PITZER_HYDRATE_FORMATION_TEMPERATURE_SPEC,
     &PITZER_PHASE_SPEC,
