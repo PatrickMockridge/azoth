@@ -312,7 +312,7 @@ def _two_phase_at(mixture: Mixture, z: list[float], t: float, p: float) -> bool:
             tolerance=_GRID_FLASH_TOLERANCE,
             strict=False,
         )
-    except Exception:  # noqa: BLE001 - a flash that cannot answer is outside the region
+    except Exception:  # a flash that cannot answer is outside the region
         return False
     if not flash.converged:
         return False
