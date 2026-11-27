@@ -60,7 +60,7 @@ const BUTTON_STYLE = {
   textAlign: 'left',
 }
 
-function AzothHero({ hero, children }) {
+function AzothHero({ hero, children, setup }) {
   if (!hero) return children
   return React.createElement(
     'div',
@@ -75,7 +75,7 @@ function AzothHero({ hero, children }) {
       ),
       React.createElement('p', { style: { margin: '6px 0 0' } }, CARD.body),
       React.createElement('p', { style: MUTED_STYLE }, CARD.note),
-      React.createElement('p', { style: MUTED_STYLE }, CARD.setup),
+      React.createElement('p', { style: MUTED_STYLE }, setup || CARD.setup),
       React.createElement(
         'ul',
         { style: LIST_STYLE },
@@ -128,10 +128,15 @@ window.__ModuleLoader__.load({
     return {
       inject: ['slots'],
       apply(ctx) {
+        const config = (ctx && ctx.config) || {}
+        const setup = config.missingKey
+          ? 'No API key is set for ' + (config.provider || 'the selected provider') +
+            '. Save one on Settings → Models, then choose the provider and model in the composer.'
+          : CARD.setup
         ctx.slots.inject('conversation.hero.frame', () =>
           ctx.slots.register(
             { name: 'conversation.hero.frame', id: 'azoth-welcome', order: -100 },
-            AzothHero,
+            (props) => AzothHero({ ...props, setup }),
           ),
         )
         ctx.slots.inject('conversation.hero.options', () =>

@@ -3,8 +3,9 @@
 
 The launcher does four things:
 
-1. pins the checkout as DSH's first workspace, where its instructions and skills live;
-2. exports the skill catalog to `.dsh/skills/`;
+1. registers the checkout (or `--workspace`) as DSH's workspace, where its instructions
+   and skills live, without reordering the store;
+2. exports the skill catalog to `.dsh/skills/` and `$DSH_HOME/skills`;
 3. renders a `--patch` overlay for the shipped `web` or `headless` profile; and
 4. starts `dsh` with that overlay.
 
@@ -245,6 +246,36 @@ def resolve(
     )
 
 
+def default_provider(config: dict[str, Any]) -> str:
+    """The first declared provider whose key is set, else the shipped default."""
+    providers = config.get("providers", {})
+    if isinstance(providers, dict):
+        for slug, meta in providers.items():
+            if isinstance(meta, dict) and os.environ.get(str(meta.get("api_key_env", ""))):
+                return str(slug)
+    return "deepseek"
+
+
+def key_warning(args: argparse.Namespace, config: dict[str, Any]) -> str | None:
+    """The one warning a launch owes when its default route has no credential."""
+    if args.base_url:
+        key_env = args.api_key_env or "AZOTH_DSH_API_KEY"
+    else:
+        meta = config.get("providers", {}).get(args.provider)
+        key_env = args.api_key_env or (
+            str(meta["api_key_env"]) if isinstance(meta, dict) else "DEEPSEEK_API_KEY"
+        )
+    if os.environ.get(key_env):
+        return None
+    return f"{key_env} is not set; save a key in DSH Settings -> Models or export it"
+
+
+def workspace_path(args: argparse.Namespace) -> Path | None:
+    """The `--workspace`/`AZOTH_DSH_WORKSPACE` path, or None for the checkout."""
+    value = args.workspace or os.environ.get("AZOTH_DSH_WORKSPACE")
+    return Path(value).expanduser() if value else None
+
+
 # ---------------------------------------------------------------------------------------
 # YAML rendering
 
@@ -383,10 +414,15 @@ def _write_store(store: Path, data: dict[str, Any]) -> None:
             Path(temporary).unlink()
 
 
-def ensure_workspace(root: Path, home: Path, *, write: bool) -> WorkspaceReport:
-    """Make the checkout the workspace DSH opens, preserving every other record."""
+def ensure_workspace(
+    root: Path, home: Path, *, write: bool, workspace: Path | None = None
+) -> WorkspaceReport:
+    """Open `workspace` (the checkout by default), preserving every other record."""
     store = home / "storages" / "workspace.json"
-    canonical = _canonical(root)
+    canonical = _canonical(workspace if workspace is not None else root)
+    if write and workspace is not None:
+        Path(canonical).mkdir(parents=True, exist_ok=True)
+        canonical = _canonical(canonical)
     if not store.is_file():
         if not write:
             return WorkspaceReport("warn", f"{canonical}: no workspace store yet; a launch pins it")
@@ -442,30 +478,24 @@ def ensure_workspace(root: Path, home: Path, *, write: bool) -> WorkspaceReport:
             "createdAt": now,
             "updatedAt": now,
         }
-        order.insert(0, workspace_id)
+        if workspace is not None:
+            order.insert(0, workspace_id)
+        else:
+            order.append(workspace_id)
         detail += "added workspace"
         changed = True
-    elif order[0] != workspace_id:
-        order.remove(workspace_id)
-        order.insert(0, workspace_id)
-        detail += "moved to first"
-        changed = True
     else:
-        detail += "first"
+        detail += "present"
 
-    record = workspaces[workspace_id]
-    if write and not record["sessionIds"]:
-        # DSH's initial pick is the workspace with the latest session, falling back to its
-        # creation time. Keep an unused checkout ahead of a previously used default.
-        latest = str(record.get("updatedAt") or record["createdAt"])
-        others = [
-            str(other.get("updatedAt") or other["createdAt"])
-            for other_id, other in workspaces.items()
-            if other_id != workspace_id
-        ]
-        if others and latest < max(others):
-            record["createdAt"] = _now()
-            record["updatedAt"] = record["createdAt"]
+    if workspace is not None:
+        if order[0] != workspace_id:
+            order.remove(workspace_id)
+            order.insert(0, workspace_id)
+            detail += ", moved to first"
+            changed = True
+        if global_state.get("defaultWorkspaceId") != workspace_id:
+            global_state["defaultWorkspaceId"] = workspace_id
+            detail += ", opened by default"
             changed = True
     if not global_state.get("initialized"):
         global_state["initialized"] = True
@@ -675,7 +705,16 @@ def build_overlay(
         )
     ui = tc.root / "agents" / "deepseek" / "ui" / "index.js"
     if args.persona == "engineer" and study is None and mode == "web" and ui.is_file():
-        inserts.append({"id": "azoth-ui", "name": str(ui), "config": {}})
+        inserts.append(
+            {
+                "id": "azoth-ui",
+                "name": str(ui),
+                "config": {
+                    "missingKey": key_warning(args, config) is not None,
+                    "provider": args.provider,
+                },
+            }
+        )
     if args.flowsheet and tc.azoth is not None:
         inserts.append(
             {
@@ -829,21 +868,10 @@ def _skill_files(args: argparse.Namespace, config: dict[str, Any]) -> dict[Path,
     return files
 
 
-def _skill_hashes(files: dict[Path, str]) -> dict[str, str]:
-    return {
-        path.stem: hashlib.sha256(text.encode("utf-8")).hexdigest() for path, text in files.items()
-    }
-
-
-def export_skills_for_launch(args: argparse.Namespace, config: dict[str, Any]) -> int:
-    files = _skill_files(args, config)
-    if not files:
-        return 0
-    out = Path(args.root).resolve() / ".dsh" / "skills"
+def _write_skill_root(out: Path, files: dict[str, str]) -> None:
     out.mkdir(parents=True, exist_ok=True)
-    for path, text in files.items():
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="utf-8")
+    for name, text in files.items():
+        (out / f"{name}.md").write_text(text, encoding="utf-8")
     manifest_path = out / ".manifest.json"
     previous: dict[str, str] = {}
     if manifest_path.is_file():
@@ -851,7 +879,9 @@ def export_skills_for_launch(args: argparse.Namespace, config: dict[str, Any]) -
             previous = dict(json.loads(manifest_path.read_text(encoding="utf-8")).get("skills", {}))
         except (json.JSONDecodeError, AttributeError):
             previous = {}
-    current = _skill_hashes(files)
+    current = {
+        name: hashlib.sha256(text.encode("utf-8")).hexdigest() for name, text in files.items()
+    }
     for name in previous:
         if name not in current:
             stale = out / f"{name}.md"
@@ -861,7 +891,19 @@ def export_skills_for_launch(args: argparse.Namespace, config: dict[str, Any]) -
         json.dumps({"schema": MANIFEST, "skills": current}, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
-    return len(files)
+
+
+def export_skills_for_launch(
+    args: argparse.Namespace, config: dict[str, Any], home: Path | None = None
+) -> int:
+    files = _skill_files(args, config)
+    if not files:
+        return 0
+    texts = {path.stem: text for path, text in files.items()}
+    _write_skill_root(Path(args.root).resolve() / ".dsh" / "skills", texts)
+    if home is not None:
+        _write_skill_root(Path(home) / "skills", texts)
+    return len(texts)
 
 
 def skills_report(
@@ -874,21 +916,25 @@ def skills_report(
         return "fail", str(exc)
     if not files:
         return "ok", "skill export disabled"
-    out = Path(args.root).resolve() / ".dsh" / "skills"
-    if not out.is_dir():
-        return "warn", "skills are not exported yet; a launch writes them"
+    roots = [Path(args.root).resolve() / ".dsh" / "skills"]
+    if home is not None:
+        roots.append(Path(home) / "skills")
+    missing = [root for root in roots if not root.is_dir()]
+    if missing:
+        return "warn", f"{missing[0]} is not exported yet; a launch writes it"
     stale: list[str] = []
-    for path, text in files.items():
-        if not path.is_file():
-            stale.append(f"missing {path.name}")
-        elif path.read_text(encoding="utf-8") != text:
-            stale.append(f"stale {path.name}")
+    orphans: list[str] = []
     expected_names = {path.stem for path in files}
-    orphans = (
-        sorted(path.stem for path in out.glob("*.md") if path.stem not in expected_names)
-        if out.is_dir()
-        else []
-    )
+    for out in roots:
+        for path, text in files.items():
+            target = out / path.name
+            if not target.is_file():
+                stale.append(f"missing {target}")
+            elif target.read_text(encoding="utf-8") != text:
+                stale.append(f"stale {target}")
+        orphans.extend(
+            sorted(path.stem for path in out.glob("*.md") if path.stem not in expected_names)
+        )
     if stale:
         return "fail", "; ".join(stale[:5])
     if orphans:
@@ -898,7 +944,9 @@ def skills_report(
         or os.environ.get("AZOTH_DSH_HOME")
         or str(Path(args.root).resolve() / ".dsh-home")
     )
-    workspace = ensure_workspace(Path(args.root), store_home, write=False)
+    workspace = ensure_workspace(
+        Path(args.root), store_home, write=False, workspace=workspace_path(args)
+    )
     if workspace.status == "fail":
         return "fail", f"{len(files)} skills exported, but {workspace.detail}"
     if workspace.status == "warn":
@@ -1180,8 +1228,8 @@ def _probe_plugin(args: argparse.Namespace, tc: Toolchain, env: dict[str, str]) 
     return Check("plugin", "ok", f"{index.name}{suffix}")
 
 
-def _probe_workspace(tc: Toolchain) -> Check:
-    report = ensure_workspace(tc.root, tc.dsh_home, write=False)
+def _probe_workspace(args: argparse.Namespace, tc: Toolchain) -> Check:
+    report = ensure_workspace(tc.root, tc.dsh_home, write=False, workspace=workspace_path(args))
     return Check("workspace", report.status, report.detail)
 
 
@@ -1307,7 +1355,7 @@ def run_checks(args: argparse.Namespace, config: dict[str, Any]) -> list[Check]:
             checks.append(mcp)
         checks.append(_probe_bridge(args, tc, env))
         checks.append(_probe_plugin(args, tc, env))
-        checks.append(_probe_workspace(tc))
+        checks.append(_probe_workspace(args, tc))
         preset = _probe_preset(args, tc, config)
         if preset is not None:
             checks.append(preset)
@@ -1358,12 +1406,18 @@ def _launch_argv(
 def _launch(args: argparse.Namespace, config: dict[str, Any]) -> int:
     if args.permission_mode is None:
         raise SystemExit("launch_dsh: choose --permission-mode read-only or workspace-write")
+    warning = key_warning(args, config)
+    if warning:
+        print(f"launch_dsh: {warning}", file=sys.stderr)
     tc = resolve(args, config)
     study = _study(config, args.study)
     if study is not None and study.get("requires_flowsheet") is True and not args.flowsheet:
         raise SystemExit(f"launch_dsh: --study {args.study} needs --flowsheet")
+    target = workspace_path(args)
     try:
-        workspace = ensure_workspace(tc.root, tc.dsh_home, write=True)
+        workspace = ensure_workspace(tc.root, tc.dsh_home, write=True, workspace=target)
+        if target is not None:
+            ensure_workspace(tc.root, tc.dsh_home, write=True)
     except WorkspaceError as exc:
         raise SystemExit(f"launch_dsh: cannot pin the workspace: {exc}") from exc
     if workspace.changed:
@@ -1371,9 +1425,12 @@ def _launch(args: argparse.Namespace, config: dict[str, Any]) -> int:
     task = _task(args) if args.mode == "headless" else None
     if args.mode == "headless" and not task:
         raise SystemExit("launch_dsh: headless mode needs a task")
-    written = export_skills_for_launch(args, config)
+    written = export_skills_for_launch(args, config, tc.dsh_home)
     if written:
-        print(f"launch_dsh: exported {written} skill(s) to {tc.root / '.dsh' / 'skills'}")
+        print(
+            f"launch_dsh: exported {written} skill(s) to "
+            f"{tc.root / '.dsh' / 'skills'} and {tc.dsh_home / 'skills'}"
+        )
 
     patch_dir = tc.root / ".dsh" / "patches"
     patch_dir.mkdir(parents=True, exist_ok=True)
@@ -1415,10 +1472,12 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--azoth-bin")
     p.add_argument("--node")
     p.add_argument("--dsh-home")
+    p.add_argument("--workspace", help="workspace to open; created when absent")
     p.add_argument(
         "--provider",
         choices=("deepseek", "openai", "anthropic", "kimi", "minimax"),
-        default="deepseek",
+        default=None,
+        help="default model route; the first provider with a key when omitted",
     )
     p.add_argument("--model")
     p.add_argument("--base-url")
@@ -1478,6 +1537,8 @@ def main(argv: list[str] | None = None) -> int:
     _study(config, args.study)
     if args.skills not in ("full", "none") and args.skills not in config.get("skills", {}):
         raise SystemExit(f"launch_dsh: harness.toml has no [skills.{args.skills}]")
+    if args.provider is None:
+        args.provider = default_provider(config)
     provider_meta = config["providers"].get(args.provider)
     if not isinstance(provider_meta, dict):
         raise SystemExit(f"launch_dsh: harness.toml has no [providers.{args.provider}]")

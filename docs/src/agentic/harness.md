@@ -35,7 +35,8 @@ writes, and neither exports the skills.
 | `--study hazop\|intake` | web only; enable Agent Teams, mount the four presets, make the study's root preset the root |
 | `--skills full\|hazop\|intake\|none` | export all 90 catalog skills, a curated study subset, or none |
 | `--permission-mode read-only\|workspace-write` | required for a launch; no default |
-| `--provider NAME` | the default route: `deepseek`, `openai`, `anthropic`, `kimi` or `minimax` |
+| `--workspace PATH` | open (and create) this workspace instead of the checkout |
+| `--provider NAME` | the default route: `deepseek`, `openai`, `anthropic`, `kimi` or `minimax`; the first provider whose key is set when omitted |
 | `--model ID` | the model id; defaults to the provider's declared default |
 | `--base-url URL`, `--api`, `--api-key-env` | use an OpenAI-compatible gateway instead of the native provider routes |
 | `--reasoning-effort` | `off`, `low`, `high` or `max`; hosted route only |
@@ -50,10 +51,16 @@ writes, and neither exports the skills.
 
 DSH scans the skills and instruction files of the **session workspace**, not the
 process's working directory. The launcher therefore writes the checkout into
-`$DSH_HOME/storages/workspace.json` as the first workspace, adding a record when it is
-absent and preserving every other workspace and session. Without that record a session
-opens DSH's own `~/Documents/deepseek-harness/default-workspace`, and neither `AGENTS.md`
-nor `.dsh/skills` is discovered.
+`$DSH_HOME/storages/workspace.json`, adding a record when it is absent and preserving
+every other workspace, its order and its sessions. It does not reorder the store on a
+later launch, so the workspace the user last chose stays the one DSH opens. Without that
+record a session opens DSH's own `~/Documents/deepseek-harness/default-workspace`, and
+neither `AGENTS.md` nor `.dsh/skills` is discovered.
+
+`--workspace PATH` (or `AZOTH_DSH_WORKSPACE`) opens and creates a different workspace and
+makes it the default; the checkout is still added so the picker lists it. The skill
+catalog is exported to both `<checkout>/.dsh/skills` and `$DSH_HOME/skills`, DSH's user
+root, so switching workspace does not lose the catalog.
 
 `--persona engineer` (the default) mounts `azoth-engineer` as the web root preset: the
 engineering persona, `agent-instructions` for `AGENTS.md`, the skill catalog, file and
@@ -67,8 +74,10 @@ instead; the headless one-shot composes no preset roster and refuses it.
 The first time the page opens, the welcome card says what azoth is, distinguishes FEED
 from a browser front end, and names the screening boundary. Three starter buttons fill
 the composer with engineer questions: a pump sizing, the demo separator, and relief and
-fire calculations. A missing model key is reported by DSH; the key is saved on the
-**Settings → Models** page or exported as the selected provider's environment variable.
+fire calculations. When the default route's key is absent, the launcher prints the env var
+and the **Settings → Models** page before starting, and the card repeats it; the key is
+saved there or exported as the selected provider's environment variable. DSH's own
+onboarding dialog only appears when no provider route has a key at all.
 
 ## Providers
 
@@ -78,14 +87,16 @@ into the overlay:
 
 | `--provider` | Provider route | Model default | Key |
 |---|---|---|---|
-| `deepseek` (default) | `deepseek-official` | `deepseek-v4-flash` | `DEEPSEEK_API_KEY` |
+| `deepseek` | `deepseek-official` | `deepseek-v4-flash` | `DEEPSEEK_API_KEY` |
 | `openai` | OpenAI catalog | `gpt-5.5` | `OPENAI_API_KEY` |
 | `anthropic` | Anthropic catalog | `claude-sonnet-5` | `ANTHROPIC_API_KEY` |
 | `kimi` | Moonshot catalog | `kimi-k2.6` | `MOONSHOT_API_KEY` |
 | `minimax` | MiniMax catalog | `MiniMax-M2.7` | `MINIMAX_API_KEY` |
 
-`--provider` only sets the session's default; the selector can choose another route or
-model. `--model` overrides the provider's default id. OpenAI speaks the Responses API
+`--provider` sets the session's default; the selector can choose another route or model.
+When it is omitted the launcher picks the first provider in the table whose key env is set
+and falls back to `deepseek`; a launch whose default has no key prints one warning naming
+that env var. `--model` overrides the provider's default id. OpenAI speaks the Responses API
 through the catalog; Anthropic, Kimi and MiniMax use their catalog protocols. The
 `--base-url` route is the escape hatch for an OpenAI-compatible gateway, an enterprise
 endpoint or a model the catalog does not list; it replaces the native routes for that
@@ -121,12 +132,12 @@ warns, unless `--require-flowsheet` makes that a failure.
 | `mcp` | a stdio `initialize` request and tool listing, under the name `azoth` |
 | `bridge` | `python -m azoth.harness version` prints JSON, and `review` checks the worked dossier |
 | `plugin` | `node --check` and `node --test` for the plugin and the welcome UI |
-| `workspace` | the first workspace is the checkout; a missing store is a warning because a launch seeds it |
+| `workspace` | the checkout (or `--workspace`) is registered without reordering the store; a missing store is a warning because a launch seeds it |
 | `preset` | the `azoth-engineer` prompt and `harness.toml` row exist in engineer mode |
 | `ui` | the welcome UI's `client.js` and `dsh.client` manifest exist in engineer web mode |
 | `provider` | the selected provider route and model are declared |
 | `providers` | which provider key variables are set, without reading their values |
-| `skills` | the exported skills are present, current, not orphaned, and in the pinned workspace |
+| `skills` | the exported skills are present, current and not orphaned in the workspace and the `$DSH_HOME/skills` user root |
 | `api-key` | the selected provider's key environment variable is set; its value is never read |
 
 Each probe is `ok`, `warn` or `fail`; one line each, or `--json` for a report of the form

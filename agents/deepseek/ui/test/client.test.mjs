@@ -12,13 +12,14 @@ const React = {
   },
 }
 
-function load() {
+function load(config) {
   let module
   const window = { __ModuleLoader__: { load: (loaded) => (module = loaded) } }
   vm.runInNewContext(SOURCE, { window, console })
   assert.equal(module.id, 'azoth-dsh-ui')
   const slots = new Map()
   const ctx = {
+    config,
     slots: {
       inject(_name, register) {
         register()
@@ -66,6 +67,14 @@ test('the hero card names the domain, FEED and the screening boundary', () => {
   assert.match(words, /screening values, not design deliverables/)
   assert.match(words, /Settings → Models/)
   assert.match(words, /conversation/)
+})
+
+test('a missing key replaces the setup line with a warning', () => {
+  const hero = load({ missingKey: true, provider: 'deepseek' }).get('conversation.hero.frame').component
+  const words = text(hero({ hero: true, children: React.createElement('div', null, 'conversation') }))
+  assert.match(words, /No API key is set for deepseek/)
+  assert.match(words, /Settings → Models/)
+  assert.doesNotMatch(words, /First run: save your model provider/)
 })
 
 test('the card renders only on the blank home', () => {
