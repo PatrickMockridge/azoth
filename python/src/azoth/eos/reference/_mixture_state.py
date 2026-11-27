@@ -1261,12 +1261,11 @@ def phase_state_at(
         # the two expressions do not reduce to one another off the pure component - which
         # is the only state at which this library's tests could tell them apart.
         ader = _ge_ader(reduced, x)
-        if ader is None:
+        if ader is None or b_der is None:
             raise InvalidInputError(
                 "mixture",
                 "the excess-Gibbs rule's derivative is absent on a mixture whose alpha_mix is set",
             )
-        assert b_der is not None
         delta1, delta2 = c.delta1, c.delta2
         for i in range(n):
             bd = b_der[i]
