@@ -672,6 +672,7 @@ pub(crate) fn build_mixture_with_mass(
 /// The translations are component fields, and a mixture built without them reports an
 /// untranslated volume - a density that differs from the Python reference by the shift.
 /// Only the models that report a density need them at the boundary.
+#[allow(non_snake_case)] // `Tc` and `Pc` are the symbols in the chemistry
 #[allow(clippy::too_many_arguments)] // one parameter per component field the model reads
 pub(crate) fn build_mixture_with_mass_and_shift(
     py: Python<'_>,

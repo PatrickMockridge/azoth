@@ -12,7 +12,6 @@ import math
 
 import pytest
 
-import _helpers as h
 from azoth import ureg, use_backend
 from azoth.characterization import tbp_cut_properties, tbp_fraction_component
 from azoth.core.result import Phase, PhaseClass
@@ -21,8 +20,8 @@ from azoth.core.warnings import WarningCode
 from azoth.eos import (
     IdealGasModel,
     critical_point,
-    pt_phase_envelope,
     pt_flash_check,
+    pt_phase_envelope,
     state_at_tp,
 )
 from azoth.eos import mixture as build_mixture
@@ -66,7 +65,9 @@ def study_fluid(eos: str = "srk"):
     cards = list(real_mix.components)
     ideal = [[], [], [], [], []]
     for vec, column in zip(
-        ideal, (ideal_real.cp_a, ideal_real.cp_b, ideal_real.cp_c, ideal_real.cp_d, ideal_real.cp_e)
+        ideal,
+        (ideal_real.cp_a, ideal_real.cp_b, ideal_real.cp_c, ideal_real.cp_d, ideal_real.cp_e),
+        strict=True,
     ):
         vec.extend(float(v) for v in column)
     kij = {
@@ -78,9 +79,10 @@ def study_fluid(eos: str = "srk"):
     names = list(real)
     from azoth.eos.components import Component
 
-    for cut, (analogue, mw, rho) in CUTS.items():
-        props = tbp_cut_properties(molar_mass=q(mw, "kg/mol"), density=q(rho, "kg/m**3"),
-                                   model="pedersen_srk")
+    for cut, (_analogue, mw, rho) in CUTS.items():
+        props = tbp_cut_properties(
+            molar_mass=q(mw, "kg/mol"), density=q(rho, "kg/m**3"), model="pedersen_srk"
+        )
         card = tbp_fraction_component(molar_mass=q(mw, "kg/mol"), density=q(rho, "kg/m**3"))
         tc = props.tc.to("K").magnitude
         pc = props.pc.to("Pa").magnitude
@@ -92,14 +94,10 @@ def study_fluid(eos: str = "srk"):
                 omega=omega,
                 rackett_z=card.racket_z,
                 molar_mass=q(mw, "kg/mol"),
-                volume_shift=pr_peneloux_shift(
-                    omega, q(tc, "K"), q(pc, "Pa"), card.racket_z
-                )
+                volume_shift=pr_peneloux_shift(omega, q(tc, "K"), q(pc, "Pa"), card.racket_z)
                 .c.to("m**3/mol")
                 .magnitude,
-                volume_shift_srk=srk_peneloux_shift(
-                    omega, q(tc, "K"), q(pc, "Pa"), card.racket_z
-                )
+                volume_shift_srk=srk_peneloux_shift(omega, q(tc, "K"), q(pc, "Pa"), card.racket_z)
                 .c.to("m**3/mol")
                 .magnitude,
             )
@@ -114,6 +112,7 @@ def study_fluid(eos: str = "srk"):
                 card.cp_d.to("J/(mol*K**4)").magnitude,
                 0.0,
             ),
+            strict=True,
         ):
             vec.append(float(value))
     mix = build_mixture(
@@ -231,7 +230,7 @@ def _two_phase_band(mix, z, t: float) -> tuple[float, float]:
 
 
 def test_the_ten_degree_upper_boundary_and_dropout() -> None:
-    _, z, mix, ideal = study_fluid("srk")
+    _, z, mix, _ = study_fluid("srk")
     assert _upper_at_10c(mix, z) == pytest.approx(99.84, abs=0.2)
     flash = pt_flash_check(mix, q(283.15, "K"), q(60e5, "Pa"), z, tolerance=1e-10)
     beta = flash.vapour_fraction
@@ -286,9 +285,8 @@ def test_the_pr_characterisation_numbers() -> None:
         result = pt_phase_envelope(mix, P=q(1e5, "Pa"), z=z)
         lower, upper = _two_phase_band(mix, z, 283.15)
     assert result.cricondenbar_pressure.to("bar").magnitude == pytest.approx(102.07, abs=0.2)
-    assert (
-        result.cricondenbar_temperature.to("K").magnitude - 273.15
-        == pytest.approx(-8.8, abs=0.3)
+    assert result.cricondenbar_temperature.to("K").magnitude - 273.15 == pytest.approx(
+        -8.8, abs=0.3
     )
     assert lower == pytest.approx(4.20, abs=0.2)
     assert upper == pytest.approx(93.90, abs=0.2)
@@ -300,9 +298,8 @@ def test_the_literal_n_alkane_cuts() -> None:
         _, z, mix, _ = literal_fluid("srk")
         result = pt_phase_envelope(mix, P=q(1e5, "Pa"), z=z)
     assert result.cricondenbar_pressure.to("bar").magnitude == pytest.approx(99.85, abs=0.3)
-    assert (
-        result.cricondenbar_temperature.to("K").magnitude - 273.15
-        == pytest.approx(-9.1, abs=0.3)
+    assert result.cricondenbar_temperature.to("K").magnitude - 273.15 == pytest.approx(
+        -9.1, abs=0.3
     )
 
 
@@ -313,6 +310,6 @@ def test_the_full_study_envelope_numbers() -> None:
         _, z, mix, _ = study_fluid("srk")
         result = pt_phase_envelope(mix, P=q(1e5, "Pa"), z=z)
     assert result.cricondenbar_pressure.to("bar").magnitude == pytest.approx(105.39, abs=0.2)
-    assert (
-        result.cricondenbar_temperature.to("K").magnitude - 273.15 == pytest.approx(-5.7, abs=0.3)
+    assert result.cricondenbar_temperature.to("K").magnitude - 273.15 == pytest.approx(
+        -5.7, abs=0.3
     )
