@@ -1,0 +1,236 @@
+id = "eos.pipeline_transient"
+name = "Transient segmented pipeline (homogeneous equilibrium)"
+kind = "procedure"
+assumptions = [
+    "**the line is a homogeneous-equilibrium (HEM) model**: one composition and one temperature per cell, no slip and no flow-regime map. NeqSim's `TransientPipe` carries one composition for the whole line; this is azoth's own component-tracking line, not a port of that class.",
+    "**the conserved state is `c_i`, `rho u` and `rho E` per cell**, and `eos.vu_flash` inverts each cell's `(v, u, z)` to pressure, temperature and the split. A failed inversion halves the step rather than the answer.",
+    "**the flux is Rusanov** with `a_max = max(|u| + a)`; `a = sqrt(gamma P / rho)` with `gamma` the frozen phase-weighted cp/cv from `phase_capacity`. It ignores phase-change relaxation and overestimates the equilibrium speed, so the CFL bound is conservative.",
+    "**the boundaries are closed or a constant-pressure ghost**; the ghost is `eos.state_at_tp` at the boundary pressure and temperature (the adjacent cell's when absent), with the adjacent composition and velocity.",
+    "**the friction factor is the caller's Darcy factor**: the whole friction model is `f rho |u| u / (2D)`; no viscosity and no roughness are modelled. Wall heat is the caller's flux, entering as `4 q / D`.",
+    "**a requested step above the CFL limit is refused**; a flash or positivity failure halves it and retries, and the result reports the rejections and the smallest step used. The stage still advances exactly `duration`.",
+    "**Peneloux translation is not in `eos.vu_flash`**: the interior volume is the untranslated cubic, while the ghost's `state_at_tp` volume is translated. The difference is a boundary-only approximation.",
+    "no gravity or elevation, no wall thermal mass and no ambient convection beyond the caller's flux; the line is horizontal.",
+]
+references = [
+    "Toro, E. F. (2009). \"Riemann Solvers and Numerical Methods for Fluid Dynamics.\" 3rd ed., Springer. The Rusanov flux and the explicit Euler update.",
+    "Michelsen, M. L.; Mollerup, J. M. (2004). \"Thermodynamic Models: Fundamentals and Computational Aspects.\" Tie-Line Publications. The volume-internal-energy inversion `eos.vu_flash` performs.",
+]
+[source]
+standard = "Finite-volume HEM line with a Rusanov flux"
+edition = "The state per cell is `c_i`, `rho u`, `rho E`; the flux is Rusanov; the march is explicit Euler with Darcy friction and the caller's wall flux. NeqSim's `TransientPipe` and `TwoFluidPipe` are not ported."
+[algorithm]
+scheme = "explicit_euler_hem_pipeline"
+initialisation = "initial_profiles"
+convergence = "absolute"
+tolerance = 5e-01
+max_iterations = 1000000
+[algorithm.inner]
+scheme = "vu_flash_newton_2x2"
+initialisation = "ideal_gas"
+convergence = "relative"
+tolerance = 1e-08
+max_iterations = 100
+[inputs]
+[inputs.components]
+type = "components"
+length = "one entry per component"
+description = "the substances the mixture is made of, by name, resolved against the databank with the keycard's overrides applied."
+[inputs.length]
+unit = "m"
+description = "the line's length."
+[inputs.diameter]
+unit = "m"
+description = "the internal diameter, uniform along the line."
+[inputs.cells]
+unit = "dimensionless"
+description = "the number of equal-length cells; at least two."
+[inputs.friction_factor]
+unit = "dimensionless"
+description = "the Darcy friction factor, uniform along the line. The caller supplies it; no Reynolds number or roughness is computed."
+[inputs.wall_heat_flux]
+unit = "W/m**2"
+optional = true
+description = "heat into the fluid per wall area; positive heats the line. Absent is adiabatic."
+[inputs.left_boundary]
+type = "enum"
+values = ["closed", "constant_pressure"]
+description = "what the inlet face is."
+[inputs.right_boundary]
+type = "enum"
+values = ["closed", "constant_pressure"]
+description = "what the outlet face is."
+[inputs.left_boundary_pressure]
+unit = "Pa"
+optional = true
+description = "the inlet ghost's pressure; required when `left_boundary` is `constant_pressure`."
+[inputs.right_boundary_pressure]
+unit = "Pa"
+optional = true
+description = "the outlet ghost's pressure; required when `right_boundary` is `constant_pressure`."
+[inputs.left_boundary_temperature]
+unit = "K"
+optional = true
+description = "the inlet ghost's temperature; absent takes the adjacent cell's."
+[inputs.right_boundary_temperature]
+unit = "K"
+optional = true
+description = "the outlet ghost's temperature; absent takes the adjacent cell's."
+[inputs.initial_component_density]
+type = "matrix"
+unit = "mol/m**3"
+shape = "one row per cell, one column per component"
+description = "the conserved component densities at the start of the stage."
+[inputs.initial_momentum]
+type = "vector"
+unit = "kg/(m**2*s)"
+length = "one per cell"
+description = "the conserved momentum `rho u` at the start of the stage."
+[inputs.initial_total_energy]
+type = "vector"
+unit = "Pa"
+length = "one per cell"
+description = "the conserved total energy per volume, `rho (e + u^2/2)`, in Pa - dimensionally J/m^3 and numerically identical."
+[inputs.time_step]
+unit = "s"
+description = "the requested step; the constant-pressure ghost, CFL and failure halvings can shorten it."
+[inputs.duration]
+unit = "s"
+description = "the time the stage advances."
+[inputs.cfl_number]
+unit = "dimensionless"
+optional = true
+description = "the CFL fraction, in `(0, 1]`; absent takes 0.5."
+[outputs]
+[outputs.final_component_density]
+type = "matrix"
+unit = "mol/m**3"
+shape = "one row per cell, one column per component"
+description = "the component densities at the end of the stage."
+[outputs.final_velocity]
+type = "vector"
+unit = "m/s"
+length = "one per cell"
+description = "the velocity at the end of the stage."
+[outputs.final_pressure]
+type = "vector"
+unit = "Pa"
+length = "one per cell"
+description = "the pressure at the end of the stage."
+[outputs.final_temperature]
+type = "vector"
+unit = "K"
+length = "one per cell"
+description = "the temperature at the end of the stage."
+[outputs.final_vapour_fraction]
+type = "vector"
+unit = "dimensionless"
+length = "one per cell"
+description = "the vapour fraction at the end of the stage; 0 or 1 in a single phase."
+[outputs.final_density]
+type = "vector"
+unit = "kg/m**3"
+length = "one per cell"
+description = "the mass density, `sum_i c_i M_i`."
+[outputs.final_liquid_volume_fraction]
+type = "vector"
+unit = "dimensionless"
+length = "one per cell"
+description = "the liquid's share of the cell volume; 1 in a liquid cell and 0 in a vapour cell."
+[outputs.boundary_component_outflow]
+type = "vector"
+unit = "mol"
+length = "one per component"
+description = "the moles of each component that crossed the boundaries outward during the stage."
+[outputs.initial_component_holdup]
+type = "vector"
+unit = "mol"
+length = "one per component"
+description = "the moles of each component in the line at the start."
+[outputs.final_component_holdup]
+type = "vector"
+unit = "mol"
+length = "one per component"
+description = "the moles of each component in the line at the end."
+[outputs.boundary_mass_outflow]
+unit = "kg"
+description = "the mass that crossed the boundaries outward during the stage."
+[outputs.initial_mass]
+unit = "kg"
+description = "the mass in the line at the start."
+[outputs.final_mass]
+unit = "kg"
+description = "the mass in the line at the end."
+[outputs.steps]
+unit = "dimensionless"
+description = "accepted steps taken."
+[outputs.rejections]
+unit = "dimensionless"
+description = "steps refused and retried at half the step."
+[outputs.min_time_step]
+unit = "s"
+description = "the smallest step used."
+[outputs.history]
+type = "record_list"
+description = "one row per accepted step, starting with the initial state."
+[outputs.history.fields.time]
+unit = "s"
+description = "the time at the row."
+[outputs.history.fields.mass]
+unit = "kg"
+description = "the mass in the line."
+[outputs.history.fields.p_in]
+unit = "Pa"
+description = "the inlet-end pressure, from the first cell or the ghost."
+[outputs.history.fields.p_out]
+unit = "Pa"
+description = "the outlet-end pressure, from the last cell or the ghost."
+[outputs.history.fields.t_out]
+unit = "K"
+description = "the outlet-end temperature."
+[outputs.history.fields.beta_out]
+unit = "dimensionless"
+description = "the outlet-end vapour fraction."
+[outputs.history.fields.liquid_inventory]
+unit = "m**3"
+description = "the liquid volume in the line."
+[[valid_range]]
+quantity = "length"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a line's length is positive"
+[[valid_range]]
+quantity = "diameter"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a diameter is positive"
+[[valid_range]]
+quantity = "cells"
+min = 2
+min_inclusive = true
+severity = "error"
+rationale = "a finite-volume line needs at least two cells"
+[[valid_range]]
+quantity = "time_step"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a step is positive"
+[[valid_range]]
+quantity = "duration"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a stage advances a positive time"
+[[valid_range]]
+quantity = "cfl_number"
+min = 0
+max = 1
+min_inclusive = false
+max_inclusive = true
+severity = "error"
+rationale = "the CFL fraction is in (0, 1]"
+[implementations]
+python = "azoth.eos.pipeline_transient"
+rust = "azoth_eos::pipeline_transient"
