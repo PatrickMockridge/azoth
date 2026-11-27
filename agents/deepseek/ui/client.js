@@ -60,7 +60,7 @@ const BUTTON_STYLE = {
   textAlign: 'left',
 }
 
-function AzothHero({ hero, children }) {
+function AzothHero({ hero, children, setup }) {
   if (!hero) return children
   return React.createElement(
     'div',
@@ -75,7 +75,7 @@ function AzothHero({ hero, children }) {
       ),
       React.createElement('p', { style: { margin: '6px 0 0' } }, CARD.body),
       React.createElement('p', { style: MUTED_STYLE }, CARD.note),
-      React.createElement('p', { style: MUTED_STYLE }, CARD.setup),
+      React.createElement('p', { style: MUTED_STYLE }, setup || CARD.setup),
       React.createElement(
         'ul',
         { style: LIST_STYLE },
@@ -126,7 +126,7 @@ window.__ModuleLoader__.load({
     const react = require('react')
     React = react && react.createElement ? react : react.default
     return {
-      inject: ['slots'],
+      inject: ['slots', 'uiWorkspace'],
       apply(ctx) {
         ctx.slots.inject('conversation.hero.frame', () =>
           ctx.slots.register(
@@ -134,6 +134,39 @@ window.__ModuleLoader__.load({
             AzothHero,
           ),
         )
+        // DSH's workspace row click expands the row; the global New Session then
+        // uses the current workspace. Remember the row that was clicked so the
+        // global button opens the workspace the user chose.
+        let chosenWorkspace
+        if (typeof document !== 'undefined') {
+          document.addEventListener(
+            'click',
+            (event) => {
+              const target = event.target
+              if (!target || typeof target.closest !== 'function') return
+              const row = target.closest('[data-row-key^="workspace:"]')
+              if (row === null) return
+              chosenWorkspace = row.getAttribute('data-row-key').slice('workspace:'.length)
+            },
+            true,
+          )
+          document.addEventListener(
+            'click',
+            (event) => {
+              if (chosenWorkspace === undefined) return
+              const target = event.target
+              if (!target || typeof target.closest !== 'function') return
+              const button = target.closest('button')
+              if (button === null || button.closest('[data-row-key^="workspace:"]') !== null) return
+              if (button.innerText.trim() !== 'New Session') return
+              event.preventDefault()
+              event.stopPropagation()
+              ctx.uiWorkspace.startSession(chosenWorkspace)
+              chosenWorkspace = undefined
+            },
+            true,
+          )
+        }
         ctx.slots.inject('conversation.hero.options', () =>
           ctx.slots.register(
             {

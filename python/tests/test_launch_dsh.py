@@ -221,6 +221,8 @@ def _args(root: Path, *extra: str) -> tuple[Any, dict[str, Any]]:
     args = launch_dsh.parser().parse_args([*extra])
     args.root = str(root)
     config = tomllib.loads((root / "agents" / "deepseek" / "harness.toml").read_text())
+    if args.provider is None:
+        args.provider = "deepseek"
     if args.model is None:
         args.model = str(config["providers"][args.provider]["default_model"])
     return args, config
@@ -250,6 +252,26 @@ def _find(rows: list[dict[str, Any]], row_id: str) -> dict[str, Any] | None:
             if inserted.get("id") == row_id:
                 return cast("dict[str, Any]", inserted)
     return None
+
+
+@pytest.fixture(autouse=True)
+def _no_provider_keys(monkeypatch: pytest.MonkeyPatch) -> None:
+    for name in (
+        "DEEPSEEK_API_KEY",
+        "OPENAI_API_KEY",
+        "ANTHROPIC_API_KEY",
+        "MOONSHOT_API_KEY",
+        "MINIMAX_API_KEY",
+    ):
+        monkeypatch.delenv(name, raising=False)
+
+
+def _store_credentials(home: Path, *refs: str) -> None:
+    home.mkdir(parents=True, exist_ok=True)
+    (home / ".credentials.yaml").write_text(
+        "version: 1\nrecords: {}\nrefs:\n" + "".join(f"  {ref}: {{}}\n" for ref in refs),
+        encoding="utf-8",
+    )
 
 
 def test_engineer_web_overlay_has_the_engineer_preset_but_no_team(tmp_path: Path) -> None:
@@ -296,13 +318,104 @@ def test_a_provider_choice_sets_the_default_and_mounts_the_routes(
     assert default["config"] == {"provider": provider, "model": model}
     routes = _find(rows, "llm-pi-ai")
     assert routes is not None
-    assert set(routes["config"]["providers"]) == {
-        "openai",
-        "anthropic",
-        "moonshotai",
-        "minimax",
-    }
+    assert set(routes["config"]["providers"]) == {provider}
     assert _find(rows, "llm-deepseek") is not None
+
+
+def test_the_default_provider_is_the_first_with_a_key(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _, config = _args(_root(tmp_path))
+    for name in (
+        "DEEPSEEK_API_KEY",
+        "OPENAI_API_KEY",
+        "ANTHROPIC_API_KEY",
+        "MOONSHOT_API_KEY",
+        "MINIMAX_API_KEY",
+    ):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("OPENAI_API_KEY", "x")
+    assert launch_dsh.default_provider(config) == "openai"
+    monkeypatch.delenv("OPENAI_API_KEY")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "x")
+    assert launch_dsh.default_provider(config) == "anthropic"
+
+
+def test_the_default_provider_falls_back_to_deepseek(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _, config = _args(_root(tmp_path))
+    for name in (
+        "DEEPSEEK_API_KEY",
+        "OPENAI_API_KEY",
+        "ANTHROPIC_API_KEY",
+        "MOONSHOT_API_KEY",
+        "MINIMAX_API_KEY",
+    ):
+        monkeypatch.delenv(name, raising=False)
+    assert launch_dsh.default_provider(config) == "deepseek"
+
+
+def test_a_stored_key_is_available(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    _, config = _args(root)
+    home = tmp_path / "home"
+    _store_credentials(home, "DEEPSEEK_API_KEY")
+    assert launch_dsh.available_providers(config, home) == ["deepseek"]
+    assert launch_dsh.default_provider(config, home) == "deepseek"
+
+
+def test_a_stored_key_outranks_a_later_env_key(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = _root(tmp_path)
+    _, config = _args(root)
+    home = tmp_path / "home"
+    _store_credentials(home, "DEEPSEEK_API_KEY")
+    monkeypatch.setenv("OPENAI_API_KEY", "x")
+    assert launch_dsh.available_providers(config, home) == ["deepseek", "openai"]
+    assert launch_dsh.default_provider(config, home) == "deepseek"
+
+
+def test_routes_follow_the_available_keys(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    _store_credentials(root / ".dsh-home", "DEEPSEEK_API_KEY")
+    rows = _rows(root)
+    assert _find(rows, "llm-deepseek") is not None
+    assert _find(rows, "llm-pi-ai") is None
+    assert _find(rows, "azoth-ui") is not None
+
+
+def test_no_key_mounts_the_official_route_for_onboarding(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    rows = _rows(root)
+    assert _find(rows, "llm-deepseek") is not None
+    assert _find(rows, "llm-pi-ai") is None
+    assert _find(rows, "azoth-ui") is not None
+
+
+def test_a_missing_key_names_the_env_and_settings(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    args, config = _args(_root(tmp_path))
+    monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
+    warning = launch_dsh.key_warning(args, config)
+    assert warning is not None
+    assert "DEEPSEEK_API_KEY" in warning
+    assert "Settings -> Models" in warning
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "x")
+    assert launch_dsh.key_warning(args, config) is None
+
+
+def test_export_writes_the_user_root_too(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    args, config = _args(root, "--skills", "hazop")
+    args.root = str(root)
+    home = tmp_path / "home"
+    written = launch_dsh.export_skills_for_launch(args, config, home)
+    assert written >= 1
+    assert (home / "skills" / "azoth-test.md").is_file()
+    assert (root / ".dsh" / "skills" / "azoth-test.md").is_file()
 
 
 def test_software_persona_leaves_the_shipped_standard_root(tmp_path: Path) -> None:
@@ -555,7 +668,7 @@ def test_workspace_pins_the_checkout_first_and_is_idempotent(tmp_path: Path) -> 
     assert json.loads((home / "storages" / "workspace.json").read_text()) == store
 
 
-def test_workspace_preserves_another_workspace_and_moves_azoth_first(tmp_path: Path) -> None:
+def test_workspace_preserves_another_workspace_without_reordering(tmp_path: Path) -> None:
     root = _root(tmp_path)
     home = tmp_path / "home"
     elsewhere = home / "storages" / "workspace.json"
@@ -568,8 +681,33 @@ def test_workspace_preserves_another_workspace_and_moves_azoth_first(tmp_path: P
     store = json.loads(elsewhere.read_text())
     assert len(store["global"]["workspaceIds"]) == 2
     assert "other" in store["global"]["workspaceIds"]
-    assert store["global"]["workspaceIds"][0] != "other"
+    assert store["global"]["workspaceIds"][0] == "other"
     assert store["tables"]["workspaces"]["other"]["path"] == "/tmp/elsewhere"
+
+
+def test_explicit_workspace_is_created_and_opened(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    home = tmp_path / "home"
+    target = tmp_path / "Documents" / "DHS" / "dws"
+    report = launch_dsh.ensure_workspace(root, home, write=True, workspace=target)
+    assert report.changed
+    assert target.is_dir()
+    store = json.loads((home / "storages" / "workspace.json").read_text())
+    first = store["global"]["workspaceIds"][0]
+    assert store["global"]["defaultWorkspaceId"] == first
+    assert store["tables"]["workspaces"][first]["path"] == str(target.resolve())
+
+
+def test_the_checkout_is_added_beside_an_explicit_workspace(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    home = tmp_path / "home"
+    target = tmp_path / "elsewhere"
+    launch_dsh.ensure_workspace(root, home, write=True, workspace=target)
+    launch_dsh.ensure_workspace(root, home, write=True)
+    store = json.loads((home / "storages" / "workspace.json").read_text())
+    paths = [record["path"] for record in store["tables"]["workspaces"].values()]
+    assert paths[0] == str(target.resolve())
+    assert str(root.resolve()) in paths
 
 
 def test_workspace_refuses_a_corrupt_store(tmp_path: Path) -> None:

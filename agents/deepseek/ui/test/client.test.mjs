@@ -12,13 +12,14 @@ const React = {
   },
 }
 
-function load() {
+function load(config) {
   let module
   const window = { __ModuleLoader__: { load: (loaded) => (module = loaded) } }
   vm.runInNewContext(SOURCE, { window, console })
   assert.equal(module.id, 'azoth-dsh-ui')
   const slots = new Map()
   const ctx = {
+    config,
     slots: {
       inject(_name, register) {
         register()
