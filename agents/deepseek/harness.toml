@@ -36,6 +36,11 @@ resolve_requires_clean_calc = false
 # `--allow-external-compute` is passed.
 external_compute = "ask"
 gate_sanctioned_bridge = true
+# The wall-clock checkpoint, and the failures with one signature that trip a path.
+review_after_minutes = 30
+failure_trip_after = 3
+# Mount the job_output/job_list/job_kill tools for the web engineer.
+job_tools = true
 
 [plan.warning_categories]
 SOLVER_NOT_CONVERGED = "numerical"

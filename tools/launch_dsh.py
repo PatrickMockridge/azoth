@@ -597,6 +597,8 @@ def _plan_config(
         "resolveRequiresCleanCalc": bool(plan.get("resolve_requires_clean_calc", False)),
         "externalCompute": external,
         "gateSanctionedBridge": bool(plan.get("gate_sanctioned_bridge", True)),
+        "reviewAfterMinutes": int(plan.get("review_after_minutes", 30)),
+        "failureTripAfter": int(plan.get("failure_trip_after", 3)),
     }
 
 
@@ -673,6 +675,8 @@ def _engineer_plugins(args: argparse.Namespace, config: dict[str, Any]) -> list[
     plugins = _role_plugins()
     plugins.insert(1, {"id": "time-context", "name": "@deepseek-ai/dsh-time-context"})
     plugins.append({"id": "tool-ask-user", "name": "@deepseek-ai/dsh-tool-ask-user"})
+    if bool((config.get("plan") or {}).get("job_tools", True)):
+        plugins.append({"id": "tool-jobs", "name": "@deepseek-ai/dsh-tool-jobs"})
     plugins.append(
         {
             "id": "compaction",

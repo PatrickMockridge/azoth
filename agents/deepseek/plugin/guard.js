@@ -55,7 +55,46 @@ const MAX_STEPS = 100
 const MAX_TRIPS = 200
 const MAX_PERMITS = 20
 const MAX_EXTERNAL_LOG = 60
+const MAX_QUESTIONS = 12
+const MAX_BASIS = 40
+const MAX_FAILURES = 100
+const MAX_TARGETS = 10
+const MAX_COMPARISONS = 50
+const MAX_JOBS = 30
 const PERMIT_SCOPES = ['once', 'step', 'session']
+const STEP_KINDS = [
+  'lookup',
+  'thermo',
+  'steady',
+  'transport',
+  'transient',
+  'field',
+  'solver',
+  'check',
+  'report',
+]
+const STEP_STATUSES = ['active', 'done', 'failed']
+const FIDELITIES = ['thermo', 'steady', 'transient', 'field', 'olga']
+const PRIORITIES = ['primary', 'secondary']
+const BASIS_CHECKS = [
+  'flow',
+  'diameter',
+  'pressure_drop',
+  'composition',
+  'units',
+  'gauge',
+  'consistency',
+]
+const BASIS_VERDICTS = ['pass', 'warn', 'fail']
+const REQUIRED_BASIS = {
+  thermo: ['composition', 'consistency'],
+  steady: ['composition', 'consistency'],
+  transport: ['flow', 'diameter', 'pressure_drop', 'composition', 'consistency'],
+  transient: ['flow', 'diameter', 'pressure_drop', 'composition', 'consistency'],
+  field: ['flow', 'diameter', 'pressure_drop', 'composition', 'consistency'],
+  solver: ['flow', 'diameter', 'pressure_drop', 'composition', 'consistency'],
+  olga: ['flow', 'diameter', 'pressure_drop', 'composition', 'consistency'],
+}
 
 const OUTPUT_SCHEMA = { type: 'object', additionalProperties: true }
 
@@ -121,6 +160,8 @@ function normalizeConfig(config = {}) {
       ? config.externalCompute
       : 'ask',
     gateSanctionedBridge: config.gateSanctionedBridge !== false,
+    reviewAfterMinutes: integer(config.reviewAfterMinutes, 30, 0, 10_080),
+    failureTripAfter: integer(config.failureTripAfter, 3, 0, 100),
   }
 }
 
@@ -268,7 +309,15 @@ function createState() {
     reviews: [],
     permits: [],
     externalLog: [],
+    questions: [],
+    basis: [],
+    failures: [],
+    targets: [],
+    comparisons: [],
+    jobs: [],
     activeStepId: null,
+    ceremony: 'simple',
+    reviewWindowStartedAt: Date.now(),
     calcCount: 0,
     calcSinceReview: 0,
     calcLog: [],
@@ -483,6 +532,91 @@ function category(value) {
   return value
 }
 
+function parseEstimate(value, field) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(`azoth_plan: \`${field}\` must be an object {minutes, compute, risk}`)
+  }
+  const minutes = Number(value.minutes)
+  if (!Number.isFinite(minutes) || minutes <= 0) {
+    throw new Error(`azoth_plan: \`${field}.minutes\` must be a positive number`)
+  }
+  return {
+    minutes,
+    compute: text(value.compute, `${field}.compute`, 300),
+    risk: text(value.risk, `${field}.risk`, 300),
+  }
+}
+
+function parseQuestions(state, raw, decisionId, candidates) {
+  if (raw === undefined) return []
+  if (!Array.isArray(raw)) throw new Error('azoth_plan: `questions` must be an array')
+  if (raw.length > MAX_QUESTIONS) {
+    throw new Error(`azoth_plan: a plan is limited to ${MAX_QUESTIONS} questions`)
+  }
+  const candidateIds = new Set(candidates.map((candidate) => candidate.id))
+  let serial = Number(nextId(state.questions, 'Q').slice(1)) - 1
+  return raw.map((item, index) => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) {
+      throw new Error(`azoth_plan: questions[${index}] must be an object`)
+    }
+    serial += 1
+    const id = `Q${serial}`
+    const body = text(item.text, `questions[${index}].text`, 500)
+    if (!FIDELITIES.includes(item.fidelity)) {
+      throw new Error(
+        `azoth_plan: question ${id} needs fidelity (${FIDELITIES.join(', ')})`,
+      )
+    }
+    const priority = item.priority === undefined ? 'primary' : item.priority
+    if (!PRIORITIES.includes(priority)) {
+      throw new Error(`azoth_plan: question ${id} needs priority (${PRIORITIES.join(', ')})`)
+    }
+    const answerBy = text(item.answer_by, `question ${id}.answer_by`, 80)
+    if (!candidateIds.has(answerBy)) {
+      throw new Error(`azoth_plan: question ${id} names unknown candidate "${answerBy}"`)
+    }
+    return {
+      id,
+      decision: decisionId,
+      text: body,
+      fidelity: item.fidelity,
+      priority,
+      answer_by: answerBy,
+    }
+  })
+}
+
+function attachQuestionAnswers(candidates, questions) {
+  for (const question of questions) {
+    const candidate = candidates.find((item) => item.id === question.answer_by)
+    if (candidate && !candidate.answers.includes(question.id)) {
+      candidate.answers.push(question.id)
+    }
+  }
+}
+
+function requireStudyFields(state, candidates, questions) {
+  if (!questions.length && state.ceremony !== 'study') return
+  if (questions.length) state.ceremony = 'study'
+  const all = state.decisions.flatMap((decision) => decision.candidates).concat(candidates)
+  for (const candidate of all) {
+    if (!candidate.estimate) {
+      throw new Error(
+        `azoth_plan: study candidate "${candidate.id}" needs estimate {minutes, compute, risk}`,
+      )
+    }
+    if (!candidate.fallback) {
+      throw new Error(`azoth_plan: study candidate "${candidate.id}" needs a fallback`)
+    }
+    if (!candidate.fidelities.length) {
+      throw new Error(
+        `azoth_plan: study candidate "${candidate.id}" needs at least one fidelity ` +
+          `(${FIDELITIES.join(', ')})`,
+      )
+    }
+  }
+}
+
 function validateCandidates(
   state,
   raw,
@@ -510,6 +644,26 @@ function validateCandidates(
     seenCandidates.add(id)
     const path = text(item.path, `candidate ${id}.path`, 2000)
     const cost = text(item.cost, `candidate ${id}.cost`, 500)
+    const estimate =
+      item.estimate === undefined ? null : parseEstimate(item.estimate, `candidate ${id}.estimate`)
+    const fallback =
+      item.fallback === undefined ? null : text(item.fallback, `candidate ${id}.fallback`, 500)
+    const answers =
+      item.answers === undefined
+        ? []
+        : stringList(item.answers, `candidate ${id}.answers`, 0, MAX_QUESTIONS, 40)
+    const fidelities =
+      item.fidelities === undefined
+        ? []
+        : stringList(item.fidelities, `candidate ${id}.fidelities`, 0, FIDELITIES.length, 40)
+    for (const fidelity of fidelities) {
+      if (!FIDELITIES.includes(fidelity)) {
+        throw new Error(
+          `azoth_plan: candidate "${id}" has unknown fidelity "${fidelity}" ` +
+            `(${FIDELITIES.join(', ')})`,
+        )
+      }
+    }
     if (!Array.isArray(item.assumptions) || item.assumptions.length === 0) {
       throw new Error(`azoth_plan: candidate "${id}" needs at least one assumption`)
     }
@@ -565,7 +719,16 @@ function validateCandidates(
         ...(calc ? { calc } : {}),
       })
     }
-    candidates.push({ id, path, cost, assumptions })
+    candidates.push({
+      id,
+      path,
+      cost,
+      assumptions,
+      ...(estimate ? { estimate } : {}),
+      ...(fallback ? { fallback } : {}),
+      answers,
+      fidelities,
+    })
   }
   if (!automatic) {
     throw new Error(
@@ -886,23 +1049,62 @@ function holdReason(state, cfg) {
       info: { name: 'AzothPlanHeld', code: 'AZOTH_PLAN_HELD' },
     }
   }
-  const current = activeDecision(state)
-  if (
-    cfg.reviewAfterCalcs > 0 &&
-    current &&
-    current.choice &&
-    state.calcSinceReview >= cfg.reviewAfterCalcs
-  ) {
+  const overrun = stepOverrun(state)
+  if (overrun) {
     return {
       reason:
-        `azoth_calc is held for a checkpoint: ${state.calcSinceReview} calculations since ` +
-        `the last review of decision "${current.id}". Call azoth_plan review ` +
-        `{"decision":"${current.id}","verdict":"confirm","evidence":...} to reaffirm the ` +
-        'choice, or verdict "reconsider" with evidence to reopen it.',
+        `azoth_calc is held: step ${overrun.step.id} "${overrun.step.description}" has run ` +
+        `${overrun.elapsedMinutes.toFixed(0)} min against a ${overrun.step.time_box_minutes}-` +
+        `minute box. Call azoth_plan review with extend_minutes to extend it, or ` +
+        `fallback_started: true and the fallback${
+          overrun.step.fallback ? ` (${overrun.step.fallback})` : ''
+        }.`,
+      info: { name: 'AzothPlanOverrun', code: 'AZOTH_STEP_OVERRUN' },
+    }
+  }
+  const current = activeDecision(state)
+  const due = reviewDue(state, cfg)
+  if (current && current.choice && due) {
+    const detail =
+      due.kind === 'calculations'
+        ? `${due.count} calculations since the last review`
+        : `${due.minutes.toFixed(0)} minutes since the last review`
+    return {
+      reason:
+        `azoth_calc is held for a checkpoint: ${detail} of decision "${current.id}". Call ` +
+        `azoth_plan review {"decision":"${current.id}","verdict":"confirm",...} with at_risk, ` +
+        'remaining_minutes and evidence, or verdict "reconsider" to reopen it.',
       info: { name: 'AzothPlanCheckpoint', code: 'AZOTH_PLAN_CHECKPOINT' },
     }
   }
   return undefined
+}
+
+function activeStep(state) {
+  if (!state.activeStepId) return null
+  const step = state.steps.find((item) => item.id === state.activeStepId)
+  return step && step.status === 'active' ? step : null
+}
+
+function stepOverrun(state) {
+  const step = activeStep(state)
+  if (!step || !step.time_box_minutes || step.fallback_started) return null
+  const elapsedMinutes = (Date.now() - (step.startedAt ?? Date.now())) / 60_000
+  if (elapsedMinutes < step.time_box_minutes) return null
+  return { step, elapsedMinutes }
+}
+
+function reviewDue(state, cfg) {
+  const current = activeDecision(state)
+  if (!current || !current.choice) return null
+  if (cfg.reviewAfterCalcs > 0 && state.calcSinceReview >= cfg.reviewAfterCalcs) {
+    return { kind: 'calculations', count: state.calcSinceReview }
+  }
+  if (cfg.reviewAfterMinutes > 0) {
+    const elapsed = (Date.now() - (state.reviewWindowStartedAt ?? Date.now())) / 60_000
+    if (elapsed >= cfg.reviewAfterMinutes) return { kind: 'minutes', minutes: elapsed }
+  }
+  return null
 }
 
 // ---------------------------------------------------------------------------------------
@@ -1097,6 +1299,18 @@ function reduce(state, args, context) {
       return choose(state, args, context)
     case 'step':
       return recordStep(state, args, context)
+    case 'basis':
+      return recordBasis(state, args, context)
+    case 'feasibility':
+      return recordFeasibility(state, args)
+    case 'fail':
+      return recordFailure(state, args, context)
+    case 'target':
+      return recordTarget(state, args)
+    case 'compare':
+      return recordComparison(state, args)
+    case 'job':
+      return recordJob(state, args)
     case 'trip':
       return recordTrip(state, args, context)
     case 'reopen':
@@ -1113,8 +1327,8 @@ function reduce(state, args, context) {
       return { message: renderState(state) }
     default:
       throw new Error(
-        'azoth_plan: `action` must be open, add, choose, step, trip, reopen, resolve, review, ' +
-          'permit, close or status',
+        'azoth_plan: `action` must be open, add, choose, step, basis, feasibility, fail, ' +
+          'target, compare, job, trip, reopen, resolve, review, permit, close or status',
       )
   }
 }
@@ -1125,7 +1339,11 @@ function openPlan(state, args, context, cfg) {
   }
   const problem = text(args.problem, 'problem', 2000)
   const criteria = stringList(args.criteria, 'criteria', 1, 10, 500)
+  state.questions = []
   const candidates = validateCandidates(state, args.candidates, cfg, new Set(), new Set())
+  const questions = parseQuestions(state, args.questions, 'D1', candidates)
+  attachQuestionAnswers(candidates, questions)
+  requireStudyFields(state, candidates, questions)
   state.problem = problem
   state.criteria = criteria
   state.decisions = [createDecision('D1', null, 'concept selection', candidates)]
@@ -1134,7 +1352,15 @@ function openPlan(state, args, context, cfg) {
   state.reviews = []
   state.permits = []
   state.externalLog = []
+  state.questions = questions
+  state.basis = []
+  state.failures = []
+  state.targets = []
+  state.comparisons = []
+  state.jobs = []
   state.activeStepId = null
+  state.ceremony = questions.length ? 'study' : 'simple'
+  state.reviewWindowStartedAt = Date.now()
   state.calcSinceReview = 0
   state.closedAt = null
   state.closeReason = null
@@ -1161,9 +1387,14 @@ function addDecision(state, args, context, cfg) {
     throw new Error(`azoth_plan: choose the parent decision "${parentId}" first; it is ${parentState}`)
   }
   const question = text(args.question, 'question', 2000)
+  const decisionId = nextId(state.decisions, 'D')
   const candidates = validateCandidates(state, args.candidates, cfg, assumptionIds(state))
-  const decision = createDecision(nextId(state.decisions, 'D'), parentId, question, candidates)
+  const questions = parseQuestions(state, args.questions, decisionId, candidates)
+  attachQuestionAnswers(candidates, questions)
+  requireStudyFields(state, candidates, questions)
+  const decision = createDecision(decisionId, parentId, question, candidates)
   state.decisions.push(decision)
+  state.questions.push(...questions)
   state.updatedAt = now()
   return {
     message: `added ${decision.id} under ${parentId} with ${candidates.length} candidates; call azoth_plan choose`,
@@ -1203,6 +1434,22 @@ function choose(state, args, context) {
         `choose another path or resolve "${bad.id}" with evidence`,
     )
   }
+  const questions = state.questions.filter(
+    (item) => item.decision === id && item.priority === 'primary',
+  )
+  for (const item of questions) {
+    if (item.answer_by !== candidateId) {
+      throw new Error(
+        `azoth_plan: candidate "${candidateId}" does not answer ${item.id} ("${item.text}"); ` +
+          `choose "${item.answer_by}" or change the question's answer_by`,
+      )
+    }
+    if (!candidate.fidelities.includes(item.fidelity)) {
+      throw new Error(
+        `azoth_plan: candidate "${candidateId}" does not provide ${item.fidelity} for ${item.id}`,
+      )
+    }
+  }
   const rationale = text(args.rationale, 'rationale', 4000)
   const revision = decision.revisions.filter((item) => item.event === 'choose').length + 1
   decision.choice = {
@@ -1215,15 +1462,99 @@ function choose(state, args, context) {
   decision.revisions.push({ ...decision.choice, event: 'choose' })
   decision.status = 'chosen'
   state.calcSinceReview = 0
+  state.reviewWindowStartedAt = Date.now()
   state.updatedAt = now()
   return { message: `chose ${candidateId} for ${id} (revision ${revision})` }
 }
 
+function latestBasis(state) {
+  const latest = new Map()
+  for (const item of state.basis) latest.set(item.check, item)
+  return latest
+}
+
+function missingBasis(state, kind) {
+  const required = REQUIRED_BASIS[kind] ?? []
+  const latest = latestBasis(state)
+  return required.filter((check) => {
+    const item = latest.get(check)
+    return !item || item.verdict === 'fail'
+  })
+}
+
+const KIND_FIDELITY = {
+  thermo: ['thermo'],
+  steady: ['steady'],
+  transport: ['steady'],
+  transient: ['transient', 'field', 'olga'],
+  field: ['field'],
+  solver: ['steady', 'transient', 'field', 'olga'],
+}
+
+function parseFeasibility(value, field) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(
+      `azoth_plan: \`${field}\` must be {dt_s, cost_per_step_ms, inversion_conditioning, ` +
+        'singular_closures, estimated_minutes, fallback, success_test}',
+    )
+  }
+  const dt = Number(value.dt_s)
+  const cost = Number(value.cost_per_step_ms)
+  const estimated = Number(value.estimated_minutes)
+  if (!Number.isFinite(dt) || dt <= 0) {
+    throw new Error(`azoth_plan: \`${field}.dt_s\` must be a positive number`)
+  }
+  if (!Number.isFinite(cost) || cost <= 0) {
+    throw new Error(`azoth_plan: \`${field}.cost_per_step_ms\` must be a positive number`)
+  }
+  if (!Number.isFinite(estimated) || estimated <= 0) {
+    throw new Error(`azoth_plan: \`${field}.estimated_minutes\` must be a positive number`)
+  }
+  return {
+    dt_s: dt,
+    cost_per_step_ms: cost,
+    inversion_conditioning: text(
+      value.inversion_conditioning,
+      `${field}.inversion_conditioning`,
+      500,
+    ),
+    singular_closures: text(value.singular_closures, `${field}.singular_closures`, 500),
+    estimated_minutes: estimated,
+    fallback: text(value.fallback, `${field}.fallback`, 500),
+    success_test: text(value.success_test, `${field}.success_test`, 500),
+  }
+}
+
+function updateStep(state, args) {
+  const id = text(args.step, 'step', 40)
+  const step = state.steps.find((item) => item.id === id)
+  if (!step) throw new Error(`azoth_plan: no step "${id}"`)
+  const status = args.status
+  if (!STEP_STATUSES.includes(status)) {
+    throw new Error(`azoth_plan: step status must be one of ${STEP_STATUSES.join(', ')}`)
+  }
+  step.status = status
+  if (status !== 'active') step.finishedAt = Date.now()
+  if (status === 'done' || status === 'failed') {
+    for (const permit of state.permits) {
+      if (permit.step === id && permit.status !== 'revoked') permit.status = 'revoked'
+    }
+    if (state.activeStepId === id) state.activeStepId = null
+  }
+  state.updatedAt = now()
+  return { message: `step ${id} is ${status}` }
+}
+
 function recordStep(state, args, context) {
+  if (args.step !== undefined && args.status !== undefined) return updateStep(state, args)
   const active = activeDecision(state)
   if (!active) throw new Error('azoth_plan: choose a decision before recording a step')
   if (state.steps.length >= MAX_STEPS) throw new Error(`azoth_plan: a plan is limited to ${MAX_STEPS} steps`)
   const description = text(args.description, 'description', 2000)
+  const kind = args.kind === undefined ? 'check' : args.kind
+  if (!STEP_KINDS.includes(kind)) {
+    throw new Error(`azoth_plan: step kind must be one of ${STEP_KINDS.join(', ')}`)
+  }
   const depends = args.depends_on === undefined
     ? []
     : stringList(args.depends_on, 'depends_on', 0, 20, 40)
@@ -1232,10 +1563,86 @@ function recordStep(state, args, context) {
       throw new Error(`azoth_plan: step depends on unknown id "${id}"`)
     }
   }
+  const timeBox = args.time_box_minutes === undefined
+    ? kind === 'solver'
+      ? 40
+      : 0
+    : Number(args.time_box_minutes)
+  if (!Number.isFinite(timeBox) || timeBox < 0) {
+    throw new Error('azoth_plan: `time_box_minutes` must be a non-negative number')
+  }
+  const estimated = args.estimated_minutes === undefined ? null : Number(args.estimated_minutes)
+  if (estimated !== null && (!Number.isFinite(estimated) || estimated <= 0)) {
+    throw new Error('azoth_plan: `estimated_minutes` must be a positive number')
+  }
+  if (estimated !== null && timeBox > 0 && estimated > timeBox && args.accept_overrun !== true) {
+    throw new Error(
+      `azoth_plan: the estimate (${estimated} min) exceeds the ${timeBox}-minute box; ` +
+        'shorten it or pass accept_overrun: true to record the overrun',
+    )
+  }
+  const overrunAccepted = estimated !== null && timeBox > 0 && estimated > timeBox
+  if (state.ceremony === 'study' && REQUIRED_BASIS[kind]) {
+    const missing = missingBasis(state, kind)
+    if (missing.length) {
+      throw new Error(
+        `azoth_plan: a ${kind} step needs basis checks first (${missing.join(', ')}); ` +
+          'call azoth_plan basis with the check, verdict and evidence',
+      )
+    }
+    if (KIND_FIDELITY[kind]) {
+      const questionId = text(args.question, 'question', 40)
+      const question = state.questions.find(
+        (item) => item.id === questionId && item.decision === active.id,
+      )
+      if (!question) {
+        throw new Error(
+          `azoth_plan: a ${kind} step needs a question of ${active.id} that it answers`,
+        )
+      }
+      if (!KIND_FIDELITY[kind].includes(question.fidelity)) {
+        throw new Error(
+          `azoth_plan: ${question.id} is a ${question.fidelity} question; a ${kind} step ` +
+            `answers ${KIND_FIDELITY[kind].join(', ')}`,
+        )
+      }
+      if (question.answer_by !== active.choice.candidate) {
+        throw new Error(
+          `azoth_plan: the chosen candidate "${active.choice.candidate}" does not answer ` +
+            `${question.id} (${question.answer_by} does)`,
+        )
+      }
+    }
+  }
+  let feasibility = null
+  if (kind === 'solver') {
+    if (args.feasibility === undefined) {
+      throw new Error(
+        'azoth_plan: a solver step needs feasibility {dt_s, cost_per_step_ms, ' +
+          'inversion_conditioning, singular_closures, estimated_minutes, fallback, success_test}',
+      )
+    }
+    feasibility = parseFeasibility(args.feasibility, 'feasibility')
+  } else if (args.feasibility !== undefined) {
+    feasibility = parseFeasibility(args.feasibility, 'feasibility')
+  }
   const step = {
     id: nextId(state.steps, 'S'),
     description,
+    kind,
     depends_on: depends,
+    time_box_minutes: timeBox,
+    success_test: optionalText(args.success_test, 'success_test', 500),
+    fallback: optionalText(args.fallback, 'fallback', 500),
+    estimated_minutes: estimated,
+    budget_note: overrunAccepted
+      ? `accepted overrun: estimate ${estimated} min against a ${timeBox}-minute box`
+      : null,
+    feasibility,
+    startedAt: Date.now(),
+    finishedAt: null,
+    status: 'active',
+    fallback_started: false,
     at: now(),
     callId: context.callId ?? null,
     stale: false,
@@ -1243,7 +1650,334 @@ function recordStep(state, args, context) {
   state.steps.push(step)
   state.activeStepId = step.id
   state.updatedAt = now()
-  return { message: `recorded ${step.id}: ${description}` }
+  return {
+    message:
+      `recorded ${step.id} (${kind}${timeBox ? `, ${timeBox} min box` : ''}): ${description}`,
+  }
+}
+
+function recordFeasibility(state, args) {
+  const id = text(args.step, 'step', 40)
+  const step = state.steps.find((item) => item.id === id)
+  if (!step) throw new Error(`azoth_plan: no step "${id}"`)
+  if (!['solver', 'transport', 'transient'].includes(step.kind)) {
+    throw new Error(`azoth_plan: ${id} is a ${step.kind} step; feasibility is for a solver`)
+  }
+  step.feasibility = parseFeasibility(args, 'feasibility')
+  state.updatedAt = now()
+  return { message: `recorded feasibility for ${id}` }
+}
+
+function recordBasis(state, args, context) {
+  const decision = activeDecision(state)
+  if (!decision) throw new Error('azoth_plan: open a plan before a basis check')
+  const check = args.check
+  if (!BASIS_CHECKS.includes(check)) {
+    throw new Error(`azoth_plan: basis check must be one of ${BASIS_CHECKS.join(', ')}`)
+  }
+  const verdict = args.verdict
+  if (!BASIS_VERDICTS.includes(verdict)) {
+    throw new Error(`azoth_plan: basis verdict must be one of ${BASIS_VERDICTS.join(', ')}`)
+  }
+  const evidence = text(args.evidence, 'evidence', 4000)
+  if (state.basis.length >= MAX_BASIS) {
+    throw new Error(`azoth_plan: a plan is limited to ${MAX_BASIS} basis checks`)
+  }
+  const step = args.step !== undefined ? text(args.step, 'step', 40) : state.activeStepId
+  const record = {
+    id: nextId(state.basis, 'B'),
+    check,
+    verdict,
+    evidence,
+    decision: decision.id,
+    step: step ?? null,
+    at: now(),
+  }
+  state.basis.push(record)
+  if (verdict === 'fail') {
+    addTrip(state, {
+      decision: decision.id,
+      assumption: null,
+      text: `basis check ${check} failed`,
+      category: check === 'consistency' ? 'consistency' : 'validity',
+      signal: 'basis',
+      evidence,
+      severity: 'trip',
+      automatic: false,
+      callId: context.callId ?? null,
+    })
+  }
+  state.updatedAt = now()
+  return { message: `recorded ${record.id}: ${check} ${verdict}` }
+}
+
+// ---------------------------------------------------------------------------------------
+// failures, targets and jobs
+
+function failureSignature(value) {
+  return String(value ?? '')
+    .toLowerCase()
+    .replace(/\d+(?:\.\d+)?/g, '#')
+    .replace(/[^a-z#_ ]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 120)
+}
+
+function externalFailure(result) {
+  if (result?.isError) {
+    const message = String(result.error?.message ?? 'external command failed')
+    return { symptom: message.slice(0, 500), evidence: message.slice(0, 4000) }
+  }
+  const value = result?.value ?? {}
+  const tail = `${value.stderr?.text ?? ''}\n${value.stdout?.text ?? ''}`.trim()
+  const lines = tail.split('\n').map((line) => line.trim()).filter(Boolean)
+  const symptom = (lines[lines.length - 1] ?? `exit ${value.exitCode ?? 'error'}`).slice(0, 500)
+  return { symptom, evidence: (tail || symptom).slice(0, 4000) }
+}
+
+function failureStreak(state, failure, context) {
+  if (!context.cfg.failureTripAfter) return null
+  const matches = state.failures.filter(
+    (item) =>
+      item.signature === failure.signature &&
+      (item.step === failure.step || item.candidate === failure.candidate),
+  )
+  if (matches.length < context.cfg.failureTripAfter) return null
+  const evidence =
+    `${matches.length} failures with signature "${failure.signature}": ` +
+    matches
+      .slice(-5)
+      .map((item) => `${item.id} ${item.symptom}`)
+      .join('; ')
+  let trip = state.trips.find(
+    (item) =>
+      item.signal === 'failure_streak' &&
+      item.decision === failure.decision &&
+      item.detail?.signature === failure.signature,
+  )
+  if (trip) {
+    trip.status = 'open'
+    trip.evidence = evidence
+    trip.detail = { ...trip.detail, failureIds: matches.map((item) => item.id) }
+    trip.at = now()
+    trip.calcSeq = state.calcCount
+  } else {
+    trip = addTrip(state, {
+      decision: failure.decision,
+      assumption: null,
+      text: `repeated failure: ${failure.signature}`,
+      category: 'feasibility',
+      signal: 'failure_streak',
+      evidence,
+      severity: 'trip',
+      automatic: true,
+      callId: context.callId ?? null,
+      detail: {
+        signature: failure.signature,
+        failureIds: matches.map((item) => item.id),
+      },
+    })
+  }
+  return { count: matches.length, trip }
+}
+
+function recordFailure(state, args, context, source = 'manual') {
+  const decision = activeChoice(state) ?? activeDecision(state)
+  if (!decision) throw new Error('azoth_plan: record a failure under an open plan')
+  const symptom = text(args.symptom, 'symptom', 500)
+  const evidence = text(args.evidence, 'evidence', 4000)
+  const signature =
+    args.signature === undefined
+      ? failureSignature(symptom)
+      : text(args.signature, 'signature', 120)
+  if (state.failures.length >= MAX_FAILURES) {
+    throw new Error(`azoth_plan: a plan is limited to ${MAX_FAILURES} failures`)
+  }
+  const failure = {
+    id: nextId(state.failures, 'F'),
+    decision: decision.id,
+    candidate: decision.choice?.candidate ?? null,
+    step:
+      args.step !== undefined ? text(args.step, 'step', 40) : (state.activeStepId ?? null),
+    symptom,
+    signature,
+    diagnosis: optionalText(args.diagnosis, 'diagnosis', 2000),
+    evidence,
+    artefact: optionalText(args.artefact, 'artefact', 500),
+    category: args.category === undefined ? 'consistency' : category(args.category),
+    source,
+    at: now(),
+  }
+  state.failures.push(failure)
+  const streak = failureStreak(state, failure, context)
+  state.updatedAt = now()
+  return {
+    message: streak
+      ? `recorded ${failure.id}; ${streak.count} failures with this signature — tripped ` +
+        `${decision.id} (${streak.trip.id})`
+      : `recorded ${failure.id} (${source}): ${signature}`,
+  }
+}
+
+function parseBand(value, field) {
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value) || value < 0) {
+      throw new Error(`azoth_plan: \`${field}\` must be a non-negative number`)
+    }
+    return { plus_minus: value }
+  }
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    if (value.plus_minus !== undefined) {
+      const plusMinus = Number(value.plus_minus)
+      if (!Number.isFinite(plusMinus) || plusMinus < 0) {
+        throw new Error(`azoth_plan: \`${field}.plus_minus\` must be a non-negative number`)
+      }
+      return { plus_minus: plusMinus }
+    }
+    const low = Number(value.low)
+    const high = Number(value.high)
+    if (!Number.isFinite(low) || !Number.isFinite(high) || low > high) {
+      throw new Error(`azoth_plan: \`${field}\` must be {low, high} with low <= high`)
+    }
+    return { low, high }
+  }
+  throw new Error(`azoth_plan: \`${field}\` must be a number or {low, high}`)
+}
+
+function bandContains(target, value) {
+  if (target.band.plus_minus !== undefined) {
+    return Math.abs(value - target.value) <= target.band.plus_minus + 1e-9
+  }
+  return value >= target.band.low - 1e-9 && value <= target.band.high + 1e-9
+}
+
+function recordTarget(state, args) {
+  const decision = activeChoice(state) ?? activeDecision(state)
+  if (!decision) throw new Error('azoth_plan: record a target under an open plan')
+  const value = Number(args.value)
+  if (!Number.isFinite(value)) throw new Error('azoth_plan: `value` must be a finite number')
+  if (state.targets.length >= MAX_TARGETS) {
+    throw new Error(`azoth_plan: a plan is limited to ${MAX_TARGETS} targets`)
+  }
+  const target = {
+    id: nextId(state.targets, 'T'),
+    value,
+    unit: text(args.unit, 'unit', 80),
+    band: parseBand(args.band, 'band'),
+    source: text(args.source, 'source', 500),
+    decision: decision.id,
+    at: now(),
+  }
+  state.targets.push(target)
+  state.updatedAt = now()
+  return {
+    message:
+      `recorded ${target.id}: ${value} ${target.unit} against ${target.source}; compare at ` +
+      'least two models, one inside the band and one outside, before confirming',
+  }
+}
+
+function recordComparison(state, args) {
+  const targetId = text(args.target, 'target', 40)
+  const target = state.targets.find((item) => item.id === targetId)
+  if (!target) throw new Error(`azoth_plan: no target "${targetId}"`)
+  const model = text(args.model, 'model', 200)
+  const value = Number(args.value)
+  if (!Number.isFinite(value)) throw new Error('azoth_plan: `value` must be a finite number')
+  const verdict = args.verdict
+  if (verdict !== 'agree' && verdict !== 'disagree') {
+    throw new Error('azoth_plan: `verdict` must be "agree" or "disagree"')
+  }
+  const inside = bandContains(target, value)
+  if (verdict === 'agree' && !inside) {
+    throw new Error(`azoth_plan: ${value} is outside the band; record verdict "disagree"`)
+  }
+  if (verdict === 'disagree' && inside) {
+    throw new Error(`azoth_plan: ${value} is inside the band; record verdict "agree"`)
+  }
+  if (state.comparisons.length >= MAX_COMPARISONS) {
+    throw new Error(`azoth_plan: a plan is limited to ${MAX_COMPARISONS} comparisons`)
+  }
+  const comparison = {
+    id: nextId(state.comparisons, 'M'),
+    target: targetId,
+    model,
+    value,
+    unit: optionalText(args.unit, 'unit', 80),
+    deviation: value - target.value,
+    verdict,
+    evidence: optionalText(args.evidence, 'evidence', 4000),
+    at: now(),
+  }
+  state.comparisons.push(comparison)
+  state.updatedAt = now()
+  const models = new Set(
+    state.comparisons.filter((item) => item.target === targetId).map((item) => item.model),
+  )
+  return { message: `recorded ${comparison.id}: ${model} ${value} (${verdict}); ${models.size} model(s)` }
+}
+
+function targetGate(state, decisionId) {
+  const targets = state.targets.filter((target) => target.decision === decisionId)
+  for (const target of targets) {
+    const comparisons = state.comparisons.filter((item) => item.target === target.id)
+    const models = new Set(comparisons.map((item) => item.model))
+    const agree = comparisons.filter((item) => item.verdict === 'agree').length
+    const disagree = comparisons.filter((item) => item.verdict === 'disagree').length
+    if (models.size < 2 || agree === 0 || disagree === 0) {
+      return (
+        `target ${target.id} (${target.value} ${target.unit}) needs two models and both an ` +
+        `agreeing and a disagreeing comparison; it has ${models.size} model(s), ${agree} ` +
+        `agree and ${disagree} disagree`
+      )
+    }
+  }
+  return null
+}
+
+function targetSummary(state, decisionId) {
+  return state.targets
+    .filter((target) => target.decision === decisionId)
+    .map((target) => {
+      const comparisons = state.comparisons.filter((item) => item.target === target.id)
+      const values = comparisons.map((item) => item.value)
+      return {
+        target: target.id,
+        models: [...new Set(comparisons.map((item) => item.model))],
+        min: values.length ? Math.min(...values) : null,
+        max: values.length ? Math.max(...values) : null,
+        spread: values.length ? Math.max(...values) - Math.min(...values) : null,
+        agree: comparisons.filter((item) => item.verdict === 'agree').length,
+        disagree: comparisons.filter((item) => item.verdict === 'disagree').length,
+      }
+    })
+}
+
+function recordJob(state, args) {
+  if (!state.decisions.length) throw new Error('azoth_plan: open a plan before a job')
+  const jobId = text(args.job_id, 'job_id', 120)
+  const purpose = text(args.purpose, 'purpose', 500)
+  if (state.jobs.some((job) => job.job_id === jobId)) {
+    return { message: `job ${jobId} is already recorded` }
+  }
+  if (state.jobs.length >= MAX_JOBS) {
+    throw new Error(`azoth_plan: a plan is limited to ${MAX_JOBS} jobs`)
+  }
+  const job = {
+    id: nextId(state.jobs, 'J'),
+    job_id: jobId,
+    purpose,
+    step: args.step === undefined ? (state.activeStepId ?? null) : text(args.step, 'step', 40),
+    label: optionalText(args.label, 'label', 300),
+    status: 'running',
+    startedAt: Date.now(),
+    finishedAt: null,
+    at: now(),
+  }
+  state.jobs.push(job)
+  state.updatedAt = now()
+  return { message: `recorded ${job.id} for job ${jobId}` }
 }
 
 function recordPermit(state, args, context) {
@@ -1377,6 +2111,7 @@ function reopen(state, args, context) {
     if (touches) step.stale = true
   }
   state.calcSinceReview = 0
+  state.reviewWindowStartedAt = Date.now()
   state.updatedAt = now()
   return { message: `reopened ${id}; call azoth_plan choose with a new path` }
 }
@@ -1416,6 +2151,7 @@ function resolve(state, args, context, cfg) {
     }
   }
   state.calcSinceReview = 0
+  state.reviewWindowStartedAt = Date.now()
   state.updatedAt = at
   return { message: `resolved ${id}; ${open.length} trip(s) closed with evidence` }
 }
@@ -1432,6 +2168,18 @@ function review(state, args, context, cfg) {
     throw new Error('azoth_plan: review needs verdict "confirm" or "reconsider"')
   }
   const evidence = text(args.evidence, 'evidence', 4000)
+  const atRisk =
+    args.at_risk === undefined ? [] : stringList(args.at_risk, 'at_risk', 0, 10, 300)
+  const remaining =
+    args.remaining_minutes === undefined ? null : Number(args.remaining_minutes)
+  if (remaining !== null && (!Number.isFinite(remaining) || remaining < 0)) {
+    throw new Error('azoth_plan: `remaining_minutes` must be a non-negative number')
+  }
+  const fallbackStarted = args.fallback_started === true
+  const extend = args.extend_minutes === undefined ? 0 : Number(args.extend_minutes)
+  if (!Number.isFinite(extend) || extend < 0) {
+    throw new Error('azoth_plan: `extend_minutes` must be a non-negative number')
+  }
   let ranking = null
   if (args.ranking !== undefined) {
     ranking = stringList(args.ranking, 'ranking', 1, MAX_CANDIDATES, 80)
@@ -1447,15 +2195,42 @@ function review(state, args, context, cfg) {
       )
     }
   }
+  const step = activeStep(state)
+  const overrun = stepOverrun(state)
+  if (overrun && args.verdict === 'confirm' && extend <= 0 && !fallbackStarted) {
+    throw new Error(
+      `azoth_plan: step ${overrun.step.id} is over its ${overrun.step.time_box_minutes}-minute ` +
+        'box; pass extend_minutes to extend it or fallback_started: true',
+    )
+  }
+  if (extend > 0) {
+    if (!step) throw new Error('azoth_plan: extend_minutes needs an active step')
+    step.time_box_minutes += extend
+    step.extended_by = (step.extended_by ?? 0) + extend
+  }
+  if (fallbackStarted) {
+    if (!step) throw new Error('azoth_plan: fallback_started needs an active step')
+    step.fallback_started = true
+  }
+  if (args.verdict === 'confirm') {
+    const gate = targetGate(state, id)
+    if (gate) throw new Error(`azoth_plan: ${gate}`)
+  }
   state.reviews.push({
     decision: id,
     verdict: args.verdict,
     evidence,
     ranking,
+    at_risk: atRisk,
+    remaining_minutes: remaining,
+    fallback_started: fallbackStarted,
+    extended_minutes: extend || null,
+    targets: targetSummary(state, id),
     at: now(),
     callId: context.callId ?? null,
   })
   state.calcSinceReview = 0
+  state.reviewWindowStartedAt = Date.now()
   if (args.verdict === 'reconsider') {
     const categoryName = args.category === undefined ? 'judgment' : category(args.category)
     addTrip(state, {
@@ -1486,6 +2261,14 @@ function closePlan(state, args) {
       `azoth_plan: ${open.length} trip(s) hold the plan; resolve or reopen first, or pass ` +
         'force: true with a reason to abandon it',
     )
+  }
+  if (args.force !== true) {
+    for (const decision of state.decisions) {
+      const gate = targetGate(state, decision.id)
+      if (gate) {
+        throw new Error(`azoth_plan: ${gate}; pass force: true with a reason to abandon`)
+      }
+    }
   }
   for (const trip of open) trip.status = 'superseded'
   for (const decision of state.decisions) decision.status = 'closed'
@@ -1551,6 +2334,13 @@ function serialize(state) {
     reviews: state.reviews.slice(-20),
     permits: state.permits.slice(-MAX_PERMITS),
     externalLog: state.externalLog.slice(-20),
+    questions: state.questions,
+    basis: state.basis.slice(-MAX_BASIS),
+    failures: state.failures.slice(-MAX_FAILURES),
+    targets: state.targets,
+    comparisons: state.comparisons.slice(-MAX_COMPARISONS),
+    jobs: state.jobs,
+    ceremony: state.ceremony,
     activeStepId: state.activeStepId,
     calcCount: state.calcCount,
     calcSinceReview: state.calcSinceReview,
@@ -1562,7 +2352,12 @@ function compactState(state) {
     ...state,
     calcLog: state.calcLog.slice(-10),
     reviews: state.reviews.slice(-5),
-    steps: state.steps.slice(-50),
+    steps: state.steps.slice(-50).map((step) => ({
+      ...step,
+      description: step.description.slice(0, 300),
+      success_test: step.success_test ? step.success_test.slice(0, 200) : null,
+      fallback: step.fallback ? step.fallback.slice(0, 200) : null,
+    })),
     trips: state.trips.slice(-100),
     permits: state.permits.slice(-8).map((permit) => ({
       ...permit,
@@ -1574,6 +2369,15 @@ function compactState(state) {
       ...entry,
       command: entry.command.slice(0, 200),
     })),
+    basis: state.basis.slice(-10),
+    failures: state.failures.slice(-15).map((failure) => ({
+      ...failure,
+      symptom: failure.symptom.slice(0, 200),
+      evidence: failure.evidence.slice(0, 600),
+      diagnosis: failure.diagnosis ? failure.diagnosis.slice(0, 300) : null,
+    })),
+    comparisons: state.comparisons.slice(-10),
+    jobs: state.jobs.slice(-10),
     decisions: state.decisions.map((decision) => ({
       ...decision,
       revisions: decision.revisions.slice(-5),
@@ -1636,9 +2440,11 @@ function renderState(state) {
   if (state.steps.length) {
     lines.push('steps:')
     for (const step of state.steps) {
-      const status = stepStale(state, step) ? 'stale' : 'open'
+      const status = stepStale(state, step) ? 'stale' : (step.status ?? 'open')
       const depends = step.depends_on.length ? ` — depends on ${step.depends_on.join(', ')}` : ''
-      lines.push(`  ${step.id} ${step.description}${depends} [${status}]`)
+      const kind = step.kind ? ` ${step.kind}` : ''
+      const box = step.time_box_minutes ? `, ${step.time_box_minutes}m box` : ''
+      lines.push(`  ${step.id}${kind} ${step.description}${depends} [${status}${box}]`)
     }
   }
   const trips = state.trips.filter((trip) => trip.status !== 'resolved').slice(-20)
@@ -1651,6 +2457,19 @@ function renderState(state) {
           `[${trip.status}/${trip.severity}] ${trip.evidence}`,
       )
     }
+  }
+  if (state.questions.length) {
+    lines.push('questions:')
+    for (const question of state.questions) {
+      lines.push(
+        `  ${question.id} ${question.text} ` +
+          `(${question.fidelity}/${question.priority} -> ${question.answer_by})`,
+      )
+    }
+  }
+  if (state.basis.length) {
+    const latest = [...latestBasis(state).values()]
+    lines.push(`basis: ${latest.map((item) => `${item.check} ${item.verdict}`).join(', ')}`)
   }
   if (state.permits.length) {
     lines.push('external permits:')
@@ -1668,6 +2487,35 @@ function renderState(state) {
         recent.map((entry) => `${entry.permit}:${entry.exitCode ?? entry.kind}`).join(', ') +
         ')',
     )
+  }
+  if (state.failures.length) {
+    const groups = new Map()
+    for (const failure of state.failures) {
+      const key = `${failure.candidate ?? '-'}/${failure.step ?? '-'}/${failure.signature}`
+      const group = groups.get(key) ?? { count: 0, last: failure }
+      group.count += 1
+      group.last = failure
+      groups.set(key, group)
+    }
+    lines.push('failures:')
+    for (const [key, group] of [...groups.entries()].slice(-10)) {
+      lines.push(`  ${group.count}x ${key} latest ${group.last.id}: ${group.last.symptom}`)
+    }
+  }
+  if (state.targets.length) {
+    lines.push('targets:')
+    for (const target of state.targets) {
+      const count = state.comparisons.filter((item) => item.target === target.id).length
+      lines.push(
+        `  ${target.id} ${target.value} ${target.unit} from ${target.source}; ` +
+          `${count} comparison(s)`,
+      )
+    }
+  }
+  if (state.jobs.length) {
+    const running = state.jobs.filter((job) => job.status === 'running')
+    const names = running.slice(-3).map((job) => job.job_id)
+    lines.push(`jobs: ${running.length} running${names.length ? ` (${names.join(', ')})` : ''}`)
   }
   if (state.calcSinceReview) {
     lines.push(`checkpoint: ${state.calcSinceReview} calculations since the last review`)
@@ -1718,11 +2566,21 @@ function normalizeState(value) {
     'calcLog',
     'permits',
     'externalLog',
+    'questions',
+    'basis',
+    'failures',
+    'targets',
+    'comparisons',
+    'jobs',
   ]) {
     if (!Array.isArray(state[key])) state[key] = []
   }
   state.criteria = Array.isArray(state.criteria) ? state.criteria : []
   state.activeStepId = typeof state.activeStepId === 'string' ? state.activeStepId : null
+  state.ceremony = state.ceremony === 'study' ? 'study' : 'simple'
+  state.reviewWindowStartedAt = Number.isFinite(state.reviewWindowStartedAt)
+    ? state.reviewWindowStartedAt
+    : Date.now()
   state.calcCount = Number.isInteger(state.calcCount) ? state.calcCount : 0
   state.calcSinceReview = Number.isInteger(state.calcSinceReview) ? state.calcSinceReview : 0
   return state
@@ -1877,6 +2735,12 @@ export function apply(ctx, config = {}) {
             'add',
             'choose',
             'step',
+            'basis',
+            'feasibility',
+            'fail',
+            'target',
+            'compare',
+            'job',
             'trip',
             'reopen',
             'resolve',
@@ -1897,6 +2761,19 @@ export function apply(ctx, config = {}) {
               id: { type: 'string' },
               path: { type: 'string' },
               cost: { type: 'string', description: 'relative effort, risk and accuracy estimate' },
+              estimate: {
+                type: 'object',
+                additionalProperties: false,
+                properties: {
+                  minutes: { type: 'number' },
+                  compute: { type: 'string' },
+                  risk: { type: 'string' },
+                },
+                required: ['minutes', 'compute', 'risk'],
+              },
+              fallback: { type: 'string' },
+              answers: { type: 'array', items: { type: 'string' } },
+              fidelities: { type: 'array', items: { type: 'string', enum: FIDELITIES } },
               assumptions: {
                 type: 'array',
                 items: {
@@ -1930,7 +2807,10 @@ export function apply(ctx, config = {}) {
         category: { type: 'string', enum: CATEGORIES },
         evidence: { type: 'string' },
         severity: { type: 'string', enum: ['trip', 'note'] },
-        verdict: { type: 'string', enum: ['confirm', 'reconsider'] },
+        verdict: {
+          type: 'string',
+          enum: ['confirm', 'reconsider', 'agree', 'disagree', 'pass', 'warn', 'fail'],
+        },
         ranking: { type: 'array', items: { type: 'string' } },
         calc_call: { type: 'string' },
         reason: { type: 'string' },
@@ -1942,6 +2822,78 @@ export function apply(ctx, config = {}) {
         verification: { type: 'string', description: 'how the result is checked' },
         expected_minutes: { type: 'number' },
         step: { type: 'string' },
+        questions: {
+          type: 'array',
+          items: {
+            type: 'object',
+            additionalProperties: false,
+            properties: {
+              text: { type: 'string' },
+              fidelity: { type: 'string', enum: FIDELITIES },
+              priority: { type: 'string', enum: PRIORITIES },
+              answer_by: { type: 'string' },
+            },
+            required: ['text', 'fidelity', 'answer_by'],
+          },
+        },
+        kind: { type: 'string', enum: STEP_KINDS },
+        time_box_minutes: { type: 'number' },
+        success_test: { type: 'string' },
+        fallback: { type: 'string' },
+        estimated_minutes: { type: 'number' },
+        accept_overrun: { type: 'boolean' },
+        feasibility: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            dt_s: { type: 'number' },
+            cost_per_step_ms: { type: 'number' },
+            inversion_conditioning: { type: 'string' },
+            singular_closures: { type: 'string' },
+            estimated_minutes: { type: 'number' },
+            fallback: { type: 'string' },
+            success_test: { type: 'string' },
+          },
+          required: [
+            'dt_s',
+            'cost_per_step_ms',
+            'inversion_conditioning',
+            'singular_closures',
+            'estimated_minutes',
+            'fallback',
+            'success_test',
+          ],
+        },
+        status: { type: 'string', enum: STEP_STATUSES },
+        check: { type: 'string', enum: BASIS_CHECKS },
+        symptom: { type: 'string' },
+        diagnosis: { type: 'string' },
+        artefact: { type: 'string' },
+        signature: { type: 'string' },
+        source: { type: 'string' },
+        value: { type: 'number' },
+        unit: { type: 'string' },
+        band: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            plus_minus: { type: 'number' },
+            low: { type: 'number' },
+            high: { type: 'number' },
+          },
+        },
+        model: { type: 'string' },
+        target: { type: 'string' },
+        job_id: { type: 'string' },
+        label: { type: 'string' },
+        dt_s: { type: 'number' },
+        cost_per_step_ms: { type: 'number' },
+        inversion_conditioning: { type: 'string' },
+        singular_closures: { type: 'string' },
+        at_risk: { type: 'array', items: { type: 'string' } },
+        remaining_minutes: { type: 'number' },
+        fallback_started: { type: 'boolean' },
+        extend_minutes: { type: 'number' },
       },
       required: ['action'],
     },
@@ -2016,6 +2968,7 @@ export function apply(ctx, config = {}) {
               )
             }
             consumePermit(state, permit, exec.callId ?? null)
+            state.calcSinceReview += 1
           }
         }
         if (exec.name === 'azoth_calc') {
@@ -2051,6 +3004,35 @@ export function apply(ctx, config = {}) {
           })
           if (state.externalLog.length > MAX_EXTERNAL_LOG) {
             state.externalLog = state.externalLog.slice(-MAX_EXTERNAL_LOG)
+          }
+          if (outcome.failed) {
+            const detail = externalFailure(result)
+            try {
+              recordFailure(
+                state,
+                {
+                  symptom: detail.symptom,
+                  evidence: detail.evidence,
+                  artefact: external.command.slice(0, 500),
+                },
+                { cfg, callId: exec.callId ?? null },
+                'external',
+              )
+            } catch (error) {
+              ctx.logger?.warn?.(`azoth-plan: cannot record external failure: ${String(error)}`)
+            }
+          }
+          const jobId = result?.value?.jobId
+          if (jobId && (outcome.kind === 'promoted' || outcome.kind === 'background')) {
+            try {
+              recordJob(state, {
+                job_id: jobId,
+                purpose: permit?.purpose ?? external.command,
+                label: external.command.slice(0, 300),
+              })
+            } catch (error) {
+              ctx.logger?.warn?.(`azoth-plan: cannot record job: ${String(error)}`)
+            }
           }
         }
         const sections = [externalBanner(permit, external.command, outcome)]

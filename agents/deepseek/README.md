@@ -70,18 +70,23 @@ with a pump sizing, the demo separator, and relief and fire questions.
   library's `to_dict()` with warnings and the provenance block, rendered with what its
   verification means.
 - **`azoth_plan`** — the planning guard in [`plugin/guard.js`](plugin/guard.js). It records
-  a decision tree: `open` requires at least two candidate paths, each with its cost and
-  assumptions; `choose` fixes the path; `add` attaches a subordinate decision; `step`
-  records ordered work. An assumption names a category — numerical, validity, evidence,
-  applicability, consistency, feasibility, requirement, budget or judgment — and, where a
-  result can decide it, a falsifier bound to a calculation id, `"*"` or `intake`.
-  `azoth_calc` and `azoth_intake` results are checked automatically for the numerical,
-  validity and evidence signals; `trip` records any other reason. A trip holds `azoth_calc`
-  until `reopen` returns to the decision or `resolve` records evidence that the assumption
-  survived. `permit` records an external bash calculation — command, scope, purpose and
-  verification — and a matching command is refused until the user approves it. `review` is
-  the periodic checkpoint; `status` returns the record. The thresholds and the
-  warning-category map are `[plan]` in [`harness.toml`](harness.toml).
+  a decision tree: `open` requires at least two candidate paths, each with a cost, an
+  estimate, a fallback and assumptions; `choose` fixes the path; `add` attaches a
+  subordinate decision; `step` records ordered work with a kind, a time box and a success
+  test. An assumption names a category — numerical, validity, evidence, applicability,
+  consistency, feasibility, requirement, budget or judgment — and, where a result can
+  decide it, a falsifier bound to a calculation id, `"*"` or `intake`. A study maps each
+  question to a fidelity and an answer; `basis` records the consistency checks; a solver
+  step needs a feasibility record. `fail` logs a failure, and three with one signature
+  trip the path; `target` and `compare` record a supplied validation value and its spread
+  across at least two models. `azoth_calc` and `azoth_intake` results are checked
+  automatically for the numerical, validity and evidence signals; `trip` records any other
+  reason. A trip holds the calculation until `reopen` returns to the decision or `resolve`
+  records evidence that the assumption survived. `permit` records an external bash
+  calculation — command, scope, purpose and verification — and a matching command is
+  refused until the user approves it. `review` is the periodic checkpoint; `job` records a
+  background job; `status` returns the record. The thresholds and the warning-category map
+  are `[plan]` in [`harness.toml`](harness.toml).
 - **`mcp__azoth__*`** — the existing `azoth mcp --flowsheet F` server, mounted through
   `@deepseek-ai/dsh-mcp-client`. It exposes the 20 flowsheet edit commands and the
   `azoth://document`, `azoth://diagnostics`, `azoth://report` and `azoth://catalogue`

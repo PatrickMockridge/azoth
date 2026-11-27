@@ -191,27 +191,51 @@ that changed it. The server holds one document in memory and never writes it.
 
 ### The planning guard
 
-The guard registers `azoth_plan` and holds `azoth_calc` while a decision is tripped or a
-review is due. It is mounted for the engineer, outside a study. `open` records the problem,
-the criteria and at least two candidate paths; each assumption carries a category
-(`numerical`, `validity`, `evidence`, `applicability`, `consistency`, `feasibility`,
-`requirement`, `budget`, `judgment`) and, where a result can decide it, a falsifier bound
-to a calculation id, `"*"` or `intake`. `choose` fixes the path; `add` attaches a
-subordinate decision; `step` records ordered work.
+The guard registers `azoth_plan` and holds every calculation — `azoth_calc` and an
+external bash command — while a decision is tripped, a step is over its time box, or a
+review is due. It is mounted for the engineer, outside a study. A single lookup is free; a
+plan is required from the second calculation.
+
+`open` records the problem, the criteria and at least two candidate paths. Each candidate
+carries a cost, an estimate (`minutes`, `compute`, `risk`), a fallback and its fidelities;
+each assumption carries a category (`numerical`, `validity`, `evidence`, `applicability`,
+`consistency`, `feasibility`, `requirement`, `budget`, `judgment`) and, where a result can
+decide it, a falsifier bound to a calculation id, `"*"` or `intake`. `choose` fixes the
+path; `add` attaches a subordinate decision; `step` records ordered work with a kind, a
+time box and a success test.
+
+A study — a plan with questions — maps each question to the cheapest fidelity (`thermo`,
+`steady`, `transient`, `field`, `olga`) and the candidate that answers it; `choose` refuses
+an unmapped primary question. `basis` records the consistency checks before a transport or
+solver step — flow, diameter, pressure drop, composition and consistency for transport;
+composition and consistency for thermodynamics — and a failed check trips the path. A
+solver step also names the question it answers and carries a feasibility record: `dt_s`,
+`cost_per_step_ms`, the inversion conditioning, the singular closures (`dP -> 0`,
+`beta -> 0/1`), `estimated_minutes`, the fallback and the success test. An estimate over
+the step's time box is refused unless `accept_overrun` records it.
 
 Every `azoth_calc` and `azoth_intake` result is checked. An error, a non-finite value,
 `converged: false`, or `SOLVER_NOT_CONVERGED`/`TRIVIAL_SOLUTION`/`FALLBACK_TO_INPUT`
 trips the chosen path; `OUT_OF_VALID_RANGE`/`RANGE_CHECK_SKIPPED`/`TRANSITIONAL_FLOW`
 trip a bound `any_warning` or `out_of_range` assumption; a refused intake or a hard gap is
 an evidence trip. Anything else is an explicit `trip` with one of the nine categories. A
-trip holds `azoth_calc` and returns to the owning decision: `reopen` clears the choice and
-marks its descendants and dependent steps stale; `resolve` records evidence that the
+trip holds the calculation and returns to the owning decision: `reopen` clears the choice
+and marks its descendants and dependent steps stale; `resolve` records evidence that the
 assumption survived. A root trip returns the whole plan to concept selection.
 
-After `review_after_calcs` calculations the next call is held for `review`: `confirm`
-reaffirms the choice, `reconsider` reopens it. The state is per session, in the plugin's
-process; every plan result and every trip or checkpoint banner carries a bounded
-`plan-record` line, which also restores the plan on resume.
+A step over its `time_box_minutes` holds the next calculation until `review` extends it
+(`extend_minutes`) or records `fallback_started`. After `review_after_calcs` calculations
+or `review_after_minutes`, `review` is due; it records `at_risk`, `remaining_minutes` and
+the verdict, and `confirm` resets the checkpoint. `fail` records a failure with its
+symptom, evidence and diagnosis; three failures with the same signature on a step or
+candidate add a `failure_streak` trip. `target` and `compare` record a supplied validation
+value and at least two model comparisons, one agreeing and one disagreeing; `review
+confirm` and `close` refuse while the spread is incomplete. `job` records a background job
+by id; the web engineer also has `job_output`, `job_list` and `job_kill`.
+
+The state is per session, in the plugin's process; every plan result and every trip,
+overrun or checkpoint banner carries a bounded `plan-record` line, which also restores the
+plan on resume.
 
 A bash command that runs an interpreter is a calculation outside azoth. It is refused
 unless `azoth_plan permit` has recorded the command, its scope (`once`, `step` or
@@ -327,9 +351,11 @@ dossier only — no `eval`, no shell, no import by a model-supplied string; a ke
 and a dossier path must be under the working directory. The bridge caps inputs at 1 MB;
 the plugin caps a result at 4 MiB and times a call out at 120 s; the CLI caps its own
 output at 8 MB; the flowsheet MCP client times a tool call at 60 s. The planning guard is
-per session, so a spawned subagent opens its own plan, and it holds the `azoth_calc` tool
-rather than the Python bridge: a direct `python -m azoth.harness` call through `tool-bash`
-bypasses it.
+per session, so a spawned subagent opens its own plan. It gates `azoth_calc` and every
+bash command that runs an interpreter; `azoth` and `python -m azoth.harness` are azoth and
+pass the same holds, and any other interpreter needs a permit and the user's approval, or
+`--allow-external-compute` at launch. It is a plugin policy over those tools, not an OS
+sandbox: an MCP tool or a future tool could compute.
 
 The library's models are `unverified` or `partially_verified`; a result is evidence for a
 finding, not a design deliverable. The provenance block says which.

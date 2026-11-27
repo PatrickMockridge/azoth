@@ -93,6 +93,42 @@ async function openAndChoose(h, s, candidate = 'C1') {
   })
 }
 
+function studyCandidates() {
+  const base = candidates()
+  return [
+    {
+      ...base[0],
+      estimate: { minutes: 30, compute: 'a few flashes', risk: 'low' },
+      fallback: 'thermodynamics only',
+      fidelities: ['thermo', 'steady'],
+    },
+    {
+      ...base[1],
+      estimate: { minutes: 240, compute: '26M flashes', risk: 'high' },
+      fallback: 'the steady map',
+      fidelities: ['transient'],
+    },
+  ]
+}
+
+async function openStudy(h, s) {
+  await plan(h.tools, s, {
+    action: 'open',
+    problem: 'when and where does liquid form',
+    criteria: ['accuracy'],
+    candidates: studyCandidates(),
+    questions: [
+      { text: 'where and how much liquid', fidelity: 'steady', answer_by: 'C1' },
+    ],
+  })
+  return plan(h.tools, s, {
+    action: 'choose',
+    decision: 'D1',
+    candidate: 'C1',
+    rationale: 'the cheapest path that answers the steady question',
+  })
+}
+
 async function calc(h, s, { id = 'eos.pt_flash', value, isError = false } = {}) {
   const exec = {
     name: 'azoth_calc',
@@ -804,4 +840,439 @@ test('a tripped plan refuses external computation', async () => {
   const run = await runBash(h, s, 'python3 src/x.py')
   assert.equal(run.gate.kind, 'deny')
   assert.equal(run.gate.info.code, 'AZOTH_PLAN_HELD')
+})
+
+test('a study needs a costed candidate with a fallback and a mapped question', async () => {
+  const h = harness()
+  const s = session()
+  await assert.rejects(
+    plan(h.tools, s, {
+      action: 'open',
+      problem: 'x',
+      criteria: ['accuracy'],
+      candidates: candidates(),
+      questions: [{ text: 'where does liquid form', fidelity: 'steady', answer_by: 'C1' }],
+    }),
+    /estimate/,
+  )
+  const mismatch = session()
+  await plan(h.tools, mismatch, {
+    action: 'open',
+    problem: 'when and where does liquid form',
+    criteria: ['accuracy'],
+    candidates: studyCandidates(),
+    questions: [{ text: 'where and how much liquid', fidelity: 'steady', answer_by: 'C1' }],
+  })
+  await assert.rejects(
+    plan(h.tools, mismatch, {
+      action: 'choose',
+      decision: 'D1',
+      candidate: 'C2',
+      rationale: 'the transient',
+    }),
+    /does not answer Q1/,
+  )
+  await plan(h.tools, mismatch, {
+    action: 'choose',
+    decision: 'D1',
+    candidate: 'C1',
+    rationale: 'the steady path',
+  })
+  const state = internals.planFor(mismatch)
+  assert.equal(state.ceremony, 'study')
+  assert.equal(state.questions[0].answer_by, 'C1')
+  assert.deepEqual(state.decisions[0].candidates[0].answers, ['Q1'])
+})
+
+test('a solver step needs basis checks and a feasibility record', async () => {
+  const h = harness()
+  const s = session()
+  await openStudy(h, s)
+  const feasibility = {
+    dt_s: 45,
+    cost_per_step_ms: 4.2,
+    inversion_conditioning: 'the Jacobian determinant is 5e-10 at 180 bara',
+    singular_closures: 'the flux gain tends to infinity as dP tends to zero',
+    estimated_minutes: 30,
+    fallback: 'the steady map',
+    success_test: 'mass balance below 1e-5 on the settle stage',
+  }
+  await assert.rejects(
+    plan(h.tools, s, { action: 'step', description: 'solve', kind: 'solver', question: 'Q1', feasibility }),
+    /basis checks first/,
+  )
+  for (const check of ['flow', 'diameter', 'pressure_drop', 'composition', 'consistency']) {
+    await plan(h.tools, s, {
+      action: 'basis',
+      check,
+      verdict: 'pass',
+      evidence: `${check} is consistent with the basis`,
+    })
+  }
+  await assert.rejects(
+    plan(h.tools, s, { action: 'step', description: 'solve', kind: 'solver', question: 'Q1' }),
+    /needs feasibility/,
+  )
+  const step = await plan(h.tools, s, {
+    action: 'step',
+    description: 'solve',
+    kind: 'solver',
+    question: 'Q1',
+    time_box_minutes: 40,
+    feasibility,
+  })
+  assert.match(step.message, /solver/)
+  const state = internals.planFor(s)
+  assert.equal(state.steps[0].kind, 'solver')
+  assert.equal(state.steps[0].feasibility.dt_s, 45)
+})
+
+test('a failed basis check trips the chosen path', async () => {
+  const h = harness()
+  const s = session()
+  await openStudy(h, s)
+  await plan(h.tools, s, {
+    action: 'basis',
+    check: 'consistency',
+    verdict: 'fail',
+    evidence: 'the flow does not satisfy the pressure drop over the stated diameter',
+  })
+  const state = internals.planFor(s)
+  assert.equal(internals.holdingTrips(state).length, 1)
+  assert.equal(state.trips[0].signal, 'basis')
+})
+
+test('a step over its time box holds until it is extended or abandoned', async () => {
+  const h = harness()
+  const s = session()
+  await openAndChoose(h, s)
+  await plan(h.tools, s, {
+    action: 'step',
+    description: 'try the solver',
+    kind: 'check',
+    time_box_minutes: 1,
+  })
+  const state = internals.planFor(s)
+  state.steps[0].startedAt = Date.now() - 120_000
+  const cfg = internals.normalizeConfig({ reviewAfterCalcs: 0, reviewAfterMinutes: 0 })
+  assert.equal(internals.holdReason(state, cfg).info.code, 'AZOTH_STEP_OVERRUN')
+  await assert.rejects(
+    plan(h.tools, s, {
+      action: 'review',
+      decision: 'D1',
+      verdict: 'confirm',
+      evidence: 'still working',
+    }),
+    /over its/,
+  )
+  await plan(h.tools, s, {
+    action: 'review',
+    decision: 'D1',
+    verdict: 'confirm',
+    evidence: 'extend the box',
+    at_risk: ['the solver has not passed the conservation test'],
+    remaining_minutes: 20,
+    extend_minutes: 10,
+  })
+  assert.equal(internals.holdReason(state, cfg), undefined)
+})
+
+test('fallback_started clears an overrun', async () => {
+  const h = harness()
+  const s = session()
+  await openAndChoose(h, s)
+  await plan(h.tools, s, {
+    action: 'step',
+    description: 'try the solver',
+    kind: 'check',
+    time_box_minutes: 1,
+    fallback: 'the steady map',
+  })
+  const state = internals.planFor(s)
+  state.steps[0].startedAt = Date.now() - 120_000
+  const cfg = internals.normalizeConfig({ reviewAfterCalcs: 0, reviewAfterMinutes: 0 })
+  await plan(h.tools, s, {
+    action: 'review',
+    decision: 'D1',
+    verdict: 'confirm',
+    evidence: 'the solver is not converging',
+    fallback_started: true,
+  })
+  assert.equal(state.steps[0].fallback_started, true)
+  assert.equal(internals.holdReason(state, cfg), undefined)
+})
+
+test('a minute-based checkpoint holds the next calculation', async () => {
+  const h = harness()
+  const s = session()
+  await openAndChoose(h, s)
+  const state = internals.planFor(s)
+  state.reviewWindowStartedAt = Date.now() - 120_000
+  const cfg = internals.normalizeConfig({ reviewAfterCalcs: 0, reviewAfterMinutes: 1 })
+  assert.equal(internals.holdReason(state, cfg).info.code, 'AZOTH_PLAN_CHECKPOINT')
+  await plan(h.tools, s, {
+    action: 'review',
+    decision: 'D1',
+    verdict: 'confirm',
+    evidence: 'still on the path',
+    at_risk: ['the heavy-end assay is missing'],
+    remaining_minutes: 30,
+  })
+  assert.equal(internals.holdReason(state, cfg), undefined)
+})
+
+test('three failures with one signature trip the path', async () => {
+  const h = harness()
+  const s = session()
+  await openAndChoose(h, s)
+  await plan(h.tools, s, { action: 'step', description: 'solve', kind: 'check' })
+  for (const symptom of ['cell 0 emptied', 'cell 7 emptied', 'cell 24 emptied']) {
+    await plan(h.tools, s, {
+      action: 'fail',
+      symptom,
+      evidence: 'the run stopped',
+      diagnosis: 'a cell lost its mass',
+    })
+  }
+  const state = internals.planFor(s)
+  assert.equal(state.failures.length, 3)
+  assert.equal(state.trips.filter((trip) => trip.signal === 'failure_streak').length, 1)
+  assert.equal(internals.holdingTrips(state).length, 1)
+  assert.match(internals.renderState(state), /3x/)
+})
+
+test('two failures of each of two signatures do not trip', async () => {
+  const h = harness()
+  const s = session()
+  await openAndChoose(h, s)
+  await plan(h.tools, s, { action: 'step', description: 'solve', kind: 'check' })
+  for (const symptom of ['cell 0 emptied', 'cell 7 emptied', 'pressure hit the clamp', 'pressure hit the clamp']) {
+    await plan(h.tools, s, { action: 'fail', symptom, evidence: 'the run stopped' })
+  }
+  const state = internals.planFor(s)
+  assert.equal(state.failures.length, 4)
+  assert.equal(state.trips.filter((trip) => trip.signal === 'failure_streak').length, 0)
+})
+
+test('a repeated failure after reopening holds again', async () => {
+  const h = harness()
+  const s = session()
+  await openAndChoose(h, s)
+  await plan(h.tools, s, { action: 'step', description: 'solve', kind: 'check' })
+  for (const symptom of ['cell 0 emptied', 'cell 7 emptied', 'cell 24 emptied']) {
+    await plan(h.tools, s, { action: 'fail', symptom, evidence: 'the run stopped' })
+  }
+  await plan(h.tools, s, {
+    action: 'reopen',
+    decision: 'D1',
+    reason: 'three failures say the formulation is wrong',
+    evidence: 'the cells empty at every stage',
+  })
+  await plan(h.tools, s, {
+    action: 'choose',
+    decision: 'D1',
+    candidate: 'C1',
+    rationale: 'the same path with a corrected source term',
+  })
+  await plan(h.tools, s, {
+    action: 'fail',
+    symptom: 'cell 31 emptied',
+    evidence: 'the correction did not hold',
+  })
+  const state = internals.planFor(s)
+  assert.equal(internals.holdingTrips(state).length, 1)
+})
+
+test('an external command failure enters the ledger and a streak trips', async () => {
+  const h = harness()
+  const s = session()
+  await openAndChoose(h, s)
+  await plan(h.tools, s, { action: 'step', description: 'run the solver' })
+  await plan(h.tools, s, {
+    action: 'permit',
+    command: 'python3 src/pipeline.py',
+    scope: 'session',
+    purpose: 'the custom solver',
+    verification: 'mass balance against the steady map',
+  })
+  const failing = (line) => ({
+    isError: false,
+    value: {
+      kind: 'foreground',
+      exitCode: 1,
+      timedOut: false,
+      stderr: { text: `RuntimeError: ${line}` },
+      stdout: { text: '' },
+    },
+    content: [{ type: 'text', text: 'failed' }],
+  })
+  await runBash(h, s, 'python3 src/pipeline.py', { result: failing('cell 0 emptied') })
+  await runBash(h, s, 'python3 src/pipeline.py', { result: failing('cell 7 emptied') })
+  await runBash(h, s, 'python3 src/pipeline.py', { result: failing('cell 24 emptied') })
+  const state = internals.planFor(s)
+  assert.equal(state.failures.length, 3)
+  assert.equal(state.trips.filter((trip) => trip.signal === 'failure_streak').length, 1)
+  assert.equal(internals.holdingTrips(state).length, 1)
+})
+
+test('a promoted bash result records a job', async () => {
+  const h = harness()
+  const s = session()
+  await openAndChoose(h, s)
+  await plan(h.tools, s, { action: 'step', description: 'run the case matrix' })
+  await plan(h.tools, s, {
+    action: 'permit',
+    command: 'python3 src/study.py',
+    scope: 'session',
+    purpose: 'the case matrix',
+    verification: 'the conservation table',
+  })
+  const run = await runBash(h, s, 'python3 src/study.py', {
+    result: {
+      isError: false,
+      value: { kind: 'promoted', jobId: 'job-1', timeoutMs: 120000 },
+      content: [{ type: 'text', text: 'moved to background' }],
+    },
+  })
+  const state = internals.planFor(s)
+  assert.equal(state.jobs.length, 1)
+  assert.equal(state.jobs[0].job_id, 'job-1')
+  assert.match(run.decision.content[0].text, /background/)
+  assert.match(internals.renderState(state), /1 running/)
+})
+
+test('a supplied target needs two models and both verdicts', async () => {
+  const h = harness()
+  const s = session()
+  await openAndChoose(h, s)
+  await plan(h.tools, s, {
+    action: 'target',
+    value: 103,
+    unit: 'bara',
+    band: { plus_minus: 2 },
+    source: 'the 102 barg reference',
+  })
+  await assert.rejects(
+    plan(h.tools, s, { action: 'close', reason: 'done' }),
+    /needs two models/,
+  )
+  await plan(h.tools, s, {
+    action: 'compare',
+    target: 'T1',
+    model: 'PR',
+    value: 102.07,
+    unit: 'bara',
+    verdict: 'agree',
+  })
+  await assert.rejects(
+    plan(h.tools, s, {
+      action: 'review',
+      decision: 'D1',
+      verdict: 'confirm',
+      evidence: 'one model',
+    }),
+    /needs two models/,
+  )
+  await assert.rejects(
+    plan(h.tools, s, {
+      action: 'compare',
+      target: 'T1',
+      model: 'SRK',
+      value: 105.4,
+      unit: 'bara',
+      verdict: 'agree',
+    }),
+    /outside the band/,
+  )
+  await plan(h.tools, s, {
+    action: 'compare',
+    target: 'T1',
+    model: 'SRK',
+    value: 105.4,
+    unit: 'bara',
+    verdict: 'disagree',
+  })
+  await plan(h.tools, s, {
+    action: 'review',
+    decision: 'D1',
+    verdict: 'confirm',
+    evidence: 'PR agrees and SRK does not',
+  })
+  const state = internals.planFor(s)
+  assert.equal(state.reviews[0].targets[0].agree, 1)
+  assert.equal(state.reviews[0].targets[0].disagree, 1)
+  assert.ok(Math.abs(state.reviews[0].targets[0].spread - 3.33) < 0.01)
+  await plan(h.tools, s, { action: 'close', reason: 'the spread is reported' })
+})
+
+test('two agreeing models do not satisfy a target', async () => {
+  const h = harness()
+  const s = session()
+  await openAndChoose(h, s)
+  await plan(h.tools, s, {
+    action: 'target',
+    value: 103,
+    unit: 'bara',
+    band: { plus_minus: 2 },
+    source: 'the 102 barg reference',
+  })
+  await plan(h.tools, s, { action: 'compare', target: 'T1', model: 'PR', value: 102.07, verdict: 'agree' })
+  await plan(h.tools, s, { action: 'compare', target: 'T1', model: 'SRK', value: 101.9, verdict: 'agree' })
+  await assert.rejects(
+    plan(h.tools, s, {
+      action: 'review',
+      decision: 'D1',
+      verdict: 'confirm',
+      evidence: 'both agree',
+    }),
+    /disagreeing/,
+  )
+})
+
+test('a finished step revokes its permits', async () => {
+  const h = harness()
+  const s = session()
+  await openAndChoose(h, s)
+  await plan(h.tools, s, { action: 'step', description: 'try the solver' })
+  await plan(h.tools, s, {
+    action: 'permit',
+    command: 'python3 src/x.py',
+    scope: 'step',
+    purpose: 'the custom solver',
+    verification: 'against the steady map',
+  })
+  await runBash(h, s, 'python3 src/x.py')
+  const state = internals.planFor(s)
+  assert.equal(state.permits[0].status, 'approved')
+  await plan(h.tools, s, { action: 'step', step: 'S1', status: 'done' })
+  assert.equal(state.permits[0].status, 'revoked')
+  const again = await runBash(h, s, 'python3 src/x.py')
+  assert.equal(again.gate.kind, 'deny')
+  assert.equal(again.gate.info.code, 'AZOTH_EXTERNAL_PERMIT_REQUIRED')
+})
+
+test('an estimate over the time box is refused unless accepted', async () => {
+  const h = harness()
+  const s = session()
+  await openAndChoose(h, s)
+  await assert.rejects(
+    plan(h.tools, s, {
+      action: 'step',
+      description: 'try the solver',
+      kind: 'check',
+      time_box_minutes: 10,
+      estimated_minutes: 30,
+    }),
+    /exceeds/,
+  )
+  await plan(h.tools, s, {
+    action: 'step',
+    description: 'try the solver',
+    kind: 'check',
+    time_box_minutes: 10,
+    estimated_minutes: 30,
+    accept_overrun: true,
+  })
+  const state = internals.planFor(s)
+  assert.match(state.steps[0].budget_note, /accepted overrun/)
 })

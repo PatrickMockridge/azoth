@@ -74,6 +74,9 @@ def _root(tmp_path: Path) -> Path:
                 "resolve_requires_clean_calc = false",
                 'external_compute = "ask"',
                 "gate_sanctioned_bridge = true",
+                "review_after_minutes = 30",
+                "failure_trip_after = 3",
+                "job_tools = true",
                 "",
                 "[plan.warning_categories]",
                 'SOLVER_NOT_CONVERGED = "numerical"',
@@ -311,6 +314,7 @@ def test_engineer_web_overlay_has_the_engineer_preset_but_no_team(tmp_path: Path
     plugins = {plugin["id"]: plugin for plugin in preset["config"]["plugins"]}
     assert plugins["tool-fs-search"]["config"]["sampleOverCapGlobResults"] is False
     assert plugins["tool-todo"]["config"]["allowParallelInProgress"] is True
+    assert "tool-jobs" in plugins
     assert _find(rows, "agent-team") is None
     assert _find(rows, "preset-azoth-hazop-chair") is None
 
@@ -349,6 +353,8 @@ def test_overlay_mounts_the_planning_guard_once(tmp_path: Path) -> None:
     assert config["warningCategories"]["OUT_OF_VALID_RANGE"] == "validity"
     assert config["externalCompute"] == "ask"
     assert config["gateSanctionedBridge"] is True
+    assert config["reviewAfterMinutes"] == 30
+    assert config["failureTripAfter"] == 3
     assert "planning guard" in config["policy"].lower()
     mounted = [
         inserted
@@ -367,6 +373,20 @@ def test_planning_guard_can_be_disabled(tmp_path: Path) -> None:
         encoding="utf-8",
     )
     assert _find(_rows(root), "azoth-plan") is None
+
+
+def test_job_tools_can_be_disabled(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    path = root / "agents" / "deepseek" / "harness.toml"
+    path.write_text(
+        path.read_text(encoding="utf-8").replace("job_tools = true", "job_tools = false"),
+        encoding="utf-8",
+    )
+    rows = _rows(root, "--flowsheet", "case.toml")
+    preset = _find(rows, "preset-azoth-engineer")
+    assert preset is not None
+    plugins = {plugin["id"]: plugin for plugin in preset["config"]["plugins"]}
+    assert "tool-jobs" not in plugins
 
 
 def test_study_overlays_leave_the_team_pipeline_alone(tmp_path: Path) -> None:
