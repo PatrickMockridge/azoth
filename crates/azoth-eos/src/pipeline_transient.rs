@@ -10,13 +10,10 @@
 //! one composition for the whole line and cannot close per component.
 
 use azoth_core::units::{
-    HeatFluxDensity, Length, Mass, MassFlux, MolarEnergy, MolarVolume, Pressure,
-    ThermodynamicTemperature, Time, Volume, kelvins, pascals,
+    HeatFluxDensity, Length, MassFlux, Pressure, ThermodynamicTemperature, Time, cubic_meters,
+    cubic_meters_per_mole, joules_per_mole, kelvins, kilograms, pascals, seconds,
 };
 use azoth_core::{AzothError, Result, Warning, apply_checks};
-use uom::si::molar_energy::joule_per_mole;
-use uom::si::molar_volume::cubic_meter_per_mole;
-use uom::si::volume::cubic_meter;
 
 use crate::entropy_state::molar_mass_of;
 use crate::heat_capacity::phase_capacity;
@@ -102,8 +99,8 @@ fn derive(
     let flash = vu_flash(
         mixture,
         ideal_gas,
-        MolarVolume::new::<cubic_meter_per_mole>(volume),
-        MolarEnergy::new::<joule_per_mole>(molar_internal),
+        cubic_meters_per_mole(volume),
+        joules_per_mole(molar_internal),
         &z,
     )?;
     let pressure = flash.pressure.value;
@@ -389,13 +386,13 @@ fn row(
         * area
         * dx;
     PipelineTransientPoint {
-        time: Time::new::<uom::si::time::second>(time),
-        mass: Mass::new::<uom::si::mass::kilogram>(mass),
+        time: seconds(time),
+        mass: kilograms(mass),
         p_in: pascals(p_in),
         p_out: pascals(p_out),
         t_out: kelvins(last.temperature),
         beta_out: last.beta,
-        liquid_inventory: Volume::new::<cubic_meter>(liquid),
+        liquid_inventory: cubic_meters(liquid),
     }
 }
 

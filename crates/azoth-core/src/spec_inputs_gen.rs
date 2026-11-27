@@ -112,6 +112,7 @@
 //!   - specs/models/eos/phase_transport.toml
 //!   - specs/models/eos/pipe_beggs_and_brills.toml
 //!   - specs/models/eos/pipeline_cooldown.toml
+//!   - specs/models/eos/pipeline_transient.toml
 //!   - specs/models/eos/pitzer_hydrate_formation_pressure.toml
 //!   - specs/models/eos/pitzer_hydrate_formation_temperature.toml
 //!   - specs/models/eos/pitzer_phase.toml
@@ -1760,6 +1761,45 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "target_temperature",
         "thermodynamic_temperature",
     ),
+    ("eos.pipeline_transient", "length", "length"),
+    ("eos.pipeline_transient", "diameter", "length"),
+    ("eos.pipeline_transient", "cells", "dimensionless"),
+    ("eos.pipeline_transient", "friction_factor", "dimensionless"),
+    (
+        "eos.pipeline_transient",
+        "wall_heat_flux",
+        "heat_flux_density",
+    ),
+    (
+        "eos.pipeline_transient",
+        "left_boundary_pressure",
+        "pressure",
+    ),
+    (
+        "eos.pipeline_transient",
+        "right_boundary_pressure",
+        "pressure",
+    ),
+    (
+        "eos.pipeline_transient",
+        "left_boundary_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "eos.pipeline_transient",
+        "right_boundary_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "eos.pipeline_transient",
+        "initial_component_density",
+        "amount_concentration",
+    ),
+    ("eos.pipeline_transient", "initial_momentum", "mass_flux"),
+    ("eos.pipeline_transient", "initial_total_energy", "pressure"),
+    ("eos.pipeline_transient", "time_step", "time"),
+    ("eos.pipeline_transient", "duration", "time"),
+    ("eos.pipeline_transient", "cfl_number", "dimensionless"),
     ("eos.pitzer_hydrate_formation_pressure", "moles", "amount"),
     (
         "eos.pitzer_hydrate_formation_pressure",

@@ -79,6 +79,9 @@ MOLAR_MASS_MODELS = frozenset(
         # that drops the masses cannot report `density` at all. A keycard-defined
         # pseudo-component is exactly the case the masses have to cross for.
         "eos.state_at_tp",
+        # The transient line derives each cell's mass density from its component
+        # densities and needs no name lookup; without the masses every cell has none.
+        "eos.pipeline_transient",
     }
 )
 
@@ -96,7 +99,7 @@ LIQUID_VISCOSITY_MODELS = frozenset({"eos.aqueous_viscosity"})
 #: The models whose boundary must carry the Peneloux translations: a density is a molar
 #: mass over a corrected molar volume, and the correction is the composition-weighted
 #: sum of these. A mixture built without them reports an untranslated volume.
-VOLUME_SHIFT_MODELS = frozenset({"eos.state_at_tp"})
+VOLUME_SHIFT_MODELS = frozenset({"eos.state_at_tp", "eos.pipeline_transient"})
 
 STUB = ROOT / "python" / "src" / "azoth" / "_core.pyi"
 

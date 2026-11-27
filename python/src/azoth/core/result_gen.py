@@ -94,6 +94,7 @@ from azoth.core.record_outputs_gen import (
     PerformanceInstrument,
     PerformanceSif,
     PipeFireRupturePoint,
+    PipelineTransientPoint,
     PrescribedSlipReleaseStation,
     ProcessCostEquipmentResult,
     ProcessCostFlag,
@@ -2835,6 +2836,67 @@ class PipelineCooldownResult(_HasWarnings):
 
     #: the interpolated crossing of the target temperature, absent when not reached.
     time_to_reach_target: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PipelineTransientResult(_HasWarnings):
+    """Result of ``eos.pipeline_transient``."""
+
+    CALC_ID: ClassVar[str] = "eos.pipeline_transient"
+
+    #: the component densities at the end of the stage.
+    final_component_density: tuple[tuple[Q, ...], ...]
+
+    #: the velocity at the end of the stage.
+    final_velocity: tuple[Q, ...]
+
+    #: the pressure at the end of the stage.
+    final_pressure: tuple[Q, ...]
+
+    #: the temperature at the end of the stage.
+    final_temperature: tuple[Q, ...]
+
+    #: the vapour fraction at the end of the stage; 0 or 1 in a single phase.
+    final_vapour_fraction: tuple[float, ...]
+
+    #: the mass density, `sum_i c_i M_i`.
+    final_density: tuple[Q, ...]
+
+    #: the liquid's share of the cell volume; 1 in a liquid cell and 0 in a vapour cell.
+    final_liquid_volume_fraction: tuple[float, ...]
+
+    #: the moles of each component that crossed the boundaries outward during the stage.
+    boundary_component_outflow: tuple[Q, ...]
+
+    #: the moles of each component in the line at the start.
+    initial_component_holdup: tuple[Q, ...]
+
+    #: the moles of each component in the line at the end.
+    final_component_holdup: tuple[Q, ...]
+
+    #: the mass that crossed the boundaries outward during the stage.
+    boundary_mass_outflow: Q
+
+    #: the mass in the line at the start.
+    initial_mass: Q
+
+    #: the mass in the line at the end.
+    final_mass: Q
+
+    #: accepted steps taken.
+    steps: int
+
+    #: steps refused and retried at half the step.
+    rejections: int
+
+    #: the smallest step used.
+    min_time_step: Q
+
+    #: one row per accepted step, starting with the initial state.
+    history: tuple[PipelineTransientPoint, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

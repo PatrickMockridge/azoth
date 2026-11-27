@@ -250,6 +250,7 @@ Five sections, and the difference between them is the point:
 - [`eos.phase_transport`](./eos/phase_transport.md) — A phase's transport properties, by NeqSim's phase-type dispatch
 - [`eos.pipe_beggs_and_brills`](./eos/pipe_beggs_and_brills.md) — Segmented pipeline pressure and temperature profile by Beggs and Brill
 - [`eos.pipeline_cooldown`](./eos/pipeline_cooldown.md) — Lumped pipeline cooldown after shutdown
+- [`eos.pipeline_transient`](./eos/pipeline_transient.md) — Transient segmented pipeline (homogeneous equilibrium)
 - [`eos.pitzer_hydrate_formation_pressure`](./eos/pitzer_hydrate_formation_pressure.md) — Hydrate formation pressure of a Pitzer brine
 - [`eos.pitzer_hydrate_formation_temperature`](./eos/pitzer_hydrate_formation_temperature.md) — Hydrate formation temperature of a Pitzer brine
 - [`eos.pitzer_phase`](./eos/pitzer_phase.md) — Activity coefficients of a Pitzer electrolyte phase

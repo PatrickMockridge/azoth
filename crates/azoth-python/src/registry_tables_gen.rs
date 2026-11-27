@@ -131,6 +131,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "eos.phase_transport" => azoth_eos::results::PhaseTransportResult::FIELDS.to_vec(),
         "eos.pipe_beggs_and_brills" => azoth_eos::results::PipeBeggsAndBrillsResult::FIELDS.to_vec(),
         "eos.pipeline_cooldown" => azoth_eos::results::PipelineCooldownResult::FIELDS.to_vec(),
+        "eos.pipeline_transient" => azoth_eos::results::PipelineTransientResult::FIELDS.to_vec(),
         "eos.pitzer_hydrate_formation_pressure" => azoth_eos::results::PitzerHydrateFormationPressureResult::FIELDS.to_vec(),
         "eos.pitzer_hydrate_formation_temperature" => azoth_eos::results::PitzerHydrateFormationTemperatureResult::FIELDS.to_vec(),
         "eos.pitzer_phase" => azoth_eos::results::PitzerPhaseResult::FIELDS.to_vec(),

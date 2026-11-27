@@ -163,6 +163,7 @@ from azoth.core.result import (
     PhFlashResult,
     PipeBeggsAndBrillsResult,
     PipelineCooldownResult,
+    PipelineTransientResult,
     PitzerHydrateFormationPressureResult,
     PitzerHydrateFormationTemperatureResult,
     PitzerPhaseResult,
@@ -4565,6 +4566,56 @@ def umr_pru_flash(
         P=P,
         z=z,
         tolerance=tolerance,
+    )
+
+
+def pipeline_transient(
+    mixture: Mixture,
+    ideal_gas: IdealGasModel,
+    length: Q,
+    diameter: Q,
+    cells: float,
+    friction_factor: float,
+    left_boundary: str,
+    right_boundary: str,
+    initial_component_density: Sequence[Sequence[Q]],
+    initial_momentum: Sequence[Q],
+    initial_total_energy: Sequence[Q],
+    time_step: Q,
+    duration: Q,
+    wall_heat_flux: Q | None = None,
+    left_boundary_pressure: Q | None = None,
+    right_boundary_pressure: Q | None = None,
+    left_boundary_temperature: Q | None = None,
+    right_boundary_temperature: Q | None = None,
+    cfl_number: float | None = None,
+) -> PipelineTransientResult:
+    """Advance one stage of a segmented, compressible HEM line.
+
+    The state per cell is the component densities, the momentum and the total energy;
+    ``eos.vu_flash`` inverts each cell and a Rusanov flux carries the faces. See
+    :func:`azoth.eos.reference.pipeline_transient.pipeline_transient`.
+    """
+    return resolve("eos.pipeline_transient")(  # type: ignore[no-any-return]
+        mixture=mixture,
+        ideal_gas=ideal_gas,
+        length=length,
+        diameter=diameter,
+        cells=cells,
+        friction_factor=friction_factor,
+        wall_heat_flux=wall_heat_flux,
+        left_boundary=left_boundary,
+        right_boundary=right_boundary,
+        left_boundary_pressure=left_boundary_pressure,
+        right_boundary_pressure=right_boundary_pressure,
+        left_boundary_temperature=left_boundary_temperature,
+        right_boundary_temperature=right_boundary_temperature,
+        initial_component_density=initial_component_density,
+        initial_momentum=initial_momentum,
+        initial_total_energy=initial_total_energy,
+        time_step=time_step,
+        duration=duration,
+        cfl_number=cfl_number,
     )
 
 

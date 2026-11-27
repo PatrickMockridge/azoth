@@ -2701,6 +2701,99 @@ pub fn pipeline_cooldown(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Transient segmented pipeline (homogeneous equilibrium).
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (Tc, Pc, omega, classes, kij, association, cp_a, cp_b, cp_c, cp_d, cp_e, length, diameter, cells, friction_factor, wall_heat_flux, left_boundary, right_boundary, left_boundary_pressure, right_boundary_pressure, left_boundary_temperature, right_boundary_temperature, initial_component_density, initial_momentum, initial_total_energy, time_step, duration, cfl_number, eos = "pr", alpha = "pr", alpha_params = None))]
+#[pyo3(
+    text_signature = "(Tc, Pc, omega, classes, kij, association, cp_a, cp_b, cp_c, cp_d, cp_e, length, diameter, cells, friction_factor, wall_heat_flux, left_boundary, right_boundary, left_boundary_pressure, right_boundary_pressure, left_boundary_temperature, right_boundary_temperature, initial_component_density, initial_momentum, initial_total_energy, time_step, duration, cfl_number, eos = \"pr\", alpha = \"pr\", alpha_params = None)"
+)]
+#[allow(non_snake_case)] // symbols from the published equation
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn pipeline_transient(
+    py: Python<'_>,
+    Tc: Vec<f64>,
+    Pc: Vec<f64>,
+    omega: Vec<f64>,
+    classes: Vec<String>,
+    kij: Vec<f64>,
+    association: PyRef<'_, PyAssociationSpec>,
+    cp_a: Vec<f64>,
+    cp_b: Vec<f64>,
+    cp_c: Vec<f64>,
+    cp_d: Vec<f64>,
+    cp_e: Vec<f64>,
+    length: f64,
+    diameter: f64,
+    cells: f64,
+    friction_factor: f64,
+    wall_heat_flux: Option<f64>,
+    left_boundary: &str,
+    right_boundary: &str,
+    left_boundary_pressure: Option<f64>,
+    right_boundary_pressure: Option<f64>,
+    left_boundary_temperature: Option<f64>,
+    right_boundary_temperature: Option<f64>,
+    initial_component_density: Vec<Vec<f64>>,
+    initial_momentum: Vec<f64>,
+    initial_total_energy: Vec<f64>,
+    time_step: f64,
+    duration: f64,
+    cfl_number: Option<f64>,
+    eos: &str,
+    alpha: &str,
+    alpha_params: Option<Vec<Vec<f64>>>,
+) -> PyResult<crate::transport_gen::PyPipelineTransientResult> {
+    let mixture = build_mixture(
+        py,
+        &Tc,
+        &Pc,
+        &omega,
+        &classes,
+        kij,
+        &association,
+        eos,
+        alpha,
+        alpha_params.as_deref(),
+    )?;
+    azoth_eos::pipeline_transient::pipeline_transient(
+        &mixture,
+        &azoth_eos::molar_enthalpy_entropy::IdealGasModel {
+            cp_a,
+            cp_b,
+            cp_c,
+            cp_d,
+            cp_e,
+        },
+        meters(length),
+        meters(diameter),
+        cells,
+        friction_factor,
+        wall_heat_flux.map(watts_per_square_meter),
+        left_boundary,
+        right_boundary,
+        left_boundary_pressure.map(pascals),
+        right_boundary_pressure.map(pascals),
+        left_boundary_temperature.map(kelvins),
+        right_boundary_temperature.map(kelvins),
+        &initial_component_density,
+        &initial_momentum
+            .iter()
+            .map(|v| kilograms_per_square_meter_second(*v))
+            .collect::<Vec<_>>(),
+        &initial_total_energy
+            .iter()
+            .map(|v| pascals(*v))
+            .collect::<Vec<_>>(),
+        seconds(time_step),
+        seconds(duration),
+        cfl_number,
+    )
+    .map(|r| crate::transport_gen::PyPipelineTransientResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Hydrate formation pressure of a Pitzer brine.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

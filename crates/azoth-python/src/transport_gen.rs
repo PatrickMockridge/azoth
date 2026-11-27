@@ -32,7 +32,7 @@ use crate::record_outputs_gen::{
     PyMinimalCutSet, PyMmpPoint, PyMultiVesselContributionRow, PyMultiVesselProfileRow,
     PyNaceIssueRow, PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment, PyOpenDrainResult,
     PyOperatingCostLine, PyP002FindingResult, PyPerformanceAssessment, PyPerformanceFinding,
-    PyPerformanceInstrument, PyPerformanceSif, PyPipeFireRupturePoint,
+    PyPerformanceInstrument, PyPerformanceSif, PyPipeFireRupturePoint, PyPipelineTransientPoint,
     PyPrescribedSlipReleaseStation, PyProcessCostEquipmentResult, PyProcessCostFlag,
     PyProcessCostMtoRow, PyProjectCostLine, PyPropertyPoint, PyPulsationModeResult,
     PyRanzMarshallReleaseStation, PyRealGasFannoReleaseStation, PyRegisterFinding,
@@ -7024,6 +7024,198 @@ impl From<&azoth_eos::results::PipelineCooldownResult> for PyPipelineCooldownRes
                 magnitude_si: v.value,
                 unit: "s".to_string(),
             }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `eos.pipeline_transient`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PipelineTransientResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPipelineTransientResult {
+    /// the component densities at the end of the stage.
+    #[pyo3(get)]
+    pub final_component_density: Vec<Vec<PyQty>>,
+    /// the velocity at the end of the stage.
+    #[pyo3(get)]
+    pub final_velocity: Vec<PyQty>,
+    /// the pressure at the end of the stage.
+    #[pyo3(get)]
+    pub final_pressure: Vec<PyQty>,
+    /// the temperature at the end of the stage.
+    #[pyo3(get)]
+    pub final_temperature: Vec<PyQty>,
+    /// the vapour fraction at the end of the stage; 0 or 1 in a single phase.
+    #[pyo3(get)]
+    pub final_vapour_fraction: Vec<f64>,
+    /// the mass density, `sum_i c_i M_i`.
+    #[pyo3(get)]
+    pub final_density: Vec<PyQty>,
+    /// the liquid's share of the cell volume; 1 in a liquid cell and 0 in a vapour cell.
+    #[pyo3(get)]
+    pub final_liquid_volume_fraction: Vec<f64>,
+    /// the moles of each component that crossed the boundaries outward during the stage.
+    #[pyo3(get)]
+    pub boundary_component_outflow: Vec<PyQty>,
+    /// the moles of each component in the line at the start.
+    #[pyo3(get)]
+    pub initial_component_holdup: Vec<PyQty>,
+    /// the moles of each component in the line at the end.
+    #[pyo3(get)]
+    pub final_component_holdup: Vec<PyQty>,
+    /// the mass that crossed the boundaries outward during the stage.
+    #[pyo3(get)]
+    pub boundary_mass_outflow: PyQty,
+    /// the mass in the line at the start.
+    #[pyo3(get)]
+    pub initial_mass: PyQty,
+    /// the mass in the line at the end.
+    #[pyo3(get)]
+    pub final_mass: PyQty,
+    /// accepted steps taken.
+    #[pyo3(get)]
+    pub steps: u32,
+    /// steps refused and retried at half the step.
+    #[pyo3(get)]
+    pub rejections: u32,
+    /// the smallest step used.
+    #[pyo3(get)]
+    pub min_time_step: PyQty,
+    /// one row per accepted step, starting with the initial state.
+    #[pyo3(get)]
+    pub history: Vec<PyPipelineTransientPoint>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyPipelineTransientResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PipelineTransientResult(final_component_density={:?}, final_velocity={:?}, final_pressure={:?}, final_temperature={:?}, final_vapour_fraction={:?}, final_density={:?}, final_liquid_volume_fraction={:?}, boundary_component_outflow={:?}, initial_component_holdup={:?}, final_component_holdup={:?}, boundary_mass_outflow={:?}, initial_mass={:?}, final_mass={:?}, steps={:?}, rejections={:?}, min_time_step={:?}, history={:?}, {} warning(s))",
+            self.final_component_density,
+            self.final_velocity,
+            self.final_pressure,
+            self.final_temperature,
+            self.final_vapour_fraction,
+            self.final_density,
+            self.final_liquid_volume_fraction,
+            self.boundary_component_outflow,
+            self.initial_component_holdup,
+            self.final_component_holdup,
+            self.boundary_mass_outflow,
+            self.initial_mass,
+            self.final_mass,
+            self.steps,
+            self.rejections,
+            self.min_time_step,
+            self.history,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_eos::results::PipelineTransientResult> for PyPipelineTransientResult {
+    fn from(r: &azoth_eos::results::PipelineTransientResult) -> Self {
+        Self {
+            final_component_density: r
+                .final_component_density
+                .iter()
+                .map(|row| {
+                    row.iter()
+                        .map(|v| PyQty {
+                            magnitude_si: *v,
+                            unit: "mol/m**3".to_string(),
+                        })
+                        .collect()
+                })
+                .collect(),
+            final_velocity: r
+                .final_velocity
+                .iter()
+                .map(|v| PyQty {
+                    magnitude_si: *v,
+                    unit: "m/s".to_string(),
+                })
+                .collect(),
+            final_pressure: r
+                .final_pressure
+                .iter()
+                .map(|v| PyQty {
+                    magnitude_si: *v,
+                    unit: "Pa".to_string(),
+                })
+                .collect(),
+            final_temperature: r
+                .final_temperature
+                .iter()
+                .map(|v| PyQty {
+                    magnitude_si: *v,
+                    unit: "K".to_string(),
+                })
+                .collect(),
+            final_vapour_fraction: r.final_vapour_fraction.clone(),
+            final_density: r
+                .final_density
+                .iter()
+                .map(|v| PyQty {
+                    magnitude_si: *v,
+                    unit: "kg/m**3".to_string(),
+                })
+                .collect(),
+            final_liquid_volume_fraction: r.final_liquid_volume_fraction.clone(),
+            boundary_component_outflow: r
+                .boundary_component_outflow
+                .iter()
+                .map(|v| PyQty {
+                    magnitude_si: *v,
+                    unit: "mol".to_string(),
+                })
+                .collect(),
+            initial_component_holdup: r
+                .initial_component_holdup
+                .iter()
+                .map(|v| PyQty {
+                    magnitude_si: *v,
+                    unit: "mol".to_string(),
+                })
+                .collect(),
+            final_component_holdup: r
+                .final_component_holdup
+                .iter()
+                .map(|v| PyQty {
+                    magnitude_si: *v,
+                    unit: "mol".to_string(),
+                })
+                .collect(),
+            boundary_mass_outflow: PyQty {
+                magnitude_si: r.boundary_mass_outflow,
+                unit: "kg".to_string(),
+            },
+            initial_mass: PyQty {
+                magnitude_si: r.initial_mass,
+                unit: "kg".to_string(),
+            },
+            final_mass: PyQty {
+                magnitude_si: r.final_mass,
+                unit: "kg".to_string(),
+            },
+            steps: r.steps,
+            rejections: r.rejections,
+            min_time_step: PyQty {
+                magnitude_si: r.min_time_step,
+                unit: "s".to_string(),
+            },
+            history: r
+                .history
+                .iter()
+                .map(PyPipelineTransientPoint::from)
+                .collect(),
             warnings: transport(&r.warnings),
         }
     }

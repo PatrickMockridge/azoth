@@ -2824,25 +2824,18 @@ impl CalcResult for UmrPruFlashResult {
 #[derive(Debug, Clone, PartialEq)]
 pub struct PipelineTransientPoint {
     /// The time at the row.
-    #[serde(serialize_with = "scalar")]
     pub time: Time,
     /// The mass in the line.
-    #[serde(serialize_with = "scalar")]
     pub mass: Mass,
     /// The inlet-end pressure.
-    #[serde(serialize_with = "scalar")]
     pub p_in: Pressure,
     /// The outlet-end pressure.
-    #[serde(serialize_with = "scalar")]
     pub p_out: Pressure,
     /// The outlet-end temperature.
-    #[serde(serialize_with = "scalar")]
     pub t_out: ThermodynamicTemperature,
     /// The outlet-end vapour fraction.
-    #[serde(serialize_with = "scalar")]
     pub beta_out: f64,
     /// The liquid volume in the line.
-    #[serde(serialize_with = "scalar")]
     pub liquid_inventory: Volume,
 }
 

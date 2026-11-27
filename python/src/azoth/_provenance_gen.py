@@ -1236,6 +1236,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 13,
         "tests_skipped": 0,
     },
+    'eos.pipeline_transient': {
+        "calc_id": 'eos.pipeline_transient',
+        "name": 'Transient segmented pipeline (homogeneous equilibrium)',
+        "spec": {'path': 'specs/models/eos/pipeline_transient.toml', 'sha256': '55b3464847f3e87e558e1fa9eca07ec34075d1ed55b247abc539b375e07377c4'},
+        "code": [{'path': 'python/src/azoth/eos/reference/pipeline_transient.py', 'sha256': '061361390e59a781fbb77444beebcf91f162c399357cc64f1ce1b3e53946284b'}, {'path': 'crates/azoth-eos/src/pipeline_transient.rs', 'sha256': '79934569ee9b18bec585541145e89654cb6e77935ba68b38a1e2c0fdca462c87'}],
+        "source": 'Finite-volume HEM line with a Rusanov flux',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 1,
+        "tests_skipped": 0,
+    },
     'eos.pitzer_hydrate_formation_pressure': {
         "calc_id": 'eos.pitzer_hydrate_formation_pressure',
         "name": 'Hydrate formation pressure of a Pitzer brine',

@@ -1469,6 +1469,18 @@ class ActivityCoefficientRow:
     activity_coefficient: float
 
 @final
+class PipelineTransientPoint:
+    """one row per accepted step, starting with the initial state."""
+
+    time: Qty
+    mass: Qty
+    p_in: Qty
+    p_out: Qty
+    t_out: Qty
+    beta_out: float
+    liquid_inventory: Qty
+
+@final
 class ScenarioIndexRow:
     """The treated indices, in the same order."""
 
@@ -3704,6 +3716,27 @@ class PipelineCooldownResult:
     calculated_u_value: Qty
     effective_u_value: Qty
     time_to_reach_target: Qty | None
+    warnings: list[Warning]
+
+@final
+class PipelineTransientResult:
+    final_component_density: list[list[Qty]]
+    final_velocity: list[Qty]
+    final_pressure: list[Qty]
+    final_temperature: list[Qty]
+    final_vapour_fraction: list[float]
+    final_density: list[Qty]
+    final_liquid_volume_fraction: list[float]
+    boundary_component_outflow: list[Qty]
+    initial_component_holdup: list[Qty]
+    final_component_holdup: list[Qty]
+    boundary_mass_outflow: Qty
+    initial_mass: Qty
+    final_mass: Qty
+    steps: int
+    rejections: int
+    min_time_step: Qty
+    history: list[PipelineTransientPoint]
     warnings: list[Warning]
 
 @final
@@ -8636,6 +8669,42 @@ def pipeline_cooldown(
     external_htc: float | None = None,
     target_temperature: float | None = None,
 ) -> PipelineCooldownResult: ...
+def pipeline_transient(
+    Tc: list[float],
+    Pc: list[float],
+    omega: list[float],
+    classes: list[str],
+    kij: list[float],
+    association: AssociationSpec,
+    molar_mass: list[float],
+    volume_shift: list[float],
+    volume_shift_srk: list[float],
+    cp_a: list[float],
+    cp_b: list[float],
+    cp_c: list[float],
+    cp_d: list[float],
+    cp_e: list[float],
+    length: float,
+    diameter: float,
+    cells: float,
+    friction_factor: float,
+    left_boundary: str,
+    right_boundary: str,
+    initial_component_density: list[list[float]],
+    initial_momentum: list[float],
+    initial_total_energy: list[float],
+    time_step: float,
+    duration: float,
+    wall_heat_flux: float | None = None,
+    left_boundary_pressure: float | None = None,
+    right_boundary_pressure: float | None = None,
+    left_boundary_temperature: float | None = None,
+    right_boundary_temperature: float | None = None,
+    cfl_number: float | None = None,
+    eos: str = "pr",
+    alpha: str = "pr",
+    alpha_params: list[list[float]] | None = None,
+) -> PipelineTransientResult: ...
 def pitzer_hydrate_formation_pressure(
     components: list[str],
     moles: list[float],

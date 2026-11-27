@@ -24,7 +24,7 @@ from azoth.core.result import (
     PipelineTransientPoint,
     PipelineTransientResult,
 )
-from azoth.core.units import Q, from_si, input_to_si
+from azoth.core.units import Q, from_si, input_to_si, quantity as q
 from azoth.core.warnings import Warning
 from azoth.eos.mixture import Mixture
 from azoth.eos.reference._heat_capacity import phase_capacity
@@ -95,8 +95,8 @@ def _derive(
     flash = vu_flash(
         mixture,
         ideal_gas,
-        Q(volume, "m**3/mol"),
-        Q(molar_internal, "J/mol"),
+        q(volume, "m**3/mol"),
+        q(molar_internal, "J/mol"),
         z,
     )
     pressure = float(flash.P.to("Pa").magnitude)
@@ -155,7 +155,7 @@ def _ghost(
     total = sum(c)
     z = [value / total for value in c]
     t_g = float(temperature.to("K").magnitude) if temperature is not None else cell.temperature
-    state = state_at_tp(mixture, ideal_gas, Q(t_g, "K"), pressure, z)
+    state = state_at_tp(mixture, ideal_gas, q(t_g, "K"), pressure, z)
     if not state.converged:
         raise SolverNotConvergedError(0, 0.0, 1.0)
     volume = float(state.molar_volume.to("m**3/mol").magnitude)

@@ -130,6 +130,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyPhaseTransportResult>()?;
     m.add_class::<crate::transport_gen::PyPipeBeggsAndBrillsResult>()?;
     m.add_class::<crate::transport_gen::PyPipelineCooldownResult>()?;
+    m.add_class::<crate::transport_gen::PyPipelineTransientResult>()?;
     m.add_class::<crate::transport_gen::PyPitzerHydrateFormationPressureResult>()?;
     m.add_class::<crate::transport_gen::PyPitzerHydrateFormationTemperatureResult>()?;
     m.add_class::<crate::transport_gen::PyPitzerPhaseResult>()?;
@@ -495,6 +496,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyPerformanceInstrument>()?;
     m.add_class::<crate::record_outputs_gen::PyPerformanceSif>()?;
     m.add_class::<crate::record_outputs_gen::PyPipeFireRupturePoint>()?;
+    m.add_class::<crate::record_outputs_gen::PyPipelineTransientPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyPrescribedSlipReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyProcessCostEquipmentResult>()?;
     m.add_class::<crate::record_outputs_gen::PyProcessCostFlag>()?;
@@ -853,6 +855,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::pipeline_cooldown, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::pipeline_transient,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::pitzer_hydrate_formation_pressure,
         m
