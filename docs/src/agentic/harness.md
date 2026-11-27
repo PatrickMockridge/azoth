@@ -76,14 +76,18 @@ from a browser front end, and names the screening boundary. Three starter button
 the composer with engineer questions: a pump sizing, the demo separator, and relief and
 fire calculations. When the default route's key is absent, the launcher prints the env var
 and the **Settings → Models** page before starting, and the card repeats it; the key is
-saved there or exported as the selected provider's environment variable. DSH's own
-onboarding dialog only appears when no provider route has a key at all.
+saved there or exported as the selected provider's environment variable. A key saved in
+the DSH credential store counts even when its env var is unset. DSH's own onboarding
+dialog only appears when no provider route has a key at all; the azoth UI blocks the
+composer in that state.
 
 ## Providers
 
-Every launch without `--base-url` mounts five routes, so the model selector in the DSH UI
-can switch without a launcher change. The table is declared in `harness.toml` and rendered
-into the overlay:
+Every launch without `--base-url` mounts the routes whose key is exported or stored in the
+DSH credential store, so the model selector matches the keys that are actually available.
+With no key at all the launcher mounts the official DeepSeek route so DSH's onboarding step
+can ask for one, and the azoth UI blocks the composer. The table is declared in
+`harness.toml` and rendered into the overlay:
 
 | `--provider` | Provider route | Model default | Key |
 |---|---|---|---|
@@ -94,9 +98,10 @@ into the overlay:
 | `minimax` | MiniMax catalog | `MiniMax-M2.7` | `MINIMAX_API_KEY` |
 
 `--provider` sets the session's default; the selector can choose another route or model.
-When it is omitted the launcher picks the first provider in the table whose key env is set
-and falls back to `deepseek`; a launch whose default has no key prints one warning naming
-that env var. `--model` overrides the provider's default id. OpenAI speaks the Responses API
+When it is omitted the launcher picks the first provider in the table whose key is exported
+or stored in the DSH credential store, and falls back to `deepseek`; a launch whose default
+has no key prints one warning naming that env var. `--model` overrides the provider's
+default id. OpenAI speaks the Responses API
 through the catalog; Anthropic, Kimi and MiniMax use their catalog protocols. The
 `--base-url` route is the escape hatch for an OpenAI-compatible gateway, an enterprise
 endpoint or a model the catalog does not list; it replaces the native routes for that

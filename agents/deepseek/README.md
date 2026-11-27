@@ -24,10 +24,11 @@ generated overlay; `--dry-run` adds the exact argv. A real launch exports the sk
 when absent) without reordering the store, and starts the shipped `web` or `headless`
 profile with `--patch`.
 
-Defaults: the first provider whose key env is set (`deepseek` when none is), the
-provider's `DEEPSEEK_API_KEY`/`default_model`, `DSH_HOME=<root>/.dsh-home`, the demo
-flowsheet `specs/flowsheets/demo.toml`, and `--persona engineer`. A launch whose default
-route has no key prints the env var and the Settings → Models remedy. `--persona software` leaves DSH's coding preset in place.
+Defaults: the first provider whose key is exported or stored in the DSH credential store
+(`deepseek` when none is), the provider's `DEEPSEEK_API_KEY`/`default_model`,
+`DSH_HOME=<root>/.dsh-home`, the demo flowsheet `specs/flowsheets/demo.toml`, and
+`--persona engineer`. A launch whose default route has no key prints the env var and the
+Settings → Models remedy. `--persona software` leaves DSH's coding preset in place.
 `--no-flowsheet` starts without a case. `--permission-mode` is required for a launch:
 `read-only` keeps calculations and in-memory flowsheet edits available while refusing
 file writes; `workspace-write` permits them. `--dsh`/`AZOTH_DSH` names an installed
@@ -45,10 +46,12 @@ relaunch:
 | `kimi` | Moonshot catalog | `kimi-k2.6` | `MOONSHOT_API_KEY` |
 | `minimax` | MiniMax catalog | `MiniMax-M2.7` | `MINIMAX_API_KEY` |
 
-`--provider` sets the session default; when omitted, the first provider with a key is the
-default. `--model` overrides the id. The selector offers the routes whose keys are
-available. `--base-url` replaces the native routes with an OpenAI-compatible gateway,
-vLLM/SGLang endpoint or any model the catalog does not list.
+`--provider` sets the session default; when omitted, the first provider with an exported
+or stored key is the default. `--model` overrides the id. Only providers with a key are
+mounted, so the selector matches the available keys; with no key at all the official
+DeepSeek route is mounted for DSH's onboarding step and the azoth UI blocks the composer.
+`--base-url` replaces the native routes with an OpenAI-compatible gateway, vLLM/SGLang
+endpoint or any model the catalog does not list.
 
 The first web session shows a compact card: azoth is a chemical-engineering calculation
 library, FEED means Front-End Engineering Design (not a browser front end), the demo

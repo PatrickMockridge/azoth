@@ -254,6 +254,26 @@ def _find(rows: list[dict[str, Any]], row_id: str) -> dict[str, Any] | None:
     return None
 
 
+@pytest.fixture(autouse=True)
+def _no_provider_keys(monkeypatch: pytest.MonkeyPatch) -> None:
+    for name in (
+        "DEEPSEEK_API_KEY",
+        "OPENAI_API_KEY",
+        "ANTHROPIC_API_KEY",
+        "MOONSHOT_API_KEY",
+        "MINIMAX_API_KEY",
+    ):
+        monkeypatch.delenv(name, raising=False)
+
+
+def _store_credentials(home: Path, *refs: str) -> None:
+    home.mkdir(parents=True, exist_ok=True)
+    (home / ".credentials.yaml").write_text(
+        "version: 1\nrecords: {}\nrefs:\n" + "".join(f"  {ref}: {{}}\n" for ref in refs),
+        encoding="utf-8",
+    )
+
+
 def test_engineer_web_overlay_has_the_engineer_preset_but_no_team(tmp_path: Path) -> None:
     rows = _rows(_root(tmp_path), "--flowsheet", "case.toml")
     assert _find(rows, "mcp-azoth-flowsheet") is not None
@@ -298,12 +318,7 @@ def test_a_provider_choice_sets_the_default_and_mounts_the_routes(
     assert default["config"] == {"provider": provider, "model": model}
     routes = _find(rows, "llm-pi-ai")
     assert routes is not None
-    assert set(routes["config"]["providers"]) == {
-        "openai",
-        "anthropic",
-        "moonshotai",
-        "minimax",
-    }
+    assert set(routes["config"]["providers"]) == {provider}
     assert _find(rows, "llm-deepseek") is not None
 
 
@@ -339,6 +354,48 @@ def test_the_default_provider_falls_back_to_deepseek(
     ):
         monkeypatch.delenv(name, raising=False)
     assert launch_dsh.default_provider(config) == "deepseek"
+
+
+def test_a_stored_key_is_available(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    _, config = _args(root)
+    home = tmp_path / "home"
+    _store_credentials(home, "DEEPSEEK_API_KEY")
+    assert launch_dsh.available_providers(config, home) == ["deepseek"]
+    assert launch_dsh.default_provider(config, home) == "deepseek"
+
+
+def test_a_stored_key_outranks_a_later_env_key(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = _root(tmp_path)
+    _, config = _args(root)
+    home = tmp_path / "home"
+    _store_credentials(home, "DEEPSEEK_API_KEY")
+    monkeypatch.setenv("OPENAI_API_KEY", "x")
+    assert launch_dsh.available_providers(config, home) == ["deepseek", "openai"]
+    assert launch_dsh.default_provider(config, home) == "deepseek"
+
+
+def test_routes_follow_the_available_keys(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    _store_credentials(root / ".dsh-home", "DEEPSEEK_API_KEY")
+    rows = _rows(root)
+    assert _find(rows, "llm-deepseek") is not None
+    assert _find(rows, "llm-pi-ai") is None
+    ui = _find(rows, "azoth-ui")
+    assert ui is not None
+    assert ui["config"]["missingKey"] is False
+
+
+def test_no_key_mounts_the_official_route_for_onboarding(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    rows = _rows(root)
+    assert _find(rows, "llm-deepseek") is not None
+    assert _find(rows, "llm-pi-ai") is None
+    ui = _find(rows, "azoth-ui")
+    assert ui is not None
+    assert ui["config"]["missingKey"] is True
 
 
 def test_a_missing_key_names_the_env_and_settings(

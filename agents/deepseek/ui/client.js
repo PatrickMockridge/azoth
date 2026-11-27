@@ -60,6 +60,37 @@ const BUTTON_STYLE = {
   textAlign: 'left',
 }
 
+const BLOCKER_STYLE = {
+  position: 'absolute',
+  inset: 0,
+  zIndex: 20,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '4px',
+  padding: '12px',
+  borderRadius: '12px',
+  background: 'var(--dsw-alias-bg-elevated, #fbfaf7)',
+  color: 'var(--dsw-alias-fg-primary, #1f2328)',
+  font: '13px/1.4 system-ui, sans-serif',
+  textAlign: 'center',
+  pointerEvents: 'auto',
+}
+
+function KeyBlocker() {
+  return React.createElement(
+    'div',
+    { style: BLOCKER_STYLE, role: 'alert' },
+    React.createElement('strong', null, 'API key required'),
+    React.createElement(
+      'span',
+      null,
+      'Save a key on Settings → Models to start a session.',
+    ),
+  )
+}
+
 function AzothHero({ hero, children, setup }) {
   if (!hero) return children
   return React.createElement(
@@ -129,7 +160,7 @@ window.__ModuleLoader__.load({
       inject: ['slots'],
       apply(ctx) {
         const config = (ctx && ctx.config) || {}
-        const setup = config.missingKey
+        const setup = config.missingKey || config.defaultMissing
           ? 'No API key is set for ' + (config.provider || 'the selected provider') +
             '. Save one on Settings → Models, then choose the provider and model in the composer.'
           : CARD.setup
@@ -139,6 +170,14 @@ window.__ModuleLoader__.load({
             (props) => AzothHero({ ...props, setup }),
           ),
         )
+        if (config.missingKey) {
+          ctx.slots.inject('conversation.input.overlay', () =>
+            ctx.slots.register(
+              { name: 'conversation.input.overlay', id: 'azoth-key-blocker', order: -100 },
+              KeyBlocker,
+            ),
+          )
+        }
         ctx.slots.inject('conversation.hero.options', () =>
           ctx.slots.register(
             {

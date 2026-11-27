@@ -211,16 +211,21 @@ def child_env(
     return env
 
 
-def resolve(
-    args: argparse.Namespace, config: dict[str, Any], *, require_dsh: bool = True
-) -> Toolchain:
-    root = Path(args.root).resolve()
-    home = Path(
+def dsh_home(args: argparse.Namespace, root: Path) -> Path:
+    """The harness home the launch will use, before the toolchain is resolved."""
+    return Path(
         args.dsh_home
         or os.environ.get("AZOTH_DSH_HOME")
         or os.environ.get("DSH_HOME")
         or root / ".dsh-home"
     ).expanduser()
+
+
+def resolve(
+    args: argparse.Namespace, config: dict[str, Any], *, require_dsh: bool = True
+) -> Toolchain:
+    root = Path(args.root).resolve()
+    home = dsh_home(args, root)
     python = resolve_python(args)
     dsh = resolve_dsh(args, config)
     if dsh is None:
@@ -246,17 +251,56 @@ def resolve(
     )
 
 
-def default_provider(config: dict[str, Any]) -> str:
-    """The first declared provider whose key is set, else the shipped default."""
+def stored_key_refs(home: Path) -> set[str]:
+    """The credential refs DSH has stored, read from `.credentials.yaml`'s `refs` map."""
+    path = home / ".credentials.yaml"
+    if not path.is_file():
+        return set()
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return set()
+    refs: set[str] = set()
+    in_refs = False
+    for line in lines:
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        indent = len(line) - len(line.lstrip())
+        if indent == 0:
+            in_refs = line.split(":", 1)[0].strip() == "refs"
+            continue
+        if in_refs and indent == 2:
+            name = line.split(":", 1)[0].strip()
+            if name:
+                refs.add(name)
+    return refs
+
+
+def available_providers(config: dict[str, Any], home: Path | None = None) -> list[str]:
+    """Provider slugs whose key is exported or stored, in `harness.toml` order."""
     providers = config.get("providers", {})
-    if isinstance(providers, dict):
-        for slug, meta in providers.items():
-            if isinstance(meta, dict) and os.environ.get(str(meta.get("api_key_env", ""))):
-                return str(slug)
-    return "deepseek"
+    if not isinstance(providers, dict):
+        return []
+    stored = stored_key_refs(home) if home is not None else set()
+    available: list[str] = []
+    for slug, meta in providers.items():
+        if not isinstance(meta, dict):
+            continue
+        key_env = str(meta.get("api_key_env", ""))
+        if key_env and (os.environ.get(key_env) or key_env in stored):
+            available.append(str(slug))
+    return available
 
 
-def key_warning(args: argparse.Namespace, config: dict[str, Any]) -> str | None:
+def default_provider(config: dict[str, Any], home: Path | None = None) -> str:
+    """The first provider with an exported or stored key, else the shipped default."""
+    available = available_providers(config, home)
+    return available[0] if available else "deepseek"
+
+
+def key_warning(
+    args: argparse.Namespace, config: dict[str, Any], home: Path | None = None
+) -> str | None:
     """The one warning a launch owes when its default route has no credential."""
     if args.base_url:
         key_env = args.api_key_env or "AZOTH_DSH_API_KEY"
@@ -265,7 +309,8 @@ def key_warning(args: argparse.Namespace, config: dict[str, Any]) -> str | None:
         key_env = args.api_key_env or (
             str(meta["api_key_env"]) if isinstance(meta, dict) else "DEEPSEEK_API_KEY"
         )
-    if os.environ.get(key_env):
+    stored = stored_key_refs(home) if home is not None else set()
+    if os.environ.get(key_env) or key_env in stored:
         return None
     return f"{key_env} is not set; save a key in DSH Settings -> Models or export it"
 
@@ -694,6 +739,7 @@ def build_overlay(
     inserts: list[dict[str, Any]] = []
     mode = "headless" if args.headless else "web" if args.web else args.mode
     study = _study(config, args.study)
+    available = set(available_providers(config, tc.dsh_home))
     plugin = tc.root / "agents" / "deepseek" / "plugin" / "index.js"
     if plugin.is_file():
         inserts.append(
@@ -710,7 +756,8 @@ def build_overlay(
                 "id": "azoth-ui",
                 "name": str(ui),
                 "config": {
-                    "missingKey": key_warning(args, config) is not None,
+                    "missingKey": not available,
+                    "defaultMissing": key_warning(args, config, tc.dsh_home) is not None,
                     "provider": args.provider,
                 },
             }
@@ -750,6 +797,8 @@ def build_overlay(
         for slug, meta in providers.items():
             if meta["route"] != "llm-pi-ai":
                 continue
+            if slug not in available and slug != args.provider:
+                continue
             key_env = (
                 args.api_key_env
                 if slug == args.provider and args.api_key_env
@@ -775,7 +824,8 @@ def build_overlay(
         }
         if args.reasoning_effort:
             model["reasoningEffort"] = args.reasoning_effort
-        rows.append({"id": "llm-deepseek", "config": model})
+        if not available or "deepseek" in available or args.provider == "deepseek":
+            rows.append({"id": "llm-deepseek", "config": model})
         provider = str(providers[args.provider]["provider"])
     rows.append(
         {"id": "agent-default-model", "config": {"provider": provider, "model": args.model}}
@@ -1300,15 +1350,17 @@ def _probe_provider(args: argparse.Namespace, config: dict[str, Any]) -> Check:
     )
 
 
-def _probe_providers(config: dict[str, Any]) -> Check:
+def _probe_providers(config: dict[str, Any], home: Path | None = None) -> Check:
+    stored = stored_key_refs(home) if home is not None else set()
     seen = []
     for slug, meta in config["providers"].items():
         key_env = str(meta["api_key_env"])
-        seen.append(f"{slug}={'set' if os.environ.get(key_env) else 'no key'}")
+        yes = os.environ.get(key_env) or key_env in stored
+        seen.append(f"{slug}={'set' if yes else 'no key'}")
     return Check("providers", "ok", ", ".join(seen))
 
 
-def _probe_key(args: argparse.Namespace, config: dict[str, Any]) -> Check:
+def _probe_key(args: argparse.Namespace, config: dict[str, Any], home: Path | None = None) -> Check:
     if args.base_url:
         key_env = args.api_key_env or "AZOTH_DSH_API_KEY"
     else:
@@ -1316,7 +1368,8 @@ def _probe_key(args: argparse.Namespace, config: dict[str, Any]) -> Check:
         key_env = args.api_key_env or (
             str(meta["api_key_env"]) if isinstance(meta, dict) else "DEEPSEEK_API_KEY"
         )
-    if os.environ.get(key_env):
+    stored = stored_key_refs(home) if home is not None else set()
+    if os.environ.get(key_env) or key_env in stored:
         return Check("api-key", "ok", f"{key_env} is set")
     if args.base_url:
         return Check("api-key", "warn", f"{key_env} is not set (only needed by the gateway)")
@@ -1363,10 +1416,10 @@ def run_checks(args: argparse.Namespace, config: dict[str, Any]) -> list[Check]:
         if ui is not None:
             checks.append(ui)
         checks.append(_probe_provider(args, config))
-        checks.append(_probe_providers(config))
+        checks.append(_probe_providers(config, tc.dsh_home))
         status, detail = skills_report(args, config, tc.dsh_home)
         checks.append(Check("skills", status, detail))
-        checks.append(_probe_key(args, config))
+        checks.append(_probe_key(args, config, tc.dsh_home))
         return checks
 
 
@@ -1406,10 +1459,10 @@ def _launch_argv(
 def _launch(args: argparse.Namespace, config: dict[str, Any]) -> int:
     if args.permission_mode is None:
         raise SystemExit("launch_dsh: choose --permission-mode read-only or workspace-write")
-    warning = key_warning(args, config)
+    tc = resolve(args, config)
+    warning = key_warning(args, config, tc.dsh_home)
     if warning:
         print(f"launch_dsh: {warning}", file=sys.stderr)
-    tc = resolve(args, config)
     study = _study(config, args.study)
     if study is not None and study.get("requires_flowsheet") is True and not args.flowsheet:
         raise SystemExit(f"launch_dsh: --study {args.study} needs --flowsheet")
@@ -1538,7 +1591,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.skills not in ("full", "none") and args.skills not in config.get("skills", {}):
         raise SystemExit(f"launch_dsh: harness.toml has no [skills.{args.skills}]")
     if args.provider is None:
-        args.provider = default_provider(config)
+        args.provider = default_provider(config, dsh_home(args, Path(args.root)))
     provider_meta = config["providers"].get(args.provider)
     if not isinstance(provider_meta, dict):
         raise SystemExit(f"launch_dsh: harness.toml has no [providers.{args.provider}]")

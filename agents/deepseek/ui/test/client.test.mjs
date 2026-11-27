@@ -77,6 +77,25 @@ test('a missing key replaces the setup line with a warning', () => {
   assert.doesNotMatch(words, /First run: save your model provider/)
 })
 
+test('a missing key registers a composer blocker', () => {
+  const slots = load({ missingKey: true, provider: 'deepseek' })
+  assert.ok(slots.has('conversation.input.overlay'))
+  const blocker = slots.get('conversation.input.overlay').component
+  assert.match(text(blocker({})), /API key required/)
+  assert.match(text(blocker({})), /Settings → Models/)
+})
+
+test('a dead default warns without blocking the composer', () => {
+  const slots = load({ defaultMissing: true, missingKey: false, provider: 'deepseek' })
+  const hero = slots.get('conversation.hero.frame').component
+  assert.match(text(hero({ hero: true, children: 'conversation' })), /No API key is set/)
+  assert.equal(slots.has('conversation.input.overlay'), false)
+})
+
+test('a present key registers no blocker', () => {
+  assert.equal(load().has('conversation.input.overlay'), false)
+})
+
 test('the card renders only on the blank home', () => {
   const hero = load().get('conversation.hero.frame').component
   assert.equal(hero({ hero: false, children: 'conversation' }), 'conversation')
