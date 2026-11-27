@@ -14,7 +14,7 @@ import pytest
 
 import _helpers as h
 from azoth import _models_gen, ureg
-from azoth.core.result import PhaseClass
+from azoth.core.result import PhaseClass, StateAtTpResult
 from azoth.eos import IdealGasModel, Mixture, state_at_tp
 from azoth.eos.components import mixture_of
 from azoth.eos.reference.pr_molar_volume import MOLAR_GAS_CONSTANT
@@ -30,7 +30,7 @@ def fluid() -> tuple[Mixture, IdealGasModel]:
     return mixture_of(["methane", "n-butane"])
 
 
-def call(case: dict[str, Any]):
+def call(case: dict[str, Any]) -> StateAtTpResult:
     kwargs = h.model_kwargs(SPEC, case["inputs"])
     return state_at_tp(**kwargs)
 
@@ -44,6 +44,7 @@ def test_spec_case(case: dict[str, Any]) -> None:
     assert result.phase.value == expected["phase"]
     assert result.phase_class.value == expected["phase_class"]
     assert result.converged is expected["converged"]
+    assert result.vapour_fraction is not None
     h.assert_close(
         result.vapour_fraction, expected["vapour_fraction"], tolerance, "vapour_fraction"
     )
@@ -95,7 +96,6 @@ def test_a_dense_negative_flash_is_not_called_gas() -> None:
     # above both, 300 K/50 bar is above the pressure alone.
     dense = state_at_tp(mix, ideal, T=Q(300.0, "K"), P=Q(200e5, "Pa"), z=[0.6, 0.4])
     assert dense.phase_class in (PhaseClass.DENSE_SUPERCRITICAL, PhaseClass.DENSE_SINGLE_PHASE)
-    assert dense.phase_class is not PhaseClass.SINGLE_PHASE_GAS
     above_pressure = state_at_tp(mix, ideal, T=Q(300.0, "K"), P=Q(50e5, "Pa"), z=[0.6, 0.4])
     assert above_pressure.phase_class is not PhaseClass.SINGLE_PHASE_GAS
 

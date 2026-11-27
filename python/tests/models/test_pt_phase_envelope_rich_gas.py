@@ -18,7 +18,9 @@ from azoth.core.result import Phase, PhaseClass
 from azoth.core.units import quantity as q
 from azoth.core.warnings import WarningCode
 from azoth.eos import (
+    Component,
     IdealGasModel,
+    Mixture,
     critical_point,
     pt_flash_check,
     pt_phase_envelope,
@@ -54,7 +56,7 @@ CUTS = {
 }
 
 
-def study_fluid(eos: str = "srk"):
+def study_fluid(eos: str = "srk") -> tuple[list[str], list[float], Mixture, IdealGasModel]:
     """The study's fluid, with its C7/C8/C9 cuts as Pedersen-SRK cards."""
     raw = [v / 100.0 for _, v in SUPPLIED]
     total = sum(raw)
@@ -63,7 +65,7 @@ def study_fluid(eos: str = "srk"):
     real = [n for n, _ in SUPPLIED if n not in CUTS and by_name[n] > 0.0]
     real_mix, ideal_real = mixture_of(real, eos=eos)
     cards = list(real_mix.components)
-    ideal = [[], [], [], [], []]
+    ideal: list[list[float]] = [[], [], [], [], []]
     for vec, column in zip(
         ideal,
         (ideal_real.cp_a, ideal_real.cp_b, ideal_real.cp_c, ideal_real.cp_d, ideal_real.cp_e),
@@ -77,7 +79,6 @@ def study_fluid(eos: str = "srk"):
         if real_mix.kij[i][j]
     }
     names = list(real)
-    from azoth.eos.components import Component
 
     for cut, (_analogue, mw, rho) in CUTS.items():
         props = tbp_cut_properties(
@@ -128,7 +129,7 @@ def study_fluid(eos: str = "srk"):
 LITERAL = {"C7": "n-heptane", "C8": "n-octane", "C9": "n-nonane"}
 
 
-def literal_fluid(eos: str = "srk"):
+def literal_fluid(eos: str = "srk") -> tuple[list[str], list[float], Mixture, IdealGasModel]:
     """The same 13 components, with the cuts as the databank's n-alkanes."""
     names = [LITERAL.get(name, name) for name, _ in SUPPLIED]
     raw = [value / 100.0 for _, value in SUPPLIED]
@@ -160,7 +161,7 @@ def test_the_envelope_falls_back_to_the_grid(monkeypatch: pytest.MonkeyPatch) ->
     assert math.isnan(result.critical_temperature.to("K").magnitude)
 
 
-def _upper_at_10c(mix, z) -> float:
+def _upper_at_10c(mix: Mixture, z: list[float]) -> float:
     """The upper two-phase pressure at 10 °C, by the study's direct-flash bisection."""
     t = 283.15
     pressures = [1.0e5 + (400.0e5 - 1.0e5) * i / 39.0 for i in range(40)]
@@ -187,7 +188,7 @@ def _upper_at_10c(mix, z) -> float:
     return 0.5 * (a + b) / 1e5
 
 
-def _two_phase_band(mix, z, t: float) -> tuple[float, float]:
+def _two_phase_band(mix: Mixture, z: list[float], t: float) -> tuple[float, float]:
     """The lower and upper two-phase pressures at one temperature, in bar."""
     pressures = [1.0e5 + (400.0e5 - 1.0e5) * i / 39.0 for i in range(40)]
 

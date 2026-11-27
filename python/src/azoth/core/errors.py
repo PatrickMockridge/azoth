@@ -42,10 +42,12 @@ class AzothError(Exception):
 class InvalidInputError(AzothError, ValueError):
     """An input is the wrong shape or value for any computation to proceed."""
 
-    def __init__(self, field: str, reason: str) -> None:
+    def __init__(self, field: str, reason: str, detail: str | None = None) -> None:
         self.input_field = field
         self.reason = reason
-        super().__init__(f"invalid input `{field}`: {reason}")
+        self.detail = detail
+        message = f"invalid input `{field}`: {reason}"
+        super().__init__(f"{message} - {detail}" if detail else message)
 
     def field(self) -> str | None:
         return self.input_field
