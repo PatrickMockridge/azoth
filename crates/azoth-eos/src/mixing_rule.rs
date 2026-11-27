@@ -146,6 +146,10 @@ pub enum MixingRule {
         kij: Vec<f64>,
         /// The UNIFAC-UMR-PRU group basis and interaction tables.
         unifac: UnifacUmrpruParameters,
+        /// Whether the co-volume is NeqSim's `bmixType = 1` rule,
+        /// `b_ij = ((sqrt(b_i) + sqrt(b_j))/2)^2`, rather than the linear sum.
+        /// `SystemUMRPRUEos` sets it; `SystemUMRCPAEoS` does not.
+        quadratic_co_volume: bool,
     },
 }
 

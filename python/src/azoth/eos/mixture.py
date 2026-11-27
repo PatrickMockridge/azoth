@@ -243,6 +243,10 @@ class Mixture:
     #: property of the fluid, and resolving them inside the solve would put a databank
     #: read on a flash's inner loop.
     umr: UnifacUmrpruParameters | None = field(default=None)
+    #: NeqSim's ``bmixType`` for the ``"umr"`` rule: 0 is the linear co-volume sum,
+    #: 1 is ``b_ij = ((sqrt(b_i) + sqrt(b_j))/2)^2``. ``SystemUMRPRUEos`` sets 1;
+    #: ``SystemUMRCPAEoS`` leaves 0.
+    umr_bmix_type: int = field(default=0)
     #: The Soreide-Whitson rule's roles and salinity, or ``None`` for every mixture that
     #: does not name that rule. Its *interaction matrix* is :attr:`kij` - the column the
     #: rule reads as its base - and the correlation replaces the water-gas entries of a
@@ -449,6 +453,7 @@ def mixture(
     associating: bool = False,
     mixing_rule: str = "classic",
     umr: UnifacUmrpruParameters | None = None,
+    umr_bmix_type: int = 0,
     soreide_whitson: SoreideWhitsonParameters | None = None,
     huron_vidal: HuronVidalParameters | None = None,
     furst: FurstElectrolyte | None = None,
@@ -521,6 +526,7 @@ def mixture(
         associating=associating,
         mixing_rule=mixing_rule,
         umr=umr,
+        umr_bmix_type=umr_bmix_type,
         soreide_whitson=soreide_whitson,
         huron_vidal=huron_vidal,
         furst=furst,

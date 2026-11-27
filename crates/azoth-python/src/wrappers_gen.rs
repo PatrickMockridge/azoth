@@ -4835,6 +4835,27 @@ pub fn umr_cpa_phase(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// UMR-PRU pressure-temperature flash.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, T, P, z, tolerance))]
+#[pyo3(text_signature = "(components, T, P, z, tolerance)")]
+#[allow(non_snake_case)] // symbols from the published equation
+pub fn umr_pru_flash(
+    py: Python<'_>,
+    components: Vec<String>,
+    T: f64,
+    P: f64,
+    z: Vec<f64>,
+    tolerance: Option<f64>,
+) -> PyResult<crate::transport_gen::PyUmrPruFlashResult> {
+    let components_refs: Vec<&str> = components.iter().map(String::as_str).collect();
+    azoth_eos::umr_pru_flash::umr_pru_flash(&components_refs, kelvins(T), pascals(P), &z, tolerance)
+        .map(|r| crate::transport_gen::PyUmrPruFlashResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// UMR-PR alpha function.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

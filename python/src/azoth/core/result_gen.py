@@ -4862,6 +4862,55 @@ class UmrCpaPhaseResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class UmrPruFlashResult(_HasWarnings):
+    """Result of ``eos.umr_pru_flash``."""
+
+    CALC_ID: ClassVar[str] = "eos.umr_pru_flash"
+
+    #: The vapour fraction, in `[0, 1]` for a two-phase split; outside that it is the negative-flash value and the feed is single phase. Absent where there is genuinely no vapour fraction.
+    vapour_fraction: float | None
+
+    #: liquid-phase mole fractions
+    x: tuple[float, ...]
+
+    #: vapour-phase mole fractions
+    y: tuple[float, ...]
+
+    #: `K_i = y_i / x_i = phi_i^L / phi_i^V`.
+    k: tuple[float, ...]
+
+    #: fugacity coefficients in the liquid phase, as logarithms.
+    ln_phi_liquid: tuple[float, ...]
+
+    #: fugacity coefficients in the vapour phase, as logarithms.
+    ln_phi_vapour: tuple[float, ...]
+
+    #: the liquid root of the cubic at the liquid composition.
+    z_liquid: float
+
+    #: the vapour root at the vapour composition.
+    z_vapour: float
+
+    #: the smallest `T / Tc_i` over the components.
+    min_t_over_tc: float
+
+    #: What the state is: `two_phase`, `all_liquid`, `all_vapour`, or `trivial` (the iteration converged to `x = y = z`).
+    phase: Phase
+
+    #: whether the iteration met its tolerance, or settled on a trivial or single-phase state by proof. False only on the cap, where the split is the last iterate.
+    converged: bool
+
+    #: outer steps taken.
+    iterations: int
+
+    #: the last step's convergence measure.
+    residual: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class UmrprAlphaResult(_HasWarnings):
     """Result of ``eos.umrpr_alpha``."""
 

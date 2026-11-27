@@ -1,0 +1,24 @@
+model = "eos.umr_pru_flash"
+[[cases]]
+id = "methane_and_butane_at_330_k_and_25_bar"
+tolerance = 1e-08
+source = "The state `eos.pt_flash` pins, flashed through the UMR-PRU fluid. The values are recorded from the reference kernel and held to the Rust kernel by the cross-implementation test; the NeqSim `SystemUMRPRUEos` capture is the external check."
+[cases.inputs]
+components = ["methane", "n-butane"]
+T = 330.0
+P = 2500000.0
+z = [0.6, 0.4]
+[cases.expected]
+vapour_fraction = 0.8378112073001198
+x = [0.09662529350823174, 0.9033747064917675]
+y = [0.6974464595486257, 0.30255354045137445]
+k = [7.218052688131898, 0.3349147793016403]
+ln_phi_liquid = [1.9694730695487475, -1.4955474867598366]
+ln_phi_vapour = [-0.007112136190840793, -0.40166831709942913]
+z_liquid = 0.09234067630193084
+z_vapour = 0.8721328711439305
+min_t_over_tc = 0.7762514113662025
+phase = "two_phase"
+converged = true
+iterations = 13
+residual = 1.9025594551795078e-11

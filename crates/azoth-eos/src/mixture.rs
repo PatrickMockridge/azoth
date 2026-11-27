@@ -470,6 +470,8 @@ pub struct UmrState {
     pub ader: Vec<f64>,
     /// `sum_i x_i ader_i`, which `A` is `B` times.
     pub alpha_mix: f64,
+    /// The mixture co-volume the rule mixes to.
+    pub b_mix: f64,
     /// The co-volume vector the fugacity's volume-derivative term carries.
     pub b_der: Vec<f64>,
     /// `T d alpha_mix/dT` at this composition.
@@ -2135,7 +2137,12 @@ impl Mixture {
     /// the second from the residual only, since the Flory-Huggins combinatorial is built
     /// from `r` and `q` and does not move.
     fn umr_ader(&self, reduced: &ReducedParameters, x: &[f64]) -> UmrState {
-        let MixingRule::Umr { unifac, .. } = &self.mixing_rule else {
+        let MixingRule::Umr {
+            unifac,
+            quadratic_co_volume,
+            ..
+        } = &self.mixing_rule
+        else {
             // claim-ok: the_umr_rule_reproduces_neqsims_alpha_mix
             unreachable!("umr_ader is only called for the UMR rule");
         };
@@ -2145,18 +2152,35 @@ impl Mixture {
                 reduced.t_kelvin,
                 x,
             );
-        let qpure: Vec<f64> = (0..self.len())
-            .map(|i| reduced.a[i] / reduced.b[i])
-            .collect();
+        let n = self.len();
+        let qpure: Vec<f64> = (0..n).map(|i| reduced.a[i] / reduced.b[i]).collect();
         let ader = crate::mixing_rule::umr_ader(&qpure, &ln_gamma);
-        let alpha_mix: f64 = (0..self.len()).map(|i| x[i] * ader[i]).sum();
-        let t_d_alpha_mix: f64 = (0..self.len())
+        let alpha_mix: f64 = (0..n).map(|i| x[i] * ader[i]).sum();
+        let t_d_alpha_mix: f64 = (0..n)
             .map(|i| x[i] * (qpure[i] * (reduced.psi[i] - 1.0) + UMR_HWFC * t_d_ln_gamma[i]))
             .sum();
+        // NeqSim's `EosMixingRuleHandler.getbij`/`calcBFull`: type 0 is the linear
+        // sum, type 1 is `((sqrt(b_i) + sqrt(b_j))/2)^2` and its partial molar
+        // `calcBiFull` is `2 sum_j x_j b_ij - b_mix`.
+        let (b_mix, b_der) = if *quadratic_co_volume {
+            let mut cross = vec![0.0; n];
+            let mut mixed = 0.0;
+            for i in 0..n {
+                for j in 0..n {
+                    let bij = ((reduced.b[i].sqrt() + reduced.b[j].sqrt()) * 0.5).powi(2);
+                    cross[i] += x[j] * bij;
+                    mixed += x[i] * x[j] * bij;
+                }
+            }
+            (mixed, cross.iter().map(|c| 2.0 * c - mixed).collect())
+        } else {
+            ((0..n).map(|i| x[i] * reduced.b[i]).sum(), reduced.b.clone())
+        };
         UmrState {
             ader,
             alpha_mix,
-            b_der: reduced.b.clone(),
+            b_mix,
+            b_der,
             t_d_alpha_mix,
         }
     }
@@ -2287,8 +2311,7 @@ impl Mixture {
             }
             MixingRule::Umr { .. } => {
                 let state = self.umr_ader(reduced, x);
-                let b_mix: f64 = (0..n).map(|i| x[i] * reduced.b[i]).sum();
-                (b_mix * state.alpha_mix, b_mix)
+                (state.b_mix * state.alpha_mix, state.b_mix)
             }
             _ => {
                 let kij = self.phase_kij(reduced, x);

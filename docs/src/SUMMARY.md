@@ -204,6 +204,7 @@
   - [Temperature-volume flash](./eos/tv_flash.md)
   - [Temperature and vapour-volume-fraction flash](./eos/tv_fraction_flash.md)
   - [UMR-CPA phase state](./eos/umr_cpa_phase.md)
+  - [UMR-PRU pressure-temperature flash](./eos/umr_pru_flash.md)
   - [Activity coefficients from the UNIFAC group-contribution model](./eos/unifac_activity_coefficients.md)
   - [Activity coefficients from UNIFAC with PSRK temperature-dependent interaction parameters](./eos/unifac_psrk_activity_coefficients.md)
   - [Activity coefficients from UNIFAC with UMR-PRU group-interaction parameters](./eos/unifac_umrpru_activity_coefficients.md)

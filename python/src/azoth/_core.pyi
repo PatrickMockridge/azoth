@@ -4432,6 +4432,23 @@ class UmrCpaPhaseResult:
     warnings: list[Warning]
 
 @final
+class UmrPruFlashResult:
+    vapour_fraction: float | None
+    x: list[float]
+    y: list[float]
+    k: list[float]
+    ln_phi_liquid: list[float]
+    ln_phi_vapour: list[float]
+    z_liquid: float
+    z_vapour: float
+    min_t_over_tc: float
+    phase: str
+    converged: bool
+    iterations: int
+    residual: float
+    warnings: list[Warning]
+
+@final
 class UmrprAlphaResult:
     alpha: float
     warnings: list[Warning]
@@ -9262,6 +9279,13 @@ def umr_cpa_phase(
     z: list[float],
     compressed_phase: str,
 ) -> UmrCpaPhaseResult: ...
+def umr_pru_flash(
+    components: list[str],
+    T: float,
+    P: float,
+    z: list[float],
+    tolerance: float | None = None,
+) -> UmrPruFlashResult: ...
 def umrpr_alpha(omega: float, Tr: float) -> UmrprAlphaResult: ...
 def unifac_activity_coefficients(
     groups: list[float],

@@ -187,6 +187,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`eos.tv_flash`](./tv_flash.md) | `tv_flash_inverse_pressure_newton` | Standard thermodynamics, as in Michelsen & Mollerup |
 | [`eos.tv_fraction_flash`](./tv_fraction_flash.md) | `volume_fraction_newton_pressure` | ASTM D6377-20 |
 | [`eos.umr_cpa_phase`](./umr_cpa_phase.md) | `direct composition` | Voutsas, E. et al. (2004) |
+| [`eos.umr_pru_flash`](./umr_pru_flash.md) | `successive_substitution_flash` | NeqSim `SystemUMRPRUEos`; Michelsen (1982) for the flash |
 | [`eos.unifac_activity_coefficients`](./unifac_activity_coefficients.md) | `direct composition` | Fredenslund et al. (1975); Hansen et al. (1991) |
 | [`eos.unifac_psrk_activity_coefficients`](./unifac_psrk_activity_coefficients.md) | `direct composition` | Holderbaum, T.; Gmehling, J. (1991) |
 | [`eos.unifac_umrpru_activity_coefficients`](./unifac_umrpru_activity_coefficients.md) | `direct composition` | Voutsas, E.; Magoulas, K.; Tassios, D. (2004) |

@@ -11858,6 +11858,102 @@ impl From<&azoth_eos::results::UmrCpaPhaseResult> for PyUmrCpaPhaseResult {
         }
     }
 }
+/// Result of `eos.umr_pru_flash`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "UmrPruFlashResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyUmrPruFlashResult {
+    /// The vapour fraction, in `[0, 1]` for a two-phase split; outside that it is the negative-flash value and the feed is single phase. Absent where there is genuinely no vapour fraction.
+    #[pyo3(get)]
+    pub vapour_fraction: Option<f64>,
+    /// liquid-phase mole fractions
+    #[pyo3(get)]
+    pub x: Vec<f64>,
+    /// vapour-phase mole fractions
+    #[pyo3(get)]
+    pub y: Vec<f64>,
+    /// `K_i = y_i / x_i = phi_i^L / phi_i^V`.
+    #[pyo3(get)]
+    pub k: Vec<f64>,
+    /// fugacity coefficients in the liquid phase, as logarithms.
+    #[pyo3(get)]
+    pub ln_phi_liquid: Vec<f64>,
+    /// fugacity coefficients in the vapour phase, as logarithms.
+    #[pyo3(get)]
+    pub ln_phi_vapour: Vec<f64>,
+    /// the liquid root of the cubic at the liquid composition.
+    #[pyo3(get)]
+    pub z_liquid: f64,
+    /// the vapour root at the vapour composition.
+    #[pyo3(get)]
+    pub z_vapour: f64,
+    /// the smallest `T / Tc_i` over the components.
+    #[pyo3(get)]
+    pub min_t_over_tc: f64,
+    /// What the state is: `two_phase`, `all_liquid`, `all_vapour`, or `trivial` (the iteration converged to `x = y = z`).
+    #[pyo3(get)]
+    pub phase: String,
+    /// whether the iteration met its tolerance, or settled on a trivial or single-phase state by proof. False only on the cap, where the split is the last iterate.
+    #[pyo3(get)]
+    pub converged: bool,
+    /// outer steps taken.
+    #[pyo3(get)]
+    pub iterations: u32,
+    /// the last step's convergence measure.
+    #[pyo3(get)]
+    pub residual: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyUmrPruFlashResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "UmrPruFlashResult(vapour_fraction={:?}, x={:?}, y={:?}, k={:?}, ln_phi_liquid={:?}, ln_phi_vapour={:?}, z_liquid={:?}, z_vapour={:?}, min_t_over_tc={:?}, phase={:?}, converged={:?}, iterations={:?}, residual={:?}, {} warning(s))",
+            self.vapour_fraction,
+            self.x,
+            self.y,
+            self.k,
+            self.ln_phi_liquid,
+            self.ln_phi_vapour,
+            self.z_liquid,
+            self.z_vapour,
+            self.min_t_over_tc,
+            self.phase,
+            self.converged,
+            self.iterations,
+            self.residual,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_eos::results::UmrPruFlashResult> for PyUmrPruFlashResult {
+    fn from(r: &azoth_eos::results::UmrPruFlashResult) -> Self {
+        Self {
+            vapour_fraction: r.vapour_fraction,
+            x: r.x.clone(),
+            y: r.y.clone(),
+            k: r.k.clone(),
+            ln_phi_liquid: r.ln_phi_liquid.clone(),
+            ln_phi_vapour: r.ln_phi_vapour.clone(),
+            z_liquid: r.z_liquid,
+            z_vapour: r.z_vapour,
+            min_t_over_tc: r.min_t_over_tc,
+            phase: r.phase.as_str().to_string(),
+            converged: r.converged,
+            iterations: r.iterations,
+            residual: r.residual,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `eos.umrpr_alpha`, transported.
 #[pyclass(
     frozen,

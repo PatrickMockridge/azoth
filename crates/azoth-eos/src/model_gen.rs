@@ -105,6 +105,7 @@
 //!   - specs/models/eos/tv_flash.toml
 //!   - specs/models/eos/tv_fraction_flash.toml
 //!   - specs/models/eos/umr_cpa_phase.toml
+//!   - specs/models/eos/umr_pru_flash.toml
 //!   - specs/models/eos/unifac_activity_coefficients.toml
 //!   - specs/models/eos/unifac_psrk_activity_coefficients.toml
 //!   - specs/models/eos/unifac_umrpru_activity_coefficients.toml
@@ -27099,6 +27100,138 @@ pub static UMR_CPA_PHASE_SPEC: ModelSpec = ModelSpec {
     cases: UMR_CPA_PHASE_CASES,
 };
 
+static UMR_PRU_FLASH_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "T",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute temperature; zero and below are not states",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "P",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure; zero and below are not states",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "tolerance",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a stopping tolerance; zero can never be met and a negative value is not a distance",
+        },
+    },
+    SpecCheck {
+        on_input: false,
+        check: RangeCheck {
+            quantity: "min_t_over_tc",
+            min: None,
+            min_inclusive: true,
+            max: Some(0.9),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Warning,
+            code: WarningCode::OutOfValidRange,
+            rationale: "Above `T / Tc = 0.9` for the nearest component the cubic's roots are close to coalescing and successive substitution converges slowly or to the trivial solution.",
+        },
+    },
+];
+
+static UMR_PRU_FLASH_CASES: &[TestCase] = &[TestCase {
+    id: "methane_and_butane_at_330_k_and_25_bar",
+    kind: "case",
+    property: None,
+    status: "active",
+    skip_reason: None,
+    tolerance: 1e-08,
+    numbers: &[("T", 330.0), ("P", 2500000.0)],
+    flags: &[],
+    lists: &[("components", &["methane", "n-butane"])],
+    strings: &[],
+    vectors: &[("z", &[0.6, 0.4])],
+    matrices: &[],
+    expected: &[
+        ("vapour_fraction", 0.8378112073001198),
+        ("z_liquid", 0.09234067630193084),
+        ("z_vapour", 0.8721328711439305),
+        ("min_t_over_tc", 0.7762514113662025),
+        ("iterations", 13.0),
+        ("residual", 1.9025594551795078e-11),
+    ],
+    expected_vectors: &[
+        ("x", &[0.09662529350823174, 0.9033747064917675]),
+        ("y", &[0.6974464595486257, 0.30255354045137445]),
+        ("k", &[7.218052688131898, 0.3349147793016403]),
+        ("ln_phi_liquid", &[1.9694730695487475, -1.4955474867598366]),
+        (
+            "ln_phi_vapour",
+            &[-0.007112136190840793, -0.40166831709942913],
+        ),
+    ],
+    expected_strings: &[("phase", "two_phase")],
+    records: &[],
+    expected_records: &[],
+}];
+
+static UMR_PRU_FLASH_INNER: ModelAlgorithm = ModelAlgorithm {
+    scheme: "rachford_rice_bisection",
+    convergence: "absolute",
+    tolerance: 1e-14,
+    max_iterations: 200,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+static UMR_PRU_FLASH_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "successive_substitution_flash",
+    convergence: "absolute",
+    tolerance: 1e-10,
+    max_iterations: 300,
+    bracket: None,
+    initialisation: Some("wilson"),
+    initial_temperature: None,
+    inner: Some(&UMR_PRU_FLASH_INNER),
+    fallback: None,
+};
+
+/// Registry entry for `eos.umr_pru_flash`.
+pub static UMR_PRU_FLASH_SPEC: ModelSpec = ModelSpec {
+    id: "eos.umr_pru_flash",
+    kind: "procedure",
+    algorithm: Some(&UMR_PRU_FLASH_ALGORITHM),
+    checks: UMR_PRU_FLASH_CHECKS,
+    cases: UMR_PRU_FLASH_CASES,
+};
+
 static UNIFAC_ACTIVITY_COEFFICIENTS_CHECKS: &[SpecCheck] = &[SpecCheck {
     on_input: true,
     check: RangeCheck {
@@ -29985,6 +30118,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &TV_FLASH_SPEC,
     &TV_FRACTION_FLASH_SPEC,
     &UMR_CPA_PHASE_SPEC,
+    &UMR_PRU_FLASH_SPEC,
     &UNIFAC_ACTIVITY_COEFFICIENTS_SPEC,
     &UNIFAC_PSRK_ACTIVITY_COEFFICIENTS_SPEC,
     &UNIFAC_UMRPRU_ACTIVITY_COEFFICIENTS_SPEC,
