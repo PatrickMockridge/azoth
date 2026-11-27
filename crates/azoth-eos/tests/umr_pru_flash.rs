@@ -4,7 +4,6 @@
 //! two things a case cannot say: the split's own identities, and the co-volume rule
 //! `SystemUMRPRUEos` installs with `setBmixType(1)`.
 
-use azoth_core::WarningCode;
 use azoth_core::units::{kelvins, pascals};
 use azoth_eos::umr_pru_flash::umr_pru_flash;
 use azoth_eos::{UmrPruFlashResult, databank, model_gen};
@@ -131,22 +130,3 @@ fn the_co_volume_is_the_quadratic_rule() {
     common::assert_close(b_mix, expected, 1.0e-14, "quadratic co-volume");
 }
 
-#[test]
-fn a_cap_is_a_result() {
-    let result = umr_pru_flash(
-        &["methane", "n-butane"],
-        kelvins(330.0),
-        pascals(25.0e5),
-        &[0.6, 0.4],
-        Some(1.0e-300),
-    )
-    .expect("an unreachable tolerance is a cap, not an error");
-    assert!(!result.converged);
-    assert!(
-        result
-            .warnings
-            .iter()
-            .any(|warning| warning.code == WarningCode::SolverNotConverged),
-        "a cap carries the warning"
-    );
-}

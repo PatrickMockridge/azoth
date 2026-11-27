@@ -11,7 +11,7 @@ the mapping, so an agent can tell "validated" from "placeholder" at a glance.
 A skill whose `calculation_basis` is `azoth` drives the validated library. Thirty-one
 are: the four `library/` skills, four under `eos/`, five under `flow-assurance/`,
 two under `hydraulics/`, five under `process/`, nine under `safety/`, one under `pvt/`
-and one under `thermal/`, driving the 98 calculations and 306 models the library
+and one under `thermal/`, driving the 98 calculations and 304 models the library
 implements.
 
 The remaining 59 are placeholders — 31 `screening`, 18 `advisory` and 10

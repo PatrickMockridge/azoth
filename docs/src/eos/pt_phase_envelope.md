@@ -6,9 +6,9 @@
 
 ## Source
 
-**Michelsen, M. L. (1980), with `eos.critical_point` for the critical point**
+**Michelsen, M. L. (1980), with NeqSim `RobustPhaseEnvelope` for the fallback and `eos.critical_point` for the critical point**
 
-The trace is Michelsen's natural-parameter continuation; the critical point is Heidemann & Khalil's construction, on the feed composition.
+The trace is Michelsen's natural-parameter continuation; the critical point is Heidemann & Khalil's construction, on the feed; the fallback is `RobustPhaseEnvelope`'s direct-flash grid at the class's own parameters.
 
 DOI: [10.1016/0378-3812(80)80001-8](https://doi.org/10.1016/0378-3812(80)80001-8)
 
@@ -56,15 +56,15 @@ not an equation, and both implementations read it from here.
 | `cricondenbar_pressure` | Pa | the cricondenbar, the highest pressure on the envelope |
 | `cricondentherm_temperature` | K | the cricondentherm, the highest temperature on the envelope |
 | `cricondentherm_pressure` | Pa | the pressure at the cricondentherm |
-| `critical_temperature` | K | the critical temperature, from `eos.critical_point` on the feed. On the validated case it is `0.21 K` from NeqSim's `374.3214 K`. |
-| `critical_pressure` | Pa | the critical pressure, from the same construction |
+| `critical_temperature` | K | the critical temperature, from `eos.critical_point` on the continuation; NaN when the fallback grid answered. |
+| `critical_pressure` | Pa | the critical pressure, from the same construction; NaN when the fallback grid answered. |
 | `iterations` | dimensionless | the continuation points traced, or the flash count when the grid answered. |
 | `residual` | K | the gap between where the two branches stopped: the width of the bracket they put around the critical point. `NaN` when a branch ran into the pressure ceiling, or when the grid answered. |
 
 | Bound | On violation | Why |
 |---|---|---|
 | `P > 0` | raises | an absolute pressure; zero and below are not states |
-| `critical_pressure > 0` | warns `OUT_OF_VALID_RANGE` | a refused critical point reports NaN with a warning; the envelope's cricondenbar and cricondentherm do not depend on it |
+| `critical_pressure > 0` | warns `OUT_OF_VALID_RANGE` | a grid answer reports NaN because RobustPhaseEnvelope has no critical point; the envelope's cricondenbar and cricondentherm do not depend on it |
 
 ## Assumptions
 
@@ -76,8 +76,8 @@ not an equation, and both implementations read it from here.
 - each branch stops at the critical region rather than continuing *through* the critical point onto the other branch as NeqSim does, so the two traces are independent and `residual` reports the bracket they put around the critical point.
 - the next point is predicted by a cubic through the last four converged points and the step size is clamped to at most 10 K and 10 bar per point.
 - the envelope is for mixtures; a single component's envelope is its vapour-pressure curve, which `eos.pure_saturation` computes.
-- **a failed continuation falls back to a direct-flash grid**: 40 isotherms on 150-500 K, 40 pressures on 1-400 bar, the boundary bisected, and the cricondenbar refined by a 0.5 K then 0.1 K scan. The grid reports no critical point; an unconverged flash is single phase and warns.
-- the critical fields are NaN when `eos.critical_point` refuses, and the warning carries the residual. A grid answer has no trace, so `residual` is NaN and `iterations` is the flash count.
+- **a failed continuation falls back to `RobustPhaseEnvelope`'s direct-flash grid**: 150-500 K, 1-400 bar, 60 x 60 points, 24 bisections, the cricondenbar resampled over one coarse step and the cricondentherm bisected. A flash that fails is single phase, as the class catches it.
+- the critical fields are the continuation's `eos.critical_point`; a grid answer reports NaN, because `RobustPhaseEnvelope` has no critical point. A grid answer has no trace, so `residual` is NaN and `iterations` is the flash count.
 - no energy balance. The envelope is a phase-equilibrium locus, not a statement about how a stream got there.
 
 ## Cases
@@ -100,3 +100,4 @@ declared checks *that call* could not evaluate.
 
 - Michelsen, M. L. (1980). "Calculation of phase envelopes and critical points for multicomponent mixtures." Fluid Phase Equilibria 4(1-2), 1-10. DOI 10.1016/0378-3812(80)80001-8.
 - Heidemann, R. A.; Khalil, A. M. (1980). "The calculation of critical points." AIChE Journal 26(5), 769-779. DOI 10.1002/aic.690260510.
+- NeqSim `thermodynamicoperations/phaseenvelopeops/multicomponentenvelopeops/RobustPhaseEnvelope.java` is the fallback's source: its 150-500 K / 1-400 bar window, 60 x 60 grid, `refinementIterations` bisections, `refineCricondenbar` resample and `refineCricondentherm` bisection.

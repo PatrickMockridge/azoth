@@ -78,7 +78,6 @@ NAMESPACES = (
 #: not, and nothing derives the difference - they are names in a module.
 ENUM_ALIASES = {
     "Phase": "_Phase",
-    "PhaseClass": "_PhaseClass",
     "PlusModel": "_PlusModel",
     "StabilityVerdict": "_StabilityVerdict",
     "TpMultiflashSeed": "_TpMultiflashSeed",
@@ -140,11 +139,6 @@ MIXTURE_EXPANSION: dict[str, str] = {
     # mixture's alpha out rather than letting the two collide.
     "cubic_alpha": "mixture.alpha",
     "alpha_params": "[list(c.alpha_params) for c in mixture.components]",
-    # The Peneloux translations, which a density needs: the molar volume is the cubic's
-    # root volume minus this composition-weighted sum. A mixture built without them
-    # reports an untranslated volume, which is a different density from the reference's.
-    "volume_shift": "[c.volume_shift for c in mixture.components]",
-    "volume_shift_srk": "[c.volume_shift_srk for c in mixture.components]",
     # The liquid-viscosity polynomial and the model number beside it. `aqueous_viscosity` is the
     # one adapter that carries these, and it carries them once, so there is no second spelling to
     # reconcile - the polynomial is flattened component-major and the model is one number each.

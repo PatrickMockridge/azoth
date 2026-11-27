@@ -47,7 +47,6 @@ from azoth.core.result_base import OverallVerdict as OverallVerdict
 from azoth.core.result_base import P002Criterion as P002Criterion
 from azoth.core.result_base import PerformanceVerdict as PerformanceVerdict
 from azoth.core.result_base import Phase as Phase
-from azoth.core.result_base import PhaseClass as PhaseClass
 from azoth.core.result_base import PlusModel as PlusModel
 from azoth.core.result_base import ReliefPhase as ReliefPhase
 from azoth.core.result_base import RootStructure as RootStructure

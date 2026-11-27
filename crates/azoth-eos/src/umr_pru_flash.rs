@@ -17,8 +17,8 @@ use crate::results::UmrPruFlashResult;
 /// The UMR-PRU flash at a temperature and pressure.
 ///
 /// # Errors
-/// As [`crate::pt_flash::pt_flash`], except that a cap is a result with
-/// `converged = false` and a `SOLVER_NOT_CONVERGED` warning.
+/// As [`crate::pt_flash::pt_flash`]. The loop has no fallback, so a cap leaves the last
+/// successive-substitution iterate in the result.
 pub fn umr_pru_flash(
     names: &[&str],
     t: ThermodynamicTemperature,
@@ -27,7 +27,7 @@ pub fn umr_pru_flash(
     tolerance: Option<f64>,
 ) -> Result<UmrPruFlashResult> {
     let (mixture, _) = umr_pru_mixture_of(names)?;
-    let (result, converged) = pt_flash_impl(
+    let (result, _converged) = pt_flash_impl(
         &mixture,
         t,
         p,
@@ -47,7 +47,6 @@ pub fn umr_pru_flash(
         z_vapour: result.z_vapour,
         min_t_over_tc: result.min_t_over_tc,
         phase: result.phase,
-        converged,
         iterations: result.iterations,
         residual: result.residual,
         warnings: result.warnings,

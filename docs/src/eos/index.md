@@ -155,8 +155,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`eos.production_chemical_scale_scenario`](./production_chemical_scale_scenario.md) | `direct composition` | NeqSim master `ProductionChemicalScaleScenario` |
 | [`eos.ps_flash`](./ps_flash.md) | `ps_flash_temperature_newton` | Standard thermodynamics, as in Smith, Van Ness & Abbott; Michelsen & Mollerup |
 | [`eos.pt_flash`](./pt_flash.md) | `successive_substitution_flash` | Rachford, H. H.; Rice, J. D. (1952); Michelsen, M. L. (1982) |
-| [`eos.pt_flash_check`](./pt_flash_check.md) | `successive_substitution_flash` | Rachford, H. H.; Rice, J. D. (1952); Michelsen, M. L. (1982) |
-| [`eos.pt_phase_envelope`](./pt_phase_envelope.md) | `phase_envelope_continuation` | Michelsen, M. L. (1980), with `eos.critical_point` for the critical point |
+| [`eos.pt_phase_envelope`](./pt_phase_envelope.md) | `phase_envelope_continuation` | Michelsen, M. L. (1980), with NeqSim `RobustPhaseEnvelope` for the fallback and `eos.critical_point` for the critical point |
 | [`eos.pu_flash`](./pu_flash.md) | `pu_flash_inverse_temperature_newton` | Standard thermodynamics, as in Michelsen & Mollerup |
 | [`eos.pure_saturation`](./pure_saturation.md) | `saturation_pressure_bisection` | Peng, D. Y.; Robinson, D. B. (1976) |
 | [`eos.pv_flash`](./pv_flash.md) | `pv_flash_inverse_temperature_newton` | Standard thermodynamics, as in Michelsen & Mollerup |
@@ -173,7 +172,6 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`eos.sound_speed`](./sound_speed.md) | `direct composition` | NeqSim thermo/phase/PhaseEos.java |
 | [`eos.srk_cpa_phase`](./srk_cpa_phase.md) | `direct composition` | Kontogeorgis, G. M. et al. (1996) |
 | [`eos.stability_test`](./stability_test.md) | `tangent_plane_stability` | Michelsen, M. L. (1982), "The isothermal flash problem. Part I. Stability" |
-| [`eos.state_at_tp`](./state_at_tp.md) | `successive_substitution_flash` | Michelsen, M. L. (1982); NeqSim `ThermodynamicCoupling.ThermoProperties` |
 | [`eos.stream_scale_analyzer`](./stream_scale_analyzer.md) | `direct composition` | NeqSim master `StreamScaleAnalyzer` |
 | [`eos.surf_cooldown`](./surf_cooldown.md) | `direct composition` | NeqSim master `SurfCooldownAnalyzer` |
 | [`eos.th_flash`](./th_flash.md) | `th_flash_inverse_pressure_newton` | Standard thermodynamics, as in Michelsen & Mollerup |

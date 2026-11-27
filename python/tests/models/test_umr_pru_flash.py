@@ -15,7 +15,6 @@ import pytest
 import _helpers as h
 from azoth import _models_gen, ureg
 from azoth.core.result import UmrPruFlashResult
-from azoth.core.warnings import WarningCode
 from azoth.eos import umr_pru_flash
 from azoth.eos.components import umr_pru_mixture_of
 from azoth.eos.reference._mixture_state import reduced_parameters, umr_ader
@@ -43,7 +42,6 @@ def test_spec_case(case: dict[str, Any]) -> None:
             h.assert_close(got, want, tolerance, f"{case['id']} ({name}[{i}])")
     for name in ("vapour_fraction", "z_liquid", "z_vapour", "min_t_over_tc"):
         h.assert_close(getattr(result, name), expected[name], tolerance, name)
-    assert result.converged is expected["converged"]
     assert result.iterations == expected["iterations"]
     h.assert_consistent(result, case["id"])
 
@@ -79,15 +77,3 @@ def test_the_co_volume_is_neqsims_quadratic_rule() -> None:
     expected = x[0] * x[0] * bij(0, 0) + 2.0 * x[0] * x[1] * bij(0, 1) + x[1] * x[1] * bij(1, 1)
     assert b_mix == pytest.approx(expected, abs=1e-14)
     assert b_mix != pytest.approx(sum(xi * bi for xi, bi in zip(x, b, strict=True)), abs=1e-6)
-
-
-def test_a_cap_is_a_result() -> None:
-    result = umr_pru_flash(
-        ["methane", "n-butane"],
-        T=Q(330.0, "K"),
-        P=Q(25.0e5, "Pa"),
-        z=[0.6, 0.4],
-        tolerance=1e-300,
-    )
-    assert result.converged is False
-    assert any(w.code is WarningCode.SOLVER_NOT_CONVERGED for w in result.warnings)

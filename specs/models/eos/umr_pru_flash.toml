@@ -6,7 +6,7 @@ assumptions = [
     "**the co-volume is `bmixType = 1`**, NeqSim's `b_ij = ((sqrt(b_i) + sqrt(b_j))/2)^2` and partial molar `2 sum_j x_j b_ij - b_mix`, not the linear sum `SystemUMRCPAEoS` carries.",
     "**successive substitution only, with no second-order fallback**: the UMR rule has no `phase_derivatives`, which the fallback needs. The spec therefore declares no fallback and the loop runs to its own cap.",
     "a component with no `UNIFACcompUMRPRU` group decomposition or no cp polynomial is refused; the rule cannot mix a substance whose groups it does not know.",
-    "`converged` is false only on the iteration cap, where the last iterate is returned with a `SOLVER_NOT_CONVERGED` warning. A non-finite K-value still raises, because divergence is not a state.",
+    "a cap leaves the last successive-substitution iterate in the result, as NeqSim's `TPflash` does; there is no convergence output. A non-finite K-value still raises, because divergence is not a state.",
     "no stability test: a converged split is a stationary point of the flash equations, not a proof that the feed was unstable.",
 ]
 references = [
@@ -90,9 +90,6 @@ description = "the smallest `T / Tc_i` over the components."
 type = "enum"
 values = ["two_phase", "all_liquid", "all_vapour", "trivial"]
 description = "What the state is: `two_phase`, `all_liquid`, `all_vapour`, or `trivial` (the iteration converged to `x = y = z`)."
-[outputs.converged]
-type = "boolean"
-description = "whether the iteration met its tolerance, or settled on a trivial or single-phase state by proof. False only on the cap, where the split is the last iterate."
 [outputs.iterations]
 unit = "dimensionless"
 description = "outer steps taken."

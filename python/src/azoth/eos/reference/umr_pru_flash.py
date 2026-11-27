@@ -38,8 +38,8 @@ def umr_pru_flash(
         tolerance: the outer stopping tolerance, or ``None`` for the spec's 1e-10.
 
     Returns:
-        The split and both phases' fugacity coefficients, with ``converged`` false
-        only when the loop hit its cap.
+        The split and both phases' fugacity coefficients. A cap leaves the last
+        successive-substitution iterate in the result.
 
     Raises:
         InvalidInputError: if a name is not in the databank, has no cp polynomial or
@@ -50,7 +50,7 @@ def umr_pru_flash(
     See :func:`azoth.eos.reference.pt_flash._pt_flash`.
     """
     mixture, _ = umr_pru_mixture_of([str(name) for name in components])
-    result, converged = _pt_flash(mixture, T, P, z, tolerance, False, model_id=MODEL_ID)
+    result, _converged = _pt_flash(mixture, T, P, z, tolerance, False, model_id=MODEL_ID)
     return UmrPruFlashResult(
         vapour_fraction=result.vapour_fraction,
         x=result.x,
@@ -62,7 +62,6 @@ def umr_pru_flash(
         z_vapour=result.z_vapour,
         min_t_over_tc=result.min_t_over_tc,
         phase=result.phase,
-        converged=converged,
         iterations=result.iterations,
         residual=result.residual,
         warnings=result.warnings,
