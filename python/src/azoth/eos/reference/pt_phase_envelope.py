@@ -748,9 +748,7 @@ def pt_phase_envelope(mixture: Mixture, P: Q, z: list[float]) -> PtPhaseEnvelope
     # from opposite sides, so the gap is the width of the bracket they put around it. A grid
     # answer has no trace and no bracket.
     residual = (
-        abs(bubble[4][0] - dew[4][0])
-        if (not grid_used and bubble[4] and dew[4])
-        else math.nan
+        abs(bubble[4][0] - dew[4][0]) if (not grid_used and bubble[4] and dew[4]) else math.nan
     )
 
     return PtPhaseEnvelopeResult(

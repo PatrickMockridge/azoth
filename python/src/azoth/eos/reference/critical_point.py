@@ -377,8 +377,8 @@ def critical_point(mixture: Mixture, z: list[float]) -> CriticalPointResult:
         )
 
     try:
-        temperature, pressure, volume, compressibility, iterations, residual = (
-            solve_critical_point(mixture, composition, spec["algorithm"])
+        temperature, pressure, volume, compressibility, iterations, residual = solve_critical_point(
+            mixture, composition, spec["algorithm"]
         )
     except SolverNotConvergedError as exc:
         return _refusal(
