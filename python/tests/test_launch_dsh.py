@@ -48,6 +48,8 @@ def _root(tmp_path: Path) -> Path:
     harness = root / "agents" / "deepseek"
     (harness / "skills").mkdir(parents=True)
     (harness / "prompts").mkdir()
+    (harness / "plugin").mkdir()
+    (harness / "plugin" / "guard.js").write_text("export function apply() {}\n", encoding="utf-8")
     (harness / "harness.toml").write_text(
         "\n".join(
             [
@@ -60,6 +62,25 @@ def _root(tmp_path: Path) -> Path:
                 "[plugin]",
                 "timeout_ms = 120000",
                 "max_output_bytes = 4194304",
+                "",
+                "[plan]",
+                "enabled = true",
+                'prompt = "prompts/plan.md"',
+                "require_plan_after = 1",
+                "minimum_candidates = 2",
+                "review_after_calcs = 6",
+                'hard_warning_codes = ["SOLVER_NOT_CONVERGED", '
+                '"TRIVIAL_SOLUTION", "FALLBACK_TO_INPUT"]',
+                "resolve_requires_clean_calc = false",
+                "",
+                "[plan.warning_categories]",
+                'SOLVER_NOT_CONVERGED = "numerical"',
+                'TRIVIAL_SOLUTION = "numerical"',
+                'FALLBACK_TO_INPUT = "numerical"',
+                'OUT_OF_VALID_RANGE = "validity"',
+                'RANGE_CHECK_SKIPPED = "validity"',
+                'TRANSITIONAL_FLOW = "validity"',
+                'MISSING_EVIDENCE = "evidence"',
                 "",
                 "[providers.deepseek]",
                 'label = "DeepSeek"',
@@ -190,6 +211,7 @@ def _root(tmp_path: Path) -> Path:
         "intake-reader",
         "intake-assessor",
         "intake-auditor",
+        "plan",
     ):
         (harness / "prompts" / f"{name}.md").write_bytes(
             (ROOT / "agents" / "deepseek" / "prompts" / f"{name}.md").read_bytes()
@@ -298,6 +320,43 @@ def test_headless_engineer_sets_the_deployment_persona(tmp_path: Path) -> None:
     assert "process-engineering assistant" in persona["config"]["personaPrefix"]
     assert _find(rows, "agent-preset-registry") is None
     assert _find(rows, "preset-azoth-engineer") is None
+    assert _find(rows, "azoth-plan") is not None
+
+
+def test_overlay_mounts_the_planning_guard_once(tmp_path: Path) -> None:
+    rows = _rows(_root(tmp_path), "--flowsheet", "case.toml")
+    row = _find(rows, "azoth-plan")
+    assert row is not None
+    assert row["name"].endswith("plugin/guard.js")
+    config = row["config"]
+    assert config["requirePlanAfter"] == 1
+    assert config["minimumCandidates"] == 2
+    assert config["reviewAfterCalcs"] == 6
+    assert "SOLVER_NOT_CONVERGED" in config["hardWarningCodes"]
+    assert config["warningCategories"]["OUT_OF_VALID_RANGE"] == "validity"
+    assert "planning guard" in config["policy"].lower()
+    mounted = [
+        inserted
+        for row in rows
+        for inserted in row.get("insert", [])
+        if inserted.get("id") == "azoth-plan"
+    ]
+    assert len(mounted) == 1
+
+
+def test_planning_guard_can_be_disabled(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    path = root / "agents" / "deepseek" / "harness.toml"
+    path.write_text(
+        path.read_text(encoding="utf-8").replace("enabled = true", "enabled = false", 1),
+        encoding="utf-8",
+    )
+    assert _find(_rows(root), "azoth-plan") is None
+
+
+def test_study_overlays_leave_the_team_pipeline_alone(tmp_path: Path) -> None:
+    rows = _rows(_root(tmp_path), "--study", "hazop", "--flowsheet", "case.toml")
+    assert _find(rows, "azoth-plan") is None
 
 
 @pytest.mark.parametrize(

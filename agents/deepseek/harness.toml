@@ -20,6 +20,27 @@ max_output_bytes = 4194304
 # the kernel; nothing else changes.
 require_dossier = false
 
+# The planning guard. `review_after_calcs = 0` disables the periodic checkpoint;
+# `resolve_requires_clean_calc` makes evidence for a surviving assumption a later
+# clean calculation rather than a written record.
+[plan]
+enabled = true
+prompt = "prompts/plan.md"
+require_plan_after = 1
+minimum_candidates = 2
+review_after_calcs = 6
+hard_warning_codes = ["SOLVER_NOT_CONVERGED", "TRIVIAL_SOLUTION", "FALLBACK_TO_INPUT"]
+resolve_requires_clean_calc = false
+
+[plan.warning_categories]
+SOLVER_NOT_CONVERGED = "numerical"
+TRIVIAL_SOLUTION = "numerical"
+FALLBACK_TO_INPUT = "numerical"
+OUT_OF_VALID_RANGE = "validity"
+RANGE_CHECK_SKIPPED = "validity"
+TRANSITIONAL_FLOW = "validity"
+MISSING_EVIDENCE = "evidence"
+
 # The providers every launch mounts. The model selector chooses among them;
 # `--provider` sets the session default, and `--model` overrides the id.
 [providers.deepseek]

@@ -574,6 +574,23 @@ def _plugin_config(tc: Toolchain, config: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _plan_config(tc: Toolchain, config: dict[str, Any]) -> dict[str, Any]:
+    plan = config.get("plan") or {}
+    prompt = Path(tc.root) / "agents" / "deepseek" / str(plan.get("prompt", "prompts/plan.md"))
+    if not prompt.is_file():
+        raise SystemExit(f"launch_dsh: [plan].prompt {prompt} is not present")
+    categories = plan.get("warning_categories") or {}
+    return {
+        "policy": prompt.read_text(encoding="utf-8").strip(),
+        "requirePlanAfter": int(plan.get("require_plan_after", 1)),
+        "minimumCandidates": int(plan.get("minimum_candidates", 2)),
+        "reviewAfterCalcs": int(plan.get("review_after_calcs", 6)),
+        "hardWarningCodes": list(plan.get("hard_warning_codes", [])),
+        "warningCategories": {str(code): str(category) for code, category in categories.items()},
+        "resolveRequiresCleanCalc": bool(plan.get("resolve_requires_clean_calc", False)),
+    }
+
+
 def _mcp_config(args: argparse.Namespace, tc: Toolchain, config: dict[str, Any]) -> dict[str, Any]:
     assert tc.azoth is not None
     command = tc.azoth.argv[0]
@@ -749,6 +766,15 @@ def build_overlay(
                 "config": _plugin_config(tc, config),
             }
         )
+    guard = tc.root / "agents" / "deepseek" / "plugin" / "guard.js"
+    plan = config.get("plan") or {}
+    if (
+        args.persona == "engineer"
+        and study is None
+        and bool(plan.get("enabled", True))
+        and guard.is_file()
+    ):
+        inserts.append({"id": "azoth-plan", "name": str(guard), "config": _plan_config(tc, config)})
     ui = tc.root / "agents" / "deepseek" / "ui" / "index.js"
     if args.persona == "engineer" and study is None and mode == "web" and ui.is_file():
         inserts.append({"id": "azoth-ui", "name": str(ui), "config": {}})
@@ -1243,7 +1269,10 @@ def _probe_plugin(args: argparse.Namespace, tc: Toolchain, env: dict[str, str]) 
         return Check("plugin", "warn", "agents/deepseek/plugin/index.js is not present")
     if tc.node is None:
         return Check("plugin", "warn", "node not found; plugin not checked")
+    guard = plugin / "guard.js"
     sources = [index, bridge]
+    if guard.is_file():
+        sources.append(guard)
     tests = sorted((plugin / "test").glob("*.test.mjs"))
     if ui.is_dir():
         sources.extend([ui / "index.js", ui / "client.js"])
@@ -1265,7 +1294,8 @@ def _probe_plugin(args: argparse.Namespace, tc: Toolchain, env: dict[str, str]) 
     except (OSError, subprocess.TimeoutExpired) as exc:
         return Check("plugin", "fail", str(exc))
     suffix = f", {len(tests)} node tests" if tests else ""
-    return Check("plugin", "ok", f"{index.name}{suffix}")
+    detail = f"{index.name}, guard.js{suffix}" if guard.is_file() else f"{index.name}{suffix}"
+    return Check("plugin", "ok", detail)
 
 
 def _probe_workspace(args: argparse.Namespace, tc: Toolchain) -> Check:

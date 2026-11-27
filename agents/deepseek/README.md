@@ -1,8 +1,9 @@
 # DeepSeek Harness
 
-The engineering entry point for azoth: a launcher, a calculation plugin, a welcome card,
-the skill catalog and two engineering teams, HAZOP and intake. DeepSeek Harness (`dsh`) is a developer preview from
-DeepSeek AI, built on Cordis; this directory holds the azoth side of it.
+The engineering entry point for azoth: a launcher, a calculation plugin, a planning guard,
+a welcome card, the skill catalog and two engineering teams, HAZOP and intake. DeepSeek
+Harness (`dsh`) is a developer preview from DeepSeek AI, built on Cordis; this directory
+holds the azoth side of it.
 
 ## Run it
 
@@ -58,7 +59,7 @@ library, FEED means Front-End Engineering Design (not a browser front end), the 
 flowsheet is loaded, and results are screening values. Three buttons fill the composer
 with a pump sizing, the demo separator, and relief and fire questions.
 
-## The two tool surfaces
+## The tool surfaces
 
 - **`azoth_help`, `azoth_catalogue`, `azoth_spec`, `azoth_intake`, `azoth_calc`** — the
   plugin in [`plugin/`](plugin/). `azoth_help` defines FEED, model, catalogue, keycard,
@@ -68,14 +69,25 @@ with a pump sizing, the demo separator, and relief and fire questions.
   a dossier replaces `inputs` and adds a sibling `intake` block. The result is the
   library's `to_dict()` with warnings and the provenance block, rendered with what its
   verification means.
+- **`azoth_plan`** — the planning guard in [`plugin/guard.js`](plugin/guard.js). It records
+  a decision tree: `open` requires at least two candidate paths, each with its cost and
+  assumptions; `choose` fixes the path; `add` attaches a subordinate decision; `step`
+  records ordered work. An assumption names a category — numerical, validity, evidence,
+  applicability, consistency, feasibility, requirement, budget or judgment — and, where a
+  result can decide it, a falsifier bound to a calculation id, `"*"` or `intake`.
+  `azoth_calc` and `azoth_intake` results are checked automatically for the numerical,
+  validity and evidence signals; `trip` records any other reason. A trip holds `azoth_calc`
+  until `reopen` returns to the decision or `resolve` records evidence that the assumption
+  survived. `review` is the periodic checkpoint; `status` returns the record. The thresholds
+  and the warning-category map are `[plan]` in [`harness.toml`](harness.toml).
 - **`mcp__azoth__*`** — the existing `azoth mcp --flowsheet F` server, mounted through
   `@deepseek-ai/dsh-mcp-client`. It exposes the 20 flowsheet edit commands and the
   `azoth://document`, `azoth://diagnostics`, `azoth://report` and `azoth://catalogue`
   resources. The server holds the document in memory and never writes it.
 
-The plugin imports nothing from `@deepseek-ai/*`: DeepSeek Harness accepts a plain tool
-definition, so it mounts by absolute path without a package install. `plugin/bridge.js` is
-pure Node and is tested with `node --test`; the engineering logic is Python.
+The plugins import nothing from `@deepseek-ai/*`: DeepSeek Harness accepts a plain tool
+definition, so they mount by absolute path without a package install. `plugin/bridge.js`
+is pure Node and is tested with `node --test`; the engineering logic is Python.
 
 ### The bridge
 
@@ -133,6 +145,9 @@ study and HAZOP close-out.
   `eval`, no shell and no import by a model-supplied string. A keycard path and a dossier
   path must be under the working directory.
 - The bridge caps inputs at 1 MB and outputs at 8 MB; the plugin times a call out at 120 s.
+- The planning guard holds the `azoth_calc` tool, not the Python bridge: a direct
+  `python -m azoth.harness` call through `tool-bash` bypasses it. It is per session, so a
+  spawned subagent opens its own plan.
 - The catalog's models are `unverified` or `partially_verified`. A result is evidence for a
   finding, not a design deliverable; the provenance block says which.
 
