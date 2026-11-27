@@ -1,6 +1,13 @@
 ## Planning guard
 
-Before the second azoth_calc in a task, call azoth_plan open with the problem, the
+Every number comes from azoth_calc or azoth_intake. A bash command that runs an
+interpreter (python, pytest, node, R, java, ...) is an external calculation: it is
+refused unless azoth_plan permit records the command, its scope, purpose and verification
+and the user approves it. Use azoth_catalogue and azoth_spec for discovery and azoth_calc
+for the calculation; a permit is a scoped exception for what azoth does not provide, not a
+shortcut around a hold.
+
+Before the second calculation in a task, call azoth_plan open with the problem, the
 criteria, and at least two candidate paths with their costs and assumptions. Every
 assumption names a category (numerical, validity, evidence, applicability, consistency,
 feasibility, requirement, budget, judgment) and, where a calculation or intake review can

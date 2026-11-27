@@ -53,11 +53,16 @@ const MAX_TOTAL_ASSUMPTIONS = 100
 const MAX_DECISIONS = 20
 const MAX_STEPS = 100
 const MAX_TRIPS = 200
+const MAX_PERMITS = 20
+const MAX_EXTERNAL_LOG = 60
+const PERMIT_SCOPES = ['once', 'step', 'session']
 
 const OUTPUT_SCHEMA = { type: 'object', additionalProperties: true }
 
 let sequence = 0
 const plans = new Map()
+//: exec -> {permitId, command, mode} for a bash call the pre-execute stage let through.
+const externalRuns = new WeakMap()
 
 function nextSequence() {
   sequence += 1
@@ -112,12 +117,141 @@ function normalizeConfig(config = {}) {
     hardCodes: new Set(hard.filter((code) => typeof code === 'string')),
     categories,
     resolveRequiresCleanCalc: config.resolveRequiresCleanCalc === true,
+    externalCompute: ['ask', 'deny', 'allow'].includes(config.externalCompute)
+      ? config.externalCompute
+      : 'ask',
+    gateSanctionedBridge: config.gateSanctionedBridge !== false,
   }
 }
 
 function integer(value, fallback, minimum, maximum) {
   if (!Number.isInteger(value)) return fallback
   return Math.min(maximum, Math.max(minimum, value))
+}
+
+// ---------------------------------------------------------------------------------------
+// bash classification
+//
+// The guard sees the shell command, not what it computes. These classes are the policy
+// boundary: azoth's own tools pass, read-only inspection passes, and an interpreter is
+// external work that needs a permit.
+
+const READONLY_COMMANDS = new Set([
+  'cat', 'head', 'tail', 'less', 'more', 'wc', 'ls', 'stat', 'file', 'pwd', 'tree', 'grep',
+  'rg', 'diff', 'sort', 'uniq', 'cut', 'tr', 'column', 'jq', 'sha256sum', 'md5sum', 'date',
+  'which', 'echo', 'printf', 'true', 'false', 'test', 'basename', 'dirname', 'realpath', 'du',
+  'df', 'ps', 'nproc', 'free',
+])
+const NEUTRAL_COMMANDS = new Set([
+  'mkdir', 'rmdir', 'cp', 'mv', 'rm', 'touch', 'chmod', 'chown', 'ln', 'sed', 'sleep', 'kill',
+  'export', 'unset', 'cd', 'set', 'wait', 'jobs',
+])
+const GIT_READ = new Set([
+  'status', 'log', 'diff', 'show', 'branch', 'rev-parse', 'ls-files', 'grep', 'blame',
+  'describe', 'remote', 'tag',
+])
+const EXTERNAL_COMMANDS = new Set([
+  'python', 'python3', 'pytest', 'maturin', 'cargo', 'rustc', 'node', 'npm', 'npx', 'yarn',
+  'pnpm', 'uv', 'pip', 'Rscript', 'julia', 'java', 'javac', 'make', 'cmake', 'ninja', 'bash',
+  'sh', 'zsh', 'perl', 'ruby', 'php', 'go', 'dotnet', 'gcc', 'g++', 'clang', 'ffmpeg',
+  'octave', 'sqlite3', 'psql', 'mysql', 'awk', 'xargs', 'source', '.',
+])
+const CLASS_RANK = {
+  readonly: 0,
+  'sanctioned-read': 1,
+  neutral: 2,
+  'sanctioned-compute': 3,
+  external: 4,
+}
+
+//: A heredoc body is data, not a command line: drop it before splitting, or `cat > f <<EOF`
+//: over a Python fragment reads as an interpreter run.
+function withoutHeredocBodies(command) {
+  const lines = command.split('\n')
+  const kept = []
+  for (let index = 0; index < lines.length; index += 1) {
+    kept.push(lines[index])
+    const marker = lines[index].match(/<<-?\s*['"]?([A-Za-z_][A-Za-z0-9_]*)['"]?/)
+    if (!marker) continue
+    const tag = marker[1]
+    while (index + 1 < lines.length) {
+      index += 1
+      if (lines[index].trim() === tag) break
+    }
+  }
+  return kept.join('\n')
+}
+
+function stripCommandPrefix(segment) {
+  let rest = segment.trim()
+  let changed = true
+  while (changed && rest) {
+    changed = false
+    const assignment = rest.match(/^[A-Za-z_][A-Za-z0-9_]*=\S*\s+/)
+    if (assignment) {
+      rest = rest.slice(assignment[0].length)
+      changed = true
+      continue
+    }
+    const first = rest.split(/\s+/, 1)[0]
+    if (['sudo', 'env', 'nohup', 'time', 'nice', 'command', 'exec'].includes(first)) {
+      rest = rest.slice(first.length).trim()
+      changed = true
+      continue
+    }
+    if (first === 'timeout') {
+      const duration = rest.match(/^timeout\s+(?:-\S+\s+)*\d+(?:\.\d+)?[smhd]?\s+/)
+      if (duration) {
+        rest = rest.slice(duration[0].length)
+        changed = true
+      }
+    }
+  }
+  return rest
+}
+
+function classifySegment(segment) {
+  const text = stripCommandPrefix(segment)
+  if (!text) return 'readonly'
+  const tokens = text.split(/\s+/)
+  const head = tokens[0].toLowerCase()
+  const args = tokens.slice(1)
+  const subcommand = args.find((arg) => !arg.startsWith('-'))?.toLowerCase()
+  if (head === 'azoth') {
+    if (['catalogue', 'spec', 'version', 'help'].includes(subcommand)) return 'sanctioned-read'
+    if (['run', 'review'].includes(subcommand)) return 'sanctioned-compute'
+    return 'external'
+  }
+  if (head === 'python' || head === 'python3') {
+    const module = args.indexOf('-m')
+    if (module >= 0 && args[module + 1] === 'azoth.harness') {
+      const sub = args.slice(module + 2).find((arg) => !arg.startsWith('-'))?.toLowerCase()
+      if (['catalogue', 'spec', 'version', 'help'].includes(sub)) return 'sanctioned-read'
+      if (['run', 'review'].includes(sub)) return 'sanctioned-compute'
+    }
+    return 'external'
+  }
+  if (head === 'find') {
+    if (args.some((arg) => ['-exec', '-execdir', '-delete'].includes(arg))) return 'external'
+    return 'readonly'
+  }
+  if (head === 'git') return GIT_READ.has(subcommand) ? 'readonly' : 'neutral'
+  if (READONLY_COMMANDS.has(head)) return 'readonly'
+  if (NEUTRAL_COMMANDS.has(head)) return 'neutral'
+  if (EXTERNAL_COMMANDS.has(head)) return 'external'
+  return 'external'
+}
+
+function classifyCommand(command) {
+  const text = String(command ?? '')
+  if (!text.trim()) return 'readonly'
+  if (/\$\(|`/.test(text)) return 'external'
+  let best = 'readonly'
+  for (const segment of withoutHeredocBodies(text).split(/&&|\|\||[;|&\n]/)) {
+    const kind = classifySegment(segment)
+    if (CLASS_RANK[kind] > CLASS_RANK[best]) best = kind
+  }
+  return best
 }
 
 // ---------------------------------------------------------------------------------------
@@ -132,6 +266,9 @@ function createState() {
     steps: [],
     trips: [],
     reviews: [],
+    permits: [],
+    externalLog: [],
+    activeStepId: null,
     calcCount: 0,
     calcSinceReview: 0,
     calcLog: [],
@@ -769,6 +906,183 @@ function holdReason(state, cfg) {
 }
 
 // ---------------------------------------------------------------------------------------
+// external computation
+//
+// A bash command that runs an interpreter is a calculation outside azoth. It runs only
+// under a permit whose command matches and whose purpose and verification the user has
+// approved; the result is logged and bannered so the report can say where the number came
+// from.
+
+function activeChoice(state) {
+  const decision = activeDecision(state)
+  return decision?.choice ? decision : null
+}
+
+function numberOrNull(value) {
+  const number = Number(value)
+  return Number.isFinite(number) && number >= 0 ? number : null
+}
+
+function findPermit(state, id) {
+  return state.permits.find((permit) => permit.id === id)
+}
+
+function permitMatches(permit, command, stepId) {
+  if (!permit || (permit.status !== 'requested' && permit.status !== 'approved')) return false
+  const target = String(command ?? '').trim()
+  const wanted = String(permit.command ?? '').trim()
+  if (!target || !wanted) return false
+  if (permit.prefix ? !target.startsWith(wanted) : target !== wanted) return false
+  if (permit.scope === 'step') return Boolean(permit.step) && permit.step === stepId
+  return true
+}
+
+function matchingPermit(state, command, callId) {
+  const stepId = state.activeStepId ?? null
+  const found = state.permits.filter((permit) => {
+    if (!permitMatches(permit, command, stepId)) return false
+    if (
+      permit.scope === 'once' &&
+      permit.status === 'approved' &&
+      permit.approvedCallId !== callId
+    ) {
+      return false
+    }
+    return true
+  })
+  return found.find((permit) => permit.status === 'approved') ?? found[0] ?? null
+}
+
+function markPermitApproved(state, permitId, callId, by) {
+  const permit = findPermit(state, permitId)
+  if (!permit || permit.status !== 'requested') return
+  permit.status = 'approved'
+  permit.approvedAt = now()
+  permit.approvedBy = by
+  permit.approvedCallId = callId ?? null
+  state.updatedAt = now()
+}
+
+function consumePermit(state, permit, callId) {
+  if (!permit) return
+  permit.usedCallId = callId ?? null
+  permit.uses = (permit.uses ?? 0) + 1
+  if (permit.scope === 'once') permit.status = 'consumed'
+}
+
+function externalOutcome(result) {
+  if (result?.isError) {
+    return { exitCode: null, timedOut: false, kind: 'error', failed: true }
+  }
+  const value = result?.value ?? {}
+  const kind = typeof value.kind === 'string' ? value.kind : 'foreground'
+  const exitCode = Number.isInteger(value.exitCode) ? value.exitCode : null
+  const timedOut = value.timedOut === true
+  return {
+    exitCode,
+    timedOut,
+    kind,
+    failed: timedOut || (exitCode !== null && exitCode !== 0),
+  }
+}
+
+function externalBanner(permit, command, outcome) {
+  const who = permit?.approvedBy ? `approved by ${permit.approvedBy}` : 'not approved'
+  const exit = outcome.exitCode === null ? '' : `; exit: ${outcome.exitCode}`
+  const job = outcome.kind === 'promoted' ? '; promoted to a background job' : ''
+  const failed = outcome.failed ? ' — FAILED; record the failure' : ''
+  return (
+    `EXTERNAL — not an azoth result; permit ${permit?.id ?? '?'} ` +
+    `(${permit?.scope ?? '?'}, ${who}); verification: ${permit?.verification ?? 'not recorded'}` +
+    `${exit}${job}${failed}\ncommand: ${String(command).slice(0, 200)}`
+  )
+}
+
+function bashGate(exec, cfg) {
+  const session = exec.agent?.session
+  if (!session) return null
+  const command = String(exec.arguments?.command ?? '')
+  const kind = classifyCommand(command)
+  if (kind === 'readonly' || kind === 'neutral' || kind === 'sanctioned-read') return null
+  const state = planFor(session)
+  const hold = holdReason(state, cfg)
+  if (kind === 'sanctioned-compute') {
+    if (cfg.gateSanctionedBridge && !state.decisions.length) {
+      return {
+        kind: 'deny',
+        reason:
+          'azoth is being called through bash. Open a plan with azoth_plan (or use azoth_calc) ' +
+          'so the decision and its assumptions are recorded.',
+        info: { name: 'AzothPlanRequired', code: 'AZOTH_PLAN_REQUIRED' },
+      }
+    }
+    return hold ? { kind: 'deny', ...hold } : null
+  }
+  if (!state.decisions.length) {
+    return {
+      kind: 'deny',
+      reason:
+        'External computation is refused: no plan with a chosen path. Call azoth_plan open and ' +
+        'choose first, then azoth_plan permit with the command, purpose and verification.',
+      info: { name: 'AzothExternalPlanRequired', code: 'AZOTH_EXTERNAL_PLAN_REQUIRED' },
+    }
+  }
+  if (hold) return { kind: 'deny', ...hold }
+  if (!activeChoice(state)) {
+    return {
+      kind: 'deny',
+      reason:
+        'External computation is refused: the plan has no chosen path. Call azoth_plan choose ' +
+        'first, then azoth_plan permit with the command, purpose and verification.',
+      info: { name: 'AzothExternalPlanRequired', code: 'AZOTH_EXTERNAL_PLAN_REQUIRED' },
+    }
+  }
+  const permit = matchingPermit(state, command, exec.callId)
+  if (!permit) {
+    return {
+      kind: 'deny',
+      reason:
+        `External computation is refused: \`${command.slice(0, 200)}\` has no permit. Call ` +
+        'azoth_plan permit {"command":...,"scope":"once|step|session","purpose":...,' +
+        '"verification":...}; a matching command then asks the user to approve it. Use azoth_calc ' +
+        'for any number azoth can calculate.',
+      info: { name: 'AzothExternalPermitRequired', code: 'AZOTH_EXTERNAL_PERMIT_REQUIRED' },
+    }
+  }
+  if (permit.status === 'approved') {
+    externalRuns.set(exec, { permitId: permit.id, command, mode: 'approved' })
+    return null
+  }
+  if (cfg.externalCompute === 'allow') {
+    externalRuns.set(exec, { permitId: permit.id, command, mode: 'launcher' })
+    return null
+  }
+  if (cfg.externalCompute !== 'ask') {
+    return {
+      kind: 'deny',
+      reason:
+        `External computation is refused by [plan].external_compute = "${cfg.externalCompute}". ` +
+        `Permit ${permit.id} covers \`${command.slice(0, 120)}\`; relaunch with ` +
+        '--allow-external-compute to approve it for this session.',
+      info: {
+        name: 'AzothExternalApprovalUnavailable',
+        code: 'AZOTH_EXTERNAL_APPROVAL_UNAVAILABLE',
+      },
+    }
+  }
+  externalRuns.set(exec, { permitId: permit.id, command, mode: 'user' })
+  return {
+    kind: 'ask',
+    reason: `azoth-plan: external computation ${permit.id}: ${command.slice(0, 300)}`,
+    displayReason: {
+      en:
+        `Run an external calculation? ${permit.purpose} ` +
+        `Verification: ${permit.verification}. Command: ${command.slice(0, 160)}`,
+    },
+  }
+}
+
+// ---------------------------------------------------------------------------------------
 // actions
 
 function reduce(state, args, context) {
@@ -791,13 +1105,16 @@ function reduce(state, args, context) {
       return resolve(state, args, context, cfg)
     case 'review':
       return review(state, args, context, cfg)
+    case 'permit':
+      return recordPermit(state, args, context)
     case 'close':
       return closePlan(state, args, context)
     case 'status':
       return { message: renderState(state) }
     default:
       throw new Error(
-        'azoth_plan: `action` must be open, add, choose, step, trip, reopen, resolve, review, close or status',
+        'azoth_plan: `action` must be open, add, choose, step, trip, reopen, resolve, review, ' +
+          'permit, close or status',
       )
   }
 }
@@ -815,6 +1132,9 @@ function openPlan(state, args, context, cfg) {
   state.steps = []
   state.trips = []
   state.reviews = []
+  state.permits = []
+  state.externalLog = []
+  state.activeStepId = null
   state.calcSinceReview = 0
   state.closedAt = null
   state.closeReason = null
@@ -921,8 +1241,56 @@ function recordStep(state, args, context) {
     stale: false,
   }
   state.steps.push(step)
+  state.activeStepId = step.id
   state.updatedAt = now()
   return { message: `recorded ${step.id}: ${description}` }
+}
+
+function recordPermit(state, args, context) {
+  if (!state.decisions.length) throw new Error('azoth_plan: open a plan before a permit')
+  if (!activeChoice(state)) throw new Error('azoth_plan: choose a decision before a permit')
+  const command = text(args.command, 'command', 500)
+  const purpose = text(args.purpose, 'purpose', 500)
+  const verification = text(args.verification, 'verification', 500)
+  const scope = PERMIT_SCOPES.includes(args.scope) ? args.scope : 'step'
+  const step =
+    args.step !== undefined ? text(args.step, 'step', 40) : (state.activeStepId ?? null)
+  if (scope === 'step' && !step) {
+    throw new Error('azoth_plan: scope "step" needs an active step; record one with step first')
+  }
+  if (state.permits.length >= MAX_PERMITS) {
+    throw new Error(`azoth_plan: at most ${MAX_PERMITS} permits per plan`)
+  }
+  const existing = state.permits.find(
+    (permit) => permit.command === command && permit.scope === scope && permit.status !== 'revoked',
+  )
+  if (existing) {
+    return { message: `permit ${existing.id} already covers \`${command}\` (${existing.status})` }
+  }
+  const permit = {
+    id: nextId(state.permits, 'P'),
+    command,
+    prefix: args.prefix === true,
+    scope,
+    step,
+    purpose,
+    verification,
+    expected_minutes: numberOrNull(args.expected_minutes),
+    status: 'requested',
+    requestedAt: now(),
+    approvedAt: null,
+    approvedBy: null,
+    approvedCallId: null,
+    usedCallId: null,
+    uses: 0,
+  }
+  state.permits.push(permit)
+  state.updatedAt = now()
+  return {
+    message:
+      `requested ${permit.id} for \`${command}\` (${scope}); purpose: ${purpose}; ` +
+      `verification: ${verification}. The next matching command asks the user to approve it.`,
+  }
 }
 
 function recordTrip(state, args, context) {
@@ -1181,6 +1549,9 @@ function serialize(state) {
       at: trip.at,
     })),
     reviews: state.reviews.slice(-20),
+    permits: state.permits.slice(-MAX_PERMITS),
+    externalLog: state.externalLog.slice(-20),
+    activeStepId: state.activeStepId,
     calcCount: state.calcCount,
     calcSinceReview: state.calcSinceReview,
   }
@@ -1193,6 +1564,16 @@ function compactState(state) {
     reviews: state.reviews.slice(-5),
     steps: state.steps.slice(-50),
     trips: state.trips.slice(-100),
+    permits: state.permits.slice(-8).map((permit) => ({
+      ...permit,
+      command: permit.command.slice(0, 200),
+      purpose: permit.purpose.slice(0, 200),
+      verification: permit.verification.slice(0, 300),
+    })),
+    externalLog: state.externalLog.slice(-10).map((entry) => ({
+      ...entry,
+      command: entry.command.slice(0, 200),
+    })),
     decisions: state.decisions.map((decision) => ({
       ...decision,
       revisions: decision.revisions.slice(-5),
@@ -1271,6 +1652,23 @@ function renderState(state) {
       )
     }
   }
+  if (state.permits.length) {
+    lines.push('external permits:')
+    for (const permit of state.permits.slice(-10)) {
+      lines.push(
+        `  ${permit.id} ${permit.status} ${permit.scope} \`${permit.command}\` — ` +
+          `${permit.purpose}; verification: ${permit.verification}`,
+      )
+    }
+  }
+  if (state.externalLog.length) {
+    const recent = state.externalLog.slice(-5)
+    lines.push(
+      `external runs: ${state.externalLog.length} (` +
+        recent.map((entry) => `${entry.permit}:${entry.exitCode ?? entry.kind}`).join(', ') +
+        ')',
+    )
+  }
   if (state.calcSinceReview) {
     lines.push(`checkpoint: ${state.calcSinceReview} calculations since the last review`)
   }
@@ -1312,10 +1710,19 @@ function normalizeState(value) {
   if (!value || typeof value !== 'object') return state
   Object.assign(state, value)
   state.v = 1
-  for (const key of ['decisions', 'steps', 'trips', 'reviews', 'calcLog']) {
+  for (const key of [
+    'decisions',
+    'steps',
+    'trips',
+    'reviews',
+    'calcLog',
+    'permits',
+    'externalLog',
+  ]) {
     if (!Array.isArray(state[key])) state[key] = []
   }
   state.criteria = Array.isArray(state.criteria) ? state.criteria : []
+  state.activeStepId = typeof state.activeStepId === 'string' ? state.activeStepId : null
   state.calcCount = Number.isInteger(state.calcCount) ? state.calcCount : 0
   state.calcSinceReview = Number.isInteger(state.calcSinceReview) ? state.calcSinceReview : 0
   return state
@@ -1455,15 +1862,29 @@ export function apply(ctx, config = {}) {
       'checks watch azoth_calc and azoth_intake for numerical, validity and evidence failures. ' +
       'For any other reason — a model outside its physical basis, a balance that does not close, ' +
       'a missing capability, a changed requirement, a budget overrun, judgement — call trip with ' +
-      'the category and evidence. A trip holds azoth_calc and reopens its decision. review is the ' +
-      'periodic checkpoint; status returns the record.',
+      'the category and evidence. A trip holds azoth_calc and reopens its decision. permit records ' +
+      'an external bash calculation (command, scope, purpose, verification); an interpreter run ' +
+      'outside azoth is refused until its permit is approved. review is the periodic checkpoint; ' +
+      'status returns the record.',
     parameters: {
       type: 'object',
       additionalProperties: false,
       properties: {
         action: {
           type: 'string',
-          enum: ['open', 'add', 'choose', 'step', 'trip', 'reopen', 'resolve', 'review', 'close', 'status'],
+          enum: [
+            'open',
+            'add',
+            'choose',
+            'step',
+            'trip',
+            'reopen',
+            'resolve',
+            'review',
+            'permit',
+            'close',
+            'status',
+          ],
         },
         problem: { type: 'string' },
         criteria: { type: 'array', items: { type: 'string' } },
@@ -1514,6 +1935,13 @@ export function apply(ctx, config = {}) {
         calc_call: { type: 'string' },
         reason: { type: 'string' },
         force: { type: 'boolean', description: 'close a held plan with a reason' },
+        command: { type: 'string', description: 'the external bash command a permit covers' },
+        prefix: { type: 'boolean', description: 'match command prefixes rather than exact text' },
+        scope: { type: 'string', enum: PERMIT_SCOPES },
+        purpose: { type: 'string', description: 'why the calculation is not an azoth call' },
+        verification: { type: 'string', description: 'how the result is checked' },
+        expected_minutes: { type: 'number' },
+        step: { type: 'string' },
       },
       required: ['action'],
     },
@@ -1551,21 +1979,45 @@ export function apply(ctx, config = {}) {
   }
   if (typeof ctx.tools.guard === 'function') {
     ctx.tools.guard(gate)
-  } else if (typeof ctx.on === 'function') {
+  }
+  if (typeof ctx.on === 'function') {
     ctx.on('tools/pre-execute', async (exec, next) => {
-      const denial = gate(exec)
-      return denial ? { kind: 'deny', ...denial } : next()
+      if (exec.name === 'bash') {
+        const decision = bashGate(exec, cfg)
+        return decision ?? next()
+      }
+      if (exec.name === 'azoth_calc' && typeof ctx.tools.guard !== 'function') {
+        const denial = gate(exec)
+        return denial ? { kind: 'deny', ...denial } : next()
+      }
+      return next()
     })
   }
 
   if (typeof ctx.on === 'function') {
     ctx.on('tools/execute', async (exec, next) => {
-      if (!watched(exec.name)) return next()
+      const external = exec.name === 'bash' ? externalRuns.get(exec) : null
+      if (!watched(exec.name) && !external) return next()
       let result
       try {
         result = await next()
       } finally {
         bodyRan.add(exec)
+        if (external) {
+          const state = planFor(exec.agent?.session)
+          if (state) {
+            const permit = findPermit(state, external.permitId)
+            if (permit && permit.status === 'requested') {
+              markPermitApproved(
+                state,
+                permit.id,
+                exec.callId ?? null,
+                external.mode === 'launcher' ? 'launcher' : 'user',
+              )
+            }
+            consumePermit(state, permit, exec.callId ?? null)
+          }
+        }
         if (exec.name === 'azoth_calc') {
           const state = planFor(exec.agent?.session)
           if (state) {
@@ -1579,6 +2031,32 @@ export function apply(ctx, config = {}) {
 
     ctx.on('tools/post-execute', async (exec, result, next) => {
       const decision = await next()
+      if (exec.name === 'bash') {
+        const external = externalRuns.get(exec)
+        if (!external || !bodyRan.has(exec)) return decision
+        const state = planFor(exec.agent?.session)
+        const permit = state ? findPermit(state, external.permitId) : null
+        const outcome = externalOutcome(result)
+        if (state) {
+          state.externalLog.push({
+            callId: exec.callId ?? null,
+            permit: permit?.id ?? external.permitId,
+            command: external.command.slice(0, 300),
+            exitCode: outcome.exitCode,
+            timedOut: outcome.timedOut,
+            kind: outcome.kind,
+            failed: outcome.failed,
+            at: now(),
+            step: state.activeStepId,
+          })
+          if (state.externalLog.length > MAX_EXTERNAL_LOG) {
+            state.externalLog = state.externalLog.slice(-MAX_EXTERNAL_LOG)
+          }
+        }
+        const sections = [externalBanner(permit, external.command, outcome)]
+        if (state) sections.push(snapshotLine(state))
+        return prepend(decision, result ?? {}, sections.join('\n\n'))
+      }
       if (!watched(exec.name) || !bodyRan.has(exec)) return decision
       const state = planFor(exec.agent?.session)
       if (!state) return decision
@@ -1644,7 +2122,14 @@ export const internals = {
   CATEGORIES,
   FALSIFIERS,
   AUTOMATIC,
+  PERMIT_SCOPES,
   normalizeConfig,
+  classifyCommand,
+  bashGate,
+  findPermit,
+  matchingPermit,
+  recordPermit,
+  externalOutcome,
   createState,
   createDecision,
   reduce,

@@ -211,9 +211,17 @@ assumption survived. A root trip returns the whole plan to concept selection.
 After `review_after_calcs` calculations the next call is held for `review`: `confirm`
 reaffirms the choice, `reconsider` reopens it. The state is per session, in the plugin's
 process; every plan result and every trip or checkpoint banner carries a bounded
-`plan-record` line, which also restores the plan on resume. The guard is procedural: it
-holds the `azoth_calc` tool, not a direct `python -m azoth.harness` call through
-`tool-bash`.
+`plan-record` line, which also restores the plan on resume.
+
+A bash command that runs an interpreter is a calculation outside azoth. It is refused
+unless `azoth_plan permit` has recorded the command, its scope (`once`, `step` or
+`session`), its purpose and how the result will be verified, and the user has approved it.
+The approval is the web UI's Allow once / Reject card; the plugin remembers a `step` or
+`session` permit so a solver iteration does not prompt every time. `external_compute` in
+`[plan]` is `ask` by default, `deny` for a headless launch, or `allow` with
+`--allow-external-compute`. Every external result is bannered `EXTERNAL` and written to the
+plan's register. Read-only commands pass; the `azoth` CLI and `python -m azoth.harness` are
+azoth and pass the same holds as `azoth_calc`.
 
 ## The bridge contract
 

@@ -31,6 +31,11 @@ minimum_candidates = 2
 review_after_calcs = 6
 hard_warning_codes = ["SOLVER_NOT_CONVERGED", "TRIVIAL_SOLUTION", "FALLBACK_TO_INPUT"]
 resolve_requires_clean_calc = false
+# `ask` prompts on the first matching command of a permit; `deny` refuses every external
+# command; `allow` treats the launch as the approval. Headless maps ask to deny unless
+# `--allow-external-compute` is passed.
+external_compute = "ask"
+gate_sanctioned_bridge = true
 
 [plan.warning_categories]
 SOLVER_NOT_CONVERGED = "numerical"

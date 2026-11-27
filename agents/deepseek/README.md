@@ -78,8 +78,10 @@ with a pump sizing, the demo separator, and relief and fire questions.
   `azoth_calc` and `azoth_intake` results are checked automatically for the numerical,
   validity and evidence signals; `trip` records any other reason. A trip holds `azoth_calc`
   until `reopen` returns to the decision or `resolve` records evidence that the assumption
-  survived. `review` is the periodic checkpoint; `status` returns the record. The thresholds
-  and the warning-category map are `[plan]` in [`harness.toml`](harness.toml).
+  survived. `permit` records an external bash calculation — command, scope, purpose and
+  verification — and a matching command is refused until the user approves it. `review` is
+  the periodic checkpoint; `status` returns the record. The thresholds and the
+  warning-category map are `[plan]` in [`harness.toml`](harness.toml).
 - **`mcp__azoth__*`** — the existing `azoth mcp --flowsheet F` server, mounted through
   `@deepseek-ai/dsh-mcp-client`. It exposes the 20 flowsheet edit commands and the
   `azoth://document`, `azoth://diagnostics`, `azoth://report` and `azoth://catalogue`
@@ -145,9 +147,12 @@ study and HAZOP close-out.
   `eval`, no shell and no import by a model-supplied string. A keycard path and a dossier
   path must be under the working directory.
 - The bridge caps inputs at 1 MB and outputs at 8 MB; the plugin times a call out at 120 s.
-- The planning guard holds the `azoth_calc` tool, not the Python bridge: a direct
-  `python -m azoth.harness` call through `tool-bash` bypasses it. It is per session, so a
-  spawned subagent opens its own plan.
+- The planning guard gates `azoth_calc` and every bash command that runs an interpreter.
+  Read-only commands pass; `python -m azoth.harness` and `azoth` are azoth and pass the
+  plan holds; any other interpreter is an external calculation that needs an
+  `azoth_plan permit` and the user's approval, or `--allow-external-compute` at launch.
+  Every external run is bannered and logged. The guard is per session, so a spawned
+  subagent opens its own plan.
 - The catalog's models are `unverified` or `partially_verified`. A result is evidence for a
   finding, not a design deliverable; the provenance block says which.
 

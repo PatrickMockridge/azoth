@@ -150,6 +150,31 @@ async function intake(h, s, verdict = 'refused') {
   return { exec, result, decision }
 }
 
+async function runBash(h, s, command, { approve = true, result } = {}) {
+  const exec = {
+    name: 'bash',
+    arguments: { command },
+    callId: `bash-${++callId}`,
+    agent: { session: s },
+  }
+  const pre = h.handlers.get('tools/pre-execute')?.[0]
+  const gate = pre ? await pre(exec, async () => ({ kind: 'allow' })) : { kind: 'allow' }
+  if (gate.kind === 'deny') return { exec, gate, result: null, decision: null }
+  if (gate.kind === 'ask' && !approve) return { exec, gate, result: null, decision: null }
+  const outcome = result ?? {
+    isError: false,
+    value: { kind: 'foreground', exitCode: 0, timedOut: false },
+    content: [{ type: 'text', text: 'external output' }],
+  }
+  const execute = h.handlers.get('tools/execute')?.[0]
+  if (execute) await execute(exec, async () => outcome)
+  const post = h.handlers.get('tools/post-execute')?.[0]
+  const decision = post
+    ? await post(exec, outcome, async () => ({ kind: 'accept', content: outcome.content }))
+    : { kind: 'accept', content: outcome.content }
+  return { exec, gate, result: outcome, decision }
+}
+
 test('concept selection needs two candidates and a chosen path', async () => {
   const h = harness()
   const s = session()
@@ -583,6 +608,33 @@ test('a plan record restores the decision tree in a new session object', async (
   assert.equal(internals.decisionState(state, state.decisions[0]), 'chosen')
 })
 
+test('the command classifier separates sanctioned, read-only and external work', () => {
+  const classify = internals.classifyCommand
+  assert.equal(classify(''), 'readonly')
+  assert.equal(classify('ls -la'), 'readonly')
+  assert.equal(classify('cat out/report.csv | grep liquid'), 'readonly')
+  assert.equal(classify('git status --short'), 'readonly')
+  assert.equal(classify('mkdir -p out && cp a.csv out/'), 'neutral')
+  assert.equal(classify('git commit -m "a note"'), 'neutral')
+  assert.equal(classify('azoth catalogue --query darcy'), 'sanctioned-read')
+  assert.equal(classify('python -m azoth.harness catalogue --query cricondenbar'), 'sanctioned-read')
+  assert.equal(
+    classify('python3 -m azoth.harness run eos.pt_flash --inputs-json "{}"'),
+    'sanctioned-compute',
+  )
+  assert.equal(classify('python3 src/thermo.py'), 'external')
+  assert.equal(classify('timeout 240 python3 src/pipeline.py'), 'external')
+  assert.equal(classify('nohup python3 src/study.py > out/log.txt 2>&1 &'), 'external')
+  assert.equal(classify('bash -c "ls"'), 'external')
+  assert.equal(classify('python3 -c "import azoth"'), 'external')
+  assert.equal(classify("python3 - <<'PY'\nprint(1)\nPY"), 'external')
+  assert.equal(classify("cat > out/notes.txt <<'EOF'\nhello\nEOF"), 'readonly')
+  assert.equal(classify('find . -name "*.py"'), 'readonly')
+  assert.equal(classify('find . -name "*.py" -delete'), 'external')
+  assert.equal(classify('echo $(python3 -c "print(1)")'), 'external')
+  assert.equal(classify('mkdir out && python3 src/study.py'), 'external')
+})
+
 test('the prompt section carries the policy and the live hold', async () => {
   const h = harness()
   const s = session()
@@ -600,4 +652,156 @@ test('the prompt section carries the policy and the live hold', async () => {
     },
   })
   assert.match(h.sections[0].text({ agent: { session: s } }), /PLAN HELD/)
+})
+
+test('read-only and sanctioned commands pass, a bridge run needs a plan', async () => {
+  const h = harness()
+  const s = session()
+  assert.equal((await runBash(h, s, 'ls -la')).gate.kind, 'allow')
+  assert.equal(
+    (await runBash(h, s, 'python -m azoth.harness catalogue --query cricondenbar')).gate.kind,
+    'allow',
+  )
+  const refused = await runBash(
+    h,
+    s,
+    'python -m azoth.harness run eos.pt_flash --inputs-json "{}"',
+  )
+  assert.equal(refused.gate.kind, 'deny')
+  assert.equal(refused.gate.info.code, 'AZOTH_PLAN_REQUIRED')
+  await openAndChoose(h, s)
+  const run = await runBash(h, s, 'python -m azoth.harness run eos.pt_flash --inputs-json "{}"')
+  assert.equal(run.gate.kind, 'allow')
+})
+
+test('an external computation without a plan is refused', async () => {
+  const h = harness()
+  const s = session()
+  const run = await runBash(h, s, 'python3 src/thermo.py')
+  assert.equal(run.gate.kind, 'deny')
+  assert.equal(run.gate.info.code, 'AZOTH_EXTERNAL_PLAN_REQUIRED')
+})
+
+test('a permit asks the user, records approval and banners the run', async () => {
+  const h = harness()
+  const s = session()
+  await openAndChoose(h, s)
+  await plan(h.tools, s, { action: 'step', description: 'build a custom solver' })
+  const denied = await runBash(h, s, 'python3 src/pipeline.py')
+  assert.equal(denied.gate.kind, 'deny')
+  assert.equal(denied.gate.info.code, 'AZOTH_EXTERNAL_PERMIT_REQUIRED')
+  const requested = await plan(h.tools, s, {
+    action: 'permit',
+    command: 'python3 src/pipeline.py',
+    scope: 'step',
+    purpose: 'a finite-volume solver azoth does not provide',
+    verification: 'compare v and h with eos.molar_enthalpy_entropy at 17 states',
+  })
+  assert.match(requested.message, /requested P1/)
+  const asked = await runBash(h, s, 'python3 src/pipeline.py', { approve: false })
+  assert.equal(asked.gate.kind, 'ask')
+  assert.match(asked.gate.displayReason.en, /finite-volume solver/)
+  const state = internals.planFor(s)
+  assert.equal(internals.findPermit(state, 'P1').status, 'requested')
+  const run = await runBash(h, s, 'python3 src/pipeline.py')
+  assert.equal(run.gate.kind, 'ask')
+  assert.equal(internals.findPermit(state, 'P1').status, 'approved')
+  assert.equal(internals.findPermit(state, 'P1').approvedBy, 'user')
+  assert.match(run.decision.content[0].text, /EXTERNAL/)
+  assert.match(run.decision.content[0].text, /P1/)
+  assert.match(run.decision.content[0].text, /verification/)
+  assert.equal(state.externalLog.length, 1)
+  const again = await runBash(h, s, 'python3 src/pipeline.py')
+  assert.equal(again.gate.kind, 'allow')
+  assert.equal(state.externalLog.length, 2)
+})
+
+test('a once permit covers one call', async () => {
+  const h = harness()
+  const s = session()
+  await openAndChoose(h, s)
+  await plan(h.tools, s, {
+    action: 'permit',
+    command: 'python3 src/one.py',
+    scope: 'once',
+    purpose: 'one verification run',
+    verification: 'compare with the azoth enthalpy at the same state',
+  })
+  const first = await runBash(h, s, 'python3 src/one.py')
+  assert.equal(first.gate.kind, 'ask')
+  const state = internals.planFor(s)
+  assert.equal(internals.findPermit(state, 'P1').status, 'consumed')
+  const second = await runBash(h, s, 'python3 src/one.py')
+  assert.equal(second.gate.kind, 'deny')
+  assert.equal(second.gate.info.code, 'AZOTH_EXTERNAL_PERMIT_REQUIRED')
+})
+
+test('the launcher mode decides whether a requested permit runs', async () => {
+  const deny = harness({ externalCompute: 'deny' })
+  const s = session()
+  await openAndChoose(deny, s)
+  await plan(deny.tools, s, {
+    action: 'permit',
+    command: 'python3 src/x.py',
+    scope: 'session',
+    purpose: 'a custom verification',
+    verification: 'against the azoth result',
+  })
+  const refused = await runBash(deny, s, 'python3 src/x.py')
+  assert.equal(refused.gate.kind, 'deny')
+  assert.equal(refused.gate.info.code, 'AZOTH_EXTERNAL_APPROVAL_UNAVAILABLE')
+
+  const allow = harness({ externalCompute: 'allow' })
+  const other = session()
+  await openAndChoose(allow, other)
+  await plan(allow.tools, other, {
+    action: 'permit',
+    command: 'python3 src/x.py',
+    scope: 'session',
+    purpose: 'a custom verification',
+    verification: 'against the azoth result',
+  })
+  const run = await runBash(allow, other, 'python3 src/x.py')
+  assert.equal(run.gate.kind, 'allow')
+  assert.equal(internals.findPermit(internals.planFor(other), 'P1').approvedBy, 'launcher')
+  assert.match(run.decision.content[0].text, /approved by launcher/)
+})
+
+test('a failed external run is logged with its exit code', async () => {
+  const h = harness()
+  const s = session()
+  await openAndChoose(h, s)
+  await plan(h.tools, s, {
+    action: 'permit',
+    command: 'python3 src/x.py',
+    scope: 'session',
+    purpose: 'a custom verification',
+    verification: 'against the azoth result',
+  })
+  const run = await runBash(h, s, 'python3 src/x.py', {
+    result: {
+      isError: false,
+      value: { kind: 'foreground', exitCode: 2, timedOut: false },
+      content: [{ type: 'text', text: 'failed' }],
+    },
+  })
+  const state = internals.planFor(s)
+  assert.equal(state.externalLog[0].exitCode, 2)
+  assert.equal(state.externalLog[0].failed, true)
+  assert.match(run.decision.content[0].text, /FAILED/)
+})
+
+test('a tripped plan refuses external computation', async () => {
+  const h = harness()
+  const s = session()
+  await openAndChoose(h, s)
+  await plan(h.tools, s, {
+    action: 'trip',
+    decision: 'D1',
+    category: 'judgment',
+    evidence: 'the model is outside its basis',
+  })
+  const run = await runBash(h, s, 'python3 src/x.py')
+  assert.equal(run.gate.kind, 'deny')
+  assert.equal(run.gate.info.code, 'AZOTH_PLAN_HELD')
 })

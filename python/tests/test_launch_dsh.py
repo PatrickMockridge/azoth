@@ -72,6 +72,8 @@ def _root(tmp_path: Path) -> Path:
                 'hard_warning_codes = ["SOLVER_NOT_CONVERGED", '
                 '"TRIVIAL_SOLUTION", "FALLBACK_TO_INPUT"]',
                 "resolve_requires_clean_calc = false",
+                'external_compute = "ask"',
+                "gate_sanctioned_bridge = true",
                 "",
                 "[plan.warning_categories]",
                 'SOLVER_NOT_CONVERGED = "numerical"',
@@ -320,7 +322,18 @@ def test_headless_engineer_sets_the_deployment_persona(tmp_path: Path) -> None:
     assert "process-engineering assistant" in persona["config"]["personaPrefix"]
     assert _find(rows, "agent-preset-registry") is None
     assert _find(rows, "preset-azoth-engineer") is None
-    assert _find(rows, "azoth-plan") is not None
+    plan = _find(rows, "azoth-plan")
+    assert plan is not None
+    assert plan["config"]["externalCompute"] == "deny"
+
+
+def test_allow_external_compute_is_the_launch_permission(tmp_path: Path) -> None:
+    rows = _rows(
+        _root(tmp_path), "--headless", "--allow-external-compute", "--flowsheet", "case.toml"
+    )
+    plan = _find(rows, "azoth-plan")
+    assert plan is not None
+    assert plan["config"]["externalCompute"] == "allow"
 
 
 def test_overlay_mounts_the_planning_guard_once(tmp_path: Path) -> None:
@@ -334,6 +347,8 @@ def test_overlay_mounts_the_planning_guard_once(tmp_path: Path) -> None:
     assert config["reviewAfterCalcs"] == 6
     assert "SOLVER_NOT_CONVERGED" in config["hardWarningCodes"]
     assert config["warningCategories"]["OUT_OF_VALID_RANGE"] == "validity"
+    assert config["externalCompute"] == "ask"
+    assert config["gateSanctionedBridge"] is True
     assert "planning guard" in config["policy"].lower()
     mounted = [
         inserted
