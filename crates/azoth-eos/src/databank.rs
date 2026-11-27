@@ -3217,8 +3217,28 @@ pub fn umr_cpa_mixture_of(names: &[&str]) -> Result<(Mixture, IdealGasModel)> {
         .with_mixing_rule(MixingRule::Umr {
             kij: vec![0.0; n * n],
             unifac,
+            quadratic_co_volume: false,
         })
         .with_association()?;
+    Ok((mixture, ideal_gas))
+}
+
+/// The UMR-PRU fluid: Peng-Robinson with the UMR rule on the `_umr` tables.
+///
+/// NeqSim's `SystemUMRPRUEos`: `attractiveTermNumber = 1` is the standard PR alpha,
+/// and `setBmixType(1)` is the quadratic co-volume the rule carries when
+/// `MixingRule::Umr`'s `quadratic_co_volume` flag is true. `SystemUMRCPAEoS` is the same
+/// rule with the linear co-volume, the `_umrcpa` tables and association; this one has
+/// none of those.
+pub fn umr_pru_mixture_of(names: &[&str]) -> Result<(Mixture, IdealGasModel)> {
+    let (base, ideal_gas) = mixture_of(names, Cubic::Pr, None)?;
+    let n = names.len();
+    let unifac = unifac_umrpru_parameters(names, UmrpruSet::Umr)?;
+    let mixture = base.with_mixing_rule(MixingRule::Umr {
+        kij: vec![0.0; n * n],
+        unifac,
+        quadratic_co_volume: true,
+    });
     Ok((mixture, ideal_gas))
 }
 

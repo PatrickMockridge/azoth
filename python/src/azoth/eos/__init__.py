@@ -241,6 +241,7 @@ from azoth.core.result import (
     TynCalusDiffusivityResult,
     UmrCpaPhaseResult,
     UmrprAlphaResult,
+    UmrPruFlashResult,
     UnifacActivityCoefficientsResult,
     UnifacPsrkActivityCoefficientsResult,
     UnifacUmrpruActivityCoefficientsResult,
@@ -410,6 +411,7 @@ __all__ = [
     "twu_kappa",
     "tyn_calus_diffusivity",
     "umr_cpa_phase",
+    "umr_pru_flash",
     "unifac_activity_coefficients",
     "unifac_psrk_activity_coefficients",
     "unifac_umrpru_activity_coefficients",
@@ -532,6 +534,7 @@ _PV_REFLUX_FLASH = "eos.pv_reflux_flash"
 _PVF_FLASH = "eos.pvf_flash"
 _PT_FLASH = "eos.pt_flash"
 _PT_FLASH_CHECK = "eos.pt_flash_check"
+_UMR_PRU_FLASH = "eos.umr_pru_flash"
 _PT_PHASE_ENVELOPE = "eos.pt_phase_envelope"
 _STATE_AT_TP = "eos.state_at_tp"
 _MULTIFLASH_STABILITY_TEST = "eos.multiflash_stability_test"
@@ -4539,6 +4542,29 @@ def pt_flash_check(
         z=z,
         tolerance=tolerance,
         strict=strict,
+    )
+
+
+def umr_pru_flash(
+    components: list[str],
+    T: Q,
+    P: Q,
+    z: list[float],
+    tolerance: float | None = None,
+) -> UmrPruFlashResult:
+    """The UMR-PRU flash: PR, the ``_umr`` tables and the quadratic co-volume.
+
+    NeqSim's ``SystemUMRPRUEos``. The loop is successive substitution only; a cap
+    returns the last iterate with ``converged=False`` and a warning.
+
+    See :func:`azoth.eos.reference.umr_pru_flash.umr_pru_flash`.
+    """
+    return resolve(_UMR_PRU_FLASH)(  # type: ignore[no-any-return]
+        components=components,
+        T=T,
+        P=P,
+        z=z,
+        tolerance=tolerance,
     )
 
 

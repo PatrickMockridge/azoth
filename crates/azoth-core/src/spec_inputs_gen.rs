@@ -189,6 +189,7 @@
 //!   - specs/calcs/eos/twucoon_statoil_alpha.toml
 //!   - specs/calcs/eos/tyn_calus_diffusivity.toml
 //!   - specs/models/eos/umr_cpa_phase.toml
+//!   - specs/models/eos/umr_pru_flash.toml
 //!   - specs/calcs/eos/umrpr_alpha.toml
 //!   - specs/models/eos/unifac_activity_coefficients.toml
 //!   - specs/models/eos/unifac_psrk_activity_coefficients.toml
@@ -2331,6 +2332,10 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("eos.umr_cpa_phase", "T", "thermodynamic_temperature"),
     ("eos.umr_cpa_phase", "P", "pressure"),
     ("eos.umr_cpa_phase", "z", "dimensionless"),
+    ("eos.umr_pru_flash", "T", "thermodynamic_temperature"),
+    ("eos.umr_pru_flash", "P", "pressure"),
+    ("eos.umr_pru_flash", "z", "dimensionless"),
+    ("eos.umr_pru_flash", "tolerance", "dimensionless"),
     ("eos.umrpr_alpha", "omega", "dimensionless"),
     ("eos.umrpr_alpha", "Tr", "dimensionless"),
     (

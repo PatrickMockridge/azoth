@@ -289,6 +289,7 @@ Five sections, and the difference between them is the point:
 - [`eos.tv_flash`](./eos/tv_flash.md) — Temperature-volume flash
 - [`eos.tv_fraction_flash`](./eos/tv_fraction_flash.md) — Temperature and vapour-volume-fraction flash
 - [`eos.umr_cpa_phase`](./eos/umr_cpa_phase.md) — UMR-CPA phase state
+- [`eos.umr_pru_flash`](./eos/umr_pru_flash.md) — UMR-PRU pressure-temperature flash
 - [`eos.unifac_activity_coefficients`](./eos/unifac_activity_coefficients.md) — Activity coefficients from the UNIFAC group-contribution model
 - [`eos.unifac_psrk_activity_coefficients`](./eos/unifac_psrk_activity_coefficients.md) — Activity coefficients from UNIFAC with PSRK temperature-dependent interaction parameters
 - [`eos.unifac_umrpru_activity_coefficients`](./eos/unifac_umrpru_activity_coefficients.md) — Activity coefficients from UNIFAC with UMR-PRU group-interaction parameters

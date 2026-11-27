@@ -207,6 +207,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyTwucoonStatoilAlphaResult>()?;
     m.add_class::<crate::transport_gen::PyTynCalusDiffusivityResult>()?;
     m.add_class::<crate::transport_gen::PyUmrCpaPhaseResult>()?;
+    m.add_class::<crate::transport_gen::PyUmrPruFlashResult>()?;
     m.add_class::<crate::transport_gen::PyUmrprAlphaResult>()?;
     m.add_class::<crate::transport_gen::PyUnifacActivityCoefficientsResult>()?;
     m.add_class::<crate::transport_gen::PyUnifacPsrkActivityCoefficientsResult>()?;
@@ -1007,6 +1008,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::umr_cpa_phase, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::umr_pru_flash, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::umrpr_alpha, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::eos::unifac_activity_coefficients,

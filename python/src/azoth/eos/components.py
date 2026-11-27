@@ -3455,6 +3455,52 @@ def umr_cpa_mixture_of(
     )
 
 
+def umr_pru_mixture_of(
+    names: list[str],
+    *,
+    card: keycard.Keycard | None = None,
+) -> tuple[Mixture, IdealGasModel]:
+    """The UMR-PRU fluid: Peng-Robinson, the ``_umr`` tables, and the quadratic co-volume.
+
+    NeqSim's ``SystemUMRPRUEos``: the standard PR alpha (``attractiveTermNumber = 1``)
+    and ``setBmixType(1)``, whose co-volume is
+    ``b_ij = ((sqrt(b_i) + sqrt(b_j))/2)^2``. This is not ``SystemUMRCPAEoS``: it has
+    no association, no ``_umrcpa`` tables and no Mathias-Copeman alpha.
+    """
+    if not names:
+        raise InvalidInputError("components", "a mixture needs at least one component")
+    resolved = [name.strip().lower() for name in names]
+    entries = [entry(name, card=card) for name in resolved]
+
+    missing = [e.name for e in entries if e.cp is None]
+    if missing:
+        raise InvalidInputError(
+            "components",
+            f"no heat-capacity coefficients for {missing}. The databank carries them for "
+            f"every substance it ships; one a keycard adds needs its own",
+        )
+
+    fluid = mixture(
+        tuple(e.component() for e in entries),
+        cubic=_cubic("pr"),
+        alpha="pr",
+        mixing_rule="umr",
+        umr=unifac_umrpru_parameters(resolved, "umr"),
+        umr_bmix_type=1,
+        names=resolved,
+    )
+    return (
+        fluid,
+        IdealGasModel(
+            cp_a=tuple(e.cp[0] for e in entries),  # type: ignore[index]
+            cp_b=tuple(e.cp[1] for e in entries),  # type: ignore[index]
+            cp_c=tuple(e.cp[2] for e in entries),  # type: ignore[index]
+            cp_d=tuple(e.cp[3] for e in entries),  # type: ignore[index]
+            cp_e=tuple(e.cp[4] for e in entries),  # type: ignore[index]
+        ),
+    )
+
+
 def soreide_whitson_mixture_of(
     names: list[str],
     salinity: float,

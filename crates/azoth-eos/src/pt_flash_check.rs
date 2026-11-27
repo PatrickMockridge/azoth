@@ -24,7 +24,15 @@ pub fn pt_flash_check(
     tolerance: Option<f64>,
     strict: Option<bool>,
 ) -> Result<PtFlashCheckResult> {
-    let (result, converged) = pt_flash_impl(mixture, t, p, z, tolerance, strict)?;
+    let (result, converged) = pt_flash_impl(
+        mixture,
+        t,
+        p,
+        z,
+        &crate::model_gen::PT_FLASH_SPEC,
+        tolerance,
+        strict,
+    )?;
     Ok(PtFlashCheckResult {
         vapour_fraction: result.vapour_fraction,
         x: result.x,

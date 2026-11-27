@@ -124,6 +124,24 @@ def card_from_cuts(
                 "value": cut.attraction_exponent,
                 "unit": "dimensionless",
             }
+        # The Rackett compressibility and the ideal-gas polynomial are what a density
+        # and an enthalpy need; `tbp_fraction_component` computes both from the same two
+        # numbers, so the card states them rather than leaving a card-added cut a cubic
+        # with no volume translation and no heat capacity. It carries no fifth
+        # coefficient, and the polynomial's last term is zero.
+        fraction = tbp_fraction_component(mass, rho)
+        stated["rackett_z"] = {"value": fraction.racket_z, "unit": "dimensionless"}
+        for letter, unit in (
+            ("a", "J/(mol*K)"),
+            ("b", "J/(mol*K**2)"),
+            ("c", "J/(mol*K**3)"),
+            ("d", "J/(mol*K**4)"),
+        ):
+            stated[f"cp_{letter}"] = {
+                "value": getattr(fraction, f"cp_{letter}").to(unit).magnitude,
+                "unit": unit,
+            }
+        stated["cp_e"] = {"value": 0.0, "unit": "J/(mol*K**5)"}
         components[name] = stated
     return keycard.use({"schema_version": 2, "components": components})
 

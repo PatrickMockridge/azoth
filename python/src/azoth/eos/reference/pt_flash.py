@@ -105,6 +105,7 @@ def _pt_flash(
     z: list[float],
     tolerance: float | None = None,
     strict: bool | None = None,
+    model_id: str | None = None,
 ) -> tuple[PtFlashResult, bool]:
     """The isothermal two-phase flash of a mixture at a temperature and pressure.
 
@@ -149,7 +150,7 @@ def _pt_flash(
         >>> r.phase.value
         'two_phase'
     """
-    spec = _models_gen.model(MODEL_ID)
+    spec = _models_gen.model(model_id or MODEL_ID)
     checks = checks_for(spec)
     warnings: list[Warning] = []
 

@@ -208,6 +208,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "eos.twucoon_statoil_alpha" => azoth_eos::results::TwucoonStatoilAlphaResult::FIELDS.to_vec(),
         "eos.tyn_calus_diffusivity" => azoth_eos::results::TynCalusDiffusivityResult::FIELDS.to_vec(),
         "eos.umr_cpa_phase" => azoth_eos::results::UmrCpaPhaseResult::FIELDS.to_vec(),
+        "eos.umr_pru_flash" => azoth_eos::results::UmrPruFlashResult::FIELDS.to_vec(),
         "eos.umrpr_alpha" => azoth_eos::results::UmrprAlphaResult::FIELDS.to_vec(),
         "eos.unifac_activity_coefficients" => azoth_eos::results::UnifacActivityCoefficientsResult::FIELDS.to_vec(),
         "eos.unifac_psrk_activity_coefficients" => azoth_eos::results::UnifacPsrkActivityCoefficientsResult::FIELDS.to_vec(),

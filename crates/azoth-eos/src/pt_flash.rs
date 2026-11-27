@@ -83,10 +83,11 @@ pub(crate) fn pt_flash_impl(
     t: ThermodynamicTemperature,
     p: Pressure,
     z: &[f64],
+    model_spec: &'static azoth_core::ModelSpec,
     tolerance: Option<f64>,
     strict: Option<bool>,
 ) -> Result<(PtFlashResult, bool)> {
-    let spec = &model_gen::PT_FLASH_SPEC;
+    let spec = model_spec;
     let mut warnings = Vec::new();
 
     apply_checks(
@@ -387,5 +388,5 @@ pub fn pt_flash(
     p: Pressure,
     z: &[f64],
 ) -> Result<PtFlashResult> {
-    pt_flash_impl(mixture, t, p, z, None, None).map(|(result, _)| result)
+    pt_flash_impl(mixture, t, p, z, &model_gen::PT_FLASH_SPEC, None, None).map(|(result, _)| result)
 }

@@ -225,6 +225,9 @@ class ReducedParameters(NamedTuple):
     #: an interaction matrix. Present is what makes :func:`mixture_parameters` mix by the
     #: universal rule instead.
     umr: UnifacTables | None = None
+    #: NeqSim's ``bmixType`` for the UMR rule: 0 is the linear co-volume sum, 1 the
+    #: quadratic ``b_ij = ((sqrt(b_i) + sqrt(b_j))/2)^2``.
+    umr_bmix_type: int = 0
     #: `Tr_i = T / Tc_i`, one per component. The reduced temperature the alpha terms were
     #: evaluated at, carried because the Soreide-Whitson mixing rule reads it again when it
     #: resolves its phase-dependent interaction matrix - and a caller holding the reduced
@@ -586,6 +589,7 @@ def reduced_parameters(mixture: Mixture, temperature: float, pressure: float) ->
         pressure=pressure,
         association=_association_of(mixture),
         umr=_unifac_tables(mixture),
+        umr_bmix_type=mixture.umr_bmix_type,
         cubic=mixture.cubic,
         warnings=warnings,
         reduced_temperatures=tuple(reduced_temperatures),
@@ -750,6 +754,16 @@ def _ge_ader(reduced: ReducedParameters, x: list[float]) -> list[float] | None:
     return None
 
 
+def _ge_state(
+    reduced: ReducedParameters, x: list[float]
+) -> tuple[float | None, list[float] | None]:
+    """The rule's ``(alpha_mix, b_der)``, or ``(None, None)`` for a classical rule."""
+    if reduced.umr is not None:
+        _, alpha_mix, b_der, _ = umr_ader(reduced, x)
+        return alpha_mix, b_der
+    return _ge_alpha_mix(reduced, x), None
+
+
 def _umr_alpha_mix(reduced: ReducedParameters, x: list[float]) -> float | None:
     """``sum_i x_i ader_i``, or ``None`` for every mixture that mixes classically."""
     if reduced.umr is None:
@@ -764,8 +778,9 @@ def umr_ader(
 
     ``ader[i] = a_i^T/(b_i R T) + hwfc ln gamma_i``, and ``alpha_mix = sum_i x_i ader_i``.
     The mixture's ``A`` is ``B * alpha_mix``, which is why this returns the rule's own
-    quantity rather than a single number. ``b_der`` is the linear co-volume sum, the
-    ordinary one.
+    quantity rather than a single number. ``b_der`` is the linear co-volume sum unless
+    ``reduced.umr_bmix_type`` is 1, where it is NeqSim's quadratic rule and its partial
+    molar ``2 sum_j x_j b_ij - b_mix``.
 
     **The temperature derivative comes back with it because the departure needs it and the
     two must be one expression.** ``T d alpha_mix/dT = sum_i x_i [qPure_i (psi_i - 1) +
@@ -798,7 +813,19 @@ def umr_ader(
         x[i] * (qpure[i] * (reduced.psi[i] - 1.0) + UMR_HWFC * t_d_ln_gamma[i])
         for i in range(len(x))
     )
-    return ader, alpha_mix, list(reduced.b), t_d_alpha
+    if reduced.umr_bmix_type == 1:
+        n = len(x)
+        cross = [0.0] * n
+        b_mix = 0.0
+        for i in range(n):
+            for j in range(n):
+                bij = ((math.sqrt(reduced.b[i]) + math.sqrt(reduced.b[j])) / 2.0) ** 2
+                cross[i] += x[j] * bij
+                b_mix += x[i] * x[j] * bij
+        b_der = [2.0 * value - b_mix for value in cross]
+    else:
+        b_der = list(reduced.b)
+    return ader, alpha_mix, b_der, t_d_alpha
 
 
 def mixture_parameters(
@@ -807,15 +834,21 @@ def mixture_parameters(
     kij: tuple[tuple[float, ...], ...],
     x: list[float],
     alpha_mix: float | None = None,
+    b_der: list[float] | None = None,
 ) -> tuple[float, float]:
     """The mixture parameters for a composition.
 
-    ``alpha_mix`` is the UMR rule's own mixing: ``A = B * alpha_mix`` with ``B`` the linear
-    co-volume sum, and ``kij`` unread. Passing it is what distinguishes the two, because a
-    universal rule has no interaction matrix to average.
+    ``alpha_mix`` is the UMR rule's own mixing: ``A = B * alpha_mix``, and ``kij``
+    unread. Passing it is what distinguishes the two, because a universal rule has no
+    interaction matrix to average. ``b_der`` is the rule's co-volume derivative; a
+    homogeneous rule's ``b_mix`` is ``sum_i x_i b_der_i``, which is the linear sum for
+    the ordinary rule and the quadratic one for NeqSim's ``bmixType = 1``.
     """
     n = len(x)
-    b_mix = sum(x[i] * b[i] for i in range(n))
+    if b_der is not None:
+        b_mix = sum(x[i] * b_der[i] for i in range(n))
+    else:
+        b_mix = sum(x[i] * b[i] for i in range(n))
     if alpha_mix is not None:
         return b_mix * alpha_mix, b_mix
     a_mix = 0.0
@@ -839,7 +872,8 @@ def phase_state(
     ``eos.pr_z_factor`` fixes. A caller who already has a root should use
     :func:`phase_state_at` instead, which does not re-derive it.
     """
-    a_mix, b_mix = mixture_parameters(reduced.a, reduced.b, kij, x, _ge_alpha_mix(reduced, x))
+    alpha_mix, b_der = _ge_state(reduced, x)
+    a_mix, b_mix = mixture_parameters(reduced.a, reduced.b, kij, x, alpha_mix, b_der)
     roots = (
         srk_z_factor(a_mix, b_mix)
         if reduced.cubic.name in ("srk", "rk")
@@ -1198,8 +1232,8 @@ def phase_state_at(
     a, b = reduced.a, reduced.b
     c = reduced.cubic
     n = len(x)
-    alpha_mix = _ge_alpha_mix(reduced, x)
-    a_mix, b_mix = mixture_parameters(a, b, kij, x, alpha_mix)
+    alpha_mix, b_der = _ge_state(reduced, x)
+    a_mix, b_mix = mixture_parameters(a, b, kij, x, alpha_mix, b_der)
     if not z > b_mix:
         raise OutOfRangeError(
             "z",
@@ -1227,12 +1261,11 @@ def phase_state_at(
         # the two expressions do not reduce to one another off the pure component - which
         # is the only state at which this library's tests could tell them apart.
         ader = _ge_ader(reduced, x)
-        if ader is None:
+        if ader is None or b_der is None:
             raise InvalidInputError(
                 "mixture",
                 "the excess-Gibbs rule's derivative is absent on a mixture whose alpha_mix is set",
             )
-        b_der = list(reduced.b)
         delta1, delta2 = c.delta1, c.delta2
         for i in range(n):
             bd = b_der[i]

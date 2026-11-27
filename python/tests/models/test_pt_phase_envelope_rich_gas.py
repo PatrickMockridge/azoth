@@ -13,7 +13,7 @@ import math
 import pytest
 
 from azoth import ureg, use_backend
-from azoth.characterization import tbp_cut_properties, tbp_fraction_component
+from azoth.characterization import card_from_cuts, tbp_cut_properties, tbp_fraction_component
 from azoth.core.result import Phase, PhaseClass
 from azoth.core.units import quantity as q
 from azoth.core.warnings import WarningCode
@@ -22,12 +22,13 @@ from azoth.eos import (
     IdealGasModel,
     Mixture,
     critical_point,
+    from_names,
     pt_flash_check,
     pt_phase_envelope,
     state_at_tp,
 )
 from azoth.eos import mixture as build_mixture
-from azoth.eos.components import mixture_of
+from azoth.eos.components import entry, mixture_of
 from azoth.eos.cubic import PR, SRK
 from azoth.eos.reference.pr_peneloux_shift import pr_peneloux_shift
 from azoth.eos.reference.srk_peneloux_shift import srk_peneloux_shift
@@ -277,6 +278,81 @@ def test_the_two_reported_bad_states() -> None:
         assert state.converged
         assert math.isfinite(state.density.to("kg/m**3").magnitude)
         assert state.phase_class in dense
+
+
+def test_the_card_from_cuts_fluid_is_the_direct_one(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A keycard produced by `card_from_cuts` is the fluid the study built by hand."""
+    import importlib
+
+    names, z, direct, ideal = study_fluid("srk")
+    card = card_from_cuts(
+        list(CUTS),
+        [q(value[1], "kg/mol") for value in CUTS.values()],
+        [q(value[2], "kg/m**3") for value in CUTS.values()],
+        model="pedersen_srk",
+    )
+    keyed = from_names(names, card=card, eos="srk", alpha="srk")
+
+    for left, right in zip(direct.components, keyed.components, strict=True):
+        assert right.Tc.to("K").magnitude == pytest.approx(left.Tc.to("K").magnitude, rel=1e-12)
+        assert right.Pc.to("Pa").magnitude == pytest.approx(left.Pc.to("Pa").magnitude, rel=1e-12)
+        assert right.omega == pytest.approx(left.omega, rel=1e-12)
+        assert right.rackett_z == pytest.approx(left.rackett_z, abs=1e-12)
+        assert right.volume_shift == pytest.approx(left.volume_shift, abs=1e-18)
+        assert right.volume_shift_srk == pytest.approx(left.volume_shift_srk, abs=1e-18)
+
+    for i, (row_left, row_right) in enumerate(zip(direct.kij, keyed.kij, strict=True)):
+        for j, (a, b) in enumerate(zip(row_left, row_right, strict=True)):
+            assert b == pytest.approx(a, abs=1e-14), f"kij[{i}][{j}]"
+
+    entries = [entry(name, card=card) for name in names]
+    cp: list[tuple[float, ...]] = []
+    for i in range(5):
+        row: list[float] = []
+        for e in entries:
+            assert e.cp is not None
+            row.append(float(e.cp[i]))
+        cp.append(tuple(row))
+    ideal_keyed = IdealGasModel(*cp)
+    for name in ("cp_a", "cp_b", "cp_c", "cp_d", "cp_e"):
+        assert getattr(ideal_keyed, name) == pytest.approx(getattr(ideal, name), rel=1e-12)
+
+    state_direct = state_at_tp(direct, ideal, q(283.15, "K"), q(60e5, "Pa"), z)
+    state_keyed = state_at_tp(keyed, ideal_keyed, q(283.15, "K"), q(60e5, "Pa"), z)
+    for name, unit in (
+        ("density", "kg/m**3"),
+        ("molar_volume", "m**3/mol"),
+        ("internal_energy", "J/mol"),
+        ("enthalpy", "J/mol"),
+        ("cp", "J/(mol*K)"),
+        ("cv", "J/(mol*K)"),
+    ):
+        assert getattr(state_keyed, name).to(unit).magnitude == pytest.approx(
+            getattr(state_direct, name).to(unit).magnitude, rel=1e-12
+        )
+
+    flash_direct = pt_flash_check(direct, q(283.15, "K"), q(60e5, "Pa"), z, strict=False)
+    flash_keyed = pt_flash_check(keyed, q(283.15, "K"), q(60e5, "Pa"), z, strict=False)
+    assert flash_keyed.vapour_fraction == pytest.approx(flash_direct.vapour_fraction, rel=1e-12)
+    for name in ("x", "y"):
+        assert getattr(flash_keyed, name) == pytest.approx(getattr(flash_direct, name), rel=1e-12)
+
+    critical_direct = critical_point(direct, z=z)
+    critical_keyed = critical_point(keyed, z=z)
+    assert critical_keyed.converged is critical_direct.converged
+
+    envelope = importlib.import_module("azoth.eos.reference.pt_phase_envelope")
+    monkeypatch.setattr(envelope, "_GRID_T_STEPS", 8)
+    monkeypatch.setattr(envelope, "_GRID_P_STEPS", 8)
+    monkeypatch.setattr(envelope, "_GRID_BISECTIONS", 4)
+    envelope_direct = pt_phase_envelope(direct, P=q(1e5, "Pa"), z=z)
+    envelope_keyed = pt_phase_envelope(keyed, P=q(1e5, "Pa"), z=z)
+    assert envelope_keyed.cricondenbar_pressure.to("bar").magnitude == pytest.approx(
+        envelope_direct.cricondenbar_pressure.to("bar").magnitude, rel=1e-9
+    )
+    assert envelope_keyed.cricondentherm_temperature.to("K").magnitude == pytest.approx(
+        envelope_direct.cricondentherm_temperature.to("K").magnitude, rel=1e-9
+    )
 
 
 @pytest.mark.slow_sweep

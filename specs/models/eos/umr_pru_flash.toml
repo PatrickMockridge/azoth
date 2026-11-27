@@ -1,0 +1,128 @@
+id = "eos.umr_pru_flash"
+name = "UMR-PRU pressure-temperature flash"
+kind = "procedure"
+assumptions = [
+    "**the class is NeqSim's `SystemUMRPRUEos`**: Peng-Robinson with the standard PR alpha (`attractiveTermNumber = 1`), the UMR mixing rule on the `_umr` UNIFAC tables, zero `kij` and no association.",
+    "**the co-volume is `bmixType = 1`**, NeqSim's `b_ij = ((sqrt(b_i) + sqrt(b_j))/2)^2` and partial molar `2 sum_j x_j b_ij - b_mix`, not the linear sum `SystemUMRCPAEoS` carries.",
+    "**successive substitution only, with no second-order fallback**: the UMR rule has no `phase_derivatives`, which the fallback needs. The spec therefore declares no fallback and the loop runs to its own cap.",
+    "a component with no `UNIFACcompUMRPRU` group decomposition or no cp polynomial is refused; the rule cannot mix a substance whose groups it does not know.",
+    "`converged` is false only on the iteration cap, where the last iterate is returned with a `SOLVER_NOT_CONVERGED` warning. A non-finite K-value still raises, because divergence is not a state.",
+    "no stability test: a converged split is a stationary point of the flash equations, not a proof that the feed was unstable.",
+]
+references = [
+    "NeqSim master `thermo/system/SystemUMRPRUEos.java`, whose constructor sets `setBmixType(1)` and `attractiveTermNumber = 1`, and `thermo/mixingrule/EosMixingRuleHandler.getbij`/`calcBFull`/`calcBiFull`, which define the co-volume rule and its partial molar.",
+    "Michelsen, M. L. (1982). \"The isothermal flash problem. Part I. Stability.\" Fluid Phase Equilibria 9(1), 1-19. DOI 10.1016/0378-3812(82)85001-2.",
+]
+[source]
+standard = "NeqSim `SystemUMRPRUEos`; Michelsen (1982) for the flash"
+edition = "PR with the standard alpha and `bmixType = 1` on the `_umr` tables, flashed by the successive-substitution procedure of `eos.pt_flash` with no fallback."
+[algorithm]
+scheme = "successive_substitution_flash"
+initialisation = "wilson"
+convergence = "absolute"
+tolerance = 1e-10
+max_iterations = 300
+[algorithm.inner]
+scheme = "rachford_rice_bisection"
+convergence = "absolute"
+tolerance = 1e-14
+max_iterations = 200
+[inputs]
+[inputs.components]
+type = "components"
+length = "one entry per component"
+description = "the substances the mixture is made of, by name, resolved against the databank with the keycard's overrides applied."
+[inputs.T]
+unit = "K"
+description = "absolute temperature."
+[inputs.P]
+unit = "Pa"
+description = "absolute pressure."
+[inputs.z]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "overall mole fractions. Checked rather than renormalised."
+[inputs.tolerance]
+unit = "dimensionless"
+optional = true
+description = "the outer stopping tolerance; absent takes `algorithm.tolerance`, 1e-10."
+[outputs]
+[outputs.vapour_fraction]
+unit = "dimensionless"
+optional = true
+description = "The vapour fraction, in `[0, 1]` for a two-phase split; outside that it is the negative-flash value and the feed is single phase. Absent where there is genuinely no vapour fraction."
+[outputs.x]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "liquid-phase mole fractions"
+[outputs.y]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "vapour-phase mole fractions"
+[outputs.k]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "`K_i = y_i / x_i = phi_i^L / phi_i^V`."
+[outputs.ln_phi_liquid]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "fugacity coefficients in the liquid phase, as logarithms."
+[outputs.ln_phi_vapour]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "fugacity coefficients in the vapour phase, as logarithms."
+[outputs.z_liquid]
+unit = "dimensionless"
+description = "the liquid root of the cubic at the liquid composition."
+[outputs.z_vapour]
+unit = "dimensionless"
+description = "the vapour root at the vapour composition."
+[outputs.min_t_over_tc]
+unit = "dimensionless"
+description = "the smallest `T / Tc_i` over the components."
+[outputs.phase]
+type = "enum"
+values = ["two_phase", "all_liquid", "all_vapour", "trivial"]
+description = "What the state is: `two_phase`, `all_liquid`, `all_vapour`, or `trivial` (the iteration converged to `x = y = z`)."
+[outputs.converged]
+type = "boolean"
+description = "whether the iteration met its tolerance, or settled on a trivial or single-phase state by proof. False only on the cap, where the split is the last iterate."
+[outputs.iterations]
+unit = "dimensionless"
+description = "outer steps taken."
+[outputs.residual]
+unit = "dimensionless"
+description = "the last step's convergence measure."
+[[valid_range]]
+quantity = "T"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature; zero and below are not states"
+[[valid_range]]
+quantity = "P"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure; zero and below are not states"
+[[valid_range]]
+quantity = "tolerance"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a stopping tolerance; zero can never be met and a negative value is not a distance"
+[[valid_range]]
+quantity = "min_t_over_tc"
+max = 0.9
+max_inclusive = true
+severity = "warning"
+rationale = "Above `T / Tc = 0.9` for the nearest component the cubic's roots are close to coalescing and successive substitution converges slowly or to the trivial solution."
+[implementations]
+python = "azoth.eos.umr_pru_flash"
+rust = "azoth_eos::umr_pru_flash"

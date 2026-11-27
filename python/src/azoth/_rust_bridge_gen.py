@@ -530,6 +530,7 @@ from azoth.core.result import (
     TypeCostLine,
     UmrCpaPhaseResult,
     UmrprAlphaResult,
+    UmrPruFlashResult,
     UnifacActivityCoefficientsResult,
     UnifacPsrkActivityCoefficientsResult,
     UnifacUmrpruActivityCoefficientsResult,
@@ -976,6 +977,7 @@ __all__ = [
     "twucoon_statoil_alpha",
     "tyn_calus_diffusivity",
     "umr_cpa_phase",
+    "umr_pru_flash",
     "umrpr_alpha",
     "unifac_activity_coefficients",
     "unifac_psrk_activity_coefficients",
@@ -5141,6 +5143,34 @@ def umr_cpa_phase(components: list[str], T: Q, P: Q, z: list[float], compressed_
         ln_phi=tuple(result.ln_phi),
         h_res=from_si(result.h_res.magnitude_si, result.h_res.unit),
         s_res=from_si(result.s_res.magnitude_si, result.s_res.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def umr_pru_flash(components: list[str], T: Q, P: Q, z: list[float], tolerance: float | None=None) -> UmrPruFlashResult:
+    """``eos.umr_pru_flash``, computed in Rust."""
+    spec = _models_gen.model("eos.umr_pru_flash")
+    result = _core.umr_pru_flash(
+        list(components),
+        input_to_si(spec, "T", T),
+        input_to_si(spec, "P", P),
+        list(z),
+        None if tolerance is None else tolerance,
+    )
+    return UmrPruFlashResult(
+        vapour_fraction=result.vapour_fraction,
+        x=tuple(result.x),
+        y=tuple(result.y),
+        k=tuple(result.k),
+        ln_phi_liquid=tuple(result.ln_phi_liquid),
+        ln_phi_vapour=tuple(result.ln_phi_vapour),
+        z_liquid=result.z_liquid,
+        z_vapour=result.z_vapour,
+        min_t_over_tc=result.min_t_over_tc,
+        phase=_Phase(result.phase),
+        converged=result.converged,
+        iterations=result.iterations,
+        residual=result.residual,
         warnings=_warnings(result.warnings),
     )
 

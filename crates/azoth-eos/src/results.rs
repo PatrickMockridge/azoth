@@ -2759,6 +2759,67 @@ impl CalcResult for PtFlashCheckResult {
     }
 }
 
+/// Result of `eos.umr_pru_flash`.
+///
+/// The same state as [`PtFlashResult`] with the iteration's own verdict. The loop is
+/// successive substitution only: the UMR rule has no `phase_derivatives`, which the
+/// second-order fallback needs, and the spec declares no fallback.
+#[derive(Debug, Clone, PartialEq)]
+pub struct UmrPruFlashResult {
+    /// The vapour fraction, or `None` when the solution is trivial.
+    pub vapour_fraction: Option<f64>,
+    /// Liquid-phase mole fractions.
+    pub x: Vec<f64>,
+    /// Vapour-phase mole fractions.
+    pub y: Vec<f64>,
+    /// `K_i = y_i / x_i`, the iterate the loop converges on.
+    pub k: Vec<f64>,
+    /// `ln phi_i` in the liquid phase.
+    pub ln_phi_liquid: Vec<f64>,
+    /// `ln phi_i` in the vapour phase.
+    pub ln_phi_vapour: Vec<f64>,
+    /// The liquid root of the cubic.
+    pub z_liquid: f64,
+    /// The vapour root.
+    pub z_vapour: f64,
+    /// The smallest `T / Tc_i` over the components.
+    pub min_t_over_tc: f64,
+    /// What the state is.
+    pub phase: Phase,
+    /// Whether the iteration met its tolerance or settled by proof.
+    pub converged: bool,
+    /// Outer steps taken.
+    pub iterations: u32,
+    /// The last step's convergence measure.
+    pub residual: f64,
+    /// Caveats.
+    pub warnings: Vec<Warning>,
+}
+
+impl CalcResult for UmrPruFlashResult {
+    const CALC_ID: &'static str = "eos.umr_pru_flash";
+    const FIELDS: &'static [&'static str] = &[
+        "vapour_fraction",
+        "x",
+        "y",
+        "k",
+        "ln_phi_liquid",
+        "ln_phi_vapour",
+        "z_liquid",
+        "z_vapour",
+        "min_t_over_tc",
+        "phase",
+        "converged",
+        "iterations",
+        "residual",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 /// Result of `eos.state_at_tp`.
 ///
 /// One state in one call: the split, the bulk volumetric and caloric properties, and

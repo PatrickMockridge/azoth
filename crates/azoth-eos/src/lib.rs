@@ -261,6 +261,7 @@ pub mod twucoon_param_alpha;
 pub mod twucoon_statoil_alpha;
 pub mod tyn_calus_diffusivity;
 pub mod umr_cpa_phase;
+pub mod umr_pru_flash;
 pub mod umrpr_alpha;
 pub mod unifac_activity_coefficients;
 pub mod unifac_psrk_activity_coefficients;
@@ -443,7 +444,7 @@ pub use results::{
     StabilityVerdict, StateAtTpResult, StreamScaleAnalyzerResult, StreamScaleMineralRow,
     SurfCooldownResult, ThFlashResult, ThermalConductivityResult, TsFlashResult, TuFlashResult,
     TwuKappaResult, TwucoonAlphaResult, TwucoonParamAlphaResult, TwucoonStatoilAlphaResult,
-    TynCalusDiffusivityResult, UmrCpaPhaseResult, UmrprAlphaResult,
+    TynCalusDiffusivityResult, UmrCpaPhaseResult, UmrPruFlashResult, UmrprAlphaResult,
     UnifacActivityCoefficientsResult, UnifacPsrkActivityCoefficientsResult,
     UnifacUmrpruActivityCoefficientsResult, UniquacActivityCoefficientsResult,
     ValveScaleDriftResult, VanLaarAcidActivityCoefficientsResult, Vdw1fMixBinaryResult,
