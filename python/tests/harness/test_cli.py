@@ -36,6 +36,32 @@ def test_catalogue_filters_and_pages(capsys: pytest.CaptureFixture[str]) -> None
     assert document["items"][0]["id"] == "hydraulics.darcy_weisbach"
 
 
+def test_catalogue_finds_an_output_name(capsys: pytest.CaptureFixture[str]) -> None:
+    code, document = _run(capsys, "catalogue", "--query", "cricondenbar")
+    assert code == 0
+    assert document["total"] == 1
+    item = document["items"][0]
+    assert item["id"] == "eos.pt_phase_envelope"
+    assert "cricondenbar_pressure" in item["outputs"]
+    assert item["matched"] == ["cricondenbar"]
+
+
+def test_catalogue_ranks_a_multi_term_query(capsys: pytest.CaptureFixture[str]) -> None:
+    code, document = _run(capsys, "catalogue", "--query", "phase envelope cricondenbar dew point")
+    assert code == 0
+    assert document["total"] > 1
+    assert document["items"][0]["id"] == "eos.pt_phase_envelope"
+    assert document["items"][0]["matched"] == ["phase", "envelope", "cricondenbar", "dew"]
+
+
+def test_catalogue_searches_an_input_name(capsys: pytest.CaptureFixture[str]) -> None:
+    code, document = _run(capsys, "catalogue", "--query", "gas_flow")
+    assert code == 0
+    item = next(i for i in document["items"] if i["id"] == "eos.beggs_brill_segment")
+    assert "gas_flow" in item["inputs"]
+    assert item["matched"] == ["gas_flow"]
+
+
 def test_a_calc_runs_and_carries_provenance(capsys: pytest.CaptureFixture[str]) -> None:
     code, document = _run(
         capsys,

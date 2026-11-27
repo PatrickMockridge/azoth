@@ -136,7 +136,7 @@ warns, unless `--require-flowsheet` makes that a failure.
 | `flowsheet` | `azoth check` accepts `F` against the palette |
 | `mcp` | a stdio `initialize` request and tool listing, under the name `azoth` |
 | `bridge` | `python -m azoth.harness version` prints JSON, and `review` checks the worked dossier |
-| `plugin` | `node --check` and `node --test` for the plugin and the welcome UI |
+| `plugin` | `node --check` and `node --test` for the calculation plugin, the planning guard and the welcome UI |
 | `workspace` | the checkout (or `--workspace`) is registered without reordering the store; a missing store is a warning because a launch seeds it |
 | `preset` | the `azoth-engineer` prompt and `harness.toml` row exist in engineer mode |
 | `ui` | the welcome UI's `client.js` and `dsh.client` manifest exist in engineer web mode |
@@ -153,7 +153,7 @@ The exit status is `0` when no probe failed and `1` otherwise.
 
 The calculation plugin registers five tools. Four are calls to the bridge, one of which
 reviews the supplied evidence; the fifth is the orientation the model reads when the user
-asks what azoth can do:
+asks what azoth can do. The planning guard adds a sixth:
 
 | tool | arguments | bridge command |
 |---|---|---|
@@ -162,6 +162,7 @@ asks what azoth can do:
 | `azoth_spec` | `id`, `full` | `spec` |
 | `azoth_intake` | `dossier` or `dossier_path`, optional `id` | `review` |
 | `azoth_calc` | `id`, `inputs` or `dossier`/`dossier_path`, `keycard`, `backend` | `run` |
+| `azoth_plan` | `action` and its arguments; see the planning guard | none; records the decision tree |
 
 A dimensioned input is a number in the unit `azoth_spec` declares, or a `{value, unit}`
 pair, which is converted to that unit. Vectors and matrices are lists; a `record_list` is
@@ -187,6 +188,64 @@ products, recycles, instruments and signals, positions and names. Its four resou
 `azoth://document`, `azoth://diagnostics`, `azoth://report` and `azoth://catalogue`; every
 tool call also returns the whole updated document, so a read is the answer to the call
 that changed it. The server holds one document in memory and never writes it.
+
+### The planning guard
+
+The guard registers `azoth_plan` and holds every calculation — `azoth_calc` and an
+external bash command — while a decision is tripped, a step is over its time box, or a
+review is due. It is mounted for the engineer, outside a study. A single lookup is free; a
+plan is required from the second calculation.
+
+`open` records the problem, the criteria and at least two candidate paths. Each candidate
+carries a cost, an estimate (`minutes`, `compute`, `risk`), a fallback and its fidelities;
+each assumption carries a category (`numerical`, `validity`, `evidence`, `applicability`,
+`consistency`, `feasibility`, `requirement`, `budget`, `judgment`) and, where a result can
+decide it, a falsifier bound to a calculation id, `"*"` or `intake`. `choose` fixes the
+path; `add` attaches a subordinate decision; `step` records ordered work with a kind, a
+time box and a success test.
+
+A study — a plan with questions — maps each question to the cheapest fidelity (`thermo`,
+`steady`, `transient`, `field`, `olga`) and the candidate that answers it; `choose` refuses
+an unmapped primary question. `basis` records the consistency checks before a transport or
+solver step — flow, diameter, pressure drop, composition and consistency for transport;
+composition and consistency for thermodynamics — and a failed check trips the path. A
+solver step also names the question it answers and carries a feasibility record: `dt_s`,
+`cost_per_step_ms`, the inversion conditioning, the singular closures (`dP -> 0`,
+`beta -> 0/1`), `estimated_minutes`, the fallback and the success test. An estimate over
+the step's time box is refused unless `accept_overrun` records it.
+
+Every `azoth_calc` and `azoth_intake` result is checked. An error, a non-finite value,
+`converged: false`, or `SOLVER_NOT_CONVERGED`/`TRIVIAL_SOLUTION`/`FALLBACK_TO_INPUT`
+trips the chosen path; `OUT_OF_VALID_RANGE`/`RANGE_CHECK_SKIPPED`/`TRANSITIONAL_FLOW`
+trip a bound `any_warning` or `out_of_range` assumption; a refused intake or a hard gap is
+an evidence trip. Anything else is an explicit `trip` with one of the nine categories. A
+trip holds the calculation and returns to the owning decision: `reopen` clears the choice
+and marks its descendants and dependent steps stale; `resolve` records evidence that the
+assumption survived. A root trip returns the whole plan to concept selection.
+
+A step over its `time_box_minutes` holds the next calculation until `review` extends it
+(`extend_minutes`) or records `fallback_started`. After `review_after_calcs` calculations
+or `review_after_minutes`, `review` is due; it records `at_risk`, `remaining_minutes` and
+the verdict, and `confirm` resets the checkpoint. `fail` records a failure with its
+symptom, evidence and diagnosis; three failures with the same signature on a step or
+candidate add a `failure_streak` trip. `target` and `compare` record a supplied validation
+value and at least two model comparisons, one agreeing and one disagreeing; `review
+confirm` and `close` refuse while the spread is incomplete. `job` records a background job
+by id; the web engineer also has `job_output`, `job_list` and `job_kill`.
+
+The state is per session, in the plugin's process; every plan result and every trip,
+overrun or checkpoint banner carries a bounded `plan-record` line, which also restores the
+plan on resume.
+
+A bash command that runs an interpreter is a calculation outside azoth. It is refused
+unless `azoth_plan permit` has recorded the command, its scope (`once`, `step` or
+`session`), its purpose and how the result will be verified, and the user has approved it.
+The approval is the web UI's Allow once / Reject card; the plugin remembers a `step` or
+`session` permit so a solver iteration does not prompt every time. `external_compute` in
+`[plan]` is `ask` by default, `deny` for a headless launch, or `allow` with
+`--allow-external-compute`. Every external result is bannered `EXTERNAL` and written to the
+plan's register. Read-only commands pass; the `azoth` CLI and `python -m azoth.harness` are
+azoth and pass the same holds as `azoth_calc`.
 
 ## The bridge contract
 
@@ -230,6 +289,7 @@ and is tested with `node --test`.
 | overlay row | what it configures |
 |---|---|
 | `azoth-calc` | the plugin, mounted by absolute path with the Python path and caps |
+| `azoth-plan` | the planning guard, its prompt and the `[plan]` thresholds |
 | `azoth-ui` | the plain-JS welcome card and starters; engineer web mode only |
 | `mcp-azoth-flowsheet` | the flowsheet server; omitted by `--no-flowsheet` or a missing CLI |
 | `llm-deepseek` | the hosted DeepSeek route: `DEEPSEEK_API_KEY` and the model ids |
@@ -240,14 +300,15 @@ and is tested with `node --test`.
 | `agent-team` | the Team board, `maxTasks` from `harness.toml`, enabled by a `--study` |
 | four preset rows per study | HAZOP: `azoth-hazop-chair`, `azoth-process`, `azoth-safety`, `azoth-scribe`; intake: `azoth-intake-clerk`, `azoth-intake-reader`, `azoth-intake-assessor`, `azoth-intake-auditor` |
 
-The engineer preset and welcome UI are rendered only outside a study; the team and the
-study's preset rows are rendered only under it. The plugin config carries
-`requireDossier`, which is `false` in this tranche.
+The engineer preset, the planning guard and the welcome UI are rendered only outside a
+study; the guard is also mounted for the headless engineer. The team and the study's
+preset rows are rendered only under it. The plugin config carries `requireDossier`, which
+is `false` in this tranche.
 
 The values the generator reads are declared in
 [`agents/deepseek/harness.toml`](../../../agents/deepseek/harness.toml): the tested DSH
 release, the Node floor, the default model, the timeouts, the curated skill lists, the
-study tables and the preset ids. The web and headless profiles compose differently — web
+study tables, the preset ids and the `[plan]` thresholds and warning-category map. The web and headless profiles compose differently — web
 ships the preset registry and disables the host's skill and subagent tools, headless does
 not — so the launcher renders by mode rather than committing one patch.
 
@@ -289,7 +350,12 @@ requires `--allow-remote`. The calculation and intake tools accept registry ids 
 dossier only — no `eval`, no shell, no import by a model-supplied string; a keycard path
 and a dossier path must be under the working directory. The bridge caps inputs at 1 MB;
 the plugin caps a result at 4 MiB and times a call out at 120 s; the CLI caps its own
-output at 8 MB; the flowsheet MCP client times a tool call at 60 s.
+output at 8 MB; the flowsheet MCP client times a tool call at 60 s. The planning guard is
+per session, so a spawned subagent opens its own plan. It gates `azoth_calc` and every
+bash command that runs an interpreter; `azoth` and `python -m azoth.harness` are azoth and
+pass the same holds, and any other interpreter needs a permit and the user's approval, or
+`--allow-external-compute` at launch. It is a plugin policy over those tools, not an OS
+sandbox: an MCP tool or a future tool could compute.
 
 The library's models are `unverified` or `partially_verified`; a result is evidence for a
 finding, not a design deliverable. The provenance block says which.

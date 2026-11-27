@@ -574,6 +574,34 @@ def _plugin_config(tc: Toolchain, config: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _plan_config(
+    tc: Toolchain, config: dict[str, Any], args: argparse.Namespace, mode: str
+) -> dict[str, Any]:
+    plan = config.get("plan") or {}
+    prompt = Path(tc.root) / "agents" / "deepseek" / str(plan.get("prompt", "prompts/plan.md"))
+    if not prompt.is_file():
+        raise SystemExit(f"launch_dsh: [plan].prompt {prompt} is not present")
+    categories = plan.get("warning_categories") or {}
+    external = "allow" if args.allow_external_compute else str(plan.get("external_compute", "ask"))
+    if mode == "headless" and external == "ask" and not args.allow_external_compute:
+        # The headless profile has no approval card: an unapproved external computation is a
+        # launch decision, not a runtime prompt.
+        external = "deny"
+    return {
+        "policy": prompt.read_text(encoding="utf-8").strip(),
+        "requirePlanAfter": int(plan.get("require_plan_after", 1)),
+        "minimumCandidates": int(plan.get("minimum_candidates", 2)),
+        "reviewAfterCalcs": int(plan.get("review_after_calcs", 6)),
+        "hardWarningCodes": list(plan.get("hard_warning_codes", [])),
+        "warningCategories": {str(code): str(category) for code, category in categories.items()},
+        "resolveRequiresCleanCalc": bool(plan.get("resolve_requires_clean_calc", False)),
+        "externalCompute": external,
+        "gateSanctionedBridge": bool(plan.get("gate_sanctioned_bridge", True)),
+        "reviewAfterMinutes": int(plan.get("review_after_minutes", 30)),
+        "failureTripAfter": int(plan.get("failure_trip_after", 3)),
+    }
+
+
 def _mcp_config(args: argparse.Namespace, tc: Toolchain, config: dict[str, Any]) -> dict[str, Any]:
     assert tc.azoth is not None
     command = tc.azoth.argv[0]
@@ -647,6 +675,8 @@ def _engineer_plugins(args: argparse.Namespace, config: dict[str, Any]) -> list[
     plugins = _role_plugins()
     plugins.insert(1, {"id": "time-context", "name": "@deepseek-ai/dsh-time-context"})
     plugins.append({"id": "tool-ask-user", "name": "@deepseek-ai/dsh-tool-ask-user"})
+    if bool((config.get("plan") or {}).get("job_tools", True)):
+        plugins.append({"id": "tool-jobs", "name": "@deepseek-ai/dsh-tool-jobs"})
     plugins.append(
         {
             "id": "compaction",
@@ -747,6 +777,21 @@ def build_overlay(
                 "id": "azoth-calc",
                 "name": str(plugin),
                 "config": _plugin_config(tc, config),
+            }
+        )
+    guard = tc.root / "agents" / "deepseek" / "plugin" / "guard.js"
+    plan = config.get("plan") or {}
+    if (
+        args.persona == "engineer"
+        and study is None
+        and bool(plan.get("enabled", True))
+        and guard.is_file()
+    ):
+        inserts.append(
+            {
+                "id": "azoth-plan",
+                "name": str(guard),
+                "config": _plan_config(tc, config, args, mode),
             }
         )
     ui = tc.root / "agents" / "deepseek" / "ui" / "index.js"
@@ -1243,7 +1288,10 @@ def _probe_plugin(args: argparse.Namespace, tc: Toolchain, env: dict[str, str]) 
         return Check("plugin", "warn", "agents/deepseek/plugin/index.js is not present")
     if tc.node is None:
         return Check("plugin", "warn", "node not found; plugin not checked")
+    guard = plugin / "guard.js"
     sources = [index, bridge]
+    if guard.is_file():
+        sources.append(guard)
     tests = sorted((plugin / "test").glob("*.test.mjs"))
     if ui.is_dir():
         sources.extend([ui / "index.js", ui / "client.js"])
@@ -1265,7 +1313,8 @@ def _probe_plugin(args: argparse.Namespace, tc: Toolchain, env: dict[str, str]) 
     except (OSError, subprocess.TimeoutExpired) as exc:
         return Check("plugin", "fail", str(exc))
     suffix = f", {len(tests)} node tests" if tests else ""
-    return Check("plugin", "ok", f"{index.name}{suffix}")
+    detail = f"{index.name}, guard.js{suffix}" if guard.is_file() else f"{index.name}{suffix}"
+    return Check("plugin", "ok", detail)
 
 
 def _probe_workspace(args: argparse.Namespace, tc: Toolchain) -> Check:
@@ -1533,6 +1582,11 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--study", default="none")
     p.add_argument("--skills", choices=("full", "hazop", "intake", "none"), default="full")
     p.add_argument("--permission-mode", choices=("read-only", "workspace-write"), default=None)
+    p.add_argument(
+        "--allow-external-compute",
+        action="store_true",
+        help="approve external bash calculations at launch instead of prompting per permit",
+    )
     p.add_argument("--port", type=int)
     p.add_argument("--no-open", action="store_true")
     p.add_argument("--host")

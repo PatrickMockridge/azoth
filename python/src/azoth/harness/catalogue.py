@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from typing import Any
 
 from azoth._models_gen import MODELS
@@ -34,6 +35,47 @@ def _jsonable(value: Any) -> Any:
     return json.loads(json.dumps(value, default=str))
 
 
+_QUERY_TOKEN = re.compile(r"[a-z0-9_.]+")
+
+
+def _tokens(query: str) -> list[str]:
+    """The query's lowercased word tokens."""
+    return _QUERY_TOKEN.findall(query.lower())
+
+
+def _match_score(
+    entry: dict[str, Any], tokens: list[str]
+) -> tuple[int, list[str], bool, bool, bool]:
+    """A token's best field, weighted: id 8, name 6, output 3, input 1.
+
+    A token is counted once, against its strongest field, so a name that repeats the id
+    does not outrank an entry that matches more of the query. The three flags separate an
+    id/name hit from an input/output hit, so a query that names an id is not diluted by
+    every entry that merely lists the word as a field.
+    """
+    entry_id = str(entry["id"]).lower()
+    name = str(entry.get("name", "")).lower()
+    outputs = [str(key).lower() for key in (entry.get("outputs") or {})]
+    inputs = [str(key).lower() for key in (entry.get("inputs") or {})]
+    score = 0
+    matched: list[str] = []
+    id_hit = name_hit = io_hit = False
+    for token in tokens:
+        if token in entry_id:
+            best, id_hit = 8, True
+        elif token in name:
+            best, name_hit = 6, True
+        elif any(token in key for key in outputs):
+            best, io_hit = 3, True
+        elif any(token in key for key in inputs):
+            best, io_hit = 1, True
+        else:
+            continue
+        score += best
+        matched.append(token)
+    return score, matched, id_hit, name_hit, io_hit
+
+
 def catalogue(
     *,
     query: str | None = None,
@@ -48,19 +90,23 @@ def catalogue(
         raise UndefinedInput(f"limit must be between 1 and {CATALOGUE_MAX_LIMIT}", field="limit")
     if offset < 0:
         raise UndefinedInput("offset must not be negative", field="offset")
-    needle = (query or "").lower()
-    matches: list[tuple[str, dict[str, Any]]] = []
+    tokens = _tokens(query or "")
+    matches: list[tuple[int, list[str], bool, bool, bool, str, dict[str, Any]]] = []
     for entry_kind, entry in _BY_ID.values():
         if kind is not None and entry_kind != kind:
             continue
-        if (
-            needle
-            and needle not in str(entry["id"]).lower()
-            and needle not in str(entry.get("name", "")).lower()
-        ):
+        score, matched, id_hit, name_hit, io_hit = _match_score(entry, tokens)
+        if tokens and not matched:
             continue
-        matches.append((entry_kind, entry))
-    matches.sort(key=lambda pair: str(pair[1]["id"]))
+        matches.append((score, matched, id_hit, name_hit, io_hit, entry_kind, entry))
+    if tokens:
+        if any(item[2] for item in matches):
+            matches = [item for item in matches if item[2]]
+        elif any(item[3] for item in matches):
+            matches = [item for item in matches if item[3]]
+        else:
+            matches = [item for item in matches if item[4]]
+    matches.sort(key=lambda item: (-len(item[1]), -item[0], str(item[6]["id"])))
     page = matches[offset : offset + limit]
     return {
         "schema": SCHEMA,
@@ -76,8 +122,9 @@ def catalogue(
                 "namespace": str(entry["id"]).split(".", 1)[0],
                 "inputs": sorted((entry.get("inputs") or {}).keys()),
                 "outputs": sorted((entry.get("outputs") or {}).keys()),
+                "matched": matched,
             }
-            for entry_kind, entry in page
+            for _, matched, _, _, _, entry_kind, entry in page
         ],
     }
 
