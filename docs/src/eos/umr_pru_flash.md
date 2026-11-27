@@ -84,6 +84,16 @@ not an equation, and both implementations read it from here.
 |---|---|---|
 | `methane_and_butane_at_330_k_and_25_bar` | components = ['methane', 'n-butane'], T = 330.0, P = 2500000.0, z = [0.6, 0.4] | vapour_fraction = 0.8378112073001198, x = [0.09662529350823174, 0.9033747064917675], y = [0.6974464595486257, 0.30255354045137445], k = [7.218052688131898, 0.3349147793016403], ln_phi_liquid = [1.9694730695487475, -1.4955474867598366], ln_phi_vapour = [-0.007112136190840793, -0.40166831709942913], z_liquid = 0.09234067630193084, z_vapour = 0.8721328711439305, min_t_over_tc = 0.7762514113662025, phase = two_phase, converged = True, iterations = 13, residual = 1.9025594551795078e-11 |
 
+## How far this is checked
+**`partially_verified`** — exercised against expectations pinned in its own spec, with no independent oracle recorded for it - **the normal case rather than a defect**.
+
+- Tests: 1 declared, every one run
+- External check: no external validation case names it
+
+The same account travels with every result this returns: `result.provenance`
+carries the status, the spec and both kernels with a SHA-256 of each, and which
+declared checks *that call* could not evaluate.
+
 ## References
 
 - NeqSim master `thermo/system/SystemUMRPRUEos.java`, whose constructor sets `setBmixType(1)` and `attractiveTermNumber = 1`, and `thermo/mixingrule/EosMixingRuleHandler.getbij`/`calcBFull`/`calcBiFull`, which define the co-volume rule and its partial molar.
