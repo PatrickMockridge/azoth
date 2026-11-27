@@ -751,17 +751,7 @@ def build_overlay(
         )
     ui = tc.root / "agents" / "deepseek" / "ui" / "index.js"
     if args.persona == "engineer" and study is None and mode == "web" and ui.is_file():
-        inserts.append(
-            {
-                "id": "azoth-ui",
-                "name": str(ui),
-                "config": {
-                    "missingKey": not available,
-                    "defaultMissing": key_warning(args, config, tc.dsh_home) is not None,
-                    "provider": args.provider,
-                },
-            }
-        )
+        inserts.append({"id": "azoth-ui", "name": str(ui), "config": {}})
     if args.flowsheet and tc.azoth is not None:
         inserts.append(
             {

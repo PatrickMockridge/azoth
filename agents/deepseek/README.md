@@ -49,9 +49,9 @@ relaunch:
 `--provider` sets the session default; when omitted, the first provider with an exported
 or stored key is the default. `--model` overrides the id. Only providers with a key are
 mounted, so the selector matches the available keys; with no key at all the official
-DeepSeek route is mounted for DSH's onboarding step and the azoth UI blocks the composer.
-`--base-url` replaces the native routes with an OpenAI-compatible gateway, vLLM/SGLang
-endpoint or any model the catalog does not list.
+DeepSeek route is mounted for DSH's onboarding step. `--base-url` replaces the native
+routes with an OpenAI-compatible gateway, vLLM/SGLang endpoint or any model the catalog
+does not list.
 
 The first web session shows a compact card: azoth is a chemical-engineering calculation
 library, FEED means Front-End Engineering Design (not a browser front end), the demo

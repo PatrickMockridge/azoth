@@ -58,9 +58,11 @@ record a session opens DSH's own `~/Documents/deepseek-harness/default-workspace
 neither `AGENTS.md` nor `.dsh/skills` is discovered.
 
 `--workspace PATH` (or `AZOTH_DSH_WORKSPACE`) opens and creates a different workspace and
-makes it the default; the checkout is still added so the picker lists it. The skill
-catalog is exported to both `<checkout>/.dsh/skills` and `$DSH_HOME/skills`, DSH's user
-root, so switching workspace does not lose the catalog.
+makes it the default; the checkout is still added so the picker lists it. In the picker,
+the row's **+** starts a session in that workspace, and the header's **New Session** opens
+the workspace row last clicked rather than the current one. The skill catalog is exported
+to both `<checkout>/.dsh/skills` and `$DSH_HOME/skills`, DSH's user root, so switching
+workspace does not lose the catalog.
 
 `--persona engineer` (the default) mounts `azoth-engineer` as the web root preset: the
 engineering persona, `agent-instructions` for `AGENTS.md`, the skill catalog, file and
@@ -78,16 +80,14 @@ fire calculations. When the default route's key is absent, the launcher prints t
 and the **Settings → Models** page before starting, and the card repeats it; the key is
 saved there or exported as the selected provider's environment variable. A key saved in
 the DSH credential store counts even when its env var is unset. DSH's own onboarding
-dialog only appears when no provider route has a key at all; the azoth UI blocks the
-composer in that state.
+dialog only appears when no provider route has a key at all.
 
 ## Providers
 
 Every launch without `--base-url` mounts the routes whose key is exported or stored in the
 DSH credential store, so the model selector matches the keys that are actually available.
 With no key at all the launcher mounts the official DeepSeek route so DSH's onboarding step
-can ask for one, and the azoth UI blocks the composer. The table is declared in
-`harness.toml` and rendered into the overlay:
+can ask for one. The table is declared in `harness.toml` and rendered into the overlay:
 
 | `--provider` | Provider route | Model default | Key |
 |---|---|---|---|

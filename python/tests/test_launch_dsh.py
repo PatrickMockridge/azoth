@@ -383,9 +383,7 @@ def test_routes_follow_the_available_keys(tmp_path: Path) -> None:
     rows = _rows(root)
     assert _find(rows, "llm-deepseek") is not None
     assert _find(rows, "llm-pi-ai") is None
-    ui = _find(rows, "azoth-ui")
-    assert ui is not None
-    assert ui["config"]["missingKey"] is False
+    assert _find(rows, "azoth-ui") is not None
 
 
 def test_no_key_mounts_the_official_route_for_onboarding(tmp_path: Path) -> None:
@@ -393,9 +391,7 @@ def test_no_key_mounts_the_official_route_for_onboarding(tmp_path: Path) -> None
     rows = _rows(root)
     assert _find(rows, "llm-deepseek") is not None
     assert _find(rows, "llm-pi-ai") is None
-    ui = _find(rows, "azoth-ui")
-    assert ui is not None
-    assert ui["config"]["missingKey"] is True
+    assert _find(rows, "azoth-ui") is not None
 
 
 def test_a_missing_key_names_the_env_and_settings(
