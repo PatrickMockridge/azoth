@@ -73,6 +73,7 @@
 //!   - specs/models/eos/production_chemical_scale_scenario.toml
 //!   - specs/models/eos/ps_flash.toml
 //!   - specs/models/eos/pt_flash.toml
+//!   - specs/models/eos/pt_flash_check.toml
 //!   - specs/models/eos/pt_phase_envelope.toml
 //!   - specs/models/eos/pu_flash.toml
 //!   - specs/models/eos/pure_saturation.toml
@@ -90,6 +91,7 @@
 //!   - specs/models/eos/sound_speed.toml
 //!   - specs/models/eos/srk_cpa_phase.toml
 //!   - specs/models/eos/stability_test.toml
+//!   - specs/models/eos/state_at_tp.toml
 //!   - specs/models/eos/stream_scale_analyzer.toml
 //!   - specs/models/eos/surf_cooldown.toml
 //!   - specs/models/eos/th_flash.toml
@@ -3749,9 +3751,9 @@ static CRITICAL_POINT_CHECKS: &[SpecCheck] = &[
             max_inclusive: true,
             equals: None,
             band: Band::Outside,
-            severity: Severity::Error,
+            severity: Severity::Warning,
             code: WarningCode::OutOfValidRange,
-            rationale: "the iteration can leave the region where the equation of state has a critical point and converge on a temperature that is not a state.",
+            rationale: "a refusal reports NaN here with `converged = false`; the warning, not the value, is the answer. A converged non-positive temperature would still be a defect.",
         },
     },
     SpecCheck {
@@ -3764,9 +3766,9 @@ static CRITICAL_POINT_CHECKS: &[SpecCheck] = &[
             max_inclusive: true,
             equals: None,
             band: Band::Outside,
-            severity: Severity::Error,
+            severity: Severity::Warning,
             code: WarningCode::OutOfValidRange,
-            rationale: "a non-positive pressure at the returned volume means the volume is inside the co-volume and the state is not one.",
+            rationale: "a refusal reports NaN here with `converged = false`; a converged non-positive pressure would mean the volume is inside the co-volume.",
         },
     },
     SpecCheck {
@@ -3779,9 +3781,9 @@ static CRITICAL_POINT_CHECKS: &[SpecCheck] = &[
             max_inclusive: true,
             equals: None,
             band: Band::Outside,
-            severity: Severity::Error,
+            severity: Severity::Warning,
             code: WarningCode::OutOfValidRange,
-            rationale: "a sign error in any of the three quantities above shows up as a negative `z_c` before it shows up anywhere else.",
+            rationale: "a refusal reports NaN here with `converged = false`; a sign error in a converged answer would show up here first.",
         },
     },
 ];
@@ -20538,6 +20540,188 @@ pub static PT_FLASH_SPEC: ModelSpec = ModelSpec {
     cases: PT_FLASH_CASES,
 };
 
+static PT_FLASH_CHECK_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "T",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute temperature; zero and below are not states",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "P",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure; zero and below are not states",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "tolerance",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a stopping tolerance; zero can never be met and a negative value is not a distance",
+        },
+    },
+    SpecCheck {
+        on_input: false,
+        check: RangeCheck {
+            quantity: "min_t_over_tc",
+            min: None,
+            min_inclusive: true,
+            max: Some(0.9),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Warning,
+            code: WarningCode::OutOfValidRange,
+            rationale: "Above `T / Tc = 0.9` for the nearest component the cubic's roots are close to coalescing and successive substitution converges slowly or to the trivial solution.",
+        },
+    },
+];
+
+static PT_FLASH_CHECK_CASES: &[TestCase] = &[
+    TestCase {
+        id: "methane_and_butane_at_330_k_and_25_bar",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("T", 330.0), ("P", 2500000.0)],
+        flags: &[],
+        lists: &[("components", &["methane", "n-butane"])],
+        strings: &[],
+        vectors: &[("z", &[0.6, 0.4])],
+        matrices: &[],
+        expected: &[
+            ("vapour_fraction", 0.8422055475803881),
+            ("z_liquid", 0.0931504946389822),
+            ("z_vapour", 0.8686112597077746),
+            ("min_t_over_tc", 0.7762514113662025),
+            ("iterations", 13.0),
+        ],
+        expected_vectors: &[
+            ("x", &[0.09509515774804526, 0.9049048422519539]),
+            ("y", &[0.6945982644451212, 0.3054017355548789]),
+            ("k", &[7.304244305324779, 0.33749596785762964]),
+            ("ln_phi_liquid", &[1.9810534354573959, -1.4950287076073359]),
+            (
+                "ln_phi_vapour",
+                &[-0.007402155428089113, -0.4088269917844861],
+            ),
+        ],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "a_subcooled_liquid_feed",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("T", 300.0), ("P", 3000000.0)],
+        flags: &[],
+        lists: &[("components", &["methane", "n-butane"])],
+        strings: &[],
+        vectors: &[("z", &[0.1, 0.9])],
+        matrices: &[],
+        expected: &[
+            ("vapour_fraction", -0.07000432582249205),
+            ("z_liquid", 0.11033733769989125),
+            ("z_vapour", 0.8875314607526533),
+            ("min_t_over_tc", 0.7056831012420023),
+            ("iterations", 12.0),
+        ],
+        expected_vectors: &[
+            ("x", &[0.15059398408339061, 0.8494060159166106]),
+            ("y", &[0.8733205226073144, 0.12667947739270397]),
+            ("k", &[5.799172708809655, 0.14913889826410245]),
+            ("ln_phi_liquid", &[1.702063242525731, -2.413379883241813]),
+            (
+                "ln_phi_vapour",
+                &[-0.05565202843993218, -0.5105026790902871],
+            ),
+        ],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static PT_FLASH_CHECK_INNER: ModelAlgorithm = ModelAlgorithm {
+    scheme: "rachford_rice_bisection",
+    convergence: "absolute",
+    tolerance: 1e-14,
+    max_iterations: 200,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+static PT_FLASH_CHECK_FALLBACK: ModelAlgorithm = ModelAlgorithm {
+    scheme: "isofugacity_newton",
+    convergence: "absolute",
+    tolerance: 1e-10,
+    max_iterations: 25,
+    bracket: None,
+    initialisation: Some("from_the_outer_scheme"),
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+static PT_FLASH_CHECK_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "successive_substitution_flash",
+    convergence: "absolute",
+    tolerance: 1e-10,
+    max_iterations: 300,
+    bracket: None,
+    initialisation: Some("wilson"),
+    initial_temperature: None,
+    inner: Some(&PT_FLASH_CHECK_INNER),
+    fallback: Some(&ModelFallback {
+        after: 25,
+        algorithm: &PT_FLASH_CHECK_FALLBACK,
+    }),
+};
+
+/// Registry entry for `eos.pt_flash_check`.
+pub static PT_FLASH_CHECK_SPEC: ModelSpec = ModelSpec {
+    id: "eos.pt_flash_check",
+    kind: "procedure",
+    algorithm: Some(&PT_FLASH_CHECK_ALGORITHM),
+    checks: PT_FLASH_CHECK_CHECKS,
+    cases: PT_FLASH_CHECK_CASES,
+};
+
 static PT_PHASE_ENVELOPE_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -20564,9 +20748,9 @@ static PT_PHASE_ENVELOPE_CHECKS: &[SpecCheck] = &[
             max_inclusive: true,
             equals: None,
             band: Band::Outside,
-            severity: Severity::Error,
+            severity: Severity::Warning,
             code: WarningCode::OutOfValidRange,
-            rationale: "the critical pressure is a positive pressure, or the trace never reached the critical point",
+            rationale: "a refused critical point reports NaN with a warning; the envelope's cricondenbar and cricondentherm do not depend on it",
         },
     },
 ];
@@ -23802,6 +23986,135 @@ pub static STABILITY_TEST_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&STABILITY_TEST_ALGORITHM),
     checks: STABILITY_TEST_CHECKS,
     cases: STABILITY_TEST_CASES,
+};
+
+static STATE_AT_TP_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "T",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute temperature; zero and below are not states",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "P",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure; zero and below are not states",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "tolerance",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a stopping tolerance; zero can never be met",
+        },
+    },
+];
+
+static STATE_AT_TP_CASES: &[TestCase] = &[TestCase {
+    id: "methane_and_butane_at_330_k_and_25_bar",
+    kind: "case",
+    property: None,
+    status: "active",
+    skip_reason: None,
+    tolerance: 1e-09,
+    numbers: &[("T", 330.0), ("P", 2500000.0)],
+    flags: &[],
+    lists: &[("components", &["methane", "n-butane"])],
+    strings: &[],
+    vectors: &[("z", &[0.6, 0.4])],
+    matrices: &[],
+    expected: &[
+        ("vapour_fraction", 0.8422055475803883),
+        ("molar_mass", 0.032874999999999995),
+        ("molar_volume", 0.000824580986104053),
+        ("density", 39.86873400431711),
+        ("internal_energy", -2429.322059912164),
+        ("enthalpy", -367.8695946520313),
+        ("cp", 78.697386468816),
+        ("cv", 59.33098195768699),
+        ("compressibility", 0.7513204327438471),
+    ],
+    expected_vectors: &[
+        ("x", &[0.09509515774804513, 0.9049048422519539]),
+        ("y", &[0.6945982644451211, 0.30540173555487904]),
+    ],
+    expected_strings: &[("phase", "two_phase"), ("phase_class", "two_phase")],
+    records: &[],
+    expected_records: &[],
+}];
+
+static STATE_AT_TP_INNER: ModelAlgorithm = ModelAlgorithm {
+    scheme: "rachford_rice_bisection",
+    convergence: "absolute",
+    tolerance: 1e-14,
+    max_iterations: 200,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+static STATE_AT_TP_FALLBACK: ModelAlgorithm = ModelAlgorithm {
+    scheme: "isofugacity_newton",
+    convergence: "absolute",
+    tolerance: 1e-10,
+    max_iterations: 25,
+    bracket: None,
+    initialisation: Some("from_the_outer_scheme"),
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+static STATE_AT_TP_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "successive_substitution_flash",
+    convergence: "absolute",
+    tolerance: 1e-10,
+    max_iterations: 300,
+    bracket: None,
+    initialisation: Some("wilson"),
+    initial_temperature: None,
+    inner: Some(&STATE_AT_TP_INNER),
+    fallback: Some(&ModelFallback {
+        after: 25,
+        algorithm: &STATE_AT_TP_FALLBACK,
+    }),
+};
+
+/// Registry entry for `eos.state_at_tp`.
+pub static STATE_AT_TP_SPEC: ModelSpec = ModelSpec {
+    id: "eos.state_at_tp",
+    kind: "procedure",
+    algorithm: Some(&STATE_AT_TP_ALGORITHM),
+    checks: STATE_AT_TP_CHECKS,
+    cases: STATE_AT_TP_CASES,
 };
 
 static STREAM_SCALE_ANALYZER_CHECKS: &[SpecCheck] = &[
@@ -29640,6 +29953,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &PRODUCTION_CHEMICAL_SCALE_SCENARIO_SPEC,
     &PS_FLASH_SPEC,
     &PT_FLASH_SPEC,
+    &PT_FLASH_CHECK_SPEC,
     &PT_PHASE_ENVELOPE_SPEC,
     &PU_FLASH_SPEC,
     &PURE_SATURATION_SPEC,
@@ -29657,6 +29971,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &SOUND_SPEED_SPEC,
     &SRK_CPA_PHASE_SPEC,
     &STABILITY_TEST_SPEC,
+    &STATE_AT_TP_SPEC,
     &STREAM_SCALE_ANALYZER_SPEC,
     &SURF_COOLDOWN_SPEC,
     &TH_FLASH_SPEC,

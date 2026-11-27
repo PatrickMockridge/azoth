@@ -78,16 +78,35 @@ def _placeholder(ty: str) -> str:
     return "{}" if ty in DISPLAY else "{:?}"
 
 
+_STRUCT_PATHS: dict[str, Path] | None = None
+
+
+def _struct_paths() -> dict[str, Path]:
+    """Every `pub struct` under `crates/*/src`, by name, to the first file in sorted order.
+
+    Built once: the per-element scan below read the whole tree twice for every record row,
+    which is a minute of IO per row at this tree's size.
+    """
+    global _STRUCT_PATHS
+    if _STRUCT_PATHS is None:
+        paths: dict[str, Path] = {}
+        for path in sorted(rust_index.CRATES.glob("*/src/**/*.rs")):
+            text = rust_index._blank_comments(path.read_text(encoding="utf-8"))
+            for name in re.findall(r"^pub struct (\w+)\s*\{", text, re.M):
+                paths.setdefault(name, path)
+        _STRUCT_PATHS = paths
+    return _STRUCT_PATHS
+
+
 def element_declaration(element: str) -> tuple[str, dict[str, Any]]:
     """The path the kernel element struct is reachable at, and its `pub` fields by name."""
     fields = gen_python_wrappers.record_fields(element)
     if fields is None:
         sys.exit(f"gen_python_record_outputs: no crate declares a `pub struct {element}`")
-    for path in sorted(rust_index.CRATES.glob("*/src/**/*.rs")):
-        text = rust_index._blank_comments(path.read_text(encoding="utf-8"))
-        if re.search(rf"^pub struct {re.escape(element)}\s*\{{", text, re.M):
-            return rust_index._item_path(path, element), dict(fields)
-    sys.exit(f"gen_python_record_outputs: `{element}` has no `pub struct` body to name")
+    path = _struct_paths().get(element)
+    if path is None:
+        sys.exit(f"gen_python_record_outputs: `{element}` has no `pub struct` body to name")
+    return rust_index._item_path(path, element), dict(fields)
 
 
 def rust_block(element: str, declaration: dict[str, Any]) -> tuple[str, bool]:

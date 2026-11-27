@@ -1,0 +1,25 @@
+model = "eos.state_at_tp"
+[[cases]]
+id = "methane_and_butane_at_330_k_and_25_bar"
+tolerance = 1e-09
+source = "This model's own output, recorded: the split is the state `eos.pt_flash_check` pins, and the properties are `eos.molar_enthalpy_entropy`'s and the phase capacity's at that split."
+[cases.inputs]
+components = ["methane", "n-butane"]
+T = 330.0
+P = 2500000.0
+z = [0.6, 0.4]
+[cases.expected]
+phase = "two_phase"
+phase_class = "two_phase"
+converged = true
+vapour_fraction = 0.8422055475803883
+x = [0.09509515774804513, 0.9049048422519539]
+y = [0.6945982644451211, 0.30540173555487904]
+molar_mass = 0.032874999999999995
+molar_volume = 0.000824580986104053
+density = 39.86873400431711
+internal_energy = -2429.322059912164
+enthalpy = -367.8695946520313
+cp = 78.697386468816
+cv = 59.33098195768699
+compressibility = 0.7513204327438471

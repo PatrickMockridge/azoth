@@ -360,6 +360,7 @@ from azoth.core.result import (
     PsvFireSizingResult,
     PsvSizingResult,
     PsvValveResult,
+    PtFlashCheckResult,
     PtFlashResult,
     PtPhaseEnvelopeResult,
     PuFlashResult,
@@ -464,6 +465,7 @@ from azoth.core.result import (
     SrkPenelouxShiftResult,
     SrkZFactorResult,
     StabilityTestResult,
+    StateAtTpResult,
     SterileRadius,
     StirredTankReactorResult,
     StreamScaleAnalyzerResult,
@@ -572,6 +574,9 @@ from azoth.core.result import (
 )
 from azoth.core.result import (
     Phase as _Phase,
+)
+from azoth.core.result import (
+    PhaseClass as _PhaseClass,
 )
 from azoth.core.result import (
     PlusModel as _PlusModel,
@@ -851,6 +856,7 @@ __all__ = [
     "psv_sizing",
     "psv_valve",
     "pt_flash",
+    "pt_flash_check",
     "pt_phase_envelope",
     "pu_flash",
     "pump",
@@ -925,6 +931,7 @@ __all__ = [
     "srk_peneloux_shift",
     "srk_z_factor",
     "stability_test",
+    "state_at_tp",
     "stirred_tank_reactor",
     "stream_scale_analyzer",
     "stripping_column",
@@ -1826,6 +1833,7 @@ def critical_point(mixture: Mixture, z: list[float]) -> CriticalPointResult:
         pc=from_si(result.pc.magnitude_si, result.pc.unit),
         vc=from_si(result.vc.magnitude_si, result.vc.unit),
         z_c=result.z_c,
+        converged=result.converged,
         iterations=result.iterations,
         residual=result.residual,
         warnings=_warnings(result.warnings),
@@ -3814,6 +3822,43 @@ def pt_flash(mixture: Mixture, T: Q, P: Q, z: list[float]) -> PtFlashResult:
     )
 
 
+def pt_flash_check(mixture: Mixture, T: Q, P: Q, z: list[float], tolerance: float | None=None, strict: bool | None=None) -> PtFlashCheckResult:
+    """``eos.pt_flash_check``, computed in Rust."""
+    spec = _models_gen.model("eos.pt_flash_check")
+    result = _core.pt_flash_check(
+        [c.Tc.to_base_units().magnitude for c in mixture.components],
+        [c.Pc.to_base_units().magnitude for c in mixture.components],
+        [c.omega for c in mixture.components],
+        [c.component_class for c in mixture.components],
+        mixture.flattened_kij(),
+        _association_spec(mixture),
+        input_to_si(spec, "T", T),
+        input_to_si(spec, "P", P),
+        list(z),
+        None if tolerance is None else tolerance,
+        strict,
+        mixture.cubic.name,
+        mixture.alpha,
+        [list(c.alpha_params) for c in mixture.components],
+    )
+    return PtFlashCheckResult(
+        vapour_fraction=result.vapour_fraction,
+        x=tuple(result.x),
+        y=tuple(result.y),
+        k=tuple(result.k),
+        ln_phi_liquid=tuple(result.ln_phi_liquid),
+        ln_phi_vapour=tuple(result.ln_phi_vapour),
+        z_liquid=result.z_liquid,
+        z_vapour=result.z_vapour,
+        min_t_over_tc=result.min_t_over_tc,
+        phase=_Phase(result.phase),
+        converged=result.converged,
+        iterations=result.iterations,
+        residual=result.residual,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def pt_phase_envelope(mixture: Mixture, P: Q, z: list[float]) -> PtPhaseEnvelopeResult:
     """``eos.pt_phase_envelope``, computed in Rust."""
     spec = _models_gen.model("eos.pt_phase_envelope")
@@ -4551,6 +4596,54 @@ def stability_test(mixture: Mixture, T: Q, P: Q, z: list[float]) -> StabilityTes
         w=tuple(tuple(row) for row in result.w),
         iterations=tuple(result.iterations),
         min_t_over_tc=result.min_t_over_tc,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def state_at_tp(mixture: Mixture, ideal_gas: IdealGasModel, T: Q, P: Q, z: list[float], tolerance: float | None=None, strict: bool | None=None) -> StateAtTpResult:
+    """``eos.state_at_tp``, computed in Rust."""
+    spec = _models_gen.model("eos.state_at_tp")
+    result = _core.state_at_tp(
+        [c.Tc.to_base_units().magnitude for c in mixture.components],
+        [c.Pc.to_base_units().magnitude for c in mixture.components],
+        [c.omega for c in mixture.components],
+        [c.component_class for c in mixture.components],
+        mixture.flattened_kij(),
+        _association_spec(mixture),
+        _molar_masses(mixture, 'a card-added component needs its own molar mass'),
+        [c.volume_shift for c in mixture.components],
+        [c.volume_shift_srk for c in mixture.components],
+        list(ideal_gas.cp_a),
+        list(ideal_gas.cp_b),
+        list(ideal_gas.cp_c),
+        list(ideal_gas.cp_d),
+        list(ideal_gas.cp_e),
+        input_to_si(spec, "T", T),
+        input_to_si(spec, "P", P),
+        list(z),
+        None if tolerance is None else tolerance,
+        strict,
+        mixture.cubic.name,
+        mixture.alpha,
+        [list(c.alpha_params) for c in mixture.components],
+    )
+    return StateAtTpResult(
+        phase=_Phase(result.phase),
+        phase_class=_PhaseClass(result.phase_class),
+        converged=result.converged,
+        vapour_fraction=result.vapour_fraction,
+        x=tuple(result.x),
+        y=tuple(result.y),
+        molar_mass=from_si(result.molar_mass.magnitude_si, result.molar_mass.unit),
+        molar_volume=from_si(result.molar_volume.magnitude_si, result.molar_volume.unit),
+        density=from_si(result.density.magnitude_si, result.density.unit),
+        internal_energy=from_si(result.internal_energy.magnitude_si, result.internal_energy.unit),
+        enthalpy=from_si(result.enthalpy.magnitude_si, result.enthalpy.unit),
+        cp=from_si(result.cp.magnitude_si, result.cp.unit),
+        cv=from_si(result.cv.magnitude_si, result.cv.unit),
+        compressibility=result.compressibility,
+        system_sound_speed=None if result.system_sound_speed is None else from_si(result.system_sound_speed.magnitude_si, result.system_sound_speed.unit),
+        interface_tension=None if result.interface_tension is None else from_si(result.interface_tension.magnitude_si, result.interface_tension.unit),
         warnings=_warnings(result.warnings),
     )
 

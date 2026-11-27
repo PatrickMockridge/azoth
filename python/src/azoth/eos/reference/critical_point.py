@@ -22,11 +22,11 @@ import math
 from typing import Any, NamedTuple
 
 from azoth import _models_gen
-from azoth.core.errors import InvalidInputError, OutOfRangeError, SolverNotConvergedError
+from azoth.core.errors import InvalidInputError, SolverNotConvergedError
 from azoth.core.range import apply_checks, checks_for
 from azoth.core.result import CriticalPointResult
 from azoth.core.units import from_si
-from azoth.core.warnings import Warning
+from azoth.core.warnings import Warning, WarningCode
 from azoth.eos.mixture import Mixture
 from azoth.eos.reference._mixture_state import (
     ReducedParameters,
@@ -315,6 +315,23 @@ def solve_critical_point(
     return temperature, pressure, volume, compressibility, iterations, residual
 
 
+def _refusal(
+    iterations: int, residual: float, message: str, warnings: list[Warning]
+) -> CriticalPointResult:
+    """A documented refusal: NaN fields, ``converged = false``, and the reason."""
+    warnings.append(Warning(code=WarningCode.SOLVER_NOT_CONVERGED, message=message))
+    return CriticalPointResult(
+        tc=from_si(math.nan, "K"),
+        pc=from_si(math.nan, "Pa"),
+        vc=from_si(math.nan, "m**3/mol"),
+        z_c=math.nan,
+        converged=False,
+        iterations=iterations,
+        residual=residual,
+        warnings=tuple(warnings),
+    )
+
+
 def critical_point(mixture: Mixture, z: list[float]) -> CriticalPointResult:
     """The critical point of a mixture of composition ``z``.
 
@@ -359,30 +376,40 @@ def critical_point(mixture: Mixture, z: list[float]) -> CriticalPointResult:
             f"refused instead",
         )
 
-    temperature, pressure, volume, compressibility, iterations, residual = solve_critical_point(
-        mixture, composition, spec["algorithm"]
-    )
+    try:
+        temperature, pressure, volume, compressibility, iterations, residual = (
+            solve_critical_point(mixture, composition, spec["algorithm"])
+        )
+    except SolverNotConvergedError as exc:
+        return _refusal(
+            exc.iterations,
+            exc.residual,
+            f"the nested Newton did not reach its tolerance after {exc.iterations} "
+            f"iterations (residual {exc.residual:.3e}); the critical point is not reported",
+            warnings,
+        )
 
     # The bounds are on the *result*, which is unusual for this tree: every input is a
     # vector or a matrix, so there is no scalar argument whose range a caller could
-    # violate. What can go wrong is the iteration, and these are how a diverged one
-    # announces itself.
+    # violate. What can go wrong is the iteration, and a diverged one is a refusal rather
+    # than a number that is not a state.
+    if not (temperature > 0.0 and pressure > 0.0 and compressibility > 0.0):
+        return _refusal(
+            iterations,
+            residual,
+            "the iteration left the region where the equation of state is defined; "
+            "the returned state is not a critical point",
+            warnings,
+        )
     computed = {"tc": temperature, "pc": pressure, "z_c": compressibility}
     apply_checks(checks.derived, computed.get, warnings)
-    for field, value in (("tc", temperature), ("pc", pressure), ("z_c", compressibility)):
-        if not value > 0.0:
-            raise OutOfRangeError(
-                field,
-                value,
-                "the critical point this composition was found to have is not a state; "
-                "the iteration left the region where the equation of state is defined",
-            )
 
     return CriticalPointResult(
         tc=from_si(temperature, "K"),
         pc=from_si(pressure, "Pa"),
         vc=from_si(volume, "m**3/mol"),
         z_c=compressibility,
+        converged=True,
         iterations=iterations,
         residual=residual,
         warnings=tuple(warnings),

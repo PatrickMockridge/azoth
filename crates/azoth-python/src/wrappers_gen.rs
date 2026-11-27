@@ -6,7 +6,9 @@
 //! Regenerate with `python tools/gen_python_wrappers.py`; CI runs `--check`
 //! and fails on any difference.
 
-use crate::eos::{PyAssociationSpec, build_mixture, build_mixture_with_mass};
+use crate::eos::{
+    PyAssociationSpec, build_mixture, build_mixture_with_mass, build_mixture_with_mass_and_shift,
+};
 use crate::errors::to_pyerr;
 use azoth_core::units::{
     cubic_meters, cubic_meters_per_mole, cubic_meters_per_second, joules_per_kilogram_kelvin,
@@ -3236,6 +3238,57 @@ pub fn pt_flash(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// Pressure-temperature flash with a convergence flag.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (Tc, Pc, omega, classes, kij, association, T, P, z, tolerance, strict, eos = "pr", alpha = "pr", alpha_params = None))]
+#[pyo3(
+    text_signature = "(Tc, Pc, omega, classes, kij, association, T, P, z, tolerance, strict, eos = \"pr\", alpha = \"pr\", alpha_params = None)"
+)]
+#[allow(non_snake_case)] // symbols from the published equation
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn pt_flash_check(
+    py: Python<'_>,
+    Tc: Vec<f64>,
+    Pc: Vec<f64>,
+    omega: Vec<f64>,
+    classes: Vec<String>,
+    kij: Vec<f64>,
+    association: PyRef<'_, PyAssociationSpec>,
+    T: f64,
+    P: f64,
+    z: Vec<f64>,
+    tolerance: Option<f64>,
+    strict: Option<bool>,
+    eos: &str,
+    alpha: &str,
+    alpha_params: Option<Vec<Vec<f64>>>,
+) -> PyResult<crate::transport_gen::PyPtFlashCheckResult> {
+    let mixture = build_mixture(
+        py,
+        &Tc,
+        &Pc,
+        &omega,
+        &classes,
+        kij,
+        &association,
+        eos,
+        alpha,
+        alpha_params.as_deref(),
+    )?;
+    azoth_eos::pt_flash_check::pt_flash_check(
+        &mixture,
+        kelvins(T),
+        pascals(P),
+        &z,
+        tolerance,
+        strict,
+    )
+    .map(|r| crate::transport_gen::PyPtFlashCheckResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// PT phase envelope.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -4102,6 +4155,75 @@ pub fn stability_test(
     azoth_eos::stability_test::stability_test(&mixture, kelvins(T), pascals(P), &z)
         .map(|r| crate::transport_gen::PyStabilityTestResult::from(&r))
         .map_err(|e| to_pyerr(py, e))
+}
+
+/// Thermodynamic state at a temperature and pressure.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (Tc, Pc, omega, classes, kij, association, molar_mass, volume_shift, volume_shift_srk, cp_a, cp_b, cp_c, cp_d, cp_e, T, P, z, tolerance, strict, eos = "pr", alpha = "pr", alpha_params = None))]
+#[pyo3(
+    text_signature = "(Tc, Pc, omega, classes, kij, association, molar_mass, volume_shift, volume_shift_srk, cp_a, cp_b, cp_c, cp_d, cp_e, T, P, z, tolerance, strict, eos = \"pr\", alpha = \"pr\", alpha_params = None)"
+)]
+#[allow(non_snake_case)] // symbols from the published equation
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn state_at_tp(
+    py: Python<'_>,
+    Tc: Vec<f64>,
+    Pc: Vec<f64>,
+    omega: Vec<f64>,
+    classes: Vec<String>,
+    kij: Vec<f64>,
+    association: PyRef<'_, PyAssociationSpec>,
+    molar_mass: Vec<f64>,
+    volume_shift: Vec<f64>,
+    volume_shift_srk: Vec<f64>,
+    cp_a: Vec<f64>,
+    cp_b: Vec<f64>,
+    cp_c: Vec<f64>,
+    cp_d: Vec<f64>,
+    cp_e: Vec<f64>,
+    T: f64,
+    P: f64,
+    z: Vec<f64>,
+    tolerance: Option<f64>,
+    strict: Option<bool>,
+    eos: &str,
+    alpha: &str,
+    alpha_params: Option<Vec<Vec<f64>>>,
+) -> PyResult<crate::transport_gen::PyStateAtTpResult> {
+    let mixture = build_mixture_with_mass_and_shift(
+        py,
+        &Tc,
+        &Pc,
+        &omega,
+        &classes,
+        kij,
+        &association,
+        &molar_mass,
+        &volume_shift,
+        &volume_shift_srk,
+        eos,
+        alpha,
+        alpha_params.as_deref(),
+    )?;
+    azoth_eos::state_at_tp::state_at_tp(
+        &mixture,
+        &azoth_eos::molar_enthalpy_entropy::IdealGasModel {
+            cp_a,
+            cp_b,
+            cp_c,
+            cp_d,
+            cp_e,
+        },
+        kelvins(T),
+        pascals(P),
+        &z,
+        tolerance,
+        strict,
+    )
+    .map(|r| crate::transport_gen::PyStateAtTpResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
 }
 
 /// Scale mass rates of an aqueous stream from its coupled mineral equilibrium.

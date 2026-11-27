@@ -16,7 +16,7 @@
 //! derivative is taken with the eigenvector belonging to each perturbed state.
 
 use azoth_core::units::{ThermodynamicTemperature, pascals};
-use azoth_core::{AzothError, Result, apply_checks};
+use azoth_core::{AzothError, Result, Warning, WarningCode, apply_checks};
 
 use crate::mixture::{Mixture, ReducedParameters};
 use crate::model_gen;
@@ -282,6 +282,25 @@ fn state(
 /// * [`AzothError::SolverNotConverged`] if the two conditions do not reach the
 ///   tolerance in the spec's iteration cap. A critical point that is nearly one is not
 ///   one.
+fn refusal(
+    iterations: u32,
+    residual: f64,
+    message: impl Into<String>,
+    mut warnings: Vec<Warning>,
+) -> CriticalPointResult {
+    warnings.push(Warning::new(WarningCode::SolverNotConverged, message));
+    CriticalPointResult {
+        tc: ThermodynamicTemperature::new::<azoth_core::units::kelvin>(f64::NAN),
+        pc: pascals(f64::NAN),
+        vc: azoth_core::units::cubic_meters_per_mole(f64::NAN),
+        z_c: f64::NAN,
+        converged: false,
+        iterations,
+        residual,
+        warnings,
+    }
+}
+
 pub fn critical_point(mixture: &Mixture, z: &[f64]) -> Result<CriticalPointResult> {
     let spec = &model_gen::CRITICAL_POINT_SPEC;
     let mut warnings = Vec::new();
@@ -361,11 +380,15 @@ pub fn critical_point(mixture: &Mixture, z: &[f64]) -> Result<CriticalPointResul
     }
 
     if residual >= residual_tolerance {
-        return Err(AzothError::SolverNotConverged {
+        return Ok(refusal(
             iterations,
             residual,
-            tolerance: residual_tolerance,
-        });
+            format!(
+                "the nested Newton did not reach its tolerance after {iterations} \
+                 iterations (residual {residual:.3e}); the critical point is not reported"
+            ),
+            warnings,
+        ));
     }
 
     let pressure = pressure_at_volume(mixture, temperature, volume, z)?;
@@ -375,6 +398,21 @@ pub fn critical_point(mixture: &Mixture, z: &[f64]) -> Result<CriticalPointResul
     // vector or a matrix, so there is no scalar argument whose range a caller could
     // violate. What can go wrong is the iteration, and these are how a diverged one
     // announces itself.
+    if !temperature.is_finite()
+        || !pressure.is_finite()
+        || !compressibility.is_finite()
+        || temperature <= 0.0
+        || pressure <= 0.0
+        || compressibility <= 0.0
+    {
+        return Ok(refusal(
+            iterations,
+            residual,
+            "the iteration left the region where the equation of state is defined; \
+             the returned state is not a critical point",
+            warnings,
+        ));
+    }
     apply_checks(
         spec.derived_checks(),
         |quantity| match quantity {
@@ -386,31 +424,12 @@ pub fn critical_point(mixture: &Mixture, z: &[f64]) -> Result<CriticalPointResul
         &mut warnings,
     )?;
 
-    for (field, value) in [
-        ("tc", temperature),
-        ("pc", pressure),
-        ("z_c", compressibility),
-    ] {
-        // Written as an explicit finiteness-and-positivity test rather than
-        // `!(value > 0.0)`, which reads as a double negative and is the shape clippy
-        // flags. Both reject NaN; only the explicit form also rejects an infinity.
-        if !value.is_finite() || value <= 0.0 {
-            return Err(AzothError::OutOfRange {
-                field: field.to_string(),
-                value,
-                detail: "the critical point this composition was found to have is not a \
-                         state; the iteration left the region where the equation of \
-                         state is defined"
-                    .to_string(),
-            });
-        }
-    }
-
     Ok(CriticalPointResult {
         tc: ThermodynamicTemperature::new::<azoth_core::units::kelvin>(temperature),
         pc: pascals(pressure),
         vc: azoth_core::units::cubic_meters_per_mole(volume),
         z_c: compressibility,
+        converged: true,
         iterations,
         residual,
         warnings,

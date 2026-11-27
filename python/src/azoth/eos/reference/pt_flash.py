@@ -19,7 +19,7 @@ from azoth.core.errors import InvalidInputError, SolverNotConvergedError
 from azoth.core.range import apply_checks, checks_for
 from azoth.core.result import Phase, PtFlashResult
 from azoth.core.units import Q, input_to_si
-from azoth.core.warnings import Warning
+from azoth.core.warnings import Warning, WarningCode
 from azoth.eos.mixture import Mixture
 from azoth.eos.reference._flash_newton import split_at as flash_newton_split
 from azoth.eos.reference._flash_newton import step as flash_newton_step
@@ -80,20 +80,32 @@ def check_composition(z: list[float], n: int, field: str = "z") -> None:
         )
 
 
-def settled_tolerance(algorithm: dict[str, Any], from_newton: bool) -> float:
+def settled_tolerance(
+    algorithm: dict[str, Any], from_newton: bool, override: float | None = None
+) -> float:
     """The tolerance the loop settled against, which depends on which scheme finished it.
 
     The two schemes measure different things - the outer one the change in ``ln K`` and
     the fallback the step it took - so they carry their own stopping rules, and the
-    comparison at the end has to be against the one that actually ran.
+    comparison at the end has to be against the one that actually ran. A caller's
+    ``override`` replaces both: it is the acceptance the caller asked for.
     """
+    if override is not None:
+        return float(override)
     fallback = algorithm.get("fallback")
     if from_newton and fallback is not None:
         return float(fallback["algorithm"]["tolerance"])
     return float(algorithm["tolerance"])
 
 
-def pt_flash(mixture: Mixture, T: Q, P: Q, z: list[float]) -> PtFlashResult:
+def _pt_flash(
+    mixture: Mixture,
+    T: Q,
+    P: Q,
+    z: list[float],
+    tolerance: float | None = None,
+    strict: bool | None = None,
+) -> tuple[PtFlashResult, bool]:
     """The isothermal two-phase flash of a mixture at a temperature and pressure.
 
     Args:
@@ -103,6 +115,12 @@ def pt_flash(mixture: Mixture, T: Q, P: Q, z: list[float]) -> PtFlashResult:
         z: overall mole fractions. **Checked rather than renormalised** - silently
             rescaling a caller's composition would make their error invisible in a
             way that changes every number downstream.
+        tolerance: the outer stopping tolerance, or ``None`` for the spec's
+            ``algorithm.tolerance``. A caller's value also becomes the acceptance
+            for the second-order fallback.
+        strict: whether a cap raises, or ``None`` for true. ``False`` returns the
+            last iterate with ``converged = False`` and a warning; a non-finite
+            K-value still raises, because that is divergence, not a state.
 
     Returns:
         The split, or a statement of why there is not one. ``beta`` is ``None``
@@ -110,11 +128,11 @@ def pt_flash(mixture: Mixture, T: Q, P: Q, z: list[float]) -> PtFlashResult:
 
     Raises:
         InvalidInputError: if ``z`` is the wrong length, has a negative entry, or
-            does not sum to one.
+            does not sum to one, or if ``tolerance`` is not finite and positive.
         OutOfRangeError: if ``T`` or ``P`` is not positive.
-        SolverNotConvergedError: if the iteration hits its cap, or if a K-value
-            becomes non-finite - which is the iteration diverging rather than a
-            state to diagnose.
+        SolverNotConvergedError: if the iteration hits its cap under ``strict``, or
+            if a K-value becomes non-finite - which is the iteration diverging
+            rather than a state to diagnose.
 
     Example:
         >>> import azoth
@@ -158,6 +176,13 @@ def pt_flash(mixture: Mixture, T: Q, P: Q, z: list[float]) -> PtFlashResult:
     warnings.extend(reduced.warnings)
 
     algorithm = spec["algorithm"]
+    if tolerance is not None and not (math.isfinite(tolerance) and tolerance > 0.0):
+        raise InvalidInputError(
+            "tolerance",
+            f"the outer tolerance is {tolerance}; it must be finite and positive",
+        )
+    effective_tolerance = float(algorithm["tolerance"]) if tolerance is None else float(tolerance)
+    strict_flag = True if strict is None else bool(strict)
     inner = algorithm["inner"]
     # **`effective_kij`, not `kij`**: rule 10 adds `cpakijT_SRK * T`, and the Rust kernel
     # reads the reduced parameters' effective matrix. This side read the base one, so a CPA
@@ -219,7 +244,12 @@ def pt_flash(mixture: Mixture, T: Q, P: Q, z: list[float]) -> PtFlashResult:
                 # rather than re-running the outer scheme from where it handed over.
                 x_newton, y_newton = flash_newton_split(list(z), u)
                 k = [yi / xi for yi, xi in zip(y_newton, x_newton, strict=True)]
-                if residual <= second_order["tolerance"]:
+                acceptance = (
+                    effective_tolerance
+                    if tolerance is not None
+                    else float(second_order["tolerance"])
+                )
+                if residual <= acceptance:
                     break
                 continue
 
@@ -234,7 +264,7 @@ def pt_flash(mixture: Mixture, T: Q, P: Q, z: list[float]) -> PtFlashResult:
         # K-values as a composition ratio, and `nan > 1.0` being false would
         # otherwise report a diverged iteration as a single-phase feed.
         if any(not math.isfinite(value) or value <= 0.0 for value in k):
-            raise SolverNotConvergedError(iterations, residual, algorithm["tolerance"])
+            raise SolverNotConvergedError(iterations, residual, effective_tolerance)
         bounds = rachford_rice_bounds(k)
         if bounds is None:
             settled = "all_vapour" if all(value > 1.0 for value in k) else "all_liquid"
@@ -253,9 +283,14 @@ def pt_flash(mixture: Mixture, T: Q, P: Q, z: list[float]) -> PtFlashResult:
         u = [beta * value for value in y]
         splits = 0.0 < beta < 1.0
 
-        if residual <= algorithm["tolerance"]:
+        if residual <= effective_tolerance:
             break
 
+    converged = (
+        settled is not None
+        or is_trivial(k, TRIVIAL_TOLERANCE)
+        or residual <= settled_tolerance(algorithm, from_newton, tolerance)
+    )
     beta_out: float | None
     if settled == "trivial" or (settled is None and is_trivial(k, TRIVIAL_TOLERANCE)):
         # Stated *exactly* - x = y = z and K = 1 - rather than as the last iterate
@@ -271,9 +306,9 @@ def pt_flash(mixture: Mixture, T: Q, P: Q, z: list[float]) -> PtFlashResult:
         phase = Phase.ALL_VAPOUR if settled == "all_vapour" else Phase.ALL_LIQUID
         beta_out = None
         warnings.append(single_phase_warning(phase))
-    elif residual > settled_tolerance(algorithm, from_newton):
+    elif residual > settled_tolerance(algorithm, from_newton, tolerance) and strict_flag:
         raise SolverNotConvergedError(
-            iterations, residual, settled_tolerance(algorithm, from_newton)
+            iterations, residual, settled_tolerance(algorithm, from_newton, tolerance)
         )
     elif from_newton:
         # The second-order scheme converged, and it converges on its own measure - the
@@ -305,21 +340,47 @@ def pt_flash(mixture: Mixture, T: Q, P: Q, z: list[float]) -> PtFlashResult:
         if phase is not Phase.TWO_PHASE:
             warnings.append(negative_flash_warning(phase, beta_out))
 
+    if not converged:
+        warnings.append(
+            Warning(
+                code=WarningCode.SOLVER_NOT_CONVERGED,
+                message=(
+                    f"the flash stopped after {iterations} iterations at residual "
+                    f"{residual!r} against "
+                    f"{settled_tolerance(algorithm, from_newton, tolerance)!r}; "
+                    "the phase split is the last iterate, not a converged state"
+                ),
+            )
+        )
+
     liquid_state = phase_state(reduced, kij, x, liquid=True)
     vapour_state = phase_state(reduced, kij, y, liquid=False)
 
-    return PtFlashResult(
-        vapour_fraction=beta_out,
-        x=tuple(x),
-        y=tuple(y),
-        k=tuple(k),
-        ln_phi_liquid=tuple(liquid_state.ln_phi),
-        ln_phi_vapour=tuple(vapour_state.ln_phi),
-        z_liquid=liquid_state.z,
-        z_vapour=vapour_state.z,
-        min_t_over_tc=min_t_over_tc,
-        phase=phase,
-        iterations=iterations,
-        residual=residual,
-        warnings=tuple(warnings),
+    return (
+        PtFlashResult(
+            vapour_fraction=beta_out,
+            x=tuple(x),
+            y=tuple(y),
+            k=tuple(k),
+            ln_phi_liquid=tuple(liquid_state.ln_phi),
+            ln_phi_vapour=tuple(vapour_state.ln_phi),
+            z_liquid=liquid_state.z,
+            z_vapour=vapour_state.z,
+            min_t_over_tc=min_t_over_tc,
+            phase=phase,
+            iterations=iterations,
+            residual=residual,
+            warnings=tuple(warnings),
+        ),
+        converged,
     )
+
+
+def pt_flash(mixture: Mixture, T: Q, P: Q, z: list[float]) -> PtFlashResult:
+    """The isothermal flash with the spec's declared tolerance and strict raising.
+
+    The compatibility entry point: `eos.pt_flash`'s contract is unchanged, and this
+    function cannot be handed a different tolerance or asked not to raise. The
+    diagnostic contract is :func:`pt_flash_check`.
+    """
+    return _pt_flash(mixture, T, P, z)[0]

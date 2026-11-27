@@ -10,6 +10,8 @@ assumptions = [
     "each branch stops at the critical region rather than continuing *through* the critical point onto the other branch as NeqSim does, so the two traces are independent and `residual` reports the bracket they put around the critical point.",
     "the next point is predicted by a cubic through the last four converged points and the step size is clamped to at most 10 K and 10 bar per point.",
     "the envelope is for mixtures; a single component's envelope is its vapour-pressure curve, which `eos.pure_saturation` computes.",
+    "**a failed continuation falls back to a direct-flash grid**: 40 isotherms on 150-500 K, 40 pressures on 1-400 bar, the boundary bisected, and the cricondenbar refined by a 0.5 K then 0.1 K scan. The grid reports no critical point; an unconverged flash is single phase and warns.",
+    "the critical fields are NaN when `eos.critical_point` refuses, and the warning carries the residual. A grid answer has no trace, so `residual` is NaN and `iterations` is the flash count.",
     "no energy balance. The envelope is a phase-equilibrium locus, not a statement about how a stream got there.",
 ]
 references = [
@@ -89,13 +91,12 @@ unit = "Pa"
 description = "the critical pressure, from the same construction"
 [outputs.iterations]
 unit = "dimensionless"
-description = "the number of continuation points traced"
+description = "the continuation points traced, or the flash count when the grid answered."
 [outputs.residual]
 unit = "K"
 description = """\
-    the gap between where the two branches stopped. They approach the critical point from opposite \
-    sides, so it is the width of the bracket they put around it - the trace's own statement that it \
-    reached the critical point. `NaN` when a branch ran into the pressure ceiling instead."""
+    the gap between where the two branches stopped: the width of the bracket they put around the \
+    critical point. `NaN` when a branch ran into the pressure ceiling, or when the grid answered."""
 [[valid_range]]
 quantity = "P"
 min = 0
@@ -106,8 +107,8 @@ rationale = "an absolute pressure; zero and below are not states"
 quantity = "critical_pressure"
 min = 0
 min_inclusive = false
-severity = "error"
-rationale = "the critical pressure is a positive pressure, or the trace never reached the critical point"
+severity = "warning"
+rationale = "a refused critical point reports NaN with a warning; the envelope's cricondenbar and cricondentherm do not depend on it"
 [implementations]
 python = "azoth.eos.pt_phase_envelope"
 rust = "azoth_eos::pt_phase_envelope"
