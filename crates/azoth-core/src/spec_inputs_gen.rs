@@ -28,6 +28,8 @@
 //!   - specs/models/eos/brine_mixing_scale_evaluator.toml
 //!   - specs/models/eos/bubble_pressure.toml
 //!   - specs/models/eos/bubble_temperature.toml
+//!   - specs/calcs/eos/bukacek_water_dew_point.toml
+//!   - specs/calcs/eos/bukacek_water_in_gas.toml
 //!   - specs/models/eos/bwrs_phase.toml
 //!   - specs/models/eos/calc_ionic_composition.toml
 //!   - specs/models/eos/capillary_dew_point.toml
@@ -40,6 +42,7 @@
 //!   - specs/models/eos/co2_phase.toml
 //!   - specs/calcs/eos/co2_water_diffusivity.toml
 //!   - specs/calcs/eos/costald_molar_volume.toml
+//!   - specs/calcs/eos/cpa_water_caloric_alpha.toml
 //!   - specs/models/eos/critical_point.toml
 //!   - specs/calcs/eos/de_waard_milliams_corrosion.toml
 //!   - specs/models/eos/desmukh_mather_phase.toml
@@ -69,6 +72,7 @@
 //!   - specs/models/eos/ge_van_laar_acid_phase.toml
 //!   - specs/models/eos/ge_wilson_phase.toml
 //!   - specs/models/eos/gerg2008_phase.toml
+//!   - specs/calcs/eos/gerg_water_alpha.toml
 //!   - specs/models/eos/gt_surface_tension.toml
 //!   - specs/models/eos/gt_surface_tension_simple.toml
 //!   - specs/calcs/eos/hayduk_minhas_diffusivity.toml
@@ -709,6 +713,18 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("eos.bubble_pressure", "x", "dimensionless"),
     ("eos.bubble_temperature", "P", "pressure"),
     ("eos.bubble_temperature", "x", "dimensionless"),
+    (
+        "eos.bukacek_water_dew_point",
+        "water_mole_fraction",
+        "dimensionless",
+    ),
+    ("eos.bukacek_water_dew_point", "pressure", "pressure"),
+    (
+        "eos.bukacek_water_in_gas",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    ("eos.bukacek_water_in_gas", "pressure", "pressure"),
     ("eos.bwrs_phase", "T", "thermodynamic_temperature"),
     ("eos.bwrs_phase", "P", "pressure"),
     ("eos.bwrs_phase", "z", "dimensionless"),
@@ -869,6 +885,16 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("eos.costald_molar_volume", "M", "molar_mass"),
     ("eos.costald_molar_volume", "rho_normal", "mass_density"),
     ("eos.costald_molar_volume", "T", "thermodynamic_temperature"),
+    (
+        "eos.cpa_water_caloric_alpha",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "eos.cpa_water_caloric_alpha",
+        "critical_temperature",
+        "thermodynamic_temperature",
+    ),
     ("eos.critical_point", "z", "dimensionless"),
     (
         "eos.de_waard_milliams_corrosion",
@@ -1264,6 +1290,16 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("eos.gerg2008_phase", "T", "thermodynamic_temperature"),
     ("eos.gerg2008_phase", "P", "pressure"),
     ("eos.gerg2008_phase", "z", "dimensionless"),
+    (
+        "eos.gerg_water_alpha",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "eos.gerg_water_alpha",
+        "critical_temperature",
+        "thermodynamic_temperature",
+    ),
     (
         "eos.gt_surface_tension",
         "influence_parameters",

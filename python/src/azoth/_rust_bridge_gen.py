@@ -51,6 +51,8 @@ from azoth.core.result import (
     BubbleTemperatureResult,
     BubbleTransferZoneReleaseResult,
     BubbleTransferZoneReleaseStation,
+    BukacekWaterDewPointResult,
+    BukacekWaterInGasResult,
     BwrsPhaseResult,
     CalcIonicCompositionResult,
     CapillaryDewPointResult,
@@ -92,6 +94,7 @@ from azoth.core.result import (
     CostBomRow,
     CostEstimationResult,
     CostEstimationResultRow,
+    CpaWaterCaloricAlphaResult,
     CriticalPointResult,
     CvdMaterialBalanceResult,
     CvdPoint,
@@ -186,6 +189,7 @@ from azoth.core.result import (
     GeNrtlFlashResult,
     GeNrtlPhaseResult,
     Gerg2008PhaseResult,
+    GergWaterAlphaResult,
     GeUnifacPhaseResult,
     GeUniquacPhaseResult,
     GeVanLaarAcidPhaseResult,
@@ -629,6 +633,8 @@ __all__ = [
     "bubble_pressure",
     "bubble_temperature",
     "bubble_transfer_zone_release",
+    "bukacek_water_dew_point",
+    "bukacek_water_in_gas",
     "bwrs_phase",
     "calc_ionic_composition",
     "capillary_dew_point",
@@ -659,6 +665,7 @@ __all__ = [
     "cooler",
     "cost_estimation",
     "costald_molar_volume",
+    "cpa_water_caloric_alpha",
     "crane_k_factors",
     "critical_point",
     "cvd_material_balance",
@@ -730,6 +737,7 @@ __all__ = [
     "ge_wilson_phase",
     "generalized_material_balance",
     "gerg2008_phase",
+    "gerg_water_alpha",
     "gibbs_reactor",
     "gt_surface_tension",
     "gt_surface_tension_simple",
@@ -1555,6 +1563,32 @@ def bubble_temperature(mixture: Mixture, P: Q, x: list[float]) -> BubbleTemperat
     )
 
 
+def bukacek_water_dew_point(water_mole_fraction: float, pressure: float) -> BukacekWaterDewPointResult:
+    """``eos.bukacek_water_dew_point``, computed in Rust."""
+    spec = _spec_for("eos.bukacek_water_dew_point")
+    result = _core.bukacek_water_dew_point(
+        water_mole_fraction,
+        _si(spec, "pressure", pressure),
+    )
+    return BukacekWaterDewPointResult(
+        temperature=from_si(result.temperature.magnitude_si, result.temperature.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def bukacek_water_in_gas(temperature: float, pressure: float) -> BukacekWaterInGasResult:
+    """``eos.bukacek_water_in_gas``, computed in Rust."""
+    spec = _spec_for("eos.bukacek_water_in_gas")
+    result = _core.bukacek_water_in_gas(
+        _si(spec, "temperature", temperature),
+        _si(spec, "pressure", pressure),
+    )
+    return BukacekWaterInGasResult(
+        water_mole_fraction=result.water_mole_fraction,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def bwrs_phase(coeffs: Sequence[BwrsCoefficients], T: Q, P: Q, z: list[float]) -> BwrsPhaseResult:
     """``eos.bwrs_phase``, computed in Rust."""
     spec = _models_gen.model("eos.bwrs_phase")
@@ -1805,6 +1839,19 @@ def costald_molar_volume(omega: float, Tc: Q, Vc: Q, M: Q, rho_normal: Q, T: Q) 
     )
     return CostaldMolarVolumeResult(
         v=from_si(result.v.magnitude_si, result.v.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def cpa_water_caloric_alpha(temperature: float, critical_temperature: float) -> CpaWaterCaloricAlphaResult:
+    """``eos.cpa_water_caloric_alpha``, computed in Rust."""
+    spec = _spec_for("eos.cpa_water_caloric_alpha")
+    result = _core.cpa_water_caloric_alpha(
+        _si(spec, "temperature", temperature),
+        _si(spec, "critical_temperature", critical_temperature),
+    )
+    return CpaWaterCaloricAlphaResult(
+        alpha=result.alpha,
         warnings=_warnings(result.warnings),
     )
 
@@ -2551,6 +2598,19 @@ def gerg2008_phase(components: list[str], T: Q, P: Q, z: list[float]) -> Gerg200
         cv=from_si(result.cv.magnitude_si, result.cv.unit),
         cp=from_si(result.cp.magnitude_si, result.cp.unit),
         g=from_si(result.g.magnitude_si, result.g.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def gerg_water_alpha(temperature: float, critical_temperature: float) -> GergWaterAlphaResult:
+    """``eos.gerg_water_alpha``, computed in Rust."""
+    spec = _spec_for("eos.gerg_water_alpha")
+    result = _core.gerg_water_alpha(
+        _si(spec, "temperature", temperature),
+        _si(spec, "critical_temperature", critical_temperature),
+    )
+    return GergWaterAlphaResult(
+        alpha=result.alpha,
         warnings=_warnings(result.warnings),
     )
 

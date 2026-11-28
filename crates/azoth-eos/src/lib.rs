@@ -55,6 +55,8 @@ pub mod beggs_brill_segment;
 pub mod brine_mixing_scale_evaluator;
 pub mod bubble_pressure;
 pub mod bubble_temperature;
+pub mod bukacek_water_dew_point;
+pub mod bukacek_water_in_gas;
 pub mod bwrs;
 pub mod bwrs_mixture;
 pub mod bwrs_phase;
@@ -70,6 +72,7 @@ pub mod co2_brine_phase_equilibrium;
 pub mod co2_phase;
 pub mod co2_water_diffusivity;
 pub mod costald_molar_volume;
+pub mod cpa_water_caloric_alpha;
 pub mod critical_point;
 pub mod cubic;
 pub mod databank;
@@ -116,6 +119,7 @@ pub mod ge_wilson_phase;
 pub mod gerg2008;
 mod gerg2008_data;
 pub mod gerg2008_phase;
+pub mod gerg_water_alpha;
 pub mod gt_surface_tension;
 pub mod gt_surface_tension_simple;
 pub mod hayduk_minhas_diffusivity;
@@ -293,6 +297,8 @@ pub use argon_solid_phase::argon_solid_phase;
 pub use barite_celestite_solid_solution::barite_celestite_solid_solution;
 pub use bubble_pressure::bubble_pressure;
 pub use bubble_temperature::bubble_temperature;
+pub use bukacek_water_dew_point::bukacek_water_dew_point;
+pub use bukacek_water_in_gas::bukacek_water_in_gas;
 pub use bwrs_phase::bwrs_phase;
 pub use calc_ionic_composition::calc_ionic_composition;
 pub use capillary_dew_point::capillary_dew_point;
@@ -305,6 +311,7 @@ pub use co2_brine_phase_equilibrium::co2_brine_phase_equilibrium;
 pub use co2_phase::co2_phase;
 pub use co2_water_diffusivity::co2_water_diffusivity;
 pub use costald_molar_volume::costald_molar_volume;
+pub use cpa_water_caloric_alpha::cpa_water_caloric_alpha;
 pub use critical_point::critical_point;
 pub use cubic::Cubic;
 pub use de_waard_milliams_corrosion::de_waard_milliams_corrosion;
@@ -329,6 +336,7 @@ pub use ge_unifac_phase::ge_unifac_phase;
 pub use ge_uniquac_phase::ge_uniquac_phase;
 pub use ge_van_laar_acid_phase::ge_van_laar_acid_phase;
 pub use ge_wilson_phase::ge_wilson_phase;
+pub use gerg_water_alpha::gerg_water_alpha;
 pub use gerg2008_phase::gerg2008_phase;
 pub use gt_surface_tension::gt_surface_tension;
 pub use gt_surface_tension_simple::gt_surface_tension_simple;
@@ -399,11 +407,12 @@ pub use rackett_molar_volume::rackett_molar_volume;
 pub use results::{
     AmmoniaPhaseResult, AntoineVaporPressureResult, ArgonSolidPhaseResult, BeggsBrillSegmentResult,
     BrineMixingPointRow, BrineMixingScaleEvaluatorResult, BubblePressureResult,
-    BubbleTemperatureResult, BwrsPhaseResult, CalcIonicCompositionResult, CdftSurfaceTensionResult,
-    ChapmanEnskogDiffusivityResult, ChemicalWarningRow, ChungConductivityResult,
-    ChungViscosityResult, ClosedLoopDepositionSolverResult, Co2BrinePhaseEquilibriumResult,
-    Co2PhaseResult, Co2WaterDiffusivityResult, CooldownVerdict, CorrosionSeverity,
-    CostaldMolarVolumeResult, CriticalPointResult, DeWaardMilliamsCorrosionResult,
+    BubbleTemperatureResult, BukacekWaterDewPointResult, BukacekWaterInGasResult, BwrsPhaseResult,
+    CalcIonicCompositionResult, CdftSurfaceTensionResult, ChapmanEnskogDiffusivityResult,
+    ChemicalWarningRow, ChungConductivityResult, ChungViscosityResult,
+    ClosedLoopDepositionSolverResult, Co2BrinePhaseEquilibriumResult, Co2PhaseResult,
+    Co2WaterDiffusivityResult, CooldownVerdict, CorrosionSeverity, CostaldMolarVolumeResult,
+    CpaWaterCaloricAlphaResult, CriticalPointResult, DeWaardMilliamsCorrosionResult,
     DepositionSegmentRow, DesmukhMatherPhaseResult, DewPressureResult, DewTemperatureResult,
     EffectiveDiffusionResult, ElectrolyteCpaStatoilPhaseResult, ElectrolyteScaleCalculatorResult,
     EmulsionType, EmulsionViscosityResult, EosCgPhaseResult, FeSMorphology,
@@ -412,12 +421,12 @@ pub use results::{
     FullerSchettlerGiddingsDiffusivityResult, FurstElectrolyteMod2004PhaseResult,
     FurstElectrolytePhaseResult, GeFlashResult, GeNrtlFlashResult, GeNrtlPhaseResult,
     GeUnifacPhaseResult, GeUniquacPhaseResult, GeVanLaarAcidPhaseResult, GeWilsonPhaseResult,
-    Gerg2008PhaseResult, GtSurfaceTensionResult, GtSurfaceTensionSimpleResult,
-    HaydukMinhasDiffusivityResult, HeatOfVaporizationResult, HeliumPhaseResult, HenryStatus,
-    HybridEosGeFlashResult, HydrateFormationTemperatureResult, HydrateFractionResult,
-    HydrateRiskLevel, HydrateRiskMapResult, HydrateRiskPoint, HydrateStructure,
-    HydrogenPhaseResult, IapwsHenryLawResult, IapwsSaturationPressureResult, IdealGasCpResult,
-    InterfacePropertiesResult, KentEisenbergPhaseResult, LgtSurfaceTensionResult,
+    Gerg2008PhaseResult, GergWaterAlphaResult, GtSurfaceTensionResult,
+    GtSurfaceTensionSimpleResult, HaydukMinhasDiffusivityResult, HeatOfVaporizationResult,
+    HeliumPhaseResult, HenryStatus, HybridEosGeFlashResult, HydrateFormationTemperatureResult,
+    HydrateFractionResult, HydrateRiskLevel, HydrateRiskMapResult, HydrateRiskPoint,
+    HydrateStructure, HydrogenPhaseResult, IapwsHenryLawResult, IapwsSaturationPressureResult,
+    IdealGasCpResult, InterfacePropertiesResult, KentEisenbergPhaseResult, LgtSurfaceTensionResult,
     LiquidConductivityPolynomResult, LiquidHeatCapacityResult, LiquidViscosityPureResult,
     MasonSaxenaConductivityResult, Matcop5PrumrAlphaResult, MatcopAlphaResult, MatcopPrAlphaResult,
     MatcopPrumrAlphaResult, MatcopPrumrNewAlphaResult, MolarEnthalpyEntropyResult,

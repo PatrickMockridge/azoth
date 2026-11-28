@@ -521,21 +521,6 @@ classes = [
 ]
 
 [[package]]
-id = "tier1.cubic_eos_breadth_attractive.port"
-tier = 1
-title = "Cubic EOS breadth (attractive)"
-state = "port"
-loc = 224
-deps = 3
-capture = ""
-new_solver = false
-size = "S"
-classes = [
-    "AttractiveTermCPAWaterCaloric",
-    "AttractiveTermGERG",
-]
-
-[[package]]
 id = "tier1.cubic_eos_breadth_phase.port"
 tier = 1
 title = "Cubic EOS breadth (phase)"
@@ -862,20 +847,6 @@ classes = [
     "SeawaterProperties",
     "SystemSeawater",
     "WaterPhaseBoundaryResult",
-]
-
-[[package]]
-id = "tier2.water_content.port"
-tier = 2
-title = "Water content"
-state = "port"
-loc = 89
-deps = 2
-capture = "validation/neqsim/AqueousViscProbe.java"
-new_solver = false
-size = "S"
-classes = [
-    "BukacekWaterInGas",
 ]
 
 [[package]]

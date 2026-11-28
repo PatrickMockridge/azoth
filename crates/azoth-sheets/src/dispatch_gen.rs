@@ -36,99 +36,103 @@ pub fn run(id: &str, inputs: &Value) -> Outcome {
         "characterization.tbp_cut_properties" => calc_0(inputs).unwrap_or_else(|outcome| outcome),
         "eos.antoine_vapor_pressure" => calc_1(inputs).unwrap_or_else(|outcome| outcome),
         "eos.beggs_brill_segment" => calc_2(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.chapman_enskog_diffusivity" => calc_3(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.chung_conductivity" => calc_4(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.chung_viscosity" => calc_5(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.co2_water_diffusivity" => calc_6(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.costald_molar_volume" => calc_7(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.de_waard_milliams_corrosion" => calc_8(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.electrolyte_scale_calculator" => calc_9(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.emulsion_viscosity" => calc_10(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.erosion_prediction" => calc_11(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.firozabadi_ramley_interface_tension" => calc_12(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.fuller_schettler_giddings_diffusivity" => calc_13(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.hayduk_minhas_diffusivity" => calc_14(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.heat_of_vaporization" => calc_15(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.iapws_henry_law" => calc_16(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.iapws_saturation_pressure" => calc_17(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.ideal_gas_cp" => calc_18(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.liquid_heat_capacity" => calc_19(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.liquid_viscosity_pure" => calc_20(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.matcop5_prumr_alpha" => calc_21(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.matcop_alpha" => calc_22(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.matcop_pr_alpha" => calc_23(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.matcop_prumr_alpha" => calc_24(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.matcop_prumr_new_alpha" => calc_25(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.mollerup_alpha" => calc_26(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.nitric_sulfuric_acid_vapor_pressure" => calc_27(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.parachor_surface_tension" => calc_28(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.pitzer_scale_activity" => calc_29(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.pr78_kappa" => calc_30(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.pr_alpha_ab" => calc_31(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.pr_danesh_alpha" => calc_32(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.pr_delft1998_alpha" => calc_33(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.pr_departure" => calc_34(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.pr_gassem2001_alpha" => calc_35(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.pr_kappa" => calc_36(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.pr_lee_kesler_alpha" => calc_37(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.pr_mass_density" => calc_38(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.pr_molar_volume" => calc_39(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.pr_peneloux_shift" => calc_40(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.pr_z_factor" => calc_41(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.rachford_rice_binary" => calc_42(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.rackett_molar_volume" => calc_43(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.rk_alpha_ab" => calc_44(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.rk_departure" => calc_45(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.scale_inhibitor_performance" => calc_46(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.scale_kinetics" => calc_47(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.scale_mass" => calc_48(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.scale_prediction" => calc_49(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.scale_saturation_ratio" => calc_50(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.schwartzentruber_alpha" => calc_51(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.siddiqi_lucas_diffusivity" => calc_52(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.solid_fugacity" => calc_53(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.soreide_whitson_alpha" => calc_54(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.srk_alpha_ab" => calc_55(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.srk_departure" => calc_56(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.srk_kappa" => calc_57(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.srk_peneloux_shift" => calc_58(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.srk_z_factor" => calc_59(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.tbp_fraction_properties" => calc_60(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.twu_kappa" => calc_61(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.twucoon_alpha" => calc_62(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.twucoon_param_alpha" => calc_63(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.twucoon_statoil_alpha" => calc_64(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.tyn_calus_diffusivity" => calc_65(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.umrpr_alpha" => calc_66(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.vdw1f_mix_binary" => calc_67(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.wax_solid_fugacity" => calc_68(inputs).unwrap_or_else(|outcome| outcome),
-        "eos.wilke_chang_diffusivity" => calc_69(inputs).unwrap_or_else(|outcome| outcome),
-        "hydraulics.choked_flow_area" => calc_70(inputs).unwrap_or_else(|outcome| outcome),
-        "hydraulics.control_valve_cv" => calc_71(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.bukacek_water_dew_point" => calc_3(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.bukacek_water_in_gas" => calc_4(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.chapman_enskog_diffusivity" => calc_5(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.chung_conductivity" => calc_6(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.chung_viscosity" => calc_7(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.co2_water_diffusivity" => calc_8(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.costald_molar_volume" => calc_9(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.cpa_water_caloric_alpha" => calc_10(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.de_waard_milliams_corrosion" => calc_11(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.electrolyte_scale_calculator" => calc_12(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.emulsion_viscosity" => calc_13(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.erosion_prediction" => calc_14(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.firozabadi_ramley_interface_tension" => calc_15(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.fuller_schettler_giddings_diffusivity" => calc_16(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.gerg_water_alpha" => calc_17(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.hayduk_minhas_diffusivity" => calc_18(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.heat_of_vaporization" => calc_19(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.iapws_henry_law" => calc_20(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.iapws_saturation_pressure" => calc_21(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.ideal_gas_cp" => calc_22(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.liquid_heat_capacity" => calc_23(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.liquid_viscosity_pure" => calc_24(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.matcop5_prumr_alpha" => calc_25(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.matcop_alpha" => calc_26(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.matcop_pr_alpha" => calc_27(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.matcop_prumr_alpha" => calc_28(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.matcop_prumr_new_alpha" => calc_29(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.mollerup_alpha" => calc_30(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.nitric_sulfuric_acid_vapor_pressure" => calc_31(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.parachor_surface_tension" => calc_32(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.pitzer_scale_activity" => calc_33(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.pr78_kappa" => calc_34(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.pr_alpha_ab" => calc_35(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.pr_danesh_alpha" => calc_36(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.pr_delft1998_alpha" => calc_37(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.pr_departure" => calc_38(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.pr_gassem2001_alpha" => calc_39(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.pr_kappa" => calc_40(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.pr_lee_kesler_alpha" => calc_41(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.pr_mass_density" => calc_42(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.pr_molar_volume" => calc_43(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.pr_peneloux_shift" => calc_44(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.pr_z_factor" => calc_45(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.rachford_rice_binary" => calc_46(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.rackett_molar_volume" => calc_47(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.rk_alpha_ab" => calc_48(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.rk_departure" => calc_49(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.scale_inhibitor_performance" => calc_50(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.scale_kinetics" => calc_51(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.scale_mass" => calc_52(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.scale_prediction" => calc_53(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.scale_saturation_ratio" => calc_54(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.schwartzentruber_alpha" => calc_55(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.siddiqi_lucas_diffusivity" => calc_56(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.solid_fugacity" => calc_57(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.soreide_whitson_alpha" => calc_58(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.srk_alpha_ab" => calc_59(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.srk_departure" => calc_60(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.srk_kappa" => calc_61(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.srk_peneloux_shift" => calc_62(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.srk_z_factor" => calc_63(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.tbp_fraction_properties" => calc_64(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.twu_kappa" => calc_65(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.twucoon_alpha" => calc_66(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.twucoon_param_alpha" => calc_67(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.twucoon_statoil_alpha" => calc_68(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.tyn_calus_diffusivity" => calc_69(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.umrpr_alpha" => calc_70(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.vdw1f_mix_binary" => calc_71(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.wax_solid_fugacity" => calc_72(inputs).unwrap_or_else(|outcome| outcome),
+        "eos.wilke_chang_diffusivity" => calc_73(inputs).unwrap_or_else(|outcome| outcome),
+        "hydraulics.choked_flow_area" => calc_74(inputs).unwrap_or_else(|outcome| outcome),
+        "hydraulics.control_valve_cv" => calc_75(inputs).unwrap_or_else(|outcome| outcome),
         "hydraulics.crane_k_factors" => Outcome::Error { message: "this calculation takes a table of rows as input, which the sheet editor does not yet provide".to_string(), field: None },
-        "hydraulics.darcy_weisbach" => calc_73(inputs).unwrap_or_else(|outcome| outcome),
-        "hydraulics.friction_factor_colebrook" => calc_74(inputs).unwrap_or_else(|outcome| outcome),
-        "hydraulics.friction_factor_haaland" => calc_75(inputs).unwrap_or_else(|outcome| outcome),
-        "hydraulics.friction_factor_swamee_jain" => calc_76(inputs).unwrap_or_else(|outcome| outcome),
-        "hydraulics.orifice_flow" => calc_77(inputs).unwrap_or_else(|outcome| outcome),
-        "hydraulics.packing_hydraulics" => calc_78(inputs).unwrap_or_else(|outcome| outcome),
-        "hydraulics.packing_sizing" => calc_79(inputs).unwrap_or_else(|outcome| outcome),
-        "hydraulics.pump_power" => calc_80(inputs).unwrap_or_else(|outcome| outcome),
-        "hydraulics.reynolds_number" => calc_81(inputs).unwrap_or_else(|outcome| outcome),
-        "hydraulics.tray_hydraulics" => calc_82(inputs).unwrap_or_else(|outcome| outcome),
-        "reactions.equilibrium_constant" => calc_83(inputs).unwrap_or_else(|outcome| outcome),
-        "thermal.boiling_heat_transfer" => calc_84(inputs).unwrap_or_else(|outcome| outcome),
-        "thermal.conduction_plane_wall" => calc_85(inputs).unwrap_or_else(|outcome| outcome),
-        "thermal.fouling_model" => calc_86(inputs).unwrap_or_else(|outcome| outcome),
+        "hydraulics.darcy_weisbach" => calc_77(inputs).unwrap_or_else(|outcome| outcome),
+        "hydraulics.friction_factor_colebrook" => calc_78(inputs).unwrap_or_else(|outcome| outcome),
+        "hydraulics.friction_factor_haaland" => calc_79(inputs).unwrap_or_else(|outcome| outcome),
+        "hydraulics.friction_factor_swamee_jain" => calc_80(inputs).unwrap_or_else(|outcome| outcome),
+        "hydraulics.orifice_flow" => calc_81(inputs).unwrap_or_else(|outcome| outcome),
+        "hydraulics.packing_hydraulics" => calc_82(inputs).unwrap_or_else(|outcome| outcome),
+        "hydraulics.packing_sizing" => calc_83(inputs).unwrap_or_else(|outcome| outcome),
+        "hydraulics.pump_power" => calc_84(inputs).unwrap_or_else(|outcome| outcome),
+        "hydraulics.reynolds_number" => calc_85(inputs).unwrap_or_else(|outcome| outcome),
+        "hydraulics.tray_hydraulics" => calc_86(inputs).unwrap_or_else(|outcome| outcome),
+        "reactions.equilibrium_constant" => calc_87(inputs).unwrap_or_else(|outcome| outcome),
+        "thermal.boiling_heat_transfer" => calc_88(inputs).unwrap_or_else(|outcome| outcome),
+        "thermal.conduction_plane_wall" => calc_89(inputs).unwrap_or_else(|outcome| outcome),
+        "thermal.fouling_model" => calc_90(inputs).unwrap_or_else(|outcome| outcome),
         "thermal.incremental_zone_analysis" => Outcome::Error { message: "this calculation takes a table of rows as input, which the sheet editor does not yet provide".to_string(), field: None },
-        "thermal.lmtd_correction_factor" => calc_88(inputs).unwrap_or_else(|outcome| outcome),
-        "thermal.shah_condensation" => calc_89(inputs).unwrap_or_else(|outcome| outcome),
+        "thermal.lmtd_correction_factor" => calc_92(inputs).unwrap_or_else(|outcome| outcome),
+        "thermal.shah_condensation" => calc_93(inputs).unwrap_or_else(|outcome| outcome),
         "thermal.shell_and_tube_design" => Outcome::Error { message: "this calculation takes a table of rows as input, which the sheet editor does not yet provide".to_string(), field: None },
-        "thermal.shell_and_tube_rating" => calc_91(inputs).unwrap_or_else(|outcome| outcome),
-        "thermal.shell_and_tube_vibration" => calc_92(inputs).unwrap_or_else(|outcome| outcome),
-        "thermal.tema_standard" => calc_93(inputs).unwrap_or_else(|outcome| outcome),
-        "thermal.tube_insert_model" => calc_94(inputs).unwrap_or_else(|outcome| outcome),
-        "thermal.two_phase_pressure_drop" => calc_95(inputs).unwrap_or_else(|outcome| outcome),
+        "thermal.shell_and_tube_rating" => calc_95(inputs).unwrap_or_else(|outcome| outcome),
+        "thermal.shell_and_tube_vibration" => calc_96(inputs).unwrap_or_else(|outcome| outcome),
+        "thermal.tema_standard" => calc_97(inputs).unwrap_or_else(|outcome| outcome),
+        "thermal.tube_insert_model" => calc_98(inputs).unwrap_or_else(|outcome| outcome),
+        "thermal.two_phase_pressure_drop" => calc_99(inputs).unwrap_or_else(|outcome| outcome),
         "thermal.zone_rating" => Outcome::Error { message: "this calculation takes a table of rows as input, which the sheet editor does not yet provide".to_string(), field: None },
         _ => Outcome::Error {
             message: format!("`{id}` is not a calculation in this build"),
@@ -285,6 +289,50 @@ fn calc_2(inputs: &Value) -> Result<Outcome, Outcome> {
 
 fn calc_3(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
+        match azoth_eos::bukacek_water_dew_point::bukacek_water_dew_point(
+            number(inputs, "water_mole_fraction")?,
+            number(inputs, "pressure")?,
+        ) {
+            Ok(r) => {
+                let mut outputs = BTreeMap::new();
+                outputs.insert(
+                    "temperature".to_string(),
+                    json!({"magnitude_si": r.temperature, "unit": "K"}),
+                );
+                Outcome::Ok(CalcOutcome {
+                    outputs,
+                    warnings: warnings(r.warnings()),
+                })
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn calc_4(inputs: &Value) -> Result<Outcome, Outcome> {
+    Ok(
+        match azoth_eos::bukacek_water_in_gas::bukacek_water_in_gas(
+            number(inputs, "temperature")?,
+            number(inputs, "pressure")?,
+        ) {
+            Ok(r) => {
+                let mut outputs = BTreeMap::new();
+                outputs.insert(
+                    "water_mole_fraction".to_string(),
+                    json!(r.water_mole_fraction),
+                );
+                Outcome::Ok(CalcOutcome {
+                    outputs,
+                    warnings: warnings(r.warnings()),
+                })
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn calc_5(inputs: &Value) -> Result<Outcome, Outcome> {
+    Ok(
         match azoth_eos::chapman_enskog_diffusivity::chapman_enskog_diffusivity(
             kilograms_per_mole(number(inputs, "MA")?),
             kilograms_per_mole(number(inputs, "MB")?),
@@ -309,7 +357,7 @@ fn calc_3(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_4(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_6(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::chung_conductivity::chung_conductivity(
             joules_per_mole_kelvin(number(inputs, "Cv0")?),
@@ -337,7 +385,7 @@ fn calc_4(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_5(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_7(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::chung_viscosity::chung_viscosity(
             number(inputs, "omega")?,
@@ -365,7 +413,7 @@ fn calc_5(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_6(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_8(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::co2_water_diffusivity::co2_water_diffusivity(kelvins(number(inputs, "T")?))
         {
@@ -385,7 +433,7 @@ fn calc_6(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_7(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_9(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::costald_molar_volume::costald_molar_volume(
             number(inputs, "omega")?,
@@ -411,7 +459,26 @@ fn calc_7(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_8(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_10(inputs: &Value) -> Result<Outcome, Outcome> {
+    Ok(
+        match azoth_eos::cpa_water_caloric_alpha::cpa_water_caloric_alpha(
+            number(inputs, "temperature")?,
+            number(inputs, "critical_temperature")?,
+        ) {
+            Ok(r) => {
+                let mut outputs = BTreeMap::new();
+                outputs.insert("alpha".to_string(), json!(r.alpha));
+                Outcome::Ok(CalcOutcome {
+                    outputs,
+                    warnings: warnings(r.warnings()),
+                })
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn calc_11(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::de_waard_milliams_corrosion::de_waard_milliams_corrosion(
             kelvins(number(inputs, "temperature")?),
@@ -498,7 +565,7 @@ fn calc_8(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_9(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_12(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::electrolyte_scale_calculator::electrolyte_scale_calculator(
             kilograms_per_cubic_meter(number(inputs, "calcium")?),
@@ -550,7 +617,7 @@ fn calc_9(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_10(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_13(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::emulsion_viscosity::emulsion_viscosity(
             pascal_seconds(number(inputs, "oil_viscosity")?),
@@ -591,7 +658,7 @@ fn calc_10(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_11(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_14(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::erosion_prediction::erosion_prediction(
             kilograms_per_cubic_meter(number(inputs, "mixture_density")?),
@@ -644,7 +711,7 @@ fn calc_11(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_12(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_15(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::firozabadi_ramley_interface_tension::firozabadi_ramley_interface_tension(
             kelvins(number(inputs, "T")?),
@@ -668,7 +735,7 @@ fn calc_12(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_13(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_16(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(match azoth_eos::fuller_schettler_giddings_diffusivity::fuller_schettler_giddings_diffusivity(kilograms_per_mole(number(inputs, "MA")?), kilograms_per_mole(number(inputs, "MB")?), cubic_meters_per_mole(number(inputs, "VA")?), cubic_meters_per_mole(number(inputs, "VB")?), kelvins(number(inputs, "T")?), pascals(number(inputs, "P")?)) {
         Ok(r) => {
             let mut outputs = BTreeMap::new();
@@ -682,7 +749,26 @@ fn calc_13(inputs: &Value) -> Result<Outcome, Outcome> {
     })
 }
 
-fn calc_14(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_17(inputs: &Value) -> Result<Outcome, Outcome> {
+    Ok(
+        match azoth_eos::gerg_water_alpha::gerg_water_alpha(
+            number(inputs, "temperature")?,
+            number(inputs, "critical_temperature")?,
+        ) {
+            Ok(r) => {
+                let mut outputs = BTreeMap::new();
+                outputs.insert("alpha".to_string(), json!(r.alpha));
+                Outcome::Ok(CalcOutcome {
+                    outputs,
+                    warnings: warnings(r.warnings()),
+                })
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn calc_18(inputs: &Value) -> Result<Outcome, Outcome> {
     let form_parsed: azoth_eos::hayduk_minhas_diffusivity::HaydukMinhasForm =
         match text(inputs, "form")?.parse() {
             Ok(parsed) => parsed,
@@ -716,7 +802,7 @@ fn calc_14(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_15(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_19(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::heat_of_vaporization::heat_of_vaporization(
             number(inputs, "c0")?,
@@ -742,7 +828,7 @@ fn calc_15(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_16(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_20(inputs: &Value) -> Result<Outcome, Outcome> {
     let gas_parsed: azoth_eos::iapws_henry_law::Gas = match text(inputs, "gas")?.parse() {
         Ok(parsed) => parsed,
         Err(error) => {
@@ -778,7 +864,7 @@ fn calc_16(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_17(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_21(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::iapws_saturation_pressure::iapws_saturation_pressure(kelvins(number(
             inputs, "T",
@@ -799,7 +885,7 @@ fn calc_17(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_18(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_22(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::ideal_gas_cp::ideal_gas_cp(
             number(inputs, "cp_a")?,
@@ -825,7 +911,7 @@ fn calc_18(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_19(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_23(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::liquid_heat_capacity::liquid_heat_capacity(
             number(inputs, "c0")?,
@@ -851,7 +937,7 @@ fn calc_19(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_20(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_24(inputs: &Value) -> Result<Outcome, Outcome> {
     let form_parsed: azoth_eos::liquid_viscosity_pure::LiquidViscosityLadder =
         match text(inputs, "form")?.parse() {
             Ok(parsed) => parsed,
@@ -892,7 +978,7 @@ fn calc_20(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_21(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_25(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::matcop5_prumr_alpha::matcop5_prumr_alpha(
             number(inputs, "omega")?,
@@ -916,7 +1002,7 @@ fn calc_21(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_22(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_26(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::matcop_alpha::matcop_alpha(
             number(inputs, "mc1")?,
@@ -937,7 +1023,7 @@ fn calc_22(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_23(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_27(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::matcop_pr_alpha::matcop_pr_alpha(
             number(inputs, "omega")?,
@@ -959,7 +1045,7 @@ fn calc_23(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_24(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_28(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::matcop_prumr_alpha::matcop_prumr_alpha(
             number(inputs, "omega")?,
@@ -981,7 +1067,7 @@ fn calc_24(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_25(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_29(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::matcop_prumr_new_alpha::matcop_prumr_new_alpha(
             number(inputs, "omega")?,
@@ -1005,7 +1091,7 @@ fn calc_25(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_26(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_30(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::mollerup_alpha::mollerup_alpha(
             number(inputs, "p1")?,
@@ -1026,7 +1112,7 @@ fn calc_26(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_27(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_31(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::nitric_sulfuric_acid_vapor_pressure::nitric_sulfuric_acid_vapor_pressure(
             kelvins(number(inputs, "T")?),
@@ -1055,7 +1141,7 @@ fn calc_27(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_28(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_32(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::parachor_surface_tension::parachor_surface_tension(
             number(inputs, "parachor")?,
@@ -1079,7 +1165,7 @@ fn calc_28(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_29(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_33(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::pitzer_scale_activity::pitzer_scale_activity(
             kelvins(number(inputs, "temperature")?),
@@ -1124,7 +1210,7 @@ fn calc_29(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_30(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_34(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::pr78_kappa::pr78_kappa(number(inputs, "omega")?) {
             Ok(r) => {
@@ -1140,7 +1226,7 @@ fn calc_30(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_31(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_35(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::pr_alpha_ab::pr_alpha_ab(
             number(inputs, "kappa")?,
@@ -1162,7 +1248,7 @@ fn calc_31(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_32(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_36(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::pr_danesh_alpha::pr_danesh_alpha(
             number(inputs, "omega")?,
@@ -1181,7 +1267,7 @@ fn calc_32(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_33(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_37(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::pr_delft1998_alpha::pr_delft1998_alpha(
             number(inputs, "omega")?,
@@ -1200,7 +1286,7 @@ fn calc_33(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_34(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_38(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::pr_departure::pr_departure(
             number(inputs, "a_reduced")?,
@@ -1225,7 +1311,7 @@ fn calc_34(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_35(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_39(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::pr_gassem2001_alpha::pr_gassem2001_alpha(
             number(inputs, "omega")?,
@@ -1244,7 +1330,7 @@ fn calc_35(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_36(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_40(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::pr_kappa::pr_kappa(number(inputs, "omega")?) {
             Ok(r) => {
@@ -1260,7 +1346,7 @@ fn calc_36(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_37(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_41(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::pr_lee_kesler_alpha::pr_lee_kesler_alpha(
             number(inputs, "omega")?,
@@ -1279,7 +1365,7 @@ fn calc_37(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_38(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_42(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::pr_mass_density::pr_mass_density(
             kilograms_per_mole(number(inputs, "M")?),
@@ -1301,7 +1387,7 @@ fn calc_38(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_39(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_43(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::pr_molar_volume::pr_molar_volume(
             number(inputs, "z")?,
@@ -1324,7 +1410,7 @@ fn calc_39(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_40(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_44(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::pr_peneloux_shift::pr_peneloux_shift(
             number(inputs, "omega")?,
@@ -1348,7 +1434,7 @@ fn calc_40(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_41(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_45(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::pr_z_factor::pr_z_factor(
             number(inputs, "a_reduced")?,
@@ -1375,7 +1461,7 @@ fn calc_41(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_42(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_46(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::rachford_rice_binary::rachford_rice_binary(
             number(inputs, "z1")?,
@@ -1395,7 +1481,7 @@ fn calc_42(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_43(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_47(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::rackett_molar_volume::rackett_molar_volume(
             number(inputs, "omega")?,
@@ -1419,7 +1505,7 @@ fn calc_43(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_44(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_48(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::rk_alpha_ab::rk_alpha_ab(number(inputs, "Tr")?, number(inputs, "Pr")?) {
             Ok(r) => {
@@ -1437,7 +1523,7 @@ fn calc_44(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_45(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_49(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::rk_departure::rk_departure(
             number(inputs, "a_reduced")?,
@@ -1460,7 +1546,7 @@ fn calc_45(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_46(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_50(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::scale_inhibitor_performance::scale_inhibitor_performance(
             text(inputs, "scale_type")?,
@@ -1506,7 +1592,7 @@ fn calc_46(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_47(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_51(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::scale_kinetics::scale_kinetics(
             number(inputs, "saturation_index")?,
@@ -1551,7 +1637,7 @@ fn calc_47(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_48(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_52(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::scale_mass::scale_mass(
             text(inputs, "mineral")?,
@@ -1584,7 +1670,7 @@ fn calc_48(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_49(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_53(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::scale_prediction::scale_prediction(
             kilograms_per_cubic_meter(number(inputs, "calcium")?),
@@ -1697,7 +1783,7 @@ fn calc_49(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_50(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_54(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::scale_saturation_ratio::scale_saturation_ratio(
             text(inputs, "salt")?,
@@ -1732,7 +1818,7 @@ fn calc_50(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_51(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_55(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::schwartzentruber_alpha::schwartzentruber_alpha(
             number(inputs, "omega")?,
@@ -1754,7 +1840,7 @@ fn calc_51(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_52(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_56(inputs: &Value) -> Result<Outcome, Outcome> {
     let form_parsed: azoth_eos::siddiqi_lucas_diffusivity::SiddiqiLucasForm =
         match text(inputs, "form")?.parse() {
             Ok(parsed) => parsed,
@@ -1789,7 +1875,7 @@ fn calc_52(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_53(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_57(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::solid_fugacity::solid_fugacity(
             number(inputs, "heat_of_fusion")?,
@@ -1819,7 +1905,7 @@ fn calc_53(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_54(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_58(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::soreide_whitson_alpha::soreide_whitson_alpha(
             number(inputs, "salinity")?,
@@ -1838,7 +1924,7 @@ fn calc_54(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_55(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_59(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::srk_alpha_ab::srk_alpha_ab(
             number(inputs, "kappa")?,
@@ -1860,7 +1946,7 @@ fn calc_55(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_56(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_60(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::srk_departure::srk_departure(
             number(inputs, "a_reduced")?,
@@ -1885,7 +1971,7 @@ fn calc_56(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_57(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_61(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::srk_kappa::srk_kappa(number(inputs, "omega")?) {
             Ok(r) => {
@@ -1901,7 +1987,7 @@ fn calc_57(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_58(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_62(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::srk_peneloux_shift::srk_peneloux_shift(
             number(inputs, "omega")?,
@@ -1925,7 +2011,7 @@ fn calc_58(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_59(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_63(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::srk_z_factor::srk_z_factor(
             number(inputs, "a_reduced")?,
@@ -1952,7 +2038,7 @@ fn calc_59(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_60(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_64(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::tbp_fraction_properties::tbp_fraction_properties(
             number(inputs, "molar_mass")?,
@@ -1987,7 +2073,7 @@ fn calc_60(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_61(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_65(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::twu_kappa::twu_kappa(number(inputs, "omega")?) {
             Ok(r) => {
@@ -2003,7 +2089,7 @@ fn calc_61(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_62(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_66(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::twucoon_alpha::twucoon_alpha(
             number(inputs, "omega")?,
@@ -2022,7 +2108,7 @@ fn calc_62(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_63(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_67(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::twucoon_param_alpha::twucoon_param_alpha(
             number(inputs, "a")?,
@@ -2043,7 +2129,7 @@ fn calc_63(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_64(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_68(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::twucoon_statoil_alpha::twucoon_statoil_alpha(
             number(inputs, "a")?,
@@ -2064,7 +2150,7 @@ fn calc_64(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_65(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_69(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::tyn_calus_diffusivity::tyn_calus_diffusivity(
             cubic_meters_per_mole(number(inputs, "VA")?),
@@ -2088,7 +2174,7 @@ fn calc_65(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_66(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_70(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::umrpr_alpha::umrpr_alpha(number(inputs, "omega")?, number(inputs, "Tr")?) {
             Ok(r) => {
@@ -2104,7 +2190,7 @@ fn calc_66(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_67(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_71(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::vdw1f_mix_binary::vdw1f_mix_binary(
             number(inputs, "z1")?,
@@ -2128,7 +2214,7 @@ fn calc_67(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_68(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_72(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::wax_solid_fugacity::wax_solid_fugacity(
             number(inputs, "molar_mass")?,
@@ -2157,7 +2243,7 @@ fn calc_68(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_69(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_73(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_eos::wilke_chang_diffusivity::wilke_chang_diffusivity(
             number(inputs, "phi")?,
@@ -2182,7 +2268,7 @@ fn calc_69(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_70(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_74(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_hydraulics::choked_flow_area::choked_flow_area(
             kilograms_per_second(number(inputs, "m_dot")?),
@@ -2206,7 +2292,7 @@ fn calc_70(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_71(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_75(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_hydraulics::control_valve_cv::control_valve_cv(
             number(inputs, "Cv")?,
@@ -2229,7 +2315,7 @@ fn calc_71(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_73(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_77(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_hydraulics::darcy_weisbach::darcy_weisbach(
             number(inputs, "f")?,
@@ -2262,7 +2348,7 @@ fn calc_73(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_74(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_78(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_hydraulics::friction_factor_colebrook::friction_factor_colebrook(
             number(inputs, "re")?,
@@ -2284,7 +2370,7 @@ fn calc_74(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_75(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_79(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_hydraulics::friction_factor_haaland::friction_factor_haaland(
             number(inputs, "re")?,
@@ -2303,7 +2389,7 @@ fn calc_75(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_76(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_80(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_hydraulics::friction_factor_swamee_jain::friction_factor_swamee_jain(
             number(inputs, "re")?,
@@ -2322,7 +2408,7 @@ fn calc_76(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_77(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_81(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_hydraulics::orifice_flow::orifice_flow(
             meters(number(inputs, "d")?),
@@ -2346,7 +2432,7 @@ fn calc_77(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_78(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_82(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_hydraulics::packing_hydraulics::packing_hydraulics(
             text(inputs, "packing")?,
@@ -2440,7 +2526,7 @@ fn calc_78(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_79(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_83(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_hydraulics::packing_sizing::packing_sizing(
             text(inputs, "packing")?,
@@ -2492,7 +2578,7 @@ fn calc_79(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_80(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_84(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_hydraulics::pump_power::pump_power(
             kilograms_per_cubic_meter(number(inputs, "rho")?),
@@ -2516,7 +2602,7 @@ fn calc_80(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_81(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_85(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_hydraulics::reynolds_number::reynolds_number(
             kilograms_per_cubic_meter(number(inputs, "rho")?),
@@ -2538,7 +2624,7 @@ fn calc_81(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_82(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_86(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_hydraulics::tray_hydraulics::tray_hydraulics(
             azoth_hydraulics::tray_hydraulics::TrayHydraulicsState {
@@ -2644,7 +2730,7 @@ fn calc_82(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_83(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_87(inputs: &Value) -> Result<Outcome, Outcome> {
     let source_parsed: azoth_reactions::databank::ReactionDataSource =
         match text(inputs, "source")?.parse() {
             Ok(parsed) => parsed,
@@ -2684,7 +2770,7 @@ fn calc_83(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_84(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_88(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_thermal::boiling_heat_transfer::boiling_heat_transfer(
             kilograms_per_square_meter_second(number(inputs, "mass_flux")?),
@@ -2743,7 +2829,7 @@ fn calc_84(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_85(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_89(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_thermal::conduction_plane_wall::conduction_plane_wall(
             watts_per_meter_kelvin(number(inputs, "k")?),
@@ -2767,7 +2853,7 @@ fn calc_85(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_86(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_90(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_thermal::fouling_model::fouling_model(
             text(inputs, "model")?,
@@ -2835,7 +2921,7 @@ fn calc_86(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_88(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_92(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_thermal::lmtd_correction_factor::lmtd_correction_factor(
             kelvins(number(inputs, "hot_inlet_temperature")?),
@@ -2865,7 +2951,7 @@ fn calc_88(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_89(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_93(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_thermal::shah_condensation::shah_condensation(
             number(inputs, "mass_flux")?,
@@ -2914,7 +3000,7 @@ fn calc_89(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_91(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_95(inputs: &Value) -> Result<Outcome, Outcome> {
     let shell_side_method_parsed: azoth_thermal::shell_and_tube_rating::ShellSideMethod =
         match text(inputs, "shell_side_method")?.parse() {
             Ok(parsed) => parsed,
@@ -3017,7 +3103,7 @@ fn calc_91(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_92(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_96(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_thermal::shell_and_tube_vibration::shell_and_tube_vibration(
             meters(number(inputs, "tube_outside_diameter")?),
@@ -3078,7 +3164,7 @@ fn calc_92(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_93(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_97(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_thermal::tema_standard::tema_standard(
             text(inputs, "front_head")?,
@@ -3177,7 +3263,7 @@ fn calc_93(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_94(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_98(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_thermal::tube_insert_model::tube_insert_model(
             text(inputs, "insert")?,
@@ -3223,7 +3309,7 @@ fn calc_94(inputs: &Value) -> Result<Outcome, Outcome> {
     )
 }
 
-fn calc_95(inputs: &Value) -> Result<Outcome, Outcome> {
+fn calc_99(inputs: &Value) -> Result<Outcome, Outcome> {
     Ok(
         match azoth_thermal::two_phase_pressure_drop::two_phase_pressure_drop(
             kilograms_per_square_meter_second(number(inputs, "mass_flux")?),

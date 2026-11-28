@@ -1873,6 +1873,81 @@ impl From<&azoth_eos::results::BubbleTemperatureResult> for PyBubbleTemperatureR
         }
     }
 }
+/// Result of `eos.bukacek_water_dew_point`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "BukacekWaterDewPointResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyBukacekWaterDewPointResult {
+    /// the water dew-point temperature.
+    #[pyo3(get)]
+    pub temperature: PyQty,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyBukacekWaterDewPointResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "BukacekWaterDewPointResult(temperature={:?}, {} warning(s))",
+            self.temperature,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_eos::results::BukacekWaterDewPointResult> for PyBukacekWaterDewPointResult {
+    fn from(r: &azoth_eos::results::BukacekWaterDewPointResult) -> Self {
+        Self {
+            temperature: PyQty {
+                magnitude_si: r.temperature,
+                unit: "K".to_string(),
+            },
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `eos.bukacek_water_in_gas`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "BukacekWaterInGasResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyBukacekWaterInGasResult {
+    /// the water mole fraction of the gas at its water dew point.
+    #[pyo3(get)]
+    pub water_mole_fraction: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyBukacekWaterInGasResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "BukacekWaterInGasResult(water_mole_fraction={:?}, {} warning(s))",
+            self.water_mole_fraction,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_eos::results::BukacekWaterInGasResult> for PyBukacekWaterInGasResult {
+    fn from(r: &azoth_eos::results::BukacekWaterInGasResult) -> Self {
+        Self {
+            water_mole_fraction: r.water_mole_fraction,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `eos.bwrs_phase`, transported.
 #[pyclass(
     frozen,
@@ -2554,6 +2629,42 @@ impl From<&azoth_eos::results::CostaldMolarVolumeResult> for PyCostaldMolarVolum
                 magnitude_si: r.v.value,
                 unit: "m**3/mol".to_string(),
             },
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `eos.cpa_water_caloric_alpha`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "CpaWaterCaloricAlphaResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyCpaWaterCaloricAlphaResult {
+    /// the temperature-dependent alpha function.
+    #[pyo3(get)]
+    pub alpha: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyCpaWaterCaloricAlphaResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "CpaWaterCaloricAlphaResult(alpha={:?}, {} warning(s))",
+            self.alpha,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_eos::results::CpaWaterCaloricAlphaResult> for PyCpaWaterCaloricAlphaResult {
+    fn from(r: &azoth_eos::results::CpaWaterCaloricAlphaResult) -> Self {
+        Self {
+            alpha: r.alpha,
             warnings: transport(&r.warnings),
         }
     }
@@ -4573,6 +4684,42 @@ impl From<&azoth_eos::results::Gerg2008PhaseResult> for PyGerg2008PhaseResult {
                 magnitude_si: r.g.value,
                 unit: "J/mol".to_string(),
             },
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `eos.gerg_water_alpha`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "GergWaterAlphaResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyGergWaterAlphaResult {
+    /// the temperature-dependent alpha function.
+    #[pyo3(get)]
+    pub alpha: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyGergWaterAlphaResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "GergWaterAlphaResult(alpha={:?}, {} warning(s))",
+            self.alpha,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_eos::results::GergWaterAlphaResult> for PyGergWaterAlphaResult {
+    fn from(r: &azoth_eos::results::GergWaterAlphaResult) -> Self {
+        Self {
+            alpha: r.alpha,
             warnings: transport(&r.warnings),
         }
     }

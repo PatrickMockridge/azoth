@@ -1,0 +1,95 @@
+id = "eos.bukacek_water_dew_point"
+name = "Bukacek water dew point"
+summary = "The water dew-point temperature of a gas from its water mole fraction and pressure. Use it for a gas dehydration screen."
+equation = "T0 = 273.15 K; at each iteration x_k = bukacek(T_{k-1}, pressure), T_k = T_{k-1} - (x_k - water_mole_fraction)*1e5, and the loop stops when |(x_k - water_mole_fraction)/water_mole_fraction| <= 1e-8 or after 1000 iterations, returning T_k"
+latex = '''T_0 = 273.15\ \mathrm{K}, \qquad T_k = T_{k-1} - 10^5\left(x_{\mathrm{Bukacek}}(T_{k-1}, P) - x\right)'''
+assumptions = ["**the loop is the class's own fixed step, with no bracket and no convergence flag.** It tests the pre-update `x_k`, updates `T`, and returns the post-update iterate; a converged state therefore returns the temperature after one more (tiny) step.\n", "**the step is dimensionally large.** `1e5` is K per unit mole fraction, so the map is coarse and is not contractive at every state.\n", "**the forward calculation is `eos.bukacek_water_in_gas`.** Its constants and its bar convention are that id's, not repeated here.\n"]
+notes = ["**the 1,000-iteration cap returns the last iterate, not an error.** The class has no converged flag; the port carries the same return.\n", "**a capped state is decided by the arithmetic's last bit.** At `500e-6` and 50 bar the map cycles and reaches the cap: the Java capture and an independent evaluation return 295.3188 and 260.7299 K. No case asserts a capped state.\n", "**the class's `main` state.** `getWaterInGas(273.15 - 18.0, 70.0)` and `waterDewPointTemperature(20.0e-6, 70.0)` are the class's own two printed values; the first is a forward state and the second is the dew-point case below.\n"]
+references = ["NeqSim master `thermo/util/empiric/BukacekWaterInGas.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.", "`validation/neqsim/captures/bukacek_probe.tsv` - the forward states, the inverse at three states, and the trajectory at the capped one.\n"]
+[source]
+standard = "NeqSim master `BukacekWaterInGas`"
+edition = "`waterDewPointTemperature(moleFractionWaterInGas, pressure)`, ported verbatim, including its 273.15 K start, its `1e5` step, its `1e-8` relative test and its 1,000-iteration cap"
+
+[source.neqsim]
+class = "BukacekWaterInGas"
+members = ["BukacekWaterInGas.waterDewPointTemperature"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
+[inputs]
+[inputs.water_mole_fraction]
+unit = "dimensionless"
+description = "the water mole fraction whose dew point is wanted.\n"
+[inputs.pressure]
+unit = "Pa"
+description = "the total pressure; the forward calculation it calls converts to bar.\n"
+[outputs]
+[outputs.temperature]
+unit = "K"
+description = "the water dew-point temperature.\n"
+[[valid_range]]
+quantity = "water_mole_fraction"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the convergence test divides by it.\n"
+[[valid_range]]
+quantity = "pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the forward calculation divides by it.\n"
+[worked_example]
+source = "the capture's `dew_point_x_20e-6_P_70` row; the class's own `main` state, `waterDewPointTemperature(20.0e-6, 70.0)`."
+derivation = "x = 20e-6, P = 70 bar = 7000000 Pa. The first iterates:\n\n  T0 = 273.15 K, x(T0) = 0.00010869774435494811, T1 = 273.15 - (0.00010869774435494811 - 20e-6)*1e5 = 264.28022556450514 K\n  T2 = 260.17776182311087 K, T3 = 257.5527720775825 K, and the map settles into the root from above\n  the loop ends at iteration 116, where the pre-update x is 2.000000018767624e-05, a relative residual of 8.008781727803903e-09, inside 1e-8\n  the returned post-update temperature is 248.33510900783565 K\n"
+tolerance = 1e-9
+[worked_example.inputs]
+water_mole_fraction = 20.0e-6
+pressure = 7000000.0
+[worked_example.expected]
+temperature = 248.33510900783565
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim BukacekWaterInGas.waterDewPointTemperature"
+
+[[provenance.constants]]
+name = "START_TEMPERATURE"
+value = 273.15
+source = "NeqSim BukacekWaterInGas.waterDewPointTemperature, `newTemp = 273.15`"
+[[provenance.constants]]
+name = "STEP"
+value = 100000.0
+source = "NeqSim BukacekWaterInGas.waterDewPointTemperature, `(newppm - moleFractionWaterInGas) * 1e5`"
+[[provenance.constants]]
+name = "RELATIVE_TOLERANCE"
+value = 1e-08
+source = "NeqSim BukacekWaterInGas.waterDewPointTemperature, the `1e-8` test"
+[[provenance.constants]]
+name = "MAX_ITERATIONS"
+value = 1000
+source = "NeqSim BukacekWaterInGas.waterDewPointTemperature, `iter < 1000`"
+
+[implementations]
+python = "azoth.eos.bukacek_water_dew_point"
+rust = "azoth_eos::bukacek_water_dew_point"
+[[tests]]
+id = "worked_example"
+type = "worked_example"
+status = "active"
+[[tests]]
+id = "a_drier_gas_at_10_bar"
+type = "reference"
+status = "active"
+source = "The capture's `dew_point_x_100e-6_P_10` row: 14 iterations, relative residual -1.2742454660874536e-09 at the last pre-update state.\n"
+tolerance = 1e-9
+[tests.inputs]
+water_mole_fraction = 100.0e-6
+pressure = 1000000.0
+[tests.expected]
+temperature = 254.81983569711215
+[[tests]]
+id = "round_trip_units"
+type = "property"
+property = "unit_round_trip"
+status = "active"

@@ -1137,6 +1137,77 @@ pub fn batch_run(py: Python<'_>, calc_id: &str, inputs: Inputs) -> PyResult<PyBa
             push_values(&mut columns, "alpha", "dimensionless", alpha);
         }
 
+        "eos.gerg_water_alpha" => {
+            let (temperature, critical_temperature) = (
+                take(&inputs, "temperature")?,
+                take(&inputs, "critical_temperature")?,
+            );
+            let mut alpha = Vec::with_capacity(n);
+            for i in 0..n {
+                let r = element(
+                    py,
+                    eos::gerg_water_alpha(temperature[i], critical_temperature[i]),
+                    &mut warnings,
+                )?;
+                alpha.push(r.alpha);
+            }
+            push_values(&mut columns, "alpha", "dimensionless", alpha);
+        }
+
+        "eos.cpa_water_caloric_alpha" => {
+            let (temperature, critical_temperature) = (
+                take(&inputs, "temperature")?,
+                take(&inputs, "critical_temperature")?,
+            );
+            let mut alpha = Vec::with_capacity(n);
+            for i in 0..n {
+                let r = element(
+                    py,
+                    eos::cpa_water_caloric_alpha(temperature[i], critical_temperature[i]),
+                    &mut warnings,
+                )?;
+                alpha.push(r.alpha);
+            }
+            push_values(&mut columns, "alpha", "dimensionless", alpha);
+        }
+
+        "eos.bukacek_water_in_gas" => {
+            let (temperature, pressure) =
+                (take(&inputs, "temperature")?, take(&inputs, "pressure")?);
+            let mut water_mole_fraction = Vec::with_capacity(n);
+            for i in 0..n {
+                let r = element(
+                    py,
+                    eos::bukacek_water_in_gas(temperature[i], pressure[i]),
+                    &mut warnings,
+                )?;
+                water_mole_fraction.push(r.water_mole_fraction);
+            }
+            push_values(
+                &mut columns,
+                "water_mole_fraction",
+                "dimensionless",
+                water_mole_fraction,
+            );
+        }
+
+        "eos.bukacek_water_dew_point" => {
+            let (water_mole_fraction, pressure) = (
+                take(&inputs, "water_mole_fraction")?,
+                take(&inputs, "pressure")?,
+            );
+            let mut temperature = Vec::with_capacity(n);
+            for i in 0..n {
+                let r = element(
+                    py,
+                    eos::bukacek_water_dew_point(water_mole_fraction[i], pressure[i]),
+                    &mut warnings,
+                )?;
+                temperature.push(r.temperature);
+            }
+            push_values(&mut columns, "temperature", "K", temperature);
+        }
+
         "eos.mollerup_alpha" => {
             let (p1, p2, p3, tr) = (
                 take(&inputs, "p1")?,

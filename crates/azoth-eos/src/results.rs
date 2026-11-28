@@ -6592,3 +6592,75 @@ impl CalcResult for UmrPruFlashResult {
         &self.warnings
     }
 }
+
+/// Result of `eos.gerg_water_alpha`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct GergWaterAlphaResult {
+    /// The temperature-dependent alpha function. Dimensionless.
+    pub alpha: f64,
+    /// Caveats.
+    pub warnings: Vec<Warning>,
+}
+
+impl CalcResult for GergWaterAlphaResult {
+    const CALC_ID: &'static str = "eos.gerg_water_alpha";
+    const FIELDS: &'static [&'static str] = &["alpha", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+/// Result of `eos.cpa_water_caloric_alpha`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct CpaWaterCaloricAlphaResult {
+    /// The temperature-dependent alpha function. Dimensionless.
+    pub alpha: f64,
+    /// Caveats.
+    pub warnings: Vec<Warning>,
+}
+
+impl CalcResult for CpaWaterCaloricAlphaResult {
+    const CALC_ID: &'static str = "eos.cpa_water_caloric_alpha";
+    const FIELDS: &'static [&'static str] = &["alpha", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+/// Result of `eos.bukacek_water_in_gas`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct BukacekWaterInGasResult {
+    /// The water mole fraction of the gas at its water dew point. Dimensionless.
+    pub water_mole_fraction: f64,
+    /// Caveats.
+    pub warnings: Vec<Warning>,
+}
+
+impl CalcResult for BukacekWaterInGasResult {
+    const CALC_ID: &'static str = "eos.bukacek_water_in_gas";
+    const FIELDS: &'static [&'static str] = &["water_mole_fraction", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+/// Result of `eos.bukacek_water_dew_point`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct BukacekWaterDewPointResult {
+    /// The water dew-point temperature. K.
+    pub temperature: f64,
+    /// Caveats.
+    pub warnings: Vec<Warning>,
+}
+
+impl CalcResult for BukacekWaterDewPointResult {
+    const CALC_ID: &'static str = "eos.bukacek_water_dew_point";
+    const FIELDS: &'static [&'static str] = &["temperature", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}

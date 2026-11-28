@@ -4,17 +4,21 @@
 //!
 //!   - specs/calcs/eos/antoine_vapor_pressure.toml
 //!   - specs/calcs/eos/beggs_brill_segment.toml
+//!   - specs/calcs/eos/bukacek_water_dew_point.toml
+//!   - specs/calcs/eos/bukacek_water_in_gas.toml
 //!   - specs/calcs/eos/chapman_enskog_diffusivity.toml
 //!   - specs/calcs/eos/chung_conductivity.toml
 //!   - specs/calcs/eos/chung_viscosity.toml
 //!   - specs/calcs/eos/co2_water_diffusivity.toml
 //!   - specs/calcs/eos/costald_molar_volume.toml
+//!   - specs/calcs/eos/cpa_water_caloric_alpha.toml
 //!   - specs/calcs/eos/de_waard_milliams_corrosion.toml
 //!   - specs/calcs/eos/electrolyte_scale_calculator.toml
 //!   - specs/calcs/eos/emulsion_viscosity.toml
 //!   - specs/calcs/eos/erosion_prediction.toml
 //!   - specs/calcs/eos/firozabadi_ramley_interface_tension.toml
 //!   - specs/calcs/eos/fuller_schettler_giddings_diffusivity.toml
+//!   - specs/calcs/eos/gerg_water_alpha.toml
 //!   - specs/calcs/eos/hayduk_minhas_diffusivity.toml
 //!   - specs/calcs/eos/heat_of_vaporization.toml
 //!   - specs/calcs/eos/iapws_henry_law.toml
@@ -751,6 +755,258 @@ pub static BEGGS_BRILL_SEGMENT_SPEC: CalcSpec = CalcSpec {
         expected_records: &[],
     },
     tests: BEGGS_BRILL_SEGMENT_TESTS,
+};
+
+/// Registry entry for `eos.bukacek_water_dew_point`.
+static BUKACEK_WATER_DEW_POINT_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "water_mole_fraction",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the convergence test divides by it.",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the forward calculation divides by it.",
+        },
+    },
+];
+
+static BUKACEK_WATER_DEW_POINT_TESTS: &[TestCase] = &[
+    TestCase {
+        id: "a_drier_gas_at_10_bar",
+        kind: "reference",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("water_mole_fraction", 0.0001), ("pressure", 1000000.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("temperature", 254.81983569711215)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "round_trip_units",
+        kind: "property",
+        property: Some("unit_round_trip"),
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+/// Registered spec for `eos.bukacek_water_dew_point`.
+///
+/// Public and addressable directly, so a calc can hold `&BUKACEK_WATER_DEW_POINT_SPEC` with no
+/// lookup and no failure path. A calc whose spec is missing is a build-time
+/// invariant, not a runtime condition, and this shape makes it unrepresentable
+/// rather than something to handle.
+pub static BUKACEK_WATER_DEW_POINT_SPEC: CalcSpec = CalcSpec {
+    id: "eos.bukacek_water_dew_point",
+    checks: BUKACEK_WATER_DEW_POINT_CHECKS,
+    solver: None,
+    worked_example: TestCase {
+        id: "worked_example",
+        kind: "worked_example",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("water_mole_fraction", 2e-05), ("pressure", 7000000.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("temperature", 248.33510900783565)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    tests: BUKACEK_WATER_DEW_POINT_TESTS,
+};
+
+/// Registry entry for `eos.bukacek_water_in_gas`.
+static BUKACEK_WATER_IN_GAS_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute temperature; the exponential's `-1716.26/T` divides by it.",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the first term divides by it.",
+        },
+    },
+];
+
+static BUKACEK_WATER_IN_GAS_TESTS: &[TestCase] = &[
+    TestCase {
+        id: "cold_gas_at_70_bar",
+        kind: "reference",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("temperature", 255.15), ("pressure", 7000000.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("water_mole_fraction", 3.26289109072766e-05)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "at_273_15_k_and_5_bar",
+        kind: "reference",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("temperature", 273.15), ("pressure", 500000.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("water_mole_fraction", 0.0007663284688898948)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "at_300_k_and_100_bar",
+        kind: "reference",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("temperature", 300.0), ("pressure", 10000000.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("water_mole_fraction", 0.00043144164901043244)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "round_trip_units",
+        kind: "property",
+        property: Some("unit_round_trip"),
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+/// Registered spec for `eos.bukacek_water_in_gas`.
+///
+/// Public and addressable directly, so a calc can hold `&BUKACEK_WATER_IN_GAS_SPEC` with no
+/// lookup and no failure path. A calc whose spec is missing is a build-time
+/// invariant, not a runtime condition, and this shape makes it unrepresentable
+/// rather than something to handle.
+pub static BUKACEK_WATER_IN_GAS_SPEC: CalcSpec = CalcSpec {
+    id: "eos.bukacek_water_in_gas",
+    checks: BUKACEK_WATER_IN_GAS_CHECKS,
+    solver: None,
+    worked_example: TestCase {
+        id: "worked_example",
+        kind: "worked_example",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("temperature", 288.15), ("pressure", 100000.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("water_mole_fraction", 0.01040391418367174)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    tests: BUKACEK_WATER_IN_GAS_TESTS,
 };
 
 /// Registry entry for `eos.chapman_enskog_diffusivity`.
@@ -1512,6 +1768,170 @@ pub static COSTALD_MOLAR_VOLUME_SPEC: CalcSpec = CalcSpec {
         expected_records: &[],
     },
     tests: COSTALD_MOLAR_VOLUME_TESTS,
+};
+
+/// Registry entry for `eos.cpa_water_caloric_alpha`.
+static CPA_WATER_CALORIC_ALPHA_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute temperature; zero and below are not states.",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "critical_temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the reduced temperature divides by it.",
+        },
+    },
+];
+
+static CPA_WATER_CALORIC_ALPHA_TESTS: &[TestCase] = &[
+    TestCase {
+        id: "the_calibration_window_low_end",
+        kind: "reference",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("temperature", 278.15), ("critical_temperature", 647.3)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("alpha", 1.5269236603431102)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "the_calibration_window_high_end",
+        kind: "reference",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("temperature", 333.15), ("critical_temperature", 647.3)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("alpha", 1.4112504228913734)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "beyond_the_window_at_373_15_k",
+        kind: "reference",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("temperature", 373.15), ("critical_temperature", 647.3)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("alpha", 1.3416962799850023)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "beyond_the_window_at_423_15_k",
+        kind: "reference",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("temperature", 423.15), ("critical_temperature", 647.3)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("alpha", 1.2655691536653126)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "round_trip_units",
+        kind: "property",
+        property: Some("unit_round_trip"),
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+/// Registered spec for `eos.cpa_water_caloric_alpha`.
+///
+/// Public and addressable directly, so a calc can hold `&CPA_WATER_CALORIC_ALPHA_SPEC` with no
+/// lookup and no failure path. A calc whose spec is missing is a build-time
+/// invariant, not a runtime condition, and this shape makes it unrepresentable
+/// rather than something to handle.
+pub static CPA_WATER_CALORIC_ALPHA_SPEC: CalcSpec = CalcSpec {
+    id: "eos.cpa_water_caloric_alpha",
+    checks: CPA_WATER_CALORIC_ALPHA_CHECKS,
+    solver: None,
+    worked_example: TestCase {
+        id: "worked_example",
+        kind: "worked_example",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("temperature", 298.15), ("critical_temperature", 647.3)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("alpha", 1.4813963230257607)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    tests: CPA_WATER_CALORIC_ALPHA_TESTS,
 };
 
 /// Registry entry for `eos.de_waard_milliams_corrosion`.
@@ -4948,6 +5368,208 @@ pub static FULLER_SCHETTLER_GIDDINGS_DIFFUSIVITY_SPEC: CalcSpec = CalcSpec {
         expected_records: &[],
     },
     tests: FULLER_SCHETTLER_GIDDINGS_DIFFUSIVITY_TESTS,
+};
+
+/// Registry entry for `eos.gerg_water_alpha`.
+static GERG_WATER_ALPHA_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute temperature; zero and below are not states.",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "critical_temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the reduced temperature divides by it.",
+        },
+    },
+];
+
+static GERG_WATER_ALPHA_TESTS: &[TestCase] = &[
+    TestCase {
+        id: "the_solid_set_at_250_k",
+        kind: "reference",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("temperature", 250.0), ("critical_temperature", 647.3)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("alpha", 1.7610397432566247)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "the_switch_just_below_273_15_k",
+        kind: "reference",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("temperature", 273.149999), ("critical_temperature", 647.3)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("alpha", 1.6769439073632098)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "below_the_switch_at_273_15_k",
+        kind: "reference",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("temperature", 273.15), ("critical_temperature", 647.3)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("alpha", 1.6769439037650673)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "the_switch_at_273_16_k",
+        kind: "reference",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("temperature", 273.16), ("critical_temperature", 647.3)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("alpha", 1.6768315406668797)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "the_liquid_set_at_373_15_k",
+        kind: "reference",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("temperature", 373.15), ("critical_temperature", 647.3)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("alpha", 1.4555471449604551)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "the_liquid_set_at_473_15_k",
+        kind: "reference",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("temperature", 473.15), ("critical_temperature", 647.3)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("alpha", 1.2699958447745907)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "round_trip_units",
+        kind: "property",
+        property: Some("unit_round_trip"),
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+/// Registered spec for `eos.gerg_water_alpha`.
+///
+/// Public and addressable directly, so a calc can hold `&GERG_WATER_ALPHA_SPEC` with no
+/// lookup and no failure path. A calc whose spec is missing is a build-time
+/// invariant, not a runtime condition, and this shape makes it unrepresentable
+/// rather than something to handle.
+pub static GERG_WATER_ALPHA_SPEC: CalcSpec = CalcSpec {
+    id: "eos.gerg_water_alpha",
+    checks: GERG_WATER_ALPHA_CHECKS,
+    solver: None,
+    worked_example: TestCase {
+        id: "worked_example",
+        kind: "worked_example",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("temperature", 300.0), ("critical_temperature", 647.3)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("alpha", 1.6127672229530905)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    tests: GERG_WATER_ALPHA_TESTS,
 };
 
 /// Registry entry for `eos.hayduk_minhas_diffusivity`.
@@ -12710,17 +13332,21 @@ pub static WILKE_CHANG_DIFFUSIVITY_SPEC: CalcSpec = CalcSpec {
 static ALL_SPECS: &[&CalcSpec] = &[
     &ANTOINE_VAPOR_PRESSURE_SPEC,
     &BEGGS_BRILL_SEGMENT_SPEC,
+    &BUKACEK_WATER_DEW_POINT_SPEC,
+    &BUKACEK_WATER_IN_GAS_SPEC,
     &CHAPMAN_ENSKOG_DIFFUSIVITY_SPEC,
     &CHUNG_CONDUCTIVITY_SPEC,
     &CHUNG_VISCOSITY_SPEC,
     &CO2_WATER_DIFFUSIVITY_SPEC,
     &COSTALD_MOLAR_VOLUME_SPEC,
+    &CPA_WATER_CALORIC_ALPHA_SPEC,
     &DE_WAARD_MILLIAMS_CORROSION_SPEC,
     &ELECTROLYTE_SCALE_CALCULATOR_SPEC,
     &EMULSION_VISCOSITY_SPEC,
     &EROSION_PREDICTION_SPEC,
     &FIROZABADI_RAMLEY_INTERFACE_TENSION_SPEC,
     &FULLER_SCHETTLER_GIDDINGS_DIFFUSIVITY_SPEC,
+    &GERG_WATER_ALPHA_SPEC,
     &HAYDUK_MINHAS_DIFFUSIVITY_SPEC,
     &HEAT_OF_VAPORIZATION_SPEC,
     &IAPWS_HENRY_LAW_SPEC,
