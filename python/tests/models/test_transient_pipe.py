@@ -7,7 +7,7 @@ transient-boundary branches, and the two backends' agreement on both cases.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 import pytest
 
@@ -109,7 +109,9 @@ def test_the_three_phase_flash_is_refused() -> None:
 
 
 @pytest.mark.parametrize("backend", ["python", "rust"])
-def test_a_cell_that_condenses_into_three_phases_is_refused(backend: str) -> None:
+def test_a_cell_that_condenses_into_three_phases_is_refused(
+    backend: Literal["python", "rust"],
+) -> None:
     # Gas + aqueous at the 5 MPa inlet, and gas + oil + aqueous at the 6 MPa outlet the
     # constant-pressure boundary holds, so the first periodic flash finds the branch the
     # model refuses. A swallowed flash would leave the cell's stale two-phase properties.
