@@ -87,7 +87,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      # `check_port_item.py` reads the base revision; two commits give a push its parent,
+      # and the base branch is fetched below for a pull request.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - if: github.event_name == 'pull_request'
+        run: git fetch --no-tags origin "${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -169,6 +175,16 @@ jobs:
       # `source.neqsim`, and every input, output, algorithm leaf and constant has a
       # provenance row. The class index is committed; the check needs no JVM.
       - run: python tools/check_port.py
+      # **The inventory.** Every class in the pinned physics scope is owned by a spec or
+      # exactly one backlog row, every row's size is its committed metric, and the
+      # generated checklist is current. A stale row - one whose classes a spec now
+      # covers - fails rather than sitting unchecked forever.
+      - run: python tools/check_port_backlog.py
+      - run: python tools/gen_port_checklist.py --check
+      # **The on-piste check.** A spec that newly names a class must carry a
+      # `Port-Item:` trailer, and the class must be in that row. A correction that adds
+      # no class is not checked, so maintenance is not blocked.
+      - run: python tools/check_port_item.py
       # The skill catalog against the SKILL.md files it points at, and each SKILL.md
       # against the required sections. Needs no `azoth` import, so it runs before the
       # library is built.

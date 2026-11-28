@@ -171,6 +171,21 @@ CLOSE_OUT: tuple[Command, ...] = (
         SCRIPT,
         "python tools/check_port.py",
     ),
+    Command(
+        "every physics class is owned by the port backlog or a spec",
+        SCRIPT,
+        "python tools/check_port_backlog.py",
+    ),
+    Command(
+        "the port checklist is current",
+        SCRIPT,
+        "python tools/gen_port_checklist.py --check",
+    ),
+    Command(
+        "a new spec class is in the Port-Item scope",
+        SCRIPT,
+        "python tools/check_port_item.py",
+    ),
     Command("the skill catalog", SCRIPT, "python tools/validate_skills.py"),
     Command("the guard theorems' ownership", SCRIPT, "python tools/check_guards.py"),
     Command("the pages against the Lean tree", SCRIPT, "python tools/audit_lean_claims.py --check"),
@@ -417,6 +432,7 @@ SPEC_GENERATORS = frozenset(
         "gen_python_result",
         "gen_python_transport",
         "gen_python_wrappers",
+        "gen_port_checklist",
         "gen_reaction_data",
         "gen_registry",
         "gen_safety",
@@ -430,7 +446,7 @@ RUST_GENERATORS = SPEC_GENERATORS
 #: A hand-written Python reference module is hashed into the provenance block `gen_registry`
 #: emits; nothing else generated reads it.
 PYTHON_GENERATORS = frozenset({"gen_registry"})
-DATA_GENERATORS = frozenset({"gen_databank", "gen_keycard"})
+DATA_GENERATORS = frozenset({"gen_databank", "gen_keycard", "gen_port_checklist"})
 CAPTURE_GENERATORS = frozenset({"gen_neqsim_cases"})
 
 #: A tree that cannot make any generated file stale.
@@ -1077,7 +1093,7 @@ def claims(path: str) -> Claim:
         # The NeqSim captures: read by `python/tests/validation`, which its own job runs.
         return Claim(data=True, jobs=("validation",))
 
-    if parts[0] == "docs" or path in ("README.md", "ROADMAP.md"):
+    if parts[0] == "docs" or path in ("README.md", "ROADMAP.md", "PORT.md"):
         return Claim(docs=True)
 
     if path in ("Cargo.lock", "rust-toolchain.toml"):
@@ -1722,7 +1738,7 @@ def scope(paths: list[str], edges: dict[str, set[str]]) -> tuple[list[Command], 
             # anything else - a hook, a helper - is covered by its own test and by nothing
             # here. Asking a tool for a flag it does not take is an argparse failure dressed as
             # a test, and a rule that cannot be satisfied teaches a reader to ignore the tool.
-            if tool.startswith("gen_"):
+            if tool.startswith("gen_") and tool not in UNCHECKABLE:
                 commands.append(
                     Command(
                         f"the generator that changed: {tool}",

@@ -15,8 +15,8 @@ standard = "NeqSim master `ComponentWax.fugcoef2`"
 edition = "The default `Pedersen` wax component model. `ComponentWonWax`, `ComponentWaxWilson` and `ComponentCoutinhoWax` are the phase's other three and are carried."
 
 [source.neqsim]
-class = "ComponentWonWax"
-members = ["ComponentWonWax"]
+class = "ComponentWax"
+members = ["ComponentWax.fugcoef2"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -115,7 +115,7 @@ fugacity_coefficient = 9.6403717586365e-07
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim ComponentWonWax"
+default = "NeqSim ComponentWax.fugcoef2"
 
 [implementations]
 python = "azoth.eos.wax_solid_fugacity"
