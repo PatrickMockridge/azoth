@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/overpressure/PipelinePressureProtectionCalculator.java"
 edition = "Its `calcProtection`, `getMaxIncidentalPressure`, `getDesignMargin` and the three verdict getters."
+
+[source.neqsim]
+class = "PipelinePressureProtectionCalculator"
+members = ["PipelinePressureProtectionCalculator.calcProtection"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_pipeline_pressure_protection"
 convergence = "absolute"
@@ -90,6 +96,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class accepts a non-positive set point; it is not a pressure"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PipelinePressureProtectionCalculator.calcProtection"
+
+[provenance.algorithm.convergence]
+source = "NeqSim PipelinePressureProtectionCalculator.calcProtection"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim PipelinePressureProtectionCalculator.calcProtection"
+
+[provenance.algorithm.scheme]
+source = "NeqSim PipelinePressureProtectionCalculator.calcProtection"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim PipelinePressureProtectionCalculator.calcProtection"
+
 [implementations]
 python = "azoth.process.pipeline_pressure_protection"
 rust = "azoth_process::pipeline_pressure_protection"

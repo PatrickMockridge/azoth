@@ -10,6 +10,12 @@ references = ["Versteeg, G. F.; van Swaaij, W. P. M. (1988). \\\"Solubility and 
 standard = "NeqSim master `CO2water`"
 edition = "the correlation NeqSim master evaluates in `CO2water.calcBinaryDiffusionCoefficient`, ported verbatim"
 doi = "10.1021/je00051a011"
+
+[source.neqsim]
+class = "CO2water"
+members = ["CO2water.calcBinaryDiffusionCoefficient"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.T]
 unit = "K"
@@ -32,6 +38,12 @@ tolerance = 1e-12
 T = 298.15
 [worked_example.expected]
 d = 2.0208212539579613e-9
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim CO2water.calcBinaryDiffusionCoefficient"
+
 [implementations]
 python = "azoth.eos.co2_water_diffusivity"
 rust = "azoth_eos::co2_water_diffusivity"

@@ -166,6 +166,11 @@ CLOSE_OUT: tuple[Command, ...] = (
     Command("the vendored MCP schemas", SCRIPT, "python tools/check_mcp_schema.py"),
     Command("the numbers the normative pages state", SCRIPT, "python tools/check_doc_claims.py"),
     Command("the porting refusals, in all three places", SCRIPT, "python tools/check_unported.py"),
+    Command(
+        "every spec names its NeqSim source and every value its provenance",
+        SCRIPT,
+        "python tools/check_port.py",
+    ),
     Command("the skill catalog", SCRIPT, "python tools/validate_skills.py"),
     Command("the guard theorems' ownership", SCRIPT, "python tools/check_guards.py"),
     Command("the pages against the Lean tree", SCRIPT, "python tools/audit_lean_claims.py --check"),
@@ -735,6 +740,10 @@ INERT_MODULES: dict[str, str] = {
 #: names by hand is how a stale generated file ships, which is not hypothetical: two did.
 UNCHECKABLE = {
     "gen_user_data": "it takes a target path, so it is not a `--check` generator",
+    "gen_neqsim_classes": (
+        "it needs a NeqSim checkout or jar, which CI does not have; the committed class "
+        "index is what the gate reads"
+    ),
 }
 
 #: Generators that are checked, but **not by the sweep**: each needs something a plain

@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/depressurization/DepressurizationSimulator.java"
 edition = "Its `run`: the mole alignment, the discharge selection, the mass and energy balance, the lumped wall, the fire boundary, the VU flash and the API 521 evaluation."
+
+[source.neqsim]
+class = "DepressurizationSimulator"
+members = ["DepressurizationSimulator"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "explicit_euler_equilibrium_blowdown"
 initialisation = "stated_initial_state"
@@ -246,6 +252,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class refuses a non-positive stop pressure"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim DepressurizationSimulator"
+
+[provenance.algorithm.convergence]
+source = "NeqSim DepressurizationSimulator"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim DepressurizationSimulator"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim DepressurizationSimulator"
+
+[provenance.algorithm.scheme]
+source = "NeqSim DepressurizationSimulator"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim DepressurizationSimulator"
+
 [implementations]
 python = "azoth.process.depressurization"
 rust = "azoth_process::depressurization"

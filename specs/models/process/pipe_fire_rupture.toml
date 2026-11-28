@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/rupture/PipeFireRuptureStudy.java"
 edition = "Its `run`, over `PipeFireRuptureInput`'s geometry and fluid, `PipeFireRuptureMaterial`'s tables and `PipeFireRuptureScenario`'s three factories."
+
+[source.neqsim]
+class = "PipeFireRuptureStudy"
+members = ["PipeFireRuptureStudy"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "strain_rate_pipe_fire_rupture"
 initialisation = "stated_initial_state"
@@ -340,6 +346,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class's builder refuses a non-positive maximum time"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PipeFireRuptureStudy"
+
+[provenance.algorithm.convergence]
+source = "NeqSim PipeFireRuptureStudy"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim PipeFireRuptureStudy"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim PipeFireRuptureStudy"
+
+[provenance.algorithm.scheme]
+source = "NeqSim PipeFireRuptureStudy"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim PipeFireRuptureStudy"
+
 [implementations]
 python = "azoth.process.pipe_fire_rupture"
 rust = "azoth_process::pipe_fire_rupture"

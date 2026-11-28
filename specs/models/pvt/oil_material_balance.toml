@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim reservoirproperties/materialbalance/OilMaterialBalance.java"
 edition = "The four material-balance terms, the three fits and the drive indices; the result struct's getters are the published fields."
+
+[source.neqsim]
+class = "OilMaterialBalance"
+members = ["OilMaterialBalance"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.calculation]
 type = "enum"
@@ -181,6 +187,12 @@ description = "the water drive index.\n"
 unit = "dimensionless"
 optional = true
 description = "the expansion drive index.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim OilMaterialBalance"
+
 [implementations]
 python = "azoth.pvt.oil_material_balance"
 rust = "azoth_pvt::oil_material_balance"

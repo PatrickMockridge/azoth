@@ -10,6 +10,12 @@ references = ["Danesh, A.; Xu, D.-H.; Todd, A. C. (1991). \"Comparative study of
 standard = "NeqSim master `AttractiveTermPrDanesh`"
 edition = "`alpha(temperature)`, ported verbatim"
 doi = "10.1016/0378-3812(91)80034-S"
+
+[source.neqsim]
+class = "AttractiveTermPrDanesh"
+members = ["AttractiveTermPrDanesh"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.omega]
 unit = "dimensionless"
@@ -36,6 +42,12 @@ omega = 0.152
 Tr = 0.7
 [worked_example.expected]
 alpha = 1.2066270990034567
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim AttractiveTermPrDanesh"
+
 [implementations]
 python = "azoth.eos.pr_danesh_alpha"
 rust = "azoth_eos::pr_danesh_alpha"

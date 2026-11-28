@@ -10,6 +10,12 @@ references = ["Mathias, P. M.; Copeman, T. W. (1983). \"Extension of the Peng-Ro
 standard = "NeqSim master `AttractiveTermMatCopPR`"
 edition = "`alpha(temperature)`, ported verbatim"
 doi = "10.1016/0378-3812(83)80084-3"
+
+[source.neqsim]
+class = "AttractiveTermMatCopPR"
+members = ["AttractiveTermMatCopPR"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.omega]
 unit = "dimensionless"
@@ -48,6 +54,12 @@ mc3 = -0.1
 Tr = 0.7
 [worked_example.expected]
 alpha = 1.180634768967036
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim AttractiveTermMatCopPR"
+
 [implementations]
 python = "azoth.eos.matcop_pr_alpha"
 rust = "azoth_eos::matcop_pr_alpha"

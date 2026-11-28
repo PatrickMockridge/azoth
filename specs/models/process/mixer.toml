@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/mixer/Mixer.java"
 edition = "Its steady-state `run`: the active inlets' lowest pressure as the outlet's unless one is specified, and a `PHflash` at the flow-weighted enthalpy for the temperature."
+
+[source.neqsim]
+class = "Mixer"
+members = ["Mixer"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -74,6 +80,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Mixer"
+
 [implementations]
 python = "azoth.process.mixer"
 rust = "azoth_process::mixer"

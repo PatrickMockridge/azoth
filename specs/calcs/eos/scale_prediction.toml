@@ -14,6 +14,12 @@ references = [
 [source]
 standard = "NeqSim master `ScalePredictionCalculator`"
 edition = "`calculate`, `debyeHuckelA`, `calculateActivityCoefficient`, `correctForIonPairing`, `estimateCarbonateFromBicarbonate`, `estimatePH`, the five Ksp correlations and `applyPressureCorrection`, ported. The toJson surface is not."
+
+[source.neqsim]
+class = "ScalePredictionCalculator"
+members = ["ScalePredictionCalculator.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.calcium]
 unit = "kg/m**3"
@@ -358,6 +364,12 @@ id = "round_trip_units"
 type = "property"
 property = "unit_round_trip"
 status = "active"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ScalePredictionCalculator.calculate"
+
 [implementations]
 python = "azoth.eos.scale_prediction"
 rust = "azoth_eos::scale_prediction"

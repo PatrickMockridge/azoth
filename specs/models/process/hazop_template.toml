@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/hazid/HAZOPTemplate.java"
 edition = "Its `generateGrid` and the `seedDeviations` table `fromProcessSystem` applies."
+
+[source.neqsim]
+class = "HAZOPTemplate"
+members = ["HAZOPTemplate.generateGrid"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "hazop_deviation_grid"
 convergence = "absolute"
@@ -65,6 +71,24 @@ description = "the new recommendation; absent for every generated row, which is 
 [outputs.deviation_count]
 unit = "dimensionless"
 description = "the number of rows.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim HAZOPTemplate.generateGrid"
+
+[provenance.algorithm.convergence]
+source = "NeqSim HAZOPTemplate.generateGrid"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim HAZOPTemplate.generateGrid"
+
+[provenance.algorithm.scheme]
+source = "NeqSim HAZOPTemplate.generateGrid"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim HAZOPTemplate.generateGrid"
+
 [implementations]
 python = "azoth.process.hazop_template"
 rust = "azoth_process::hazop_template"

@@ -9,6 +9,12 @@ references = ["No specific source is claimed: the isentropic critical-flow relat
 standard = """\
     the isentropic critical-flow relation from gas dynamics; API 520 / ISO 4126 for relief \
     valve sizing, which this calc does NOT implement"""
+
+[source.neqsim]
+class = "Orifice"
+members = ["Orifice"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.m_dot]
 unit = "kg/s"
@@ -72,6 +78,12 @@ rho0 = 10.0
 k = 1.4
 [worked_example.expected]
 a = 0.00046182742602466937
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Orifice"
+
 [implementations]
 python = "azoth.hydraulics.choked_flow_area"
 rust = "azoth_hydraulics::choked_flow_area"

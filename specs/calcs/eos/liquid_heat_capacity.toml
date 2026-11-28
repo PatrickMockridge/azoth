@@ -9,6 +9,12 @@ references = ["Poling, B. E.; Prausnitz, J. M.; O'Connell, J. P. (2001). \\\"The
 [source]
 standard = "NeqSim's `getPureComponentCpLiquid`"
 edition = "the correlation NeqSim master evaluates in `thermo/component/Component.java`, ported verbatim"
+
+[source.neqsim]
+class = "Component"
+members = ["Component"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.c0]
 unit = "dimensionless"
@@ -51,6 +57,12 @@ c4 = 9.37e-6
 T = 300.0
 [worked_example.expected]
 cp = 75.355
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Component"
+
 [implementations]
 python = "azoth.eos.liquid_heat_capacity"
 rust = "azoth_eos::liquid_heat_capacity"

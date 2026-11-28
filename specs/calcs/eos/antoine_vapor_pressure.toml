@@ -15,6 +15,12 @@ references = ["Antoine, C. (1888). \\\"Tensions des vapeurs; nouvelle relation e
 [source]
 standard = "NeqSim's `getAntoineVaporPressure`"
 edition = "the four correlations NeqSim master evaluates in `thermo/component/Component.java`, ported verbatim"
+
+[source.neqsim]
+class = "Component"
+members = ["Component"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.A]
 unit = "dimensionless"
@@ -82,6 +88,12 @@ Pc = 4599000.0
 T = 150.0
 [worked_example.expected]
 p_sat = 929295.9523003073
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Component"
+
 [implementations]
 python = "azoth.eos.antoine_vapor_pressure"
 rust = "azoth_eos::antoine_vapor_pressure"

@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/overpressure/TubeRuptureRelief.java"
 edition = "Its `calculate` with a fluid, through `ReliefFluidState.evaluate` and `NozzleFlow.gasMassRateKgPerS`."
+
+[source.neqsim]
+class = "TubeRuptureRelief"
+members = ["TubeRuptureRelief.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "tube_rupture_nozzle"
 convergence = "absolute"
@@ -122,6 +128,24 @@ max = 1
 max_inclusive = true
 severity = "error"
 rationale = "a discharge coefficient is in (0, 1]"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TubeRuptureRelief.calculate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim TubeRuptureRelief.calculate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim TubeRuptureRelief.calculate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim TubeRuptureRelief.calculate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim TubeRuptureRelief.calculate"
+
 [implementations]
 python = "azoth.process.tube_rupture_relief"
 rust = "azoth_process::tube_rupture_relief"

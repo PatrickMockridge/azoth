@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim master `FilippovConductivityMethod`"
 edition = "`calcConductivity`, `calcPureComponentConductivity` and `getMissenardPressureCorrection`, ported verbatim."
+
+[source.neqsim]
+class = "FilippovConductivityMethod"
+members = ["FilippovConductivityMethod.calcConductivity"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.liquid_conductivity]
 type = "matrix"
@@ -104,6 +110,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "It is the denominator of `Pr`.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim FilippovConductivityMethod.calcConductivity"
+
 [implementations]
 python = "azoth.eos.filippov_conductivity"
 rust = "azoth_eos::filippov_conductivity"

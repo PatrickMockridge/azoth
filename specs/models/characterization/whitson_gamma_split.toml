@@ -27,6 +27,12 @@ references = [
 [source]
 standard = "NeqSim master `PlusFractionModel.WhitsonGammaModel`"
 edition = "Its `characterizePlusFraction` override, its `P0P1`, its `gamma`, and its `densityUOP`/`densitySoreide`. `Characterise.setGammaShapeParameter`, `setGammaMinMW`, `setGammaDensityModel` and `setAutoEstimateGammaAlpha` are the four switches."
+
+[source.neqsim]
+class = "PlusFractionModel"
+members = ["PlusFractionModel.characterizePlusFraction"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.molar_mass]
 unit = "kg/mol"
@@ -131,6 +137,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "a molar mass, and the lower edge of the first window\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PlusFractionModel.characterizePlusFraction"
+
 [implementations]
 python = "azoth.characterization.whitson_gamma_split"
 rust = "azoth_characterization::whitson_gamma_split"

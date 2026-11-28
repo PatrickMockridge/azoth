@@ -20,6 +20,12 @@ standard = """\
 edition = """\
     The classical mixing rule. Its modern form, and the role of k12, are set out in e.g. \
     Poling, Prausnitz & O'Connell, The Properties of Gases and Liquids, 5th ed., ch. 5."""
+
+[source.neqsim]
+class = "EosMixingRuleHandler"
+members = ["EosMixingRuleHandler"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.z1]
 unit = "dimensionless"
@@ -72,6 +78,12 @@ k12 = 0.05
 [worked_example.expected]
 a_mix = 0.14584053499701302
 b_mix = 0.02495957371083088
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim EosMixingRuleHandler"
+
 [implementations]
 python = "azoth.eos.vdw1f_mix_binary"
 rust = "azoth_eos::vdw1f_mix_binary"

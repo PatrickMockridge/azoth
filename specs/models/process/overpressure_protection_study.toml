@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/overpressure/OverpressureProtectionStudy.java"
 edition = "Its `evaluate`: the governing-case selection, the three sizing branches, the selected capacity and the accumulated-pressure check."
+
+[source.neqsim]
+class = "OverpressureProtectionStudy"
+members = ["OverpressureProtectionStudy.evaluate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "overpressure_protection_study"
 convergence = "absolute"
@@ -203,6 +209,24 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "a back pressure is non-negative"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim OverpressureProtectionStudy.evaluate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim OverpressureProtectionStudy.evaluate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim OverpressureProtectionStudy.evaluate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim OverpressureProtectionStudy.evaluate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim OverpressureProtectionStudy.evaluate"
+
 [implementations]
 python = "azoth.process.overpressure_protection_study"
 rust = "azoth_process::overpressure_protection_study"

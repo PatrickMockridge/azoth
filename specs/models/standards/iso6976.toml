@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "ISO 6976"
 edition = "1995; ported through NeqSim's `Standard_ISO6976`, which queries `ISO6976constants`"
+
+[source.neqsim]
+class = "Standard_ISO6976"
+members = ["Standard_ISO6976"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -71,6 +77,12 @@ max = 298.15
 max_inclusive = true
 severity = "error"
 rationale = "the standard's combustion temperatures, 0 to 25 C\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Standard_ISO6976"
+
 [implementations]
 python = "azoth.standards.iso6976"
 rust = "azoth_standards::iso6976"

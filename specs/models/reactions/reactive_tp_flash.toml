@@ -27,6 +27,12 @@ references = [
 [source]
 standard = "NeqSim master `ReactiveMultiphaseTPflash`"
 edition = "The whole stack as one procedure: the formula matrix, the `NR = 0` dispatch, the VLE initialisation, the tangent-plane analysis, the outer loop with its removal and trial-phase rules, the modified-RAND solve with DIIS, and the Gibbs measure. The ionic branch is refused."
+
+[source.neqsim]
+class = "ReactiveMultiphaseTPflash"
+members = ["ReactiveMultiphaseTPflash"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "phase_add_remove_loop"
 initialisation = "wilson_vle"
@@ -116,6 +122,42 @@ min = 1
 min_inclusive = true
 severity = "error"
 rationale = "a phase ceiling below one is not a ceiling; the driver has no way to answer it"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ReactiveMultiphaseTPflash"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ReactiveMultiphaseTPflash"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim ReactiveMultiphaseTPflash"
+
+[provenance.algorithm."inner.convergence"]
+source = "NeqSim ReactiveMultiphaseTPflash"
+
+[provenance.algorithm."inner.initialisation"]
+source = "NeqSim ReactiveMultiphaseTPflash"
+
+[provenance.algorithm."inner.max_iterations"]
+source = "NeqSim ReactiveMultiphaseTPflash"
+
+[provenance.algorithm."inner.scheme"]
+source = "NeqSim ReactiveMultiphaseTPflash"
+
+[provenance.algorithm."inner.tolerance"]
+source = "NeqSim ReactiveMultiphaseTPflash"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ReactiveMultiphaseTPflash"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ReactiveMultiphaseTPflash"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ReactiveMultiphaseTPflash"
+
 [implementations]
 python = "azoth.reactions.reactive_tp_flash"
 rust = "azoth_reactions::reactive_tp_flash"

@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/compressor/AntiSurgeRecycleCalculator.java"
 edition = "`solve`: the natural run, the control-line comparison, and the damped fixed point that mixes a cooled clone of the suction back into the machine."
+
+[source.neqsim]
+class = "AntiSurgeRecycleCalculator"
+members = ["AntiSurgeRecycleCalculator.solve"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "damped_fixed_point_recycle"
 initialisation = "shortfall_over_inlet_volume_times_feed_mass"
@@ -175,6 +181,27 @@ min = 1
 min_inclusive = true
 severity = "error"
 rationale = "a cap below one runs no pass, so nothing is calculated"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim AntiSurgeRecycleCalculator.solve"
+
+[provenance.algorithm.convergence]
+source = "NeqSim AntiSurgeRecycleCalculator.solve"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim AntiSurgeRecycleCalculator.solve"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim AntiSurgeRecycleCalculator.solve"
+
+[provenance.algorithm.scheme]
+source = "NeqSim AntiSurgeRecycleCalculator.solve"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim AntiSurgeRecycleCalculator.solve"
+
 [implementations]
 python = "azoth.process.anti_surge_recycle"
 rust = "azoth_process::anti_surge_recycle"

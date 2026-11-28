@@ -17,6 +17,12 @@ references = [
 standard = "Abrams, D. S.; Prausnitz, J. M. (1975)"
 edition = "AIChE Journal 21(1), 116-128"
 doi = "10.1002/aic.690210115"
+
+[source.neqsim]
+class = "ComponentGEUniquac"
+members = ["ComponentGEUniquac"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -52,6 +58,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute temperature; zero and below are not states\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ComponentGEUniquac"
+
 [implementations]
 python = "azoth.eos.uniquac_activity_coefficients"
 rust = "azoth_eos::uniquac_activity_coefficients"

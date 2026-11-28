@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/overpressure/FireCaseRelief.java"
 edition = "Its `calculate` no-fluid path and `ReliefValveSizing.calculateAPI521FireHeatInput`."
+
+[source.neqsim]
+class = "FireCaseRelief"
+members = ["FireCaseRelief.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_fire_case_relief"
 convergence = "absolute"
@@ -94,6 +100,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "a non-positive absolute temperature is not a relieving state"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim FireCaseRelief.calculate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim FireCaseRelief.calculate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim FireCaseRelief.calculate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim FireCaseRelief.calculate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim FireCaseRelief.calculate"
+
 [implementations]
 python = "azoth.process.fire_case_relief"
 rust = "azoth_process::fire_case_relief"

@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim `SystemUMRPRUEos`; Michelsen (1982) for the flash"
 edition = "PR with the standard alpha and `bmixType = 1` on the `_umr` tables, flashed by the successive-substitution procedure of `eos.pt_flash` with no fallback."
+
+[source.neqsim]
+class = "SystemUMRPRUEos"
+members = ["SystemUMRPRUEos"]
+commit = "f0c7436c6923766b1e22957b7075f650600457a7"
+
 [algorithm]
 scheme = "successive_substitution_flash"
 initialisation = "wilson"
@@ -120,6 +126,39 @@ max = 0.9
 max_inclusive = true
 severity = "warning"
 rationale = "Above `T / Tc = 0.9` for the nearest component the cubic's roots are close to coalescing and successive substitution converges slowly or to the trivial solution."
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SystemUMRPRUEos"
+
+[provenance.algorithm.convergence]
+source = "NeqSim SystemUMRPRUEos"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim SystemUMRPRUEos"
+
+[provenance.algorithm."inner.convergence"]
+source = "NeqSim SystemUMRPRUEos"
+
+[provenance.algorithm."inner.max_iterations"]
+source = "NeqSim SystemUMRPRUEos"
+
+[provenance.algorithm."inner.scheme"]
+source = "NeqSim SystemUMRPRUEos"
+
+[provenance.algorithm."inner.tolerance"]
+source = "NeqSim SystemUMRPRUEos"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim SystemUMRPRUEos"
+
+[provenance.algorithm.scheme]
+source = "NeqSim SystemUMRPRUEos"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim SystemUMRPRUEos"
+
 [implementations]
 python = "azoth.eos.umr_pru_flash"
 rust = "azoth_eos::umr_pru_flash"

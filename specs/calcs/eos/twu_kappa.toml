@@ -9,6 +9,12 @@ references = ["Twu, C. H.; Bluck, D.; Cunningham, J. R.; Coon, J. E. (1991). \\\
 standard = "Twu, C. H.; Bluck, D.; Cunningham, J. R.; Coon, J. E. (1991)"
 edition = "A Cubic Equation of State with a New Alpha Function and a New Mixing Rule. Fluid Phase Equilibria, 69, 33-50"
 doi = "10.1016/0378-3812(91)90024-2"
+
+[source.neqsim]
+class = "Fluid"
+members = ["Fluid"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.omega]
 unit = "dimensionless"
@@ -31,6 +37,12 @@ tolerance = 1e-12
 omega = 0.152
 [worked_example.expected]
 kappa = 0.7152048
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Fluid"
+
 [implementations]
 python = "azoth.eos.twu_kappa"
 rust = "azoth_eos::twu_kappa"

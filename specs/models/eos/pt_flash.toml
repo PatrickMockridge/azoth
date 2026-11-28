@@ -19,6 +19,12 @@ references = [
 standard = "Rachford, H. H.; Rice, J. D. (1952); Michelsen, M. L. (1982)"
 edition = "The Rachford-Rice equation is Rachford & Rice, Journal of Petroleum Technology 4(10), 19-3; successive substitution with a fugacity-coefficient update is set out in Michelsen (1982)."
 doi = "10.1016/0378-3812(82)85001-2"
+
+[source.neqsim]
+class = "TPflash"
+members = ["TPflash.run"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "successive_substitution_flash"
 initialisation = "wilson"
@@ -132,6 +138,57 @@ max = 0.9
 max_inclusive = true
 severity = "warning"
 rationale = "Above `T / Tc = 0.9` for the nearest component the cubic's roots are close to coalescing and successive substitution converges slowly or to the trivial solution."
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TPflash.run"
+
+[provenance.algorithm.convergence]
+source = "NeqSim TPflash.run"
+
+[provenance.algorithm."fallback.after"]
+source = "NeqSim TPflash.run"
+
+[provenance.algorithm."fallback.algorithm.convergence"]
+source = "NeqSim TPflash.run"
+
+[provenance.algorithm."fallback.algorithm.initialisation"]
+source = "NeqSim TPflash.run"
+
+[provenance.algorithm."fallback.algorithm.max_iterations"]
+source = "NeqSim TPflash.run"
+
+[provenance.algorithm."fallback.algorithm.scheme"]
+source = "NeqSim TPflash.run"
+
+[provenance.algorithm."fallback.algorithm.tolerance"]
+source = "NeqSim TPflash.run"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim TPflash.run"
+
+[provenance.algorithm."inner.convergence"]
+source = "NeqSim TPflash.run"
+
+[provenance.algorithm."inner.max_iterations"]
+source = "NeqSim TPflash.run"
+
+[provenance.algorithm."inner.scheme"]
+source = "NeqSim TPflash.run"
+
+[provenance.algorithm."inner.tolerance"]
+source = "NeqSim TPflash.run"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim TPflash.run"
+
+[provenance.algorithm.scheme]
+source = "NeqSim TPflash.run"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim TPflash.run"
+
 [implementations]
 python = "azoth.eos.pt_flash"
 rust = "azoth_eos::pt_flash"

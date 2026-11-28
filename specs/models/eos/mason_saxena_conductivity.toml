@@ -16,6 +16,12 @@ references = [
 standard = "Mason, E. A.; Saxena, S. C. (1958); Chung et al. (1988)"
 edition = "Mason-Saxena mixing is Mason & Saxena, Physics of Fluids 1(5), 361-369; the pure-component conductivity it mixes is Chung et al., Ind. Eng. Chem. Res. 27(4), 671-679."
 doi = "10.1063/1.1724352"
+
+[source.neqsim]
+class = "ChungConductivityMethod"
+members = ["ChungConductivityMethod"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.Cv0]
 type = "vector"
@@ -70,6 +76,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute temperature; zero and below are not states\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ChungConductivityMethod"
+
 [implementations]
 python = "azoth.eos.mason_saxena_conductivity"
 rust = "azoth_eos::mason_saxena_conductivity"

@@ -14,6 +14,12 @@ standard = "The ideal-gas law with the compressibility factor as the departure f
 edition = """\
     Clapeyron, É. (1834); van der Waals, J. D. (1873) for the compressibility factor as the \
     correction"""
+
+[source.neqsim]
+class = "Units"
+members = ["Units"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.z]
 unit = "dimensionless"
@@ -65,6 +71,12 @@ T = 295.864
 P = 1062000.0
 [worked_example.expected]
 v = 0.0018317107825229842
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Units"
+
 [implementations]
 python = "azoth.eos.pr_molar_volume"
 rust = "azoth_eos::pr_molar_volume"

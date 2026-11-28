@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/separator/SeparatorCapacityAssessment.java"
 edition = "`from`: the provenance and state checks in the class's order, the sizing family's densities and gas area, the optional mechanical-design gas limit and the governed utilisation."
+
+[source.neqsim]
+class = "SeparatorCapacityAssessment"
+members = ["SeparatorCapacityAssessment.from"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -115,6 +121,12 @@ description = "the governed limit: the mechanical limit where it binds, the Soud
 unit = "dimensionless"
 optional = true
 description = "the current gas flow over the governed limit; `<= 1` is `feasible`. Absent on `unassessed`.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SeparatorCapacityAssessment.from"
+
 [implementations]
 python = "azoth.process.separator_capacity_assessment"
 rust = "azoth_process::separator_capacity_assessment"

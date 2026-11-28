@@ -148,7 +148,6 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyPrPenelouxShiftResult>()?;
     m.add_class::<crate::transport_gen::PyPrZFactorResult>()?;
     m.add_class::<crate::transport_gen::PyProductionChemicalScaleScenarioResult>()?;
-    m.add_class::<crate::transport_gen::PyPrsvKappaResult>()?;
     m.add_class::<crate::transport_gen::PyPsFlashResult>()?;
     m.add_class::<crate::transport_gen::PyPtFlashResult>()?;
     m.add_class::<crate::transport_gen::PyPtPhaseEnvelopeResult>()?;
@@ -890,7 +889,6 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         crate::wrappers_gen::production_chemical_scale_scenario,
         m
     )?)?;
-    m.add_function(wrap_pyfunction!(crate::wrappers_gen::prsv_kappa, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::ps_flash, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::pt_flash, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::pt_phase_envelope, m)?)?;

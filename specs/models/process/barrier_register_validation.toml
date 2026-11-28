@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/barrier/BarrierRegister.java"
 edition = "Its `validate`, with `SafetyBarrier.validate`, `PerformanceStandard.validate` and `SafetyCriticalElement.validate`."
+
+[source.neqsim]
+class = "BarrierRegister"
+members = ["BarrierRegister.validate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "barrier_register_validation"
 convergence = "absolute"
@@ -193,6 +199,24 @@ description = "the number of findings.\n"
 [outputs.valid]
 type = "boolean"
 description = "whether the register has no findings.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim BarrierRegister.validate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim BarrierRegister.validate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim BarrierRegister.validate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim BarrierRegister.validate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim BarrierRegister.validate"
+
 [implementations]
 python = "azoth.process.barrier_register_validation"
 rust = "azoth_process::barrier_register_validation"

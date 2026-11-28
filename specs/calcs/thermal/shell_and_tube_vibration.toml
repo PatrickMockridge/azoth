@@ -15,6 +15,12 @@ references = [
 [source]
 standard = "NeqSim process/mechanicaldesign/heatexchanger/VibrationAnalysis.java"
 edition = "`performScreening` and the four helpers it reads: `calcNaturalFrequency`, `calcVortexSheddingFrequency`, `calcCriticalVelocityConnors` and `calcAcousticFrequency`."
+
+[source.neqsim]
+class = "VibrationAnalysis"
+members = ["VibrationAnalysis.performScreening"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.tube_outside_diameter]
 unit = "m"
@@ -188,6 +194,12 @@ acoustic_frequency = 340.0
 acoustic_ratio = 0.024533449208752126
 acoustic_critical = false
 passed = true
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim VibrationAnalysis.performScreening"
+
 [implementations]
 python = "azoth.thermal.shell_and_tube_vibration"
 rust = "azoth_thermal::shell_and_tube_vibration"

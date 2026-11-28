@@ -13,6 +13,12 @@ references = [
 [source]
 standard = "NeqSim process/mechanicaldesign/heatexchanger/TEMAStandard.java"
 edition = "the seven enum tables and `TEMAConfiguration`'s cost and head predicates, with `recommendConfiguration`, `calculateMinTubePitch`, `estimateTubeCount`, `getMaxUnsupportedSpan`, `getMinBaffleSpacing` and `getMaxBaffleSpacing`."
+
+[source.neqsim]
+class = "TEMAStandard"
+members = ["TEMAStandard.recommendConfiguration"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.front_head]
 type = "enum"
@@ -186,6 +192,12 @@ max_unsupported_span = 0.889
 min_baffle_spacing = 0.1
 max_baffle_spacing = 0.5
 recommended_designation = "BEM"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TEMAStandard.recommendConfiguration"
+
 [implementations]
 python = "azoth.thermal.tema_standard"
 rust = "azoth_thermal::tema_standard"

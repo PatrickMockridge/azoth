@@ -9,6 +9,12 @@ references = ["Peng, D. Y.; Robinson, D. B. (1978). \"The Characterization of th
 [source]
 standard = "NeqSim master `AttractiveTermPrDelft1998`"
 edition = "`alpha(temperature)`, general branch ported verbatim"
+
+[source.neqsim]
+class = "AttractiveTermPrDelft1998"
+members = ["AttractiveTermPrDelft1998"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.omega]
 unit = "dimensionless"
@@ -35,6 +41,12 @@ omega = 0.1
 Tr = 0.7
 [worked_example.expected]
 alpha = 1.1792745256672486
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim AttractiveTermPrDelft1998"
+
 [implementations]
 python = "azoth.eos.pr_delft1998_alpha"
 rust = "azoth_eos::pr_delft1998_alpha"

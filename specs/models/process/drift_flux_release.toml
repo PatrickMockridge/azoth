@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/release/DriftFluxHomogeneousEquilibriumReleaseModel.java"
 edition = "Its `calculate`: the homogeneous base, the exactly-two-phase opening check, the Zuber-Findlay/Harmathy drift-flux solve, the phase-area and kinetic-energy closures and the closure's rate."
+
+[source.neqsim]
+class = "DriftFluxHomogeneousEquilibriumReleaseModel"
+members = ["DriftFluxHomogeneousEquilibriumReleaseModel.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "drift_flux_partition"
 initialisation = "hem_isentropic_pressure_scan"
@@ -179,6 +185,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class refuses a non-positive surface tension"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim DriftFluxHomogeneousEquilibriumReleaseModel.calculate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim DriftFluxHomogeneousEquilibriumReleaseModel.calculate"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim DriftFluxHomogeneousEquilibriumReleaseModel.calculate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim DriftFluxHomogeneousEquilibriumReleaseModel.calculate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim DriftFluxHomogeneousEquilibriumReleaseModel.calculate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim DriftFluxHomogeneousEquilibriumReleaseModel.calculate"
+
 [implementations]
 python = "azoth.process.drift_flux_release"
 rust = "azoth_process::drift_flux_release"

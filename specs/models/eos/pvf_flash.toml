@@ -14,6 +14,12 @@ references = [
 [source]
 standard = "Standard thermodynamics, as in Michelsen & Mollerup"
 edition = "NeqSim master `thermodynamicoperations/flashops/PVFflash`: its bracket, its widening, its Illinois search and its `computeBeta` are this model's loop."
+
+[source.neqsim]
+class = "Standard"
+members = ["Standard.computeBeta"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "pvf_flash_illinois_temperature"
 initialisation = "from_the_feed_temperature"
@@ -107,6 +113,66 @@ min_inclusive = false
 max_inclusive = false
 severity = "error"
 rationale = "the endpoints are the bubble and dew points, which are other calculations with their own procedures"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Standard.computeBeta"
+
+[provenance.algorithm."bracket.lower"]
+source = "NeqSim Standard.computeBeta"
+
+[provenance.algorithm."bracket.scheme"]
+source = "NeqSim Standard.computeBeta"
+
+[provenance.algorithm."bracket.steps"]
+source = "NeqSim Standard.computeBeta"
+
+[provenance.algorithm."bracket.upper"]
+source = "NeqSim Standard.computeBeta"
+
+[provenance.algorithm.convergence]
+source = "NeqSim Standard.computeBeta"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim Standard.computeBeta"
+
+[provenance.algorithm."inner.convergence"]
+source = "NeqSim Standard.computeBeta"
+
+[provenance.algorithm."inner.initialisation"]
+source = "NeqSim Standard.computeBeta"
+
+[provenance.algorithm."inner.inner.convergence"]
+source = "NeqSim Standard.computeBeta"
+
+[provenance.algorithm."inner.inner.max_iterations"]
+source = "NeqSim Standard.computeBeta"
+
+[provenance.algorithm."inner.inner.scheme"]
+source = "NeqSim Standard.computeBeta"
+
+[provenance.algorithm."inner.inner.tolerance"]
+source = "NeqSim Standard.computeBeta"
+
+[provenance.algorithm."inner.max_iterations"]
+source = "NeqSim Standard.computeBeta"
+
+[provenance.algorithm."inner.scheme"]
+source = "NeqSim Standard.computeBeta"
+
+[provenance.algorithm."inner.tolerance"]
+source = "NeqSim Standard.computeBeta"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim Standard.computeBeta"
+
+[provenance.algorithm.scheme]
+source = "NeqSim Standard.computeBeta"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim Standard.computeBeta"
+
 [implementations]
 python = "azoth.eos.pvf_flash"
 rust = "azoth_eos::pvf_flash"

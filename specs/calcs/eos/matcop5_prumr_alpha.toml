@@ -10,6 +10,12 @@ references = ["Tasios, I.; et al. (2025). Fluid Phase Equilib. DOI 10.1016/j.flu
 standard = "NeqSim master `AttractiveTermMatCop5PRUMR`"
 edition = "`alpha(temperature)`, ported verbatim"
 doi = "10.1016/j.fluid.2024.114241"
+
+[source.neqsim]
+class = "AttractiveTermMatCop5PRUMR"
+members = ["AttractiveTermMatCop5PRUMR"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.omega]
 unit = "dimensionless"
@@ -56,6 +62,12 @@ mc5 = 0.01
 Tr = 0.7
 [worked_example.expected]
 alpha = 1.1807146411895904
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim AttractiveTermMatCop5PRUMR"
+
 [implementations]
 python = "azoth.eos.matcop5_prumr_alpha"
 rust = "azoth_eos::matcop5_prumr_alpha"

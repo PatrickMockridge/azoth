@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/firewater/DelugeNozzleLayout.java"
 edition = "Its `requiredFlowLpm`, `flowPerNozzleLpm`, `coveragePerNozzleM2`, the two counts, `gridSpacingM`, `deliveredFlowLpm`, `deliveredDensityLpmPerM2` and `isClearanceAdequate`."
+
+[source.neqsim]
+class = "DelugeNozzleLayout"
+members = ["DelugeNozzleLayout.requiredFlowLpm"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_deluge_nozzle_layout"
 convergence = "absolute"
@@ -154,6 +160,24 @@ max = 1
 max_inclusive = true
 severity = "error"
 rationale = "the class's setter refuses an efficiency outside (0, 1]"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim DelugeNozzleLayout.requiredFlowLpm"
+
+[provenance.algorithm.convergence]
+source = "NeqSim DelugeNozzleLayout.requiredFlowLpm"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim DelugeNozzleLayout.requiredFlowLpm"
+
+[provenance.algorithm.scheme]
+source = "NeqSim DelugeNozzleLayout.requiredFlowLpm"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim DelugeNozzleLayout.requiredFlowLpm"
+
 [implementations]
 python = "azoth.process.deluge_nozzle_layout"
 rust = "azoth_process::deluge_nozzle_layout"

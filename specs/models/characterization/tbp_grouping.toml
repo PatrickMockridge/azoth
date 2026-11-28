@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim master `Phase.groupTBPfractions`"
 edition = "Its twenty-bin grouping on fourteen boiling-point thresholds in degrees Celsius. `TBPCharacterize`'s override does the same binning and adds per-bin moles, molar mass and density; it is unreachable and is named in the assumptions rather than ported."
+
+[source.neqsim]
+class = "Phase"
+members = ["Phase"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.boiling_point]
 type = "vector"
@@ -37,6 +43,12 @@ type = "vector"
 unit = "dimensionless"
 length = "always twenty, bins 6 to 19 being the ones a threshold can open"
 description = "Each bin's summed mole fraction. Bins 0 to 5 are always zero, and the entries do not sum to one because the light end is in no bin.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Phase"
+
 [implementations]
 python = "azoth.characterization.tbp_grouping"
 rust = "azoth_characterization::tbp_grouping"

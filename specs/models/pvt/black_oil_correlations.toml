@@ -29,6 +29,12 @@ references = [
 [source]
 standard = "NeqSim pvtsimulation/util/BlackOilCorrelations.java and SaturationPressureCorrelation.java"
 edition = "Every public correlation and the two classes' unit-aware overloads; the table validator, the reports and the convenience maps are named in the assumptions rather than ported."
+
+[source.neqsim]
+class = "BlackOilCorrelations"
+members = ["BlackOilCorrelations"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "black_oil_correlation_dispatch"
 initialisation = "first_query_in_caller_order"
@@ -196,6 +202,27 @@ description = "Glaso's answer, beside the statistics.\n"
 unit = "Pa"
 optional = true
 description = "Petrosky-Farshad's answer, beside the statistics.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim BlackOilCorrelations"
+
+[provenance.algorithm.convergence]
+source = "NeqSim BlackOilCorrelations"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim BlackOilCorrelations"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim BlackOilCorrelations"
+
+[provenance.algorithm.scheme]
+source = "NeqSim BlackOilCorrelations"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim BlackOilCorrelations"
+
 [implementations]
 python = "azoth.pvt.black_oil_correlations"
 rust = "azoth_pvt::black_oil_correlations"

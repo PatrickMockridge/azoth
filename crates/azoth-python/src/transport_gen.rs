@@ -7976,42 +7976,6 @@ impl From<&azoth_eos::results::ProductionChemicalScaleScenarioResult>
         }
     }
 }
-/// Result of `eos.prsv_kappa`, transported.
-#[pyclass(
-    frozen,
-    skip_from_py_object,
-    module = "azoth._core",
-    name = "PrsvKappaResult"
-)]
-#[derive(Debug, Clone, PartialEq)]
-pub struct PyPrsvKappaResult {
-    /// The PRSV alpha-function coefficient, which feeds the same alpha function as Peng-Robinson's, `alpha = (1 + kappa*(1 - sqrt(Tr)))**2`. Unlike Peng-Robinson's, it varies with `Tr`.
-    #[pyo3(get)]
-    pub kappa: f64,
-    /// Caveats, deduplicated.
-    #[pyo3(get)]
-    pub warnings: Vec<PyWarning>,
-}
-
-#[pymethods]
-impl PyPrsvKappaResult {
-    fn __repr__(&self) -> String {
-        format!(
-            "PrsvKappaResult(kappa={:?}, {} warning(s))",
-            self.kappa,
-            self.warnings.len()
-        )
-    }
-}
-
-impl From<&azoth_eos::results::PrsvKappaResult> for PyPrsvKappaResult {
-    fn from(r: &azoth_eos::results::PrsvKappaResult) -> Self {
-        Self {
-            kappa: r.kappa,
-            warnings: transport(&r.warnings),
-        }
-    }
-}
 /// Result of `eos.ps_flash`, transported.
 #[pyclass(
     frozen,

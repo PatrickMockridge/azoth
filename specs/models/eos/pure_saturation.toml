@@ -19,6 +19,12 @@ edition = """\
     A New Two-Constant Equation of State. Industrial & Engineering Chemistry Fundamentals, \
     15(1), 59-64"""
 doi = "10.1021/i160057a011"
+
+[source.neqsim]
+class = "CubicPureSaturation"
+members = ["CubicPureSaturation"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "saturation_pressure_bisection"
 convergence = "relative"
@@ -63,6 +69,36 @@ max = 1
 max_inclusive = false
 severity = "error"
 rationale = "Above the critical temperature a pure component has no saturation pressure, and at exactly `Tc` the residual is zero for every pressure, so the search would converge on nothing."
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim CubicPureSaturation"
+
+[provenance.algorithm."bracket.lower"]
+source = "NeqSim CubicPureSaturation"
+
+[provenance.algorithm."bracket.scheme"]
+source = "NeqSim CubicPureSaturation"
+
+[provenance.algorithm."bracket.steps"]
+source = "NeqSim CubicPureSaturation"
+
+[provenance.algorithm."bracket.upper"]
+source = "NeqSim CubicPureSaturation"
+
+[provenance.algorithm.convergence]
+source = "NeqSim CubicPureSaturation"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim CubicPureSaturation"
+
+[provenance.algorithm.scheme]
+source = "NeqSim CubicPureSaturation"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim CubicPureSaturation"
+
 [implementations]
 python = "azoth.eos.pure_saturation"
 rust = "azoth_eos::pure_saturation"

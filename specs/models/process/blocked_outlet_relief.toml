@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/overpressure/BlockedOutletRelief.java"
 edition = "Its `calculate` with a fluid supplied, through `ReliefFluidState.evaluate`."
+
+[source.neqsim]
+class = "BlockedOutletRelief"
+members = ["BlockedOutletRelief.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "blocked_outlet_full_inflow"
 convergence = "absolute"
@@ -91,6 +97,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute temperature must be positive"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim BlockedOutletRelief.calculate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim BlockedOutletRelief.calculate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim BlockedOutletRelief.calculate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim BlockedOutletRelief.calculate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim BlockedOutletRelief.calculate"
+
 [implementations]
 python = "azoth.process.blocked_outlet_relief"
 rust = "azoth_process::blocked_outlet_relief"

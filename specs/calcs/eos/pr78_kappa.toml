@@ -14,6 +14,12 @@ references = ["Peng, D. Y.; Robinson, D. B. (1978). \\\"The Characterization of 
 [source]
 standard = "Peng, D. Y.; Robinson, D. B. (1978)"
 edition = "The Characterization of the Heptanes and Heavier Fractions for the GPA Peng-Robinson Programs. GPA Research Report RR-28"
+
+[source.neqsim]
+class = "Report"
+members = ["Report"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.omega]
 unit = "dimensionless"
@@ -36,6 +42,12 @@ tolerance = 1e-12
 omega = 0.6
 [worked_example.expected]
 kappa = 1.2150662799999998
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Report"
+
 [implementations]
 python = "azoth.eos.pr78_kappa"
 rust = "azoth_eos::pr78_kappa"

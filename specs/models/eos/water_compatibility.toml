@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim master `WaterCompatibilityScreener`"
 edition = "`calculate`, `checkWorstCase` and the two mixing loops, ported. The two stored pH fields, the Gson report and the array default of eleven ratios are not."
+
+[source.neqsim]
+class = "WaterCompatibilityScreener"
+members = ["WaterCompatibilityScreener.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.formation_water]
 type = "record_list"
@@ -141,6 +147,12 @@ description = "the mineral that produced it.\n"
 unit = "dimensionless"
 optional = true
 description = "the index itself.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim WaterCompatibilityScreener.calculate"
+
 [implementations]
 python = "azoth.eos.water_compatibility"
 rust = "azoth_eos::water_compatibility"

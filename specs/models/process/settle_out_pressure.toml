@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/settleout/SettleOutPressureAnalyzer.java"
 edition = "Its `analyze`: the ideal-gas inventory, the settle temperature and pressure, the rating verdict and the breakdown."
+
+[source.neqsim]
+class = "SettleOutPressureAnalyzer"
+members = ["SettleOutPressureAnalyzer.analyze"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "ideal_gas_settle_out_balance"
 convergence = "absolute"
@@ -102,6 +108,24 @@ description = "the compartment's compressibility, 1.0.\n"
 [outputs.compartments.fields.moles]
 unit = "mol"
 description = "the compartment's inventory.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SettleOutPressureAnalyzer.analyze"
+
+[provenance.algorithm.convergence]
+source = "NeqSim SettleOutPressureAnalyzer.analyze"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim SettleOutPressureAnalyzer.analyze"
+
+[provenance.algorithm.scheme]
+source = "NeqSim SettleOutPressureAnalyzer.analyze"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim SettleOutPressureAnalyzer.analyze"
+
 [implementations]
 python = "azoth.process.settle_out_pressure"
 rust = "azoth_process::settle_out_pressure"

@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim process/mechanicaldesign/heatexchanger/BoilingHeatTransfer.java"
 edition = "`calcChenHTC`, `calcGungorWintertonHTC`, `calcGungorWintertonCorrectedHTC`, the Martinelli and factor helpers, and `calcAverageHTC`, composed as the zone analysis uses them."
+
+[source.neqsim]
+class = "BoilingHeatTransfer"
+members = ["BoilingHeatTransfer.calcChenHTC"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.mass_flux]
 unit = "kg/(m**2*s)"
@@ -202,6 +208,12 @@ average_htc = 3092.2347498731165
 martinelli_parameter = 0.5799274339133583
 chen_enhancement_factor = 3.823434196686962
 chen_suppression_factor = 0.2918448293001838
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim BoilingHeatTransfer.calcChenHTC"
+
 [implementations]
 python = "azoth.thermal.boiling_heat_transfer"
 rust = "azoth_thermal::boiling_heat_transfer"

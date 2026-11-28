@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/release/RanzMarshallFiniteRateReleaseModel.java"
 edition = "Its `calculate`: the correlation applicability, the morphology check, the component-set check and the component-selective delegate at the correlation times."
+
+[source.neqsim]
+class = "RanzMarshallFiniteRateReleaseModel"
+members = ["RanzMarshallFiniteRateReleaseModel.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "ranz_marshall_component_transfer"
 initialisation = "hem_isentropic_pressure_scan"
@@ -236,6 +242,27 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "the class refuses a negative relative velocity"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim RanzMarshallFiniteRateReleaseModel.calculate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim RanzMarshallFiniteRateReleaseModel.calculate"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim RanzMarshallFiniteRateReleaseModel.calculate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim RanzMarshallFiniteRateReleaseModel.calculate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim RanzMarshallFiniteRateReleaseModel.calculate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim RanzMarshallFiniteRateReleaseModel.calculate"
+
 [implementations]
 python = "azoth.process.ranz_marshall_release"
 rust = "azoth_process::ranz_marshall_release"

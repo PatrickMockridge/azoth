@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/depressurization/DynamicPsvSizingStudy.java"
 edition = "Its `run`: the steady API 521 area, the ideal-gas PSV-cycling march and the bisection over the orifice area."
+
+[source.neqsim]
+class = "DynamicPsvSizingStudy"
+members = ["DynamicPsvSizingStudy"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "bisection_over_psv_area"
 initialisation = "stated_bisection_bracket"
@@ -173,6 +179,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class refuses a non-positive horizon"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim DynamicPsvSizingStudy"
+
+[provenance.algorithm.convergence]
+source = "NeqSim DynamicPsvSizingStudy"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim DynamicPsvSizingStudy"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim DynamicPsvSizingStudy"
+
+[provenance.algorithm.scheme]
+source = "NeqSim DynamicPsvSizingStudy"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim DynamicPsvSizingStudy"
+
 [implementations]
 python = "azoth.process.dynamic_psv_sizing"
 rust = "azoth_process::dynamic_psv_sizing"

@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/compliance/NorsokP002ComplianceChecker.java"
 edition = "Its seven `check...` and `record...` methods, `isCompliant` and `countNonCompliant`."
+
+[source.neqsim]
+class = "NorsokP002ComplianceChecker"
+members = ["NorsokP002ComplianceChecker.isCompliant"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "norsok_p002_point_checks"
 convergence = "absolute"
@@ -107,6 +113,24 @@ description = "whether every finding is compliant.\n"
 [outputs.non_compliant_count]
 unit = "dimensionless"
 description = "the number of non-compliant findings.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim NorsokP002ComplianceChecker.isCompliant"
+
+[provenance.algorithm.convergence]
+source = "NeqSim NorsokP002ComplianceChecker.isCompliant"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim NorsokP002ComplianceChecker.isCompliant"
+
+[provenance.algorithm.scheme]
+source = "NeqSim NorsokP002ComplianceChecker.isCompliant"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim NorsokP002ComplianceChecker.isCompliant"
+
 [implementations]
 python = "azoth.process.norsok_p002_compliance"
 rust = "azoth_process::norsok_p002_compliance"

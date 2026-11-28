@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim master `PipeBeggsAndBrills`"
 edition = "`runWithSpecifiedFlowRate`'s isothermal branch and the profile lists it fills, ported over `eos.pt_flash`, `eos.phase_transport` and `eos.beggs_brill_segment`. The flow-rate and inlet-pressure solving modes, the low-flow bypass, the heat-transfer branch and the transient are not."
+
+[source.neqsim]
+class = "PipeBeggsAndBrills"
+members = ["PipeBeggsAndBrills.runWithSpecifiedFlowRate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -120,6 +126,12 @@ min = 1
 min_inclusive = true
 severity = "error"
 rationale = "The class refuses a non-positive increment count.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PipeBeggsAndBrills.runWithSpecifiedFlowRate"
+
 [implementations]
 python = "azoth.eos.pipe_beggs_and_brills"
 rust = "azoth_eos::pipe_beggs_and_brills"

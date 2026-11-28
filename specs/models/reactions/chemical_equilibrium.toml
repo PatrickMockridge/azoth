@@ -24,6 +24,12 @@ references = [
 [source]
 standard = "NeqSim master `ChemicalEquilibrium`"
 edition = "Its `chemSolve` for the bordered Lagrange system, `step` for the damped step length, and `solve` for the outer loop - all three on the ideal `M` matrix and the mole-fraction standard state."
+
+[source.neqsim]
+class = "ChemicalEquilibrium"
+members = ["ChemicalEquilibrium.chemSolve"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "smith_missen_newton"
 initialisation = "caller_supplied"
@@ -116,6 +122,27 @@ min = 2
 min_inclusive = true
 severity = "error"
 rationale = "the solve runs at least two passes whatever the error, so a cap below two is not a cap this honours\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ChemicalEquilibrium.chemSolve"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ChemicalEquilibrium.chemSolve"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim ChemicalEquilibrium.chemSolve"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ChemicalEquilibrium.chemSolve"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ChemicalEquilibrium.chemSolve"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ChemicalEquilibrium.chemSolve"
+
 [implementations]
 python = "azoth.reactions.chemical_equilibrium"
 rust = "azoth_reactions::chemical_equilibrium"

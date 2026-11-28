@@ -9,6 +9,12 @@ references = ["Fair, J. R. (1961). \\\"How to predict sieve tray entrainment and
 [source]
 standard = "NeqSim master `TrayHydraulicsCalculator`"
 edition = "`calculateAreas` through `assessDesign`, the class's ten calculation methods, ported in its own order. **`sizeColumnDiameter` is a separate entry point of the class and is outside this calculation's inputs.**"
+
+[source.neqsim]
+class = "TrayHydraulicsCalculator"
+members = ["TrayHydraulicsCalculator.calculateAreas"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.tray_type]
 type = "enum"
@@ -612,6 +618,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "O'Connell's efficiency takes its logarithm too\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TrayHydraulicsCalculator.calculateAreas"
+
 [implementations]
 python = "azoth.hydraulics.tray_hydraulics"
 rust = "azoth_hydraulics::tray_hydraulics"

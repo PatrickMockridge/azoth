@@ -13,6 +13,12 @@ assumptions = [
 [source]
 standard = "Standard thermodynamics, as in Michelsen & Mollerup"
 edition = "The procedure is the ordinary one: the molar property of a mixture is a monotonic function of the solved variable."
+
+[source.neqsim]
+class = "ThermodynamicOperations"
+members = ["ThermodynamicOperations.TUflash"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "tu_flash_inverse_pressure_newton"
 convergence = "relative"
@@ -90,6 +96,54 @@ min = 0.0
 min_inclusive = false
 severity = "error"
 rationale = "a positive state variable"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ThermodynamicOperations.TUflash"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ThermodynamicOperations.TUflash"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim ThermodynamicOperations.TUflash"
+
+[provenance.algorithm."inner.convergence"]
+source = "NeqSim ThermodynamicOperations.TUflash"
+
+[provenance.algorithm."inner.initialisation"]
+source = "NeqSim ThermodynamicOperations.TUflash"
+
+[provenance.algorithm."inner.inner.convergence"]
+source = "NeqSim ThermodynamicOperations.TUflash"
+
+[provenance.algorithm."inner.inner.max_iterations"]
+source = "NeqSim ThermodynamicOperations.TUflash"
+
+[provenance.algorithm."inner.inner.scheme"]
+source = "NeqSim ThermodynamicOperations.TUflash"
+
+[provenance.algorithm."inner.inner.tolerance"]
+source = "NeqSim ThermodynamicOperations.TUflash"
+
+[provenance.algorithm."inner.max_iterations"]
+source = "NeqSim ThermodynamicOperations.TUflash"
+
+[provenance.algorithm."inner.scheme"]
+source = "NeqSim ThermodynamicOperations.TUflash"
+
+[provenance.algorithm."inner.tolerance"]
+source = "NeqSim ThermodynamicOperations.TUflash"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ThermodynamicOperations.TUflash"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ThermodynamicOperations.TUflash"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ThermodynamicOperations.TUflash"
+
 [implementations]
 python = "azoth.eos.tu_flash"
 rust = "azoth_eos::tu_flash"

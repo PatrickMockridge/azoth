@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/risk/bowtie/BowTieModel.java"
 edition = "Its `calculateRisk`, `getTotalRRF` and the `Threat`, `Consequence` and `Barrier` records."
+
+[source.neqsim]
+class = "BowTieModel"
+members = ["BowTieModel.calculateRisk"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_bow_tie"
 convergence = "absolute"
@@ -74,6 +80,24 @@ description = "`unmitigated / mitigated`; zero when the mitigated frequency is z
 [outputs.max_severity]
 unit = "dimensionless"
 description = "the largest consequence severity, or zero when there are no consequences.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim BowTieModel.calculateRisk"
+
+[provenance.algorithm.convergence]
+source = "NeqSim BowTieModel.calculateRisk"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim BowTieModel.calculateRisk"
+
+[provenance.algorithm.scheme]
+source = "NeqSim BowTieModel.calculateRisk"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim BowTieModel.calculateRisk"
+
 [implementations]
 python = "azoth.process.bow_tie"
 rust = "azoth_process::bow_tie"

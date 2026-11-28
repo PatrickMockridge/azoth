@@ -24,6 +24,12 @@ references = [
 standard = "NeqSim master `PhaseGEUniquac`"
 edition = "`ComponentGE.fugcoef`, ported verbatim; the activity coefficient is `eos.uniquac_activity_coefficients`'. Upstream commit `c5ec5fb` (PR #3774) rejects standalone UNIQUAC outright, so there is no upstream `gamma` and the phase's composition is checked by construction rather than against an oracle."
 doi = "10.1002/aic.690210115"
+
+[source.neqsim]
+class = "PhaseGEUniquac"
+members = ["PhaseGEUniquac.c5ec5fb"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -76,6 +82,12 @@ type = "vector"
 unit = "dimensionless"
 length = "one per component"
 description = "the infinite-dilution activity coefficient each component's Henry arm divided by, and **one where the arm does not divide by one**"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PhaseGEUniquac.c5ec5fb"
+
 [implementations]
 python = "azoth.eos.ge_uniquac_phase"
 rust = "azoth_eos::ge_uniquac_phase"

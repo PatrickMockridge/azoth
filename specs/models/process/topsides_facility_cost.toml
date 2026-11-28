@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/costestimation/topsides/TopsidesFacilityCostEstimator.java"
 edition = "Its `estimate` over the process rows, `classifyModule`, `isExcludedFromTopsides`, `addScopeQualityFlags` and the facility-type and project-context factor sets."
+
+[source.neqsim]
+class = "TopsidesFacilityCostEstimator"
+members = ["TopsidesFacilityCostEstimator.estimate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "topsides_facility_stack"
 initialisation = "first_unit_in_caller_order"
@@ -184,6 +190,27 @@ description = "the class's quality flags.\n"
 [outputs.quality_flags.fields.message]
 type = "string"
 description = "the flag's message.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TopsidesFacilityCostEstimator.estimate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim TopsidesFacilityCostEstimator.estimate"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim TopsidesFacilityCostEstimator.estimate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim TopsidesFacilityCostEstimator.estimate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim TopsidesFacilityCostEstimator.estimate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim TopsidesFacilityCostEstimator.estimate"
+
 [implementations]
 python = "azoth.process.topsides_facility_cost"
 rust = "azoth_process::topsides_facility_cost"

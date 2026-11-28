@@ -21,6 +21,12 @@ references = [
 standard = "Nielsen, L. (2023)"
 edition = "`RachfordRice.calcBetaNielsen2023` from NeqSim master, minus the single-phase dispatch: NeqSim answers a root outside `[0, 1]` with the `phaseFractionMinimumLimit` clamp, and this returns the root."
 doi = "10.2118/952327-G"
+
+[source.neqsim]
+class = "RachfordRice"
+members = ["RachfordRice.calcBetaNielsen2023"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "rachford_rice_nielsen_2023"
 initialisation = "vapour_fraction_one_half"
@@ -48,6 +54,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the solver takes the reciprocal of `K` and of `1 - K`, so zero and below have no meaning"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim RachfordRice.calcBetaNielsen2023"
+
+[provenance.algorithm.convergence]
+source = "NeqSim RachfordRice.calcBetaNielsen2023"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim RachfordRice.calcBetaNielsen2023"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim RachfordRice.calcBetaNielsen2023"
+
+[provenance.algorithm.scheme]
+source = "NeqSim RachfordRice.calcBetaNielsen2023"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim RachfordRice.calcBetaNielsen2023"
+
 [implementations]
 python = "azoth.eos.rachford_rice"
 rust = "azoth_eos::rachford_rice"

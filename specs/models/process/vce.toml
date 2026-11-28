@@ -21,6 +21,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/fire/VCEModel.java"
 edition = "Its `combustionEnergyJ`, `scaledDistance`, `dimensionlessOverpressure`, `overpressurePa` and `distanceToOverpressure`."
+
+[source.neqsim]
+class = "VCEModel"
+members = ["VCEModel.combustionEnergyJ"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "tno_multi_energy_scaled_overpressure"
 initialisation = "near_bound_one_decimetre"
@@ -107,6 +113,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class throws IllegalArgumentException for a non-positive target"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim VCEModel.combustionEnergyJ"
+
+[provenance.algorithm.convergence]
+source = "NeqSim VCEModel.combustionEnergyJ"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim VCEModel.combustionEnergyJ"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim VCEModel.combustionEnergyJ"
+
+[provenance.algorithm.scheme]
+source = "NeqSim VCEModel.combustionEnergyJ"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim VCEModel.combustionEnergyJ"
+
 [implementations]
 python = "azoth.process.vce"
 rust = "azoth_process::vce"

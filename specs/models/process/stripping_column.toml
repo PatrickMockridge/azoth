@@ -23,6 +23,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/absorber/StrippingColumn.java"
 edition = "Its two inlet methods and its two product getters, over `AbsorptionColumn`'s constructor: no condenser, no reboiler, the gas at stage 0 and the liquid at the top stage."
+
+[source.neqsim]
+class = "StrippingColumn"
+members = ["StrippingColumn"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.stripping_gas_components]
 type = "components"
@@ -383,6 +389,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "`calcDesign` divides the tray count by it with no guard, so a non-positive efficiency is a number its own integer cast saturates rather than a tray count\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim StrippingColumn"
+
 [implementations]
 python = "azoth.process.stripping_column"
 rust = "azoth_process::stripping_column"

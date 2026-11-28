@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim master `ReactiveCO2BrinePhaseEquilibrium`"
 edition = "Its `run`: the phase selection, the reaction residual read on the flashed state, the element and charge gates, the isolated aqueous chemistry solve, the conservative delta written back, and the 30-pass cap."
+
+[source.neqsim]
+class = "ReactiveCO2BrinePhaseEquilibrium"
+members = ["ReactiveCO2BrinePhaseEquilibrium"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "bounded_phase_reaction_coupling"
 convergence = "absolute"
@@ -93,6 +99,39 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+
+[provenance.algorithm."inner.convergence"]
+source = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+
+[provenance.algorithm."inner.max_iterations"]
+source = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+
+[provenance.algorithm."inner.scheme"]
+source = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+
+[provenance.algorithm."inner.tolerance"]
+source = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+
 [implementations]
 python = "azoth.reactions.reactive_co2_brine_phase_equilibrium"
 rust = "azoth_reactions::reactive_co2_brine_phase_equilibrium"

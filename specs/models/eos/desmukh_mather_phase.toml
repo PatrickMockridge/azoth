@@ -21,6 +21,12 @@ references = [
 [source]
 standard = "NeqSim master `PhaseDesmukhMather`"
 edition = "`ComponentDesmukhMather.getGamma` and `fugcoef`, ported verbatim, with `PhaseDesmukhMather.getParameters`'s pair lookup and its `MDEA` diagonal."
+
+[source.neqsim]
+class = "PhaseDesmukhMather"
+members = ["PhaseDesmukhMather.fugcoef"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -64,6 +70,12 @@ type = "vector"
 unit = "dimensionless"
 length = "one per component"
 description = "the natural logarithm of each component's fugacity coefficient. `ln(gamma P0 / P)` for a solvent, `ln((gamma / gamma^inf) H / P)` for a neutral solute, `ln(1e-15)` for an ion."
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PhaseDesmukhMather.fugcoef"
+
 [implementations]
 python = "azoth.eos.desmukh_mather_phase"
 rust = "azoth_eos::desmukh_mather_phase"

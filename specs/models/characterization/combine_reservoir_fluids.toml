@@ -28,6 +28,12 @@ references = [
 [source]
 standard = "NeqSim master `PseudoComponentCombiner.combineReservoirFluids`"
 edition = "Its `combineReservoirFluids(Collection)` and the helpers it reaches. The class returns a `SystemInterface`; the rows it would have read out of one are this id's input, and the fluid is rebuilt from them by `mixture_from_characterization`."
+
+[source.neqsim]
+class = "PseudoComponentCombiner"
+members = ["PseudoComponentCombiner.mixture_from_characterization"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.target_pseudo_components]
 unit = "dimensionless"
@@ -222,6 +228,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "a blended slate needs at least one pseudo-component\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PseudoComponentCombiner.mixture_from_characterization"
+
 [implementations]
 python = "azoth.characterization.combine_reservoir_fluids"
 rust = "azoth_characterization::combine_reservoir_fluids"

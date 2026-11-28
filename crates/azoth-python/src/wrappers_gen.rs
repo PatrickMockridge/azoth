@@ -3117,24 +3117,6 @@ pub fn production_chemical_scale_scenario(
     .map_err(|e| to_pyerr(py, e))
 }
 
-/// Peng-Robinson-Stryjek-Vera alpha-function coefficient.
-///
-/// All arguments are SI magnitudes. See the module documentation for why.
-#[pyfunction]
-#[pyo3(signature = (omega, Tr, kappa1))]
-#[pyo3(text_signature = "(omega, Tr, kappa1)")]
-#[allow(non_snake_case)] // symbols from the published equation
-pub fn prsv_kappa(
-    py: Python<'_>,
-    omega: f64,
-    Tr: f64,
-    kappa1: f64,
-) -> PyResult<crate::transport_gen::PyPrsvKappaResult> {
-    azoth_eos::prsv_kappa::prsv_kappa(omega, Tr, kappa1)
-        .map(|r| crate::transport_gen::PyPrsvKappaResult::from(&r))
-        .map_err(|e| to_pyerr(py, e))
-}
-
 /// Pressure-entropy flash.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

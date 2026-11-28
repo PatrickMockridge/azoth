@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim master `Kinetics`"
 edition = "`calcReacMatrix`, ported verbatim: the pseudo-first-order coefficient, the `phiInfinite` assignment and the irreversibility test, on the two-phase pairing the class reads."
+
+[source.neqsim]
+class = "Kinetics"
+members = ["Kinetics.calcReacMatrix"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -101,6 +107,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the reactive concentration divides by it\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Kinetics.calcReacMatrix"
+
 [implementations]
 python = "azoth.reactions.kinetics"
 rust = "azoth_reactions::kinetics"

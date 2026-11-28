@@ -46,6 +46,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/filter/Filter.java"
 edition = "Its steady-state `run`: the selected clean drop, the carried loading and breakthrough, the bypass and the replacement check, a `TPflash` at the feed's temperature, one `runTransient` step, and `FilterMechanicalDesign.calcDesign`'s element, vessel and boundary screening."
+
+[source.neqsim]
+class = "Filter"
+members = ["Filter.runTransient"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -540,6 +546,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "`Filter.setElementCollapsePressure` throws on a non-positive rating; the collapse utilization divides by it."
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Filter.runTransient"
+
 [implementations]
 python = "azoth.process.filter"
 rust = "azoth_process::filter"

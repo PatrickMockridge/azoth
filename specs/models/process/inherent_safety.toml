@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/inherent/InherentSafetyEvaluator.java"
 edition = "Its four-pillar `score` and `overallIndex`."
+
+[source.neqsim]
+class = "InherentSafetyEvaluator"
+members = ["InherentSafetyEvaluator.score"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "kletz_inherent_safety_index"
 convergence = "absolute"
@@ -74,6 +80,24 @@ max = 10
 max_inclusive = true
 severity = "error"
 rationale = "the class refuses a score outside [0, 10]"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim InherentSafetyEvaluator.score"
+
+[provenance.algorithm.convergence]
+source = "NeqSim InherentSafetyEvaluator.score"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim InherentSafetyEvaluator.score"
+
+[provenance.algorithm.scheme]
+source = "NeqSim InherentSafetyEvaluator.score"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim InherentSafetyEvaluator.score"
+
 [implementations]
 python = "azoth.process.inherent_safety"
 rust = "azoth_process::inherent_safety"

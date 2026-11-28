@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim master `PitzerHydrateFlash`"
 edition = "`run`, `evaluate`, `validateFeed`, `minimumHenryTemperature`, `bisect` and `accept`, with `ComponentHydratePitzer.fugcoef`. The Gson report is not."
+
+[source.neqsim]
+class = "PitzerHydrateFlash"
+members = ["PitzerHydrateFlash.evaluate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "pitzer_hydrate_scan_bisection"
 initialisation = "henry_floor"
@@ -98,6 +104,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "An absolute temperature.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PitzerHydrateFlash.evaluate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim PitzerHydrateFlash.evaluate"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim PitzerHydrateFlash.evaluate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim PitzerHydrateFlash.evaluate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim PitzerHydrateFlash.evaluate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim PitzerHydrateFlash.evaluate"
+
 [implementations]
 python = "azoth.eos.pitzer_hydrate_formation_temperature"
 rust = "azoth_eos::pitzer_hydrate_formation_temperature"

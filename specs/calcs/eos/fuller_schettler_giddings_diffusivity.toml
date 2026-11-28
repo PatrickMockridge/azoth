@@ -10,6 +10,12 @@ references = ["Fuller, E. N.; Schettler, P. D.; Giddings, J. C. (1966). \\\"A ne
 standard = "Fuller, E. N.; Schettler, P. D.; Giddings, J. C. (1966)"
 edition = "A new method for prediction of binary gas-phase diffusion coefficients. Ind. Eng. Chem. 58(5), 18-27"
 doi = "10.1021/ie50677a007"
+
+[source.neqsim]
+class = "Table"
+members = ["Table"]
+commit = "f0c7436c6923766b1e22957b7075f650600457a7"
+
 [inputs]
 [inputs.MA]
 unit = "kg/mol"
@@ -60,6 +66,12 @@ T = 298.15
 P = 101325.0
 [worked_example.expected]
 d = 2.155058583907974e-5
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Table"
+
 [implementations]
 python = "azoth.eos.fuller_schettler_giddings_diffusivity"
 rust = "azoth_eos::fuller_schettler_giddings_diffusivity"

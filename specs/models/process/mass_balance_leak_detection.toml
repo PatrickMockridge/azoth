@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/leakdetection/MassBalanceLeakDetector.java"
 edition = "Its `calculateSensitivity` and `calculateLinepackUncertaintyKgPerS`, with the setters' clamps."
+
+[source.neqsim]
+class = "MassBalanceLeakDetector"
+members = ["MassBalanceLeakDetector.calculateSensitivity"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "mass_balance_leak_sensitivity"
 convergence = "absolute"
@@ -148,6 +154,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "a density is positive"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim MassBalanceLeakDetector.calculateSensitivity"
+
+[provenance.algorithm.convergence]
+source = "NeqSim MassBalanceLeakDetector.calculateSensitivity"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim MassBalanceLeakDetector.calculateSensitivity"
+
+[provenance.algorithm.scheme]
+source = "NeqSim MassBalanceLeakDetector.calculateSensitivity"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim MassBalanceLeakDetector.calculateSensitivity"
+
 [implementations]
 python = "azoth.process.mass_balance_leak_detection"
 rust = "azoth_process::mass_balance_leak_detection"

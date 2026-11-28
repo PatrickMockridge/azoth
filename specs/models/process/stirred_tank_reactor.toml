@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/reactor/StirredTankReactor.java"
 edition = "Its steady-state `run`: every reaction applied, the pressure set, the temperature held when isothermal, then a `TPflash` or a `PHflash` at the inlet's enthalpy. **The energy-port branch is declared out.**"
+
+[source.neqsim]
+class = "StirredTankReactor"
+members = ["StirredTankReactor"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -111,6 +117,12 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "a vessel passes pressure down, not up\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim StirredTankReactor"
+
 [implementations]
 python = "azoth.process.stirred_tank_reactor"
 rust = "azoth_process::stirred_tank_reactor"

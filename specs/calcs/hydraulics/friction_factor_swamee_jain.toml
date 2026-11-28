@@ -11,6 +11,12 @@ references = ["Swamee, P. K.; Jain, A. K. (1976). \"Explicit equations for pipe-
 standard = "Swamee, P. K.; Jain, A. K. (1976)"
 edition = "Journal of the Hydraulics Division, ASCE, 102(5), 657-664"
 equation = '''"Explicit equations for pipe-flow problems"'''
+
+[source.neqsim]
+class = "FrictionFactorCalculator"
+members = ["FrictionFactorCalculator"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.re]
 unit = "dimensionless"
@@ -66,6 +72,12 @@ re = 100000.0
 relative_roughness = 0.00046
 [worked_example.expected]
 f = 0.0202400309
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim FrictionFactorCalculator"
+
 [implementations]
 python = "azoth.hydraulics.friction_factor_swamee_jain"
 rust = "azoth_hydraulics::friction_factor_swamee_jain"

@@ -19,6 +19,12 @@ references = [
 standard = "Taleb, D.; Ponche, J. L.; Mirabel, P. (1996)"
 edition = "Journal of Geophysical Research 101(D20), 25967-25977"
 doi = "10.1029/96JD02155"
+
+[source.neqsim]
+class = "ComponentGEVanLaarAcid"
+members = ["ComponentGEVanLaarAcid"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -55,6 +61,12 @@ min = 190.0
 max = 298.0
 severity = "warning"
 rationale = "the Taleb correlation is fitted from 190 K to 298 K; outside it the model extrapolates.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ComponentGEVanLaarAcid"
+
 [implementations]
 python = "azoth.eos.van_laar_acid_activity_coefficients"
 rust = "azoth_eos::van_laar_acid_activity_coefficients"

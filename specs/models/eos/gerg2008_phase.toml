@@ -14,6 +14,12 @@ references = [
 [source]
 standard = "Kunz, O.; Wagner, W. (2012)"
 edition = "The 21-component GERG-2008 Helmholtz mixture, evaluated in the reduced variables tau = Tr/T and delta = D/Dr with the reducing parameters composition-averaged over binary interaction parameters and a pairwise departure contribution."
+
+[source.neqsim]
+class = "GERG2008"
+members = ["GERG2008"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "log_volume_newton"
 initialisation = "ideal_gas"
@@ -70,6 +76,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim GERG2008"
+
+[provenance.algorithm.convergence]
+source = "NeqSim GERG2008"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim GERG2008"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim GERG2008"
+
+[provenance.algorithm.scheme]
+source = "NeqSim GERG2008"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim GERG2008"
+
 [implementations]
 python = "azoth.eos.gerg2008_phase"
 rust = "azoth_eos::gerg2008_phase"

@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim master `CalcIonicComposition`"
 edition = "Its `run` - three columns per component, the molalities over the water's mass and the activity coefficient at the class's own reference - over `Phase`'s two reference-state constructions."
+
+[source.neqsim]
+class = "CalcIonicComposition"
+members = ["CalcIonicComposition"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -61,6 +67,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim CalcIonicComposition"
+
 [implementations]
 python = "azoth.eos.calc_ionic_composition"
 rust = "azoth_eos::calc_ionic_composition"

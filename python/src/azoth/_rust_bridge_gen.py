@@ -354,7 +354,6 @@ from azoth.core.result import (
     PropertyPoint,
     PropertySweepResult,
     PrPenelouxShiftResult,
-    PrsvKappaResult,
     PrZFactorResult,
     PsFlashResult,
     PsvFireSizingResult,
@@ -846,7 +845,6 @@ __all__ = [
     "process_cost_estimate",
     "production_chemical_scale_scenario",
     "property_sweep",
-    "prsv_kappa",
     "ps_flash",
     "psv_fire_sizing",
     "psv_sizing",
@@ -3728,19 +3726,6 @@ def production_chemical_scale_scenario(calcium: Q, barium: Q, strontium: Q, iron
         treated_si=tuple(ScenarioIndexRow(mineral=c.mineral, saturation_index=c.saturation_index) for c in result.treated_si),
         si_change=tuple(ScenarioChangeRow(mineral=c.mineral, change=c.change) for c in result.si_change),
         model_warnings=tuple(ChemicalWarningRow(code=c.code, message=c.message) for c in result.model_warnings),
-        warnings=_warnings(result.warnings),
-    )
-
-
-def prsv_kappa(omega: float, Tr: float, kappa1: float) -> PrsvKappaResult:
-    """``eos.prsv_kappa``, computed in Rust."""
-    result = _core.prsv_kappa(
-        omega,
-        Tr,
-        kappa1,
-    )
-    return PrsvKappaResult(
-        kappa=result.kappa,
         warnings=_warnings(result.warnings),
     )
 

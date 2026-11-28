@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim master `WaterDewPointTemperatureFlash`"
 edition = "The prescribed-incipient-phase route, which is the one `WaterDewPointAnalyser` selects by the method name `GERG-water-EOS`."
+
+[source.neqsim]
+class = "WaterDewPointTemperatureFlash"
+members = ["WaterDewPointTemperatureFlash"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "water_dew_point_fixed_point"
 initialisation = "the_target_components_melting_point"
@@ -65,6 +71,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim WaterDewPointTemperatureFlash"
+
+[provenance.algorithm.convergence]
+source = "NeqSim WaterDewPointTemperatureFlash"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim WaterDewPointTemperatureFlash"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim WaterDewPointTemperatureFlash"
+
+[provenance.algorithm.scheme]
+source = "NeqSim WaterDewPointTemperatureFlash"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim WaterDewPointTemperatureFlash"
+
 [implementations]
 python = "azoth.eos.water_dew_point_temperature"
 rust = "azoth_eos::water_dew_point_temperature"

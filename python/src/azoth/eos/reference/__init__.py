@@ -26,7 +26,6 @@ from azoth.eos.reference.pr_kappa import pr_kappa
 from azoth.eos.reference.pr_mass_density import pr_mass_density
 from azoth.eos.reference.pr_molar_volume import MOLAR_GAS_CONSTANT, pr_molar_volume
 from azoth.eos.reference.pr_z_factor import pr_z_factor
-from azoth.eos.reference.prsv_kappa import prsv_kappa
 from azoth.eos.reference.ps_flash import ps_flash
 from azoth.eos.reference.pt_flash import pt_flash
 from azoth.eos.reference.pt_phase_envelope import pt_phase_envelope
@@ -58,7 +57,6 @@ __all__ = [
     "pr_mass_density",
     "pr_molar_volume",
     "pr_z_factor",
-    "prsv_kappa",
     "ps_flash",
     "pt_flash",
     "pt_phase_envelope",

@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim master `TBPfractionModel`, all ten models"
 edition = "`getAvailableModels()` returns `PedersenSRK`, `PedersenSRKHeavyOil`, `PedersenPR`, `PedersenPR2`, `PedersenPRHeavyOil`, `RiaziDaubert`, `Lee-Kesler`, `Twu`, `Cavett` and `Standing`. The seam id `eos.tbp_fraction_properties` is the first of them."
+
+[source.neqsim]
+class = "TBPfractionModel"
+members = ["TBPfractionModel"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.model]
 type = "enum"
@@ -98,6 +104,12 @@ pc = 663946.297092384
 boiling_temperature = 785.228404434496
 acentric_factor = 1.43229568844577
 watson_k = 12.752837620579
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TBPfractionModel"
+
 [implementations]
 python = "azoth.characterization.tbp_cut_properties"
 rust = "azoth_characterization::tbp_cut_properties"

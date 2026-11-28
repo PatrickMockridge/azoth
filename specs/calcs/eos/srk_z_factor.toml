@@ -11,6 +11,12 @@ references = ["Redlich, O.; Kwong, J. N. S. (1949). \\\"On the Thermodynamics of
 standard = "Redlich, O.; Kwong, J. N. S. (1949)"
 edition = "On the Thermodynamics of Solutions. V. Chemical Reviews, 44(1), 233-244"
 doi = "10.1021/cr60137a013"
+
+[source.neqsim]
+class = "PhaseSrkEos"
+members = ["PhaseSrkEos"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.a_reduced]
 unit = "dimensionless"
@@ -65,6 +71,24 @@ b_reduced = 0.02707510936404929
 [worked_example.expected]
 z_min = 0.04171316701447374
 z_max = 0.8019551972557889
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PhaseSrkEos"
+
+[provenance.algorithm.convergence]
+source = "NeqSim PhaseSrkEos"
+
+[provenance.algorithm.kind]
+source = "NeqSim PhaseSrkEos"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim PhaseSrkEos"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim PhaseSrkEos"
+
 [implementations]
 python = "azoth.eos.srk_z_factor"
 rust = "azoth_eos::srk_z_factor"

@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/firewater/FireMonitorCoverage.java"
 edition = "Its `totalFlowLpm`, `sweptAreaM2`, `nominalDensityLpmPerM2`, `driftDisplacementM`, `windCoverageFraction`, `effectiveDensityLpmPerM2`, `flowNeededForComplianceLpm` and `verdict`."
+
+[source.neqsim]
+class = "FireMonitorCoverage"
+members = ["FireMonitorCoverage.totalFlowLpm"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_fire_monitor_coverage"
 convergence = "absolute"
@@ -164,6 +170,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class's setter refuses a non-positive dimension"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim FireMonitorCoverage.totalFlowLpm"
+
+[provenance.algorithm.convergence]
+source = "NeqSim FireMonitorCoverage.totalFlowLpm"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim FireMonitorCoverage.totalFlowLpm"
+
+[provenance.algorithm.scheme]
+source = "NeqSim FireMonitorCoverage.totalFlowLpm"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim FireMonitorCoverage.totalFlowLpm"
+
 [implementations]
 python = "azoth.process.fire_monitor_coverage"
 rust = "azoth_process::fire_monitor_coverage"

@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/selfheating/SelfHeatingInductionSolver.java"
 edition = "Its `solve`: the explicit Euler march, the adaptive step, the three termination states and the retained history."
+
+[source.neqsim]
+class = "SelfHeatingInductionSolver"
+members = ["SelfHeatingInductionSolver.solve"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "explicit_euler_induction"
 initialisation = "stated_initial_temperature"
@@ -177,6 +183,27 @@ min = 5
 min_inclusive = true
 severity = "error"
 rationale = "the class refuses fewer than five nodes"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SelfHeatingInductionSolver.solve"
+
+[provenance.algorithm.convergence]
+source = "NeqSim SelfHeatingInductionSolver.solve"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim SelfHeatingInductionSolver.solve"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim SelfHeatingInductionSolver.solve"
+
+[provenance.algorithm.scheme]
+source = "NeqSim SelfHeatingInductionSolver.solve"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim SelfHeatingInductionSolver.solve"
+
 [implementations]
 python = "azoth.process.self_heating_induction"
 rust = "azoth_process::self_heating_induction"

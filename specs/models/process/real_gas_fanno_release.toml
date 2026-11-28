@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/release/RealGasFannoPipeReleaseModel.java"
 edition = "Its `calculate` and `trace`: the one-gas-phase check, the entropy inlet root, the ten-step predictor-corrector march, the nested flux bisections and the three closures."
+
+[source.neqsim]
+class = "RealGasFannoPipeReleaseModel"
+members = ["RealGasFannoPipeReleaseModel.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "real_gas_fanno_march"
 initialisation = "stated_inlet_state"
@@ -203,6 +209,27 @@ max = 1
 max_inclusive = true
 severity = "error"
 rationale = "the request refuses a friction factor outside [0, 1]"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim RealGasFannoPipeReleaseModel.calculate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim RealGasFannoPipeReleaseModel.calculate"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim RealGasFannoPipeReleaseModel.calculate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim RealGasFannoPipeReleaseModel.calculate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim RealGasFannoPipeReleaseModel.calculate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim RealGasFannoPipeReleaseModel.calculate"
+
 [implementations]
 python = "azoth.process.real_gas_fanno_release"
 rust = "azoth_process::real_gas_fanno_release"

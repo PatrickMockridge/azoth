@@ -29,6 +29,12 @@ references = [
 [source]
 standard = "NeqSim master `TPmultiflash`"
 edition = "`solveBeta`/`calcQ` for the fraction solve, `stabilityAnalysis` for the seeding, both ported; the merge rules are ported from `run()`'s removal loop except the density branch, which the assumptions name."
+
+[source.neqsim]
+class = "TPmultiflash"
+members = ["TPmultiflash.solveBeta"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "multiphase_fraction_newton"
 initialisation = "wilson_stability_trial"
@@ -142,6 +148,27 @@ max = 0.9
 max_inclusive = true
 severity = "warning"
 rationale = "Above `T / Tc = 0.9` for every component the cubic's roots are close to coalescing and the two phases stop being distinguishable, so a phase count near the critical point is the one to distrust."
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TPmultiflash.solveBeta"
+
+[provenance.algorithm.convergence]
+source = "NeqSim TPmultiflash.solveBeta"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim TPmultiflash.solveBeta"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim TPmultiflash.solveBeta"
+
+[provenance.algorithm.scheme]
+source = "NeqSim TPmultiflash.solveBeta"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim TPmultiflash.solveBeta"
+
 [implementations]
 python = "azoth.eos.tp_multiflash"
 rust = "azoth_eos::tp_multiflash"

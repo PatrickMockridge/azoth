@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/esd/EsdResponseTimeSimulator.java"
 edition = "Its `evaluate`, the three stage totals, the total, the budget test and the result."
+
+[source.neqsim]
+class = "EsdResponseTimeSimulator"
+members = ["EsdResponseTimeSimulator.evaluate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "esd_response_time"
 convergence = "absolute"
@@ -92,6 +98,24 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "a negative budget is not a budget"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim EsdResponseTimeSimulator.evaluate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim EsdResponseTimeSimulator.evaluate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim EsdResponseTimeSimulator.evaluate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim EsdResponseTimeSimulator.evaluate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim EsdResponseTimeSimulator.evaluate"
+
 [implementations]
 python = "azoth.process.esd_response_time"
 rust = "azoth_process::esd_response_time"

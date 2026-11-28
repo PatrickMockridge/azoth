@@ -193,7 +193,6 @@ pub mod pr_molar_volume;
 pub mod pr_peneloux_shift;
 pub mod pr_z_factor;
 pub mod production_chemical_scale_scenario;
-pub mod prsv_kappa;
 pub mod ps_flash;
 pub mod pt_flash;
 pub mod pt_phase_envelope;
@@ -388,7 +387,6 @@ pub use pr_molar_volume::{MOLAR_GAS_CONSTANT, pr_molar_volume};
 pub use pr_peneloux_shift::pr_peneloux_shift;
 pub use pr_z_factor::pr_z_factor;
 pub use pr78_kappa::pr78_kappa;
-pub use prsv_kappa::prsv_kappa;
 pub use ps_flash::ps_flash;
 pub use pt_flash::pt_flash;
 pub use pt_phase_envelope::pt_phase_envelope;
@@ -428,7 +426,7 @@ pub use results::{
     PipelineCooldownResult, PitzerDataset, PitzerPhaseResult, Pr78KappaResult, PrAlphaAbResult,
     PrDaneshAlphaResult, PrDelft1998AlphaResult, PrDepartureResult, PrGassem2001AlphaResult,
     PrKappaResult, PrLeeKeslerAlphaResult, PrMassDensityResult, PrMolarVolumeResult,
-    PrPenelouxShiftResult, PrZFactorResult, ProductionChemicalScaleScenarioResult, PrsvKappaResult,
+    PrPenelouxShiftResult, PrZFactorResult, ProductionChemicalScaleScenarioResult,
     PsFlashResult, PtFlashResult, PtPhaseEnvelopeResult, PuFlashResult, PureSaturationResult,
     PvRefluxFlashResult, PvfFlashResult, RachfordRiceBinaryResult, RachfordRiceResult,
     RackettMolarVolumeResult, RemediationOptionRow, RkAlphaAbResult, RkDepartureResult,

@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim process/costestimation/ProcessCostEstimate.java"
 edition = "Its `calculateAllCosts` roll-up over the summary rows, `classifyEquipment`, `calculateDisciplineCosts`, `getProjectCostBreakdown`, `calculateOperatingCost`, `calculatePaybackPeriod`, `calculateROI` and `calculateNPV`."
+
+[source.neqsim]
+class = "ProcessCostEstimate"
+members = ["ProcessCostEstimate.calculateAllCosts"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "process_cost_roll_up"
 initialisation = "first_unit_in_caller_order"
@@ -266,6 +272,27 @@ description = "the class's quality flags.\n"
 [outputs.quality_flags.fields.message]
 type = "string"
 description = "the flag's message.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ProcessCostEstimate.calculateAllCosts"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ProcessCostEstimate.calculateAllCosts"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim ProcessCostEstimate.calculateAllCosts"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ProcessCostEstimate.calculateAllCosts"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ProcessCostEstimate.calculateAllCosts"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ProcessCostEstimate.calculateAllCosts"
+
 [implementations]
 python = "azoth.process.process_cost_estimate"
 rust = "azoth_process::process_cost_estimate"

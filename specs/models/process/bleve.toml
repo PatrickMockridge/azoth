@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/fire/BLEVECalculator.java"
 edition = "Its `fireballDiameterM`, `fireballDurationS`, `surfaceEmissivePowerWPerM2`, `transmissivity`, `incidentHeatFlux` and `distanceToFlux`."
+
+[source.neqsim]
+class = "BLEVECalculator"
+members = ["BLEVECalculator.fireballDiameterM"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "ccps_fireball_point_source"
 initialisation = "fireball_radius_bound"
@@ -112,6 +118,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "a non-positive target is not a contour; the class answers the far end of its numerical search for zero"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim BLEVECalculator.fireballDiameterM"
+
+[provenance.algorithm.convergence]
+source = "NeqSim BLEVECalculator.fireballDiameterM"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim BLEVECalculator.fireballDiameterM"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim BLEVECalculator.fireballDiameterM"
+
+[provenance.algorithm.scheme]
+source = "NeqSim BLEVECalculator.fireballDiameterM"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim BLEVECalculator.fireballDiameterM"
+
 [implementations]
 python = "azoth.process.bleve"
 rust = "azoth_process::bleve"

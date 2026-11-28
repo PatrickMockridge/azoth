@@ -14,6 +14,12 @@ references = [
 [source]
 standard = "NeqSim master `CheckScalePotential`"
 edition = "One row of its `compsalt` walk, which is the whole of what the operation computes per salt."
+
+[source.neqsim]
+class = "CheckScalePotential"
+members = ["CheckScalePotential.compsalt"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.salt]
 type = "string"
@@ -84,6 +90,12 @@ T = 298.15
 P = 1000000.0
 [worked_example.expected]
 saturation_ratio = 1.282928947262809e-07
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim CheckScalePotential.compsalt"
+
 [implementations]
 python = "azoth.eos.scale_saturation_ratio"
 rust = "azoth_eos::scale_saturation_ratio"

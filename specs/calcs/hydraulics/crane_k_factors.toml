@@ -8,6 +8,12 @@ references = ["Crane Technical Paper No. 410, \"Flow of Fluids Through Valves, F
 [source]
 standard = "Crane TP-410"
 edition = "2013 method; the coefficient set is NeqSim's equivalent-length default, not a verified Crane transcription"
+
+[source.neqsim]
+class = "Fittings"
+members = ["Fittings"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.fittings]
 type = "fitting_list"
@@ -62,6 +68,12 @@ f_t = 0.018
 fittings = ["90_elbow", "gate_valve_open"]
 [worked_example.expected]
 k_total = 0.684
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Fittings"
+
 [implementations]
 python = "azoth.hydraulics.crane_k_factors"
 rust = "azoth_hydraulics::crane_k_factors"

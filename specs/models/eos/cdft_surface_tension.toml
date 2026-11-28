@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim master `CDFTSurfaceTension`"
 edition = "`calcSurfaceTension`, `solvePureComponent`, `solveMixture`, `computeSigmaForDelta`, `computeMixtureSigmaForDelta`, the step convolution and the variational search, ported; predictive mode and the three setters are unreachable in the tree's main sources."
+
+[source.neqsim]
+class = "CDFTSurfaceTension"
+members = ["CDFTSurfaceTension.calcSurfaceTension"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "cdft_tanh_variational"
 initialisation = "tanh_profile_between_phases"
@@ -85,6 +91,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "Its reciprocal is a density the profile takes the logarithm of.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim CDFTSurfaceTension.calcSurfaceTension"
+
+[provenance.algorithm.convergence]
+source = "NeqSim CDFTSurfaceTension.calcSurfaceTension"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim CDFTSurfaceTension.calcSurfaceTension"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim CDFTSurfaceTension.calcSurfaceTension"
+
+[provenance.algorithm.scheme]
+source = "NeqSim CDFTSurfaceTension.calcSurfaceTension"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim CDFTSurfaceTension.calcSurfaceTension"
+
 [implementations]
 python = "azoth.eos.cdft_surface_tension"
 rust = "azoth_eos::cdft_surface_tension"

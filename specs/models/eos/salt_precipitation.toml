@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim master `MultiSaltPrecipitation`"
 edition = "`precipitateScales` in `ThermodynamicOperations`. The continuation entry `equilibrateScales`, which carries a previous solid ledger, is not taken."
+
+[source.neqsim]
+class = "MultiSaltPrecipitation"
+members = ["MultiSaltPrecipitation.precipitateScales"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "removal_extent_bisection"
 initialisation = "full_removal"
@@ -74,6 +80,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim MultiSaltPrecipitation.precipitateScales"
+
+[provenance.algorithm.convergence]
+source = "NeqSim MultiSaltPrecipitation.precipitateScales"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim MultiSaltPrecipitation.precipitateScales"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim MultiSaltPrecipitation.precipitateScales"
+
+[provenance.algorithm.scheme]
+source = "NeqSim MultiSaltPrecipitation.precipitateScales"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim MultiSaltPrecipitation.precipitateScales"
+
 [implementations]
 python = "azoth.eos.salt_precipitation"
 rust = "azoth_eos::salt_precipitation"

@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/vibration/PipingFivScreening.java"
 edition = "Its `screenLiquid` and `bandFor`."
+
+[source.neqsim]
+class = "PipingFivScreening"
+members = ["PipingFivScreening.screenLiquid"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "aviff_liquid_likelihood_of_failure"
 convergence = "absolute"
@@ -93,6 +99,24 @@ max = 3
 max_inclusive = true
 severity = "warning"
 rationale = "the class clamps the support-quality factor to [1, 3] rather than refusing it"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PipingFivScreening.screenLiquid"
+
+[provenance.algorithm.convergence]
+source = "NeqSim PipingFivScreening.screenLiquid"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim PipingFivScreening.screenLiquid"
+
+[provenance.algorithm.scheme]
+source = "NeqSim PipingFivScreening.screenLiquid"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim PipingFivScreening.screenLiquid"
+
 [implementations]
 python = "azoth.process.piping_fiv_liquid"
 rust = "azoth_process::piping_fiv_liquid"

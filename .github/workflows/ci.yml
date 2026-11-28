@@ -158,6 +158,10 @@ jobs:
       # and declared ported by the spec, and no test could see it - the cross-language
       # test compares cases, and no case stated that value.
       - run: python tools/check_unported.py
+      # **The port law.** Every model and calc names a NeqSim class and a pinned commit in
+      # `source.neqsim`, and every input, output, algorithm leaf and constant has a
+      # provenance row. The class index is committed; the check needs no JVM.
+      - run: python tools/check_port.py
       # The skill catalog against the SKILL.md files it points at, and each SKILL.md
       # against the required sections. Needs no `azoth` import, so it runs before the
       # library is built.

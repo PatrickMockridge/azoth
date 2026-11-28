@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim master `PhaseKentEisenberg`"
 edition = "`ComponentKentEisenberg.fugcoef`, ported verbatim. The activity coefficient is `PhaseKentEisenberg.getActivityCoefficient`'s override, which is the constant one."
+
+[source.neqsim]
+class = "PhaseKentEisenberg"
+members = ["PhaseKentEisenberg.getActivityCoefficient"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -49,6 +55,12 @@ type = "vector"
 unit = "dimensionless"
 length = "one per component"
 description = "the natural logarithm of each component's fugacity coefficient. Which of `P0_i(T)/P`, `H_i(T)/P` and `1e8` it is comes from the component's reference state and charge, which the spec lists above."
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PhaseKentEisenberg.getActivityCoefficient"
+
 [implementations]
 python = "azoth.eos.kent_eisenberg_phase"
 rust = "azoth_eos::kent_eisenberg_phase"

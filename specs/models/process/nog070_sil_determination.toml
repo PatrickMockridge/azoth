@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/risk/sis/nog070/Nog070SilDetermination.java"
 edition = "Its `evaluate` and `pfdToSil`, with `Nog070SilCatalogue.getMinimumSil` and the `Nog070SifType` members."
+
+[source.neqsim]
+class = "Nog070SilDetermination"
+members = ["Nog070SilDetermination.evaluate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_nog070_sil_determination"
 convergence = "absolute"
@@ -87,6 +93,24 @@ max = 4
 max_inclusive = true
 severity = "error"
 rationale = "the class refuses a minimum outside [0, 4]"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Nog070SilDetermination.evaluate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim Nog070SilDetermination.evaluate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim Nog070SilDetermination.evaluate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim Nog070SilDetermination.evaluate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim Nog070SilDetermination.evaluate"
+
 [implementations]
 python = "azoth.process.nog070_sil_determination"
 rust = "azoth_process::nog070_sil_determination"

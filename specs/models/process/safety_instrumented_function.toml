@@ -21,6 +21,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/risk/sis/SafetyInstrumentedFunction.java"
 edition = "Its `getRiskReductionFactor`, `getMitigatedFrequency`, `calculateRequiredPfd`, `getRequiredSil`, `getMaxPfdForSil`, `getProofTestIntervalYears`, the three `calculatePfd*` methods and `getAvailabilityWithSpuriousTrips`."
+
+[source.neqsim]
+class = "SafetyInstrumentedFunction"
+members = ["SafetyInstrumentedFunction.getRiskReductionFactor"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_safety_instrumented_function"
 convergence = "absolute"
@@ -157,6 +163,24 @@ max = 1
 max_inclusive = true
 severity = "error"
 rationale = "an availability is in [0, 1]"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SafetyInstrumentedFunction.getRiskReductionFactor"
+
+[provenance.algorithm.convergence]
+source = "NeqSim SafetyInstrumentedFunction.getRiskReductionFactor"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim SafetyInstrumentedFunction.getRiskReductionFactor"
+
+[provenance.algorithm.scheme]
+source = "NeqSim SafetyInstrumentedFunction.getRiskReductionFactor"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim SafetyInstrumentedFunction.getRiskReductionFactor"
+
 [implementations]
 python = "azoth.process.safety_instrumented_function"
 rust = "azoth_process::safety_instrumented_function"

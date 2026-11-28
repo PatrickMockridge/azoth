@@ -20,6 +20,12 @@ references = [
 standard = "Voutsas, E.; Magoulas, K.; Tassios, D. (2004)"
 edition = "Industrial & Engineering Chemistry Research 43(19), 6238-6246"
 doi = "10.1021/ie049832l"
+
+[source.neqsim]
+class = "ComponentGEUnifacUMRPRU"
+members = ["ComponentGEUnifacUMRPRU"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -54,6 +60,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute temperature; zero and below are not states\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ComponentGEUnifacUMRPRU"
+
 [implementations]
 python = "azoth.eos.unifac_umrpru_activity_coefficients"
 rust = "azoth_eos::unifac_umrpru_activity_coefficients"

@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/firewater/FireWaterDemandCalculator.java"
 edition = "Its `areaDemandLpm`, `objectDemandLpm`, `totalDemandLpm`, `waterVolumeM3`, `foamConcentrateVolumeM3` and `objectToAreaDemandRatio`."
+
+[source.neqsim]
+class = "FireWaterDemandCalculator"
+members = ["FireWaterDemandCalculator.areaDemandLpm"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_fire_water_demand"
 convergence = "absolute"
@@ -113,6 +119,24 @@ min = 1
 min_inclusive = true
 severity = "error"
 rationale = "the class's setter refuses a factor below one"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim FireWaterDemandCalculator.areaDemandLpm"
+
+[provenance.algorithm.convergence]
+source = "NeqSim FireWaterDemandCalculator.areaDemandLpm"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim FireWaterDemandCalculator.areaDemandLpm"
+
+[provenance.algorithm.scheme]
+source = "NeqSim FireWaterDemandCalculator.areaDemandLpm"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim FireWaterDemandCalculator.areaDemandLpm"
+
 [implementations]
 python = "azoth.process.fire_water_demand"
 rust = "azoth_process::fire_water_demand"

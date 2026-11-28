@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/overpressure/ControlValveFailureRelief.java"
 edition = "Its `calculate` with a fluid, through `ReliefFluidState.evaluate` and `NozzleFlow.gasMassRateKgPerS`."
+
+[source.neqsim]
+class = "ControlValveFailureRelief"
+members = ["ControlValveFailureRelief.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "control_valve_fail_open_nozzle"
 convergence = "absolute"
@@ -133,6 +139,24 @@ max = 1
 max_inclusive = true
 severity = "error"
 rationale = "a discharge coefficient is in (0, 1]"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ControlValveFailureRelief.calculate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ControlValveFailureRelief.calculate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ControlValveFailureRelief.calculate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ControlValveFailureRelief.calculate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ControlValveFailureRelief.calculate"
+
 [implementations]
 python = "azoth.process.control_valve_failure_relief"
 rust = "azoth_process::control_valve_failure_relief"

@@ -21,6 +21,12 @@ references = [
 [source]
 standard = "NeqSim master `SystemFurstElectrolyteEosMod2004`"
 edition = "`PhaseModifiedFurstElectrolyteEosMod2004`, which is `eos.furst_electrolyte_phase`'s port with the five quantities its `volInit` and its component zero. The parameters are the same hardcoded `FurstElectrolyteConstants`."
+
+[source.neqsim]
+class = "SystemFurstElectrolyteEosMod2004"
+members = ["SystemFurstElectrolyteEosMod2004.volInit"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -62,6 +68,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SystemFurstElectrolyteEosMod2004.volInit"
+
 [implementations]
 python = "azoth.eos.furst_electrolyte_mod2004_phase"
 rust = "azoth_eos::furst_electrolyte_mod2004_phase"

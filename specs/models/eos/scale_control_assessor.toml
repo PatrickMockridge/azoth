@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim master `ScaleControlAssessor`"
 edition = "`evaluate`, `getKineticRiskIndex`, `getWorstKineticRiskIndex` and `isKineticallyControlled`, ported. `fromStream`, the deprecated `getResidualSI` aliases and the Gson report are not."
+
+[source.neqsim]
+class = "ScaleControlAssessor"
+members = ["ScaleControlAssessor.evaluate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.calcium]
 unit = "kg/m**3"
@@ -191,6 +197,12 @@ min_inclusive = true
 max_inclusive = true
 severity = "warning"
 rationale = "A pH outside the aqueous range is a caller's mistake rather than a state; the arithmetic still runs.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ScaleControlAssessor.evaluate"
+
 [implementations]
 python = "azoth.eos.scale_control_assessor"
 rust = "azoth_eos::scale_control_assessor"

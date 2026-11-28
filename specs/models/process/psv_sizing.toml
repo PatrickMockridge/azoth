@@ -23,6 +23,12 @@ references = [
 [source]
 standard = "NeqSim process/util/fire/ReliefValveSizing.java"
 edition = "Its `calculateRequiredArea`, `calculateLiquidReliefArea`, `calculateTwoPhaseReliefArea`, `calculateMassFlowCapacity` and the `STANDARD_ORIFICE_AREAS_IN2` ladder."
+
+[source.neqsim]
+class = "ReliefValveSizing"
+members = ["ReliefValveSizing.calculateRequiredArea"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_psv_sizing"
 convergence = "absolute"
@@ -259,6 +265,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the capacity helper multiplies the coefficient"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ReliefValveSizing.calculateRequiredArea"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ReliefValveSizing.calculateRequiredArea"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ReliefValveSizing.calculateRequiredArea"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ReliefValveSizing.calculateRequiredArea"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ReliefValveSizing.calculateRequiredArea"
+
 [implementations]
 python = "azoth.process.psv_sizing"
 rust = "azoth_process::psv_sizing"

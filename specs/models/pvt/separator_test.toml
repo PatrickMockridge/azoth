@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim pvtsimulation/simulation/{GOR,SeparatorTest,MultiStageSeparatorTest}.java"
 edition = "The continuous GOR, the staged cascade and the multi-stage train, with the stage densities, molar masses, Z, viscosity, stock-tank API and the optional first-stage optimisation."
+
+[source.neqsim]
+class = "GOR"
+members = ["GOR"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "record_list"
@@ -275,6 +281,12 @@ description = "the gas phase's compressibility, in the train.\n"
 unit = "Pa*s"
 optional = true
 description = "the oil phase's viscosity, in the train.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim GOR"
+
 [implementations]
 python = "azoth.pvt.separator_test"
 rust = "azoth_pvt::separator_test"

@@ -23,6 +23,12 @@ references = [
 [source]
 standard = "NeqSim master `OilAssayCharacterisation.resolveMassFractions`"
 edition = "Its basis validation, its `ASSAY_CLOSURE_TOLERANCE`, the normalisation, and the volume-to-mass conversion. `apply`'s per-cut derivation and the databank lookups are named in the assumptions as owed."
+
+[source.neqsim]
+class = "OilAssayCharacterisation"
+members = ["OilAssayCharacterisation.apply"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.basis]
 type = "enum"
@@ -58,6 +64,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the declared fractions' sum, which a row of non-negative fractions cannot make zero or less\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim OilAssayCharacterisation.apply"
+
 [implementations]
 python = "azoth.characterization.assay_mass_fractions"
 rust = "azoth_characterization::assay_mass_fractions"

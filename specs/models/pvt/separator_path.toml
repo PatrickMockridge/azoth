@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim pvtsimulation/util/PvtSeparatorPath.java"
 edition = "The staged flash, the offgas flashed at the final basis, the oil and aqueous carry, the corrected volumes and component amounts, and the 1e-8 component balance."
+
+[source.neqsim]
+class = "PvtSeparatorPath"
+members = ["PvtSeparatorPath"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "record_list"
@@ -159,6 +165,12 @@ description = "The product component amounts at the final basis; an absent phase
 unit = "dimensionless"
 optional = true
 description = "The gas volume over the oil volume at the final basis; absent when no oil phase is present.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PvtSeparatorPath"
+
 [implementations]
 python = "azoth.pvt.separator_path"
 rust = "azoth_pvt::separator_path"

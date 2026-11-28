@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/pipeline/AdiabaticPipe.java"
 edition = "Its steady-state `run`: the outlet pressure iterated to `1e-2` bar, the compressible form for a gas and Darcy-Weisbach for a liquid, a `TPflash` at the answer, `calcFlow`'s bisection when an outlet pressure is stated, and `Pipeline.getEffectiveLength` for the fittings."
+
+[source.neqsim]
+class = "AdiabaticPipe"
+members = ["AdiabaticPipe.calcFlow"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -129,6 +135,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "a sand-grain height is a positive length, and a smooth pipe states a small one rather than zero"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim AdiabaticPipe.calcFlow"
+
 [implementations]
 python = "azoth.process.pipe"
 rust = "azoth_process::pipe"

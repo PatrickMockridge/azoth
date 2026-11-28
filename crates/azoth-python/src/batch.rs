@@ -1512,24 +1512,6 @@ pub fn batch_run(py: Python<'_>, calc_id: &str, inputs: Inputs) -> PyResult<PyBa
             push_values(&mut columns, "cp_dep_r", "dimensionless", cp_dep_r);
         }
 
-        "eos.prsv_kappa" => {
-            let (omega, tr, kappa1) = (
-                take(&inputs, "omega")?,
-                take(&inputs, "Tr")?,
-                take(&inputs, "kappa1")?,
-            );
-            let mut kappa = Vec::with_capacity(n);
-            for i in 0..n {
-                let r = element(
-                    py,
-                    eos::prsv_kappa(omega[i], tr[i], kappa1[i]),
-                    &mut warnings,
-                )?;
-                kappa.push(r.kappa);
-            }
-            push_values(&mut columns, "kappa", "dimensionless", kappa);
-        }
-
         "eos.pr_departure" => {
             let (a, b, z, kappa, tr) = (
                 take(&inputs, "a_reduced")?,

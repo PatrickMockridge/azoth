@@ -28,6 +28,12 @@ references = [
 [source]
 standard = "NeqSim master `ChemicalReactionOperations`"
 edition = "The facade as an operation on one phase: the phase search and its skip, the element matrix with its charge row, the element amounts, the reference potentials, the solve, and the write-back floor. The LP estimate is the starting composition; the second refinement is measured not to converge."
+
+[source.neqsim]
+class = "ChemicalReactionOperations"
+members = ["ChemicalReactionOperations"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "phase_reaction_balance"
 initialisation = "caller_supplied"
@@ -161,6 +167,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the phase's total moles; a phase holding material cannot have zero as its total\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ChemicalReactionOperations"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ChemicalReactionOperations"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim ChemicalReactionOperations"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ChemicalReactionOperations"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ChemicalReactionOperations"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ChemicalReactionOperations"
+
 [implementations]
 python = "azoth.reactions.reactive_phase_equilibrium"
 rust = "azoth_reactions::reactive_phase_equilibrium"

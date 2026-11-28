@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim master `TbpClosure`"
 edition = "All four members: `RIAZI_DAUBERT_1980` and `RIAZI_DAUBERT_1987` in closed form, `SOREIDE` and `TBP_MODEL` by bisection. `SystemThermo.addTBPfraction_Mw_Tb`, `_Sg_Tb`, `_Tb_Kw` and `_Tb_Pna` are its callers."
+
+[source.neqsim]
+class = "TbpClosure"
+members = ["TbpClosure"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "molar_mass_bisection"
 initialisation = "bracket_midpoint"
@@ -61,6 +67,39 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "a specific gravity; the 1987 pair raises it to the 4.98308 power and the 1980 pair to -1.0164\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TbpClosure"
+
+[provenance.algorithm."bracket.lower"]
+source = "NeqSim TbpClosure"
+
+[provenance.algorithm."bracket.scheme"]
+source = "NeqSim TbpClosure"
+
+[provenance.algorithm."bracket.steps"]
+source = "NeqSim TbpClosure"
+
+[provenance.algorithm."bracket.upper"]
+source = "NeqSim TbpClosure"
+
+[provenance.algorithm.convergence]
+source = "NeqSim TbpClosure"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim TbpClosure"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim TbpClosure"
+
+[provenance.algorithm.scheme]
+source = "NeqSim TbpClosure"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim TbpClosure"
+
 [implementations]
 python = "azoth.characterization.tbp_closure"
 rust = "azoth_characterization::tbp_closure"

@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim pvtsimulation/reservoirproperties/relpermeability/RelativePermeabilityGenerator.java"
 edition = "The Corey and LET curves, the four Eclipse table types, the saturation normalisations and the endpoint overwrites; the keyword text is a report."
+
+[source.neqsim]
+class = "RelativePermeabilityGenerator"
+members = ["RelativePermeabilityGenerator"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.table_type]
 type = "enum"
@@ -180,6 +186,12 @@ description = "the water-oil capillary pressure column; the class hardcodes zero
 unit = "Pa"
 optional = true
 description = "the gas-oil capillary pressure column; the class hardcodes zero.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim RelativePermeabilityGenerator"
+
 [implementations]
 python = "azoth.pvt.relative_permeability"
 rust = "azoth_pvt::relative_permeability"

@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim master `InterfaceProperties`"
 edition = "`setInterfacialTensionModel(int)`'s six arms, the string `parachor`, `Firozabadi Ramley` and `cDFT` arms, and `getSurfaceTension`'s phase-type dispatch, ported. The dispatch flashes the feed with `eos.tp_multiflash` and lets each arm's own model answer."
+
+[source.neqsim]
+class = "InterfaceProperties"
+members = ["InterfaceProperties.parachor"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -95,6 +101,12 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "A mole fraction cannot be negative.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim InterfaceProperties.parachor"
+
 [implementations]
 python = "azoth.eos.interface_properties"
 rust = "azoth_eos::interface_properties"

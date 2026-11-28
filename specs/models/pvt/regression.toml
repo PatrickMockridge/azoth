@@ -21,6 +21,12 @@ references = [
 [source]
 standard = "NeqSim pvtsimulation/regression/PVTRegression.java"
 edition = "Its `runRegression`, `PVTRegressionFunction.calcValue`, the five sample scales, and `calculateUncertainty`."
+
+[source.neqsim]
+class = "PVTRegression"
+members = ["PVTRegression.runRegression"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "levenberg_marquardt"
 convergence = "absolute"
@@ -338,6 +344,27 @@ min = 1
 min_inclusive = true
 severity = "error"
 rationale = "the optimizer needs at least one step budget; the class's floor is five either way\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PVTRegression.runRegression"
+
+[provenance.algorithm.convergence]
+source = "NeqSim PVTRegression.runRegression"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim PVTRegression.runRegression"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim PVTRegression.runRegression"
+
+[provenance.algorithm.scheme]
+source = "NeqSim PVTRegression.runRegression"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim PVTRegression.runRegression"
+
 [implementations]
 python = "azoth.pvt.regression"
 rust = "azoth_pvt::regression"

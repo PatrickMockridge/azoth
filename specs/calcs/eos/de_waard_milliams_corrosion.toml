@@ -13,6 +13,12 @@ references = [
 [source]
 standard = "NeqSim master `DeWaardMilliamsCorrosion`"
 edition = "`calculateBaselineRate`, the four correction factors, `getSulfurCorrosionRate`, `getFeSCorrosionRate`, `getFeCO3SaturationIndex`, `getCorrosionSeverity`, `getFeSScaleMorphology` and `estimateCorrosionAllowance`. The comprehensive map, the temperature sweep and the Gson report are compositions."
+
+[source.neqsim]
+class = "DeWaardMilliamsCorrosion"
+members = ["DeWaardMilliamsCorrosion.calculateBaselineRate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.temperature]
 unit = "K"
@@ -687,6 +693,12 @@ corrosion_allowance = 0.03635532470514697
 id = "default_worked_example"
 type = "worked_example"
 status = "active"
+
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim DeWaardMilliamsCorrosion.calculateBaselineRate"
 
 [implementations]
 python = "azoth.eos.de_waard_milliams_corrosion"

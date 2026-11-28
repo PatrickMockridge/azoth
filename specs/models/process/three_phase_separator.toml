@@ -23,6 +23,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/separator/ThreePhaseSeparator.java"
 edition = "Its steady-state `run`: the pressure less `pressureDrop`, a multiphase `TPflash` at the feed's temperature or a `PHflash` at the `heatInput` enthalpy, the six entrainment calls, and each outlet from its phase - the oil and aqueous ones re-run as streams."
+
+[source.neqsim]
+class = "ThreePhaseSeparator"
+members = ["ThreePhaseSeparator.pressureDrop"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -270,6 +276,12 @@ max = 1
 max_inclusive = true
 severity = "error"
 rationale = "a level fraction of the internal diameter\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ThreePhaseSeparator.pressureDrop"
+
 [implementations]
 python = "azoth.process.three_phase_separator"
 rust = "azoth_process::three_phase_separator"

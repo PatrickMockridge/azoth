@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/splitter/ComponentSplitter.java"
 edition = "Its `run`: the per-component routing, and a `TPflash` on each outlet. **The outlet enthalpies are recomputed rather than carried**, for the reason the assumptions give."
+
+[source.neqsim]
+class = "ComponentSplitter"
+members = ["ComponentSplitter"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -88,6 +94,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute temperature"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ComponentSplitter"
+
 [implementations]
 python = "azoth.process.component_splitter"
 rust = "azoth_process::component_splitter"

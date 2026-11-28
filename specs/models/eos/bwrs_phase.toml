@@ -16,6 +16,12 @@ references = [
 standard = "Younglove, B. A.; Ely, J. F. (1987)"
 edition = "The 32-term modified Benedict-Webb-Rubin equation, integrated in closed form to the residual Helmholtz free energy and differentiated for the pressure, the fugacity and the departure functions."
 doi = "10.1063/1.555785"
+
+[source.neqsim]
+class = "ComponentBWRS"
+members = ["ComponentBWRS"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "newton_density_solve"
 initialisation = "ideal_gas"
@@ -68,6 +74,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ComponentBWRS"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ComponentBWRS"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim ComponentBWRS"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ComponentBWRS"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ComponentBWRS"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ComponentBWRS"
+
 [implementations]
 python = "azoth.eos.bwrs_phase"
 rust = "azoth_eos::bwrs_phase"

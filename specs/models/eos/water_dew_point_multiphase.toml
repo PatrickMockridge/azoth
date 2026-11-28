@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim master `WaterDewPointTemperatureMultiphaseFlash`"
 edition = "The bracketing route, which is the one `WaterDewPointAnalyser` selects by the method names `multiphase` and `CPA` and by its own default."
+
+[source.neqsim]
+class = "WaterDewPointTemperatureMultiphaseFlash"
+members = ["WaterDewPointTemperatureMultiphaseFlash.multiphase"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "water_dew_point_bracket_bisection"
 initialisation = "coarse_step_down_from_500_k"
@@ -66,6 +72,39 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim WaterDewPointTemperatureMultiphaseFlash.multiphase"
+
+[provenance.algorithm."bracket.lower"]
+source = "NeqSim WaterDewPointTemperatureMultiphaseFlash.multiphase"
+
+[provenance.algorithm."bracket.scheme"]
+source = "NeqSim WaterDewPointTemperatureMultiphaseFlash.multiphase"
+
+[provenance.algorithm."bracket.steps"]
+source = "NeqSim WaterDewPointTemperatureMultiphaseFlash.multiphase"
+
+[provenance.algorithm."bracket.upper"]
+source = "NeqSim WaterDewPointTemperatureMultiphaseFlash.multiphase"
+
+[provenance.algorithm.convergence]
+source = "NeqSim WaterDewPointTemperatureMultiphaseFlash.multiphase"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim WaterDewPointTemperatureMultiphaseFlash.multiphase"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim WaterDewPointTemperatureMultiphaseFlash.multiphase"
+
+[provenance.algorithm.scheme]
+source = "NeqSim WaterDewPointTemperatureMultiphaseFlash.multiphase"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim WaterDewPointTemperatureMultiphaseFlash.multiphase"
+
 [implementations]
 python = "azoth.eos.water_dew_point_multiphase"
 rust = "azoth_eos::water_dew_point_multiphase"

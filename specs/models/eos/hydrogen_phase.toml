@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "Leachman, J. W.; Jacobsen, R. T.; Penoncello, S. G.; Lemmon, E. W. (2009)"
 edition = "The multiparameter Helmholtz equation for the hydrogen spin-isomers, evaluated in the reduced variables tau = Tc/T and delta = rho/rho_c and differentiated for the full property set."
+
+[source.neqsim]
+class = "Leachman"
+members = ["Leachman"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "density_solve_on_the_selected_root"
 initialisation = "ideal_gas_or_dense_side"
@@ -72,6 +78,39 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Leachman"
+
+[provenance.algorithm."bracket.lower"]
+source = "NeqSim Leachman"
+
+[provenance.algorithm."bracket.scheme"]
+source = "NeqSim Leachman"
+
+[provenance.algorithm."bracket.steps"]
+source = "NeqSim Leachman"
+
+[provenance.algorithm."bracket.upper"]
+source = "NeqSim Leachman"
+
+[provenance.algorithm.convergence]
+source = "NeqSim Leachman"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim Leachman"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim Leachman"
+
+[provenance.algorithm.scheme]
+source = "NeqSim Leachman"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim Leachman"
+
 [implementations]
 python = "azoth.eos.hydrogen_phase"
 rust = "azoth_eos::hydrogen_phase"

@@ -130,7 +130,6 @@
 //!   - specs/calcs/eos/pr_peneloux_shift.toml
 //!   - specs/calcs/eos/pr_z_factor.toml
 //!   - specs/models/eos/production_chemical_scale_scenario.toml
-//!   - specs/calcs/eos/prsv_kappa.toml
 //!   - specs/models/eos/ps_flash.toml
 //!   - specs/models/eos/pt_flash.toml
 //!   - specs/models/eos/pt_phase_envelope.toml
@@ -1911,9 +1910,6 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "pitzer_ionic_strength_molal",
         "molality",
     ),
-    ("eos.prsv_kappa", "omega", "dimensionless"),
-    ("eos.prsv_kappa", "Tr", "dimensionless"),
-    ("eos.prsv_kappa", "kappa1", "dimensionless"),
     ("eos.ps_flash", "P", "pressure"),
     ("eos.ps_flash", "S", "molar_heat_capacity"),
     ("eos.ps_flash", "z", "dimensionless"),

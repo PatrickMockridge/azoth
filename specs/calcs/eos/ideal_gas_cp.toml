@@ -8,6 +8,12 @@ references = ["NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `Compone
 [source]
 standard = "NeqSim, developed at NTNU and maintained by Equinor - Apache-2.0"
 edition = "`thermo/component/Component.java`, `getCp0(double)` at line 1547. The five coefficients are the `CPA`-`CPE` columns of NeqSim's `COMP.csv`.\n"
+
+[source.neqsim]
+class = "Component"
+members = ["Component"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.cp_a]
 unit = "J/(mol*K)"
@@ -53,6 +59,12 @@ min_inclusive = false
 severity = "warning"
 code = "OUT_OF_VALID_RANGE"
 rationale = "a heat capacity of zero or below, which is how a fitted polynomial evaluated beyond its range presents.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Component"
+
 [implementations]
 python = "azoth.eos.ideal_gas_cp"
 rust = "azoth_eos::ideal_gas_cp"

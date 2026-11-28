@@ -14,6 +14,12 @@ references = [
 [source]
 standard = "Span, R.; Wagner, W. (1996)"
 edition = "The multiparameter Helmholtz equation for carbon dioxide, evaluated in the reduced variables tau = Tc/T and delta = rho/rho_c and differentiated for the full property set."
+
+[source.neqsim]
+class = "NeqSimSpanWagner"
+members = ["NeqSimSpanWagner"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "newton_density_solve"
 initialisation = "ideal_gas"
@@ -61,6 +67,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim NeqSimSpanWagner"
+
+[provenance.algorithm.convergence]
+source = "NeqSim NeqSimSpanWagner"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim NeqSimSpanWagner"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim NeqSimSpanWagner"
+
+[provenance.algorithm.scheme]
+source = "NeqSim NeqSimSpanWagner"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim NeqSimSpanWagner"
+
 [implementations]
 python = "azoth.eos.co2_phase"
 rust = "azoth_eos::co2_phase"

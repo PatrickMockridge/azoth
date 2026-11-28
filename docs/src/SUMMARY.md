@@ -71,7 +71,6 @@
   - [Molar volume from a compressibility factor](./eos/pr_molar_volume.md)
   - [Peng-Robinson Peneloux volume-translation parameter](./eos/pr_peneloux_shift.md)
   - [Peng-Robinson compressibility factor](./eos/pr_z_factor.md)
-  - [Peng-Robinson-Stryjek-Vera alpha-function coefficient](./eos/prsv_kappa.md)
   - [Rachford-Rice vapour fraction, for a binary](./eos/rachford_rice_binary.md)
   - [Saturated liquid molar volume from the Rackett equation](./eos/rackett_molar_volume.md)
   - [Redlich-Kwong alpha function and reduced attraction parameters](./eos/rk_alpha_ab.md)

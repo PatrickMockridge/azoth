@@ -24,6 +24,12 @@ references = [
 [source]
 standard = "NeqSim master `SystemEosGE`'s hybrid route"
 edition = "`TPHybridEosGeFlash`'s four overrides of `TPmultiflash` - `calcE`, `calcQ`, `setXY` and `limitBetaStepScale` - and `SystemEosGE.prepareHybridEosGeFlash`'s seed, ported verbatim."
+
+[source.neqsim]
+class = "SystemEosGE"
+members = ["SystemEosGE.calcE"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "fixed_topology_fraction_newton"
 convergence = "absolute"
@@ -93,6 +99,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SystemEosGE.calcE"
+
+[provenance.algorithm.convergence]
+source = "NeqSim SystemEosGE.calcE"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim SystemEosGE.calcE"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim SystemEosGE.calcE"
+
+[provenance.algorithm.scheme]
+source = "NeqSim SystemEosGE.calcE"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim SystemEosGE.calcE"
+
 [implementations]
 python = "azoth.eos.hybrid_eos_ge_flash"
 rust = "azoth_eos::hybrid_eos_ge_flash"

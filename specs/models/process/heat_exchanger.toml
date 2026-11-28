@@ -45,6 +45,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/heatexchanger/HeatExchanger.java"
 edition = "Its steady-state `run` - the rating, the `outTemperature` pin, `runDeltaT`'s closure and `runThermalHydraulicRating` - **the mechanical design's two-stream estimate, and `runTransient`'s enabled branch, one step**. The detailed `ShellAndTubeDesignCalculator` and the two-phase models are outside."
+
+[source.neqsim]
+class = "HeatExchanger"
+members = ["HeatExchanger.outTemperature"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.hot_components]
 type = "components"
@@ -687,6 +693,12 @@ min = 0
 min_inclusive = true
 severity = "warning"
 rationale = "`setHeatTransferArea` clamps a negative area to zero; zero takes the steady fallback.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim HeatExchanger.outTemperature"
+
 [implementations]
 python = "azoth.process.heat_exchanger"
 rust = "azoth_process::heat_exchanger"

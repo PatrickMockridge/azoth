@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim master `TPmultiflashWAX`"
 edition = "The `Pedersen` component model (`ComponentWax`), which is `PhaseWax`'s default. The Won, Wilson and Coutinho models are that class's other three and are carried."
+
+[source.neqsim]
+class = "TPmultiflashWAX"
+members = ["TPmultiflashWAX"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "multiphase_fraction_newton"
 initialisation = "two_phase_flash_plus_wax"
@@ -85,6 +91,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TPmultiflashWAX"
+
+[provenance.algorithm.convergence]
+source = "NeqSim TPmultiflashWAX"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim TPmultiflashWAX"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim TPmultiflashWAX"
+
+[provenance.algorithm.scheme]
+source = "NeqSim TPmultiflashWAX"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim TPmultiflashWAX"
+
 [implementations]
 python = "azoth.eos.tp_multiflash_wax"
 rust = "azoth_eos::tp_multiflash_wax"

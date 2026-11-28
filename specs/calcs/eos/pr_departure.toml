@@ -44,6 +44,12 @@ edition = """\
     A New Two-Constant Equation of State. Industrial & Engineering Chemistry Fundamentals, \
     15(1), 59-64"""
 doi = "10.1021/i160057a011"
+
+[source.neqsim]
+class = "Constant"
+members = ["Constant"]
+commit = "f0c7436c6923766b1e22957b7075f650600457a7"
+
 [inputs]
 [inputs.a_reduced]
 unit = "dimensionless"
@@ -56,7 +62,7 @@ unit = "dimensionless"
 description = "The compressibility factor, from `eos.pr_z_factor`. This calc does not check that `z` is a root of the cubic `A` and `B` define.\n"
 [inputs.kappa]
 unit = "dimensionless"
-description = "The alpha-function coefficient, from `eos.pr_kappa` or `eos.prsv_kappa`; both supply a coefficient for the same alpha function.\n"
+description = "The alpha-function coefficient, from `eos.pr_kappa`.\n"
 [inputs.Tr]
 unit = "dimensionless"
 description = "reduced temperature, T / Tc"
@@ -101,6 +107,12 @@ ln_phi = -0.19131055684257678
 h_dep_rt = -0.5830167814158524
 s_dep_r = -0.39170622457327564
 cp_dep_r = 1.3282223816107868
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Constant"
+
 [implementations]
 python = "azoth.eos.pr_departure"
 rust = "azoth_eos::pr_departure"

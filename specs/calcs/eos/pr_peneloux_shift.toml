@@ -10,6 +10,12 @@ references = ["Péneloux, A.; Rauzy, E.; Fréze, R. (1982). \\\"A consistent cor
 standard = "Péneloux, A.; Rauzy, E.; Fréze, R. (1982)"
 edition = "A consistent correction for Redlich-Kwong-Soave volumes. Fluid Phase Equilibria, 8(1), 7-23"
 doi = "10.1016/0378-3812(82)80002-2"
+
+[source.neqsim]
+class = "Fluid"
+members = ["Fluid"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.omega]
 unit = "dimensionless"
@@ -50,6 +56,12 @@ Tc = 369.83
 Pc = 4248000.0
 [worked_example.expected]
 c = -6.349504285100194e-06
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Fluid"
+
 [implementations]
 python = "azoth.eos.pr_peneloux_shift"
 rust = "azoth_eos::pr_peneloux_shift"

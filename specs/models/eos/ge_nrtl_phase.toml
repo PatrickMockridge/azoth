@@ -21,6 +21,12 @@ references = [
 standard = "NeqSim master `PhaseGENRTL`"
 edition = "`ComponentGE.fugcoef`, ported verbatim"
 doi = "10.1002/aic.690140124"
+
+[source.neqsim]
+class = "PhaseGENRTL"
+members = ["PhaseGENRTL"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -80,6 +86,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PhaseGENRTL"
+
 [implementations]
 python = "azoth.eos.ge_nrtl_phase"
 rust = "azoth_eos::ge_nrtl_phase"

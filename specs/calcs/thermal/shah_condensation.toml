@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim process/mechanicaldesign/heatexchanger/ShahCondensation.java"
 edition = "`calcLiquidOnlyHTC`, `calcLocalHTC`, `calcAverageHTC`, `calcVerticalTubeHTC` and `isInValidRange`, composed as the zone analysis uses them."
+
+[source.neqsim]
+class = "ShahCondensation"
+members = ["ShahCondensation.calcLiquidOnlyHTC"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.mass_flux]
 unit = "kg/(m**2*s)"
@@ -145,6 +151,12 @@ local_htc = 3698.110351929876
 average_htc = 2860.9227997298617
 vertical_htc = 3698.110351929876
 in_valid_range = true
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ShahCondensation.calcLiquidOnlyHTC"
+
 [implementations]
 python = "azoth.thermal.shah_condensation"
 rust = "azoth_thermal::shah_condensation"

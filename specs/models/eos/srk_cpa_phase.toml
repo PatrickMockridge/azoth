@@ -18,6 +18,12 @@ references = [
 standard = "Kontogeorgis, G. M. et al. (1996)"
 edition = "The Soave-Redlich-Kwong cubic with the Wertheim association contribution added to the residual Helmholtz energy, which is what makes the attraction and covolume per-fluid fitted values rather than critical-constant combinations."
 doi = "10.1021/ie9600203"
+
+[source.neqsim]
+class = "PhaseSrkCPA"
+members = ["PhaseSrkCPA"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -65,6 +71,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PhaseSrkCPA"
+
 [implementations]
 python = "azoth.eos.srk_cpa_phase"
 rust = "azoth_eos::srk_cpa_phase"

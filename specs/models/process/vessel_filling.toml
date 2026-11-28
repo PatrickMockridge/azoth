@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/depressurization/VesselFillingSimulator.java"
 edition = "Its `run`: the inlet enthalpy, the mole alignment, the VU-flash march, the lumped wall, the Woodfield coefficient and the liner limits."
+
+[source.neqsim]
+class = "VesselFillingSimulator"
+members = ["VesselFillingSimulator"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "explicit_euler_vessel_filling"
 initialisation = "stated_initial_state"
@@ -216,6 +222,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class refuses a non-positive horizon"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim VesselFillingSimulator"
+
+[provenance.algorithm.convergence]
+source = "NeqSim VesselFillingSimulator"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim VesselFillingSimulator"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim VesselFillingSimulator"
+
+[provenance.algorithm.scheme]
+source = "NeqSim VesselFillingSimulator"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim VesselFillingSimulator"
+
 [implementations]
 python = "azoth.process.vessel_filling"
 rust = "azoth_process::vessel_filling"

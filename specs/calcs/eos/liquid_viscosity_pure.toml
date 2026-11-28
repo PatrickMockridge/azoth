@@ -10,6 +10,12 @@ references = ["Yaws, C. L. (2003). \\\"Yaws' Handbook of Thermodynamic and Physi
 standard = "NeqSim master `commonphasephysicalproperties/viscosity/Viscosity` and `liquidphysicalproperties/viscosity/Viscosity`"
 edition = "`calcPureComponentViscosity` and `getViscosityPressureCorrection`, ported from the two classes that carry them."
 doi = "10.1002/cite.330530107"
+
+[source.neqsim]
+class = "Viscosity"
+members = ["Viscosity.calcPureComponentViscosity"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.form]
 type = "enum"
@@ -85,6 +91,12 @@ T = 313.15
 P = 5000000.0
 [worked_example.expected]
 mu = 6.528922494381046e-4
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Viscosity.calcPureComponentViscosity"
+
 [implementations]
 python = "azoth.eos.liquid_viscosity_pure"
 rust = "azoth_eos::liquid_viscosity_pure"

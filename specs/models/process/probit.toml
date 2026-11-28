@@ -21,6 +21,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/dispersion/ProbitModel.java"
 edition = "Its `probit`, `probability`, `probabilityFromDose`, the Abramowitz-Stegun `erf` and the five static factory triples."
+
+[source.neqsim]
+class = "ProbitModel"
+members = ["ProbitModel.probit"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_probit"
 convergence = "absolute"
@@ -58,6 +64,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class answers a non-positive dose with -Infinity, which is not a probit this port publishes"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ProbitModel.probit"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ProbitModel.probit"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ProbitModel.probit"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ProbitModel.probit"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ProbitModel.probit"
+
 [implementations]
 python = "azoth.process.probit"
 rust = "azoth_process::probit"

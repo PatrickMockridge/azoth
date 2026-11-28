@@ -15,6 +15,12 @@ references = [
 [source]
 standard = "NeqSim master `BrineMixingScaleEvaluator`"
 edition = "`evaluate`, `blend`, `updateWorst` and the two loops, ported. The constructors' null checks, the Gson report and the `MixPoint` class are not."
+
+[source.neqsim]
+class = "BrineMixingScaleEvaluator"
+members = ["BrineMixingScaleEvaluator.evaluate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.brine_a]
 type = "record_list"
@@ -138,6 +144,12 @@ min_inclusive = true
 max_inclusive = true
 severity = "warning"
 rationale = "A pH outside the aqueous range is a caller's mistake rather than a state; the arithmetic still runs.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim BrineMixingScaleEvaluator.evaluate"
+
 [implementations]
 python = "azoth.eos.brine_mixing_scale_evaluator"
 rust = "azoth_eos::brine_mixing_scale_evaluator"

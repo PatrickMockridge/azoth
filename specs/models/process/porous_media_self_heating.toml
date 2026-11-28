@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/selfheating/PorousMediaSelfHeatingAnalyzer.java"
 edition = "Its `analyze`: the criticality parameter, the critical temperature and half-dimension, and the verdict."
+
+[source.neqsim]
+class = "PorousMediaSelfHeatingAnalyzer"
+members = ["PorousMediaSelfHeatingAnalyzer.analyze"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "frank_kamenetskii_criticality"
 initialisation = "critical_temperature_bisection_150_2000_k"
@@ -146,6 +152,27 @@ max = 1
 max_inclusive = false
 severity = "error"
 rationale = "the class accepts a ratio strictly between zero and one"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PorousMediaSelfHeatingAnalyzer.analyze"
+
+[provenance.algorithm.convergence]
+source = "NeqSim PorousMediaSelfHeatingAnalyzer.analyze"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim PorousMediaSelfHeatingAnalyzer.analyze"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim PorousMediaSelfHeatingAnalyzer.analyze"
+
+[provenance.algorithm.scheme]
+source = "NeqSim PorousMediaSelfHeatingAnalyzer.analyze"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim PorousMediaSelfHeatingAnalyzer.analyze"
+
 [implementations]
 python = "azoth.process.porous_media_self_heating"
 rust = "azoth_process::porous_media_self_heating"

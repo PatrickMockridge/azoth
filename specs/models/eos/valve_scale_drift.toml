@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim master `ValveScaleDrift`"
 edition = "`advance`, `getOpenAreaFraction`, `getFoulingFraction`, `getDepositThicknessMm`, `getElapsedDays`, `getEffectiveKv`, `getTimeToPlugDays`, `predictOpeningPercent` and `predictTimeToPinDays`, ported. The bound `ThrottlingValve`, `setKinetics`, `reset` and the Gson report are not."
+
+[source.neqsim]
+class = "ValveScaleDrift"
+members = ["ValveScaleDrift.advance"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.port_diameter]
 unit = "m"
@@ -89,6 +95,12 @@ min = 0
 min_inclusive = true
 severity = "warning"
 rationale = "The class does not clamp the valve's coefficient; a negative one is a caller's mistake and the arithmetic still runs.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ValveScaleDrift.advance"
+
 [implementations]
 python = "azoth.eos.valve_scale_drift"
 rust = "azoth_eos::valve_scale_drift"

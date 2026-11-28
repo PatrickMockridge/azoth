@@ -3091,7 +3091,6 @@ class CriticalPointResult:
     pc: Qty
     vc: Qty
     z_c: float
-    converged: bool
     iterations: int
     residual: float
     warnings: list[Warning]
@@ -3846,11 +3845,6 @@ class ProductionChemicalScaleScenarioResult:
     warnings: list[Warning]
 
 @final
-class PrsvKappaResult:
-    kappa: float
-    warnings: list[Warning]
-
-@final
 class PsFlashResult:
     T: Qty
     vapour_fraction: float | None
@@ -4406,7 +4400,6 @@ class UmrPruFlashResult:
     z_vapour: float
     min_t_over_tc: float
     phase: str
-    converged: bool
     iterations: int
     residual: float
     warnings: list[Warning]
@@ -8683,7 +8676,6 @@ def production_chemical_scale_scenario(
     chemicals: list[ProductionChemicalDose],
     pitzer_ionic_strength_molal: float | None = None,
 ) -> ProductionChemicalScaleScenarioResult: ...
-def prsv_kappa(omega: float, Tr: float, kappa1: float) -> PrsvKappaResult: ...
 def ps_flash(
     Tc: list[float],
     Pc: list[float],

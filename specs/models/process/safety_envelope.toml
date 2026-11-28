@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/envelope/SafetyEnvelopeCalculator.java"
 edition = "Its five `calculate*Envelope` methods, and `SafetyEnvelope`'s interpolation, safe test and margin."
+
+[source.neqsim]
+class = "SafetyEnvelopeCalculator"
+members = ["SafetyEnvelopeCalculator"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "safety_envelope"
 convergence = "absolute"
@@ -200,6 +206,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute temperature"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SafetyEnvelopeCalculator"
+
+[provenance.algorithm.convergence]
+source = "NeqSim SafetyEnvelopeCalculator"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim SafetyEnvelopeCalculator"
+
+[provenance.algorithm.scheme]
+source = "NeqSim SafetyEnvelopeCalculator"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim SafetyEnvelopeCalculator"
+
 [implementations]
 python = "azoth.process.safety_envelope"
 rust = "azoth_process::safety_envelope"

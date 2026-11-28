@@ -21,6 +21,12 @@ references = [
 [source]
 standard = "NeqSim master `ChemicalReactionList`"
 edition = "Three passes over the reaction set: `removeJunkReactions`, then `removeDependentReactions`, then `calcReferencePotentials`'s independent-column solve with the dependent components at the zero gauge, and the Gibbs-energy-of-formation fallback only for a rank-deficient basis."
+
+[source.neqsim]
+class = "ChemicalReactionList"
+members = ["ChemicalReactionList.removeJunkReactions"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -57,6 +63,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute temperature, and the constants take its logarithm\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ChemicalReactionList.removeJunkReactions"
+
 [implementations]
 python = "azoth.reactions.reference_potentials"
 rust = "azoth_reactions::reference_potentials"

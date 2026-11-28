@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/hazid/MahBowTieBuilder.java"
 edition = "Its `build` and the `MahCatalogue` lists it reads; the `BowTieModel` arithmetic is `process.bow_tie`'s."
+
+[source.neqsim]
+class = "MahBowTieBuilder"
+members = ["MahBowTieBuilder.build"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "mah_bow_tie_catalogue"
 convergence = "absolute"
@@ -72,6 +78,24 @@ description = "the number of consequences.\n"
 [outputs.barrier_count]
 unit = "dimensionless"
 description = "the number of barrier classes.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim MahBowTieBuilder.build"
+
+[provenance.algorithm.convergence]
+source = "NeqSim MahBowTieBuilder.build"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim MahBowTieBuilder.build"
+
+[provenance.algorithm.scheme]
+source = "NeqSim MahBowTieBuilder.build"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim MahBowTieBuilder.build"
+
 [implementations]
 python = "azoth.process.mah_bow_tie_skeleton"
 rust = "azoth_process::mah_bow_tie_skeleton"

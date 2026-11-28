@@ -9,6 +9,12 @@ references = ["Mollerup, J. (1986). \"Thermodynamic properties from a cubic equa
 [source]
 standard = "NeqSim master `AttractiveTermMollerup`"
 edition = "`alpha(temperature)`, ported verbatim"
+
+[source.neqsim]
+class = "AttractiveTermMollerup"
+members = ["AttractiveTermMollerup"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.p1]
 unit = "dimensionless"
@@ -43,6 +49,12 @@ p3 = 0.02
 Tr = 0.7
 [worked_example.expected]
 alpha = 1.0243735198192874
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim AttractiveTermMollerup"
+
 [implementations]
 python = "azoth.eos.mollerup_alpha"
 rust = "azoth_eos::mollerup_alpha"

@@ -18,6 +18,12 @@ references = [
 # not a paper - the definition and the datum NeqSim makes are in `edition`.
 standard = "The composition of ideal-gas and residual contributions"
 edition = "Standard thermodynamics: an absolute enthalpy or entropy is a reference value plus an ideal-gas integral plus a departure, with the datum NeqSim's (`T_ref = 273.15 K`, `P_ref = 1.01325 bar`)."
+
+[source.neqsim]
+class = "PhasePrEos"
+members = ["PhasePrEos"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -97,6 +103,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "`Z = P v /(R T)` is positive for any state with a positive volume."
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PhasePrEos"
+
 [implementations]
 python = "azoth.eos.molar_enthalpy_entropy"
 rust = "azoth_eos::molar_enthalpy_entropy"

@@ -3218,19 +3218,6 @@ class ProductionChemicalScaleScenarioResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
-class PrsvKappaResult(_HasWarnings):
-    """Result of ``eos.prsv_kappa``."""
-
-    CALC_ID: ClassVar[str] = "eos.prsv_kappa"
-
-    #: The PRSV alpha-function coefficient, which feeds the same alpha function as Peng-Robinson's, `alpha = (1 + kappa*(1 - sqrt(Tr)))**2`. Unlike Peng-Robinson's, it varies with `Tr`.
-    kappa: float
-
-    #: Caveats.
-    warnings: tuple[Warning, ...]
-
-
-@dataclass(frozen=True, slots=True, eq=False)
 class PsFlashResult(_HasWarnings):
     """Result of ``eos.ps_flash``."""
 

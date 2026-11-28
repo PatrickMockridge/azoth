@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim thermo/util/EquilibriumSoundSpeed.java"
 edition = "Its `calculate`: the fixed-entropy pressure stencil, the bracketed TP entropy root (and the pure-fluid saturation quality), the closure checks, and the step refinement."
+
+[source.neqsim]
+class = "EquilibriumSoundSpeed"
+members = ["EquilibriumSoundSpeed.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "fixed_entropy_pressure_stencil"
 initialisation = "flash_at_stated_state"
@@ -119,6 +125,27 @@ min = 1.0e-6
 max = 0.05
 severity = "error"
 rationale = "the class refuses a step outside this band"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim EquilibriumSoundSpeed.calculate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim EquilibriumSoundSpeed.calculate"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim EquilibriumSoundSpeed.calculate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim EquilibriumSoundSpeed.calculate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim EquilibriumSoundSpeed.calculate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim EquilibriumSoundSpeed.calculate"
+
 [implementations]
 python = "azoth.eos.equilibrium_sound_speed"
 rust = "azoth_eos::equilibrium_sound_speed"

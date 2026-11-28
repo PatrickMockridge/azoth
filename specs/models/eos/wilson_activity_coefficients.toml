@@ -16,6 +16,12 @@ references = [
 standard = "Coutinho et al. (1995)"
 edition = "Fluid Phase Equilibria 103, 23-39"
 doi = "10.1016/0378-3812(94)02603-Y"
+
+[source.neqsim]
+class = "Fluid"
+members = ["Fluid"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -46,6 +52,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute temperature; zero and below are not states\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Fluid"
+
 [implementations]
 python = "azoth.eos.wilson_activity_coefficients"
 rust = "azoth_eos::wilson_activity_coefficients"

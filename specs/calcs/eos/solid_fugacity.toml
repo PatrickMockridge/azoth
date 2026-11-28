@@ -12,6 +12,12 @@ references = [
 [source]
 standard = "NeqSim master `ComponentSolid.fugcoef2`"
 edition = "The tabulated route, which `ThermodynamicOperations.TPSolidflash` drives through `SolidFlash1`. The Helmholtz route, `PhaseSolidHelmholtzEos`, is `eos.parahydrogen_solid_phase`'s and is not this."
+
+[source.neqsim]
+class = "ComponentSolid"
+members = ["ComponentSolid"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.heat_of_fusion]
 unit = "J/mol"
@@ -90,6 +96,12 @@ P = 1000000.0
 eos = "srk"
 [worked_example.expected]
 fugacity_coefficient = 0.0004079887721484625
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ComponentSolid"
+
 [implementations]
 python = "azoth.eos.solid_fugacity"
 rust = "azoth_eos::solid_fugacity"

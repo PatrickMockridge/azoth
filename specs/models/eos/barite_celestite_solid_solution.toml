@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim master `BariteCelestiteSolidSolution`"
 edition = "`calculate`, `objectiveFunction` and `solidActivityCoefficient`, ported. The temperature setter and the Gson report are not."
+
+[source.neqsim]
+class = "BariteCelestiteSolidSolution"
+members = ["BariteCelestiteSolidSolution.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "solid_mole_fraction_bisection"
 convergence = "absolute"
@@ -92,6 +98,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "It is a divisor.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim BariteCelestiteSolidSolution.calculate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim BariteCelestiteSolidSolution.calculate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim BariteCelestiteSolidSolution.calculate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim BariteCelestiteSolidSolution.calculate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim BariteCelestiteSolidSolution.calculate"
+
 [implementations]
 python = "azoth.eos.barite_celestite_solid_solution"
 rust = "azoth_eos::barite_celestite_solid_solution"

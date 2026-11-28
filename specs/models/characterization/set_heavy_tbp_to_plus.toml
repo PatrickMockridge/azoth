@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim master `PlusCharacterize.setHeavyTBPtoPlus`"
 edition = "Its name-to-carbon-number parse, its choice of the largest by that number, the row it then reads for `densLastTBP`, and the `coefs[2]` seed it sets from it. The flag it sets on the component - `isPlusFraction` - is the walk's own state, and this id reports the position and the numbers instead."
+
+[source.neqsim]
+class = "PlusCharacterize"
+members = ["PlusCharacterize.densLastTBP"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.names]
 type = "vector_string"
@@ -60,6 +66,12 @@ description = "The normal liquid density of the row **below** the winner in inde
 [outputs.density_intercept]
 unit = "kg/m**3"
 description = "`last_tbp_density + 0.03`, the value the class stores at `coefs[2]`.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PlusCharacterize.densLastTBP"
+
 [implementations]
 python = "azoth.characterization.set_heavy_tbp_to_plus"
 rust = "azoth_characterization::set_heavy_tbp_to_plus"

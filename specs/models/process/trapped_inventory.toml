@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/inventory/TrappedInventoryCalculator.java"
 edition = "Its `calculate`, `prepareFluidState`, `getGasDensity` and `getLiquidDensity`."
+
+[source.neqsim]
+class = "TrappedInventoryCalculator"
+members = ["TrappedInventoryCalculator.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "trapped_inventory"
 convergence = "absolute"
@@ -184,6 +190,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "a density is positive"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TrappedInventoryCalculator.calculate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim TrappedInventoryCalculator.calculate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim TrappedInventoryCalculator.calculate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim TrappedInventoryCalculator.calculate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim TrappedInventoryCalculator.calculate"
+
 [implementations]
 python = "azoth.process.trapped_inventory"
 rust = "azoth_process::trapped_inventory"

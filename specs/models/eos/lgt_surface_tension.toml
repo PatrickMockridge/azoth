@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim master `LGTSurfaceTension`"
 edition = "`calcSurfaceTension`, ported verbatim: the linear density interpolation, the influence-parameter sum with its name-keyed interaction rule, and the `sqrt(2 kappa mu_times_rho)` accumulation."
+
+[source.neqsim]
+class = "LGTSurfaceTension"
+members = ["LGTSurfaceTension.calcSurfaceTension"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "lgt_density_integration"
 initialisation = "linear_density_between_phases"
@@ -84,6 +90,27 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "A mole fraction cannot be negative.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim LGTSurfaceTension.calcSurfaceTension"
+
+[provenance.algorithm.convergence]
+source = "NeqSim LGTSurfaceTension.calcSurfaceTension"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim LGTSurfaceTension.calcSurfaceTension"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim LGTSurfaceTension.calcSurfaceTension"
+
+[provenance.algorithm.scheme]
+source = "NeqSim LGTSurfaceTension.calcSurfaceTension"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim LGTSurfaceTension.calcSurfaceTension"
+
 [implementations]
 python = "azoth.eos.lgt_surface_tension"
 rust = "azoth_eos::lgt_surface_tension"

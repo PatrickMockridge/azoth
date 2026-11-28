@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/blowby/GasBlowbyAnalyzer.java"
 edition = "Its `analyze`: the critical ratio, the two nozzle forms, the standard volume and the relief verdict."
+
+[source.neqsim]
+class = "GasBlowbyAnalyzer"
+members = ["GasBlowbyAnalyzer.analyze"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "isentropic_nozzle_blowby"
 convergence = "absolute"
@@ -127,6 +133,24 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "the class refuses a negative relief capacity"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim GasBlowbyAnalyzer.analyze"
+
+[provenance.algorithm.convergence]
+source = "NeqSim GasBlowbyAnalyzer.analyze"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim GasBlowbyAnalyzer.analyze"
+
+[provenance.algorithm.scheme]
+source = "NeqSim GasBlowbyAnalyzer.analyze"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim GasBlowbyAnalyzer.analyze"
+
 [implementations]
 python = "azoth.process.gas_blowby"
 rust = "azoth_process::gas_blowby"

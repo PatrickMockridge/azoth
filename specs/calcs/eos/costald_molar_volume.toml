@@ -10,6 +10,12 @@ references = ["Hankinson, R. W.; Thomson, G. H. (1979). \\\"A new correlation fo
 standard = "Hankinson, R. W.; Thomson, G. H. (1979)"
 edition = "A new correlation for saturated densities of liquids and their mixtures. AIChE J., 25(4), 653-663"
 doi = "10.1002/aic.690250412"
+
+[source.neqsim]
+class = "Costald"
+members = ["Costald"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.omega]
 unit = "dimensionless"
@@ -64,6 +70,12 @@ rho_normal = 664.0
 T = 298.15
 [worked_example.expected]
 v = 0.0001315006475383877
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Costald"
+
 [implementations]
 python = "azoth.eos.costald_molar_volume"
 rust = "azoth_eos::costald_molar_volume"

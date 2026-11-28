@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim pvtsimulation/simulation/ConstantMassExpansion.java"
 edition = "The upward saturation scan, the per-pressure relative volume, density and gas volume, the Y-factor, the single-phase viscosity and isothermal compressibility, and the class's Bg."
+
+[source.neqsim]
+class = "ConstantMassExpansion"
+members = ["ConstantMassExpansion"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "record_list"
@@ -200,6 +206,12 @@ description = "phase 0's viscosity; absent in a two-phase point.\n"
 unit = "dimensionless"
 optional = true
 description = "phase 0's isothermal compressibility, in 1/Pa; absent in a two-phase point.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ConstantMassExpansion"
+
 [implementations]
 python = "azoth.pvt.constant_mass_expansion"
 rust = "azoth_pvt::constant_mass_expansion"

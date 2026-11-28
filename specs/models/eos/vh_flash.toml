@@ -15,6 +15,12 @@ references = [
 [source]
 standard = "Standard thermodynamics, as in Michelsen & Mollerup"
 edition = "NeqSim master `thermodynamicoperations/flashops/VHflashQfunc`, whose Q-function quartet is `OptimizedVUflash`'s with `Hspec` in place of `Uspec + P Vspec`."
+
+[source.neqsim]
+class = "Standard"
+members = ["Standard"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "vh_flash_newton_2x2"
 convergence = "relative"
@@ -96,6 +102,54 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "a molar volume; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Standard"
+
+[provenance.algorithm.convergence]
+source = "NeqSim Standard"
+
+[provenance.algorithm.initial_temperature]
+source = "NeqSim Standard"
+
+[provenance.algorithm."inner.convergence"]
+source = "NeqSim Standard"
+
+[provenance.algorithm."inner.initialisation"]
+source = "NeqSim Standard"
+
+[provenance.algorithm."inner.inner.convergence"]
+source = "NeqSim Standard"
+
+[provenance.algorithm."inner.inner.max_iterations"]
+source = "NeqSim Standard"
+
+[provenance.algorithm."inner.inner.scheme"]
+source = "NeqSim Standard"
+
+[provenance.algorithm."inner.inner.tolerance"]
+source = "NeqSim Standard"
+
+[provenance.algorithm."inner.max_iterations"]
+source = "NeqSim Standard"
+
+[provenance.algorithm."inner.scheme"]
+source = "NeqSim Standard"
+
+[provenance.algorithm."inner.tolerance"]
+source = "NeqSim Standard"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim Standard"
+
+[provenance.algorithm.scheme]
+source = "NeqSim Standard"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim Standard"
+
 [implementations]
 python = "azoth.eos.vh_flash"
 rust = "azoth_eos::vh_flash"

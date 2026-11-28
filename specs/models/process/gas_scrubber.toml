@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/separator/GasScrubber.java"
 edition = "No `run` of its own: the port is the separator's, through the class that adds only a capacity metric."
+
+[source.neqsim]
+class = "GasScrubber"
+members = ["GasScrubber"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -358,6 +364,12 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "an allowance adds metal; a negative one removes it\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim GasScrubber"
+
 [implementations]
 python = "azoth.process.gas_scrubber"
 rust = "azoth_process::gas_scrubber"

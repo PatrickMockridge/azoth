@@ -42,8 +42,7 @@ def pr_departure(
         b_reduced: the cubic's repulsion parameter ``B``, likewise.
         z: the compressibility factor, from :func:`azoth.eos.pr_z_factor`. Not
             checked against the cubic - see the module documentation.
-        kappa: the alpha-function coefficient, from :func:`azoth.eos.pr_kappa` or
-            :func:`azoth.eos.prsv_kappa`. Either serves.
+        kappa: the alpha-function coefficient, from :func:`azoth.eos.pr_kappa`.
         Tr: reduced temperature.
 
     Returns:

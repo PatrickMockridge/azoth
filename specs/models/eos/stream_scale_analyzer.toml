@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim master `StreamScaleAnalyzer`"
 edition = "`analyze`, `getScaleRateKgPerDay`, `getTotalScaleRateKgPerDay`, `getTotalScaleMassMgPerL`, `getDominantScale` and `hasScaling`, ported over `eos.multi_mineral_scale_equilibrium`. `fromStream`, `getEquilibrium`/`getPredictor`, the Gson report and the `ensureAnalyzed` flag are not."
+
+[source.neqsim]
+class = "StreamScaleAnalyzer"
+members = ["StreamScaleAnalyzer.analyze"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.calcium]
 unit = "kg/m**3"
@@ -137,6 +143,12 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "A throughput cannot be negative.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim StreamScaleAnalyzer.analyze"
+
 [implementations]
 python = "azoth.eos.stream_scale_analyzer"
 rust = "azoth_eos::stream_scale_analyzer"

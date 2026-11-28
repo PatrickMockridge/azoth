@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim master `ScaleDepositionAccumulator`"
 edition = "`evaluate` and its getters, ported over `eos.scale_prediction`. The bound `PipeBeggsAndBrills` and its profile lists, the `StandardsRegistry` report and the Gson report are not."
+
+[source.neqsim]
+class = "ScaleDepositionAccumulator"
+members = ["ScaleDepositionAccumulator.evaluate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.calcium]
 unit = "kg/m**3"
@@ -107,6 +113,12 @@ min = 0
 min_inclusive = true
 severity = "warning"
 rationale = "A pipe with no length has no wall area; the arithmetic still runs and the result is empty.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ScaleDepositionAccumulator.evaluate"
+
 [implementations]
 python = "azoth.eos.scale_deposition_accumulator"
 rust = "azoth_eos::scale_deposition_accumulator"

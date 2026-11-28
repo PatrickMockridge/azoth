@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim pvtsimulation/simulation/DensitySim.java and ViscositySim.java"
 edition = "The density and viscosity sweeps: one flash per state, the present phases' properties and their availability flags."
+
+[source.neqsim]
+class = "DensitySim"
+members = ["DensitySim"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "record_list"
@@ -180,6 +186,12 @@ description = "whether an oil phase is present.\n"
 [outputs.points.fields.aqueous_phase_available]
 type = "boolean"
 description = "whether an aqueous phase is present.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim DensitySim"
+
 [implementations]
 python = "azoth.pvt.property_sweep"
 rust = "azoth_pvt::property_sweep"

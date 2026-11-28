@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/overpressure/CheckValveLeakRelief.java"
 edition = "Its `calculate` with a fluid, through `ReliefFluidState.evaluate` and `NozzleFlow.gasMassRateKgPerS`."
+
+[source.neqsim]
+class = "CheckValveLeakRelief"
+members = ["CheckValveLeakRelief.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "check_valve_leak_nozzle"
 convergence = "absolute"
@@ -122,6 +128,24 @@ max = 1
 max_inclusive = true
 severity = "error"
 rationale = "a discharge coefficient is in (0, 1]"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim CheckValveLeakRelief.calculate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim CheckValveLeakRelief.calculate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim CheckValveLeakRelief.calculate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim CheckValveLeakRelief.calculate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim CheckValveLeakRelief.calculate"
+
 [implementations]
 python = "azoth.process.check_valve_leak_relief"
 rust = "azoth_process::check_valve_leak_relief"

@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim master `ClosedLoopDepositionSolver`"
 edition = "`solve` and its getters, over `eos.pipe_beggs_and_brills` and `eos.scale_deposition_accumulator`. The host pipe's mutable diameter and its restore have no counterpart here; the model is a function. The Gson report has none either."
+
+[source.neqsim]
+class = "ClosedLoopDepositionSolver"
+members = ["ClosedLoopDepositionSolver.solve"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -117,6 +123,12 @@ description = "the worst segment's thickness after each iteration's accumulator 
 type = "vector"
 unit = "m/s"
 description = "the mean mixture superficial velocity of each iteration's profile.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ClosedLoopDepositionSolver.solve"
+
 [implementations]
 python = "azoth.eos.closed_loop_deposition_solver"
 rust = "azoth_eos::closed_loop_deposition_solver"

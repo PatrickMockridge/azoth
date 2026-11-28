@@ -23,6 +23,12 @@ references = [
 standard = "Michelsen, M. L. (1980), with NeqSim `RobustPhaseEnvelope` for the fallback and `eos.critical_point` for the critical point"
 edition = "The trace is Michelsen's natural-parameter continuation; the critical point is Heidemann & Khalil's construction, on the feed; the fallback is `RobustPhaseEnvelope`'s direct-flash grid at the class's own parameters."
 doi = "10.1016/0378-3812(80)80001-8"
+
+[source.neqsim]
+class = "PTPhaseEnvelopeMichelsen"
+members = ["PTPhaseEnvelopeMichelsen", "RobustPhaseEnvelope"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "phase_envelope_continuation"
 initialisation = "wilson"
@@ -110,6 +116,39 @@ min = 0
 min_inclusive = false
 severity = "warning"
 rationale = "a grid answer reports NaN because RobustPhaseEnvelope has no critical point; the envelope's cricondenbar and cricondentherm do not depend on it"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim RobustPhaseEnvelope"
+
+[provenance.algorithm.convergence]
+source = "NeqSim RobustPhaseEnvelope"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim RobustPhaseEnvelope"
+
+[provenance.algorithm."inner.convergence"]
+source = "NeqSim RobustPhaseEnvelope"
+
+[provenance.algorithm."inner.max_iterations"]
+source = "NeqSim RobustPhaseEnvelope"
+
+[provenance.algorithm."inner.scheme"]
+source = "NeqSim RobustPhaseEnvelope"
+
+[provenance.algorithm."inner.tolerance"]
+source = "NeqSim RobustPhaseEnvelope"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim RobustPhaseEnvelope"
+
+[provenance.algorithm.scheme]
+source = "NeqSim RobustPhaseEnvelope"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim RobustPhaseEnvelope"
+
 [implementations]
 python = "azoth.eos.pt_phase_envelope"
 rust = "azoth_eos::pt_phase_envelope"

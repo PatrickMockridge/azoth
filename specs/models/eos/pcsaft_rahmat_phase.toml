@@ -20,6 +20,12 @@ references = [
 standard = "Gross, J.; Sadowski, G. (2001)"
 edition = "The perturbed-chain form of statistical associating fluid theory, without its association term: a hard-sphere term weighted by the segment number, a chain term from the hard-sphere pair correlation, and two dispersion terms from the second-order perturbation expansion."
 doi = "10.1021/ie0003887"
+
+[source.neqsim]
+class = "PhasePCSAFT"
+members = ["PhasePCSAFT"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -70,6 +76,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PhasePCSAFT"
+
 [implementations]
 python = "azoth.eos.pcsaft_rahmat_phase"
 rust = "azoth_eos::pcsaft_rahmat_phase"

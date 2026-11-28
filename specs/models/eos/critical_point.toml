@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "Heidemann, R. A.; Khalil, A. M. (1980)"
 edition = "The calculation of critical points. AIChE Journal 26(5), 769-779."
+
+[source.neqsim]
+class = "CriticalPointFlash"
+members = ["CriticalPointFlash"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "heidemann_khalil_critical"
 initialisation = "kay_rule_and_covolume"
@@ -75,6 +81,39 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "a sign error in any of the three quantities above shows up as a negative `z_c` before it shows up anywhere else."
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim CriticalPointFlash"
+
+[provenance.algorithm.convergence]
+source = "NeqSim CriticalPointFlash"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim CriticalPointFlash"
+
+[provenance.algorithm."inner.convergence"]
+source = "NeqSim CriticalPointFlash"
+
+[provenance.algorithm."inner.max_iterations"]
+source = "NeqSim CriticalPointFlash"
+
+[provenance.algorithm."inner.scheme"]
+source = "NeqSim CriticalPointFlash"
+
+[provenance.algorithm."inner.tolerance"]
+source = "NeqSim CriticalPointFlash"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim CriticalPointFlash"
+
+[provenance.algorithm.scheme]
+source = "NeqSim CriticalPointFlash"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim CriticalPointFlash"
+
 [implementations]
 python = "azoth.eos.critical_point"
 rust = "azoth_eos::critical_point"

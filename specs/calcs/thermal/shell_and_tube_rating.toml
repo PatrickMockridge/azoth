@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim process/mechanicaldesign/heatexchanger/ThermalDesignCalculator.java"
 edition = "`calculate()` and `calculateStrict()` with `calculateTubeSide`, `calculateShellSide` (Kern and Bell-Delaware), `calculateOverallU`, both pressure drops and `calcDarcyFriction`; the shell-side helpers are `BellDelawareMethod`'s."
+
+[source.neqsim]
+class = "ThermalDesignCalculator"
+members = ["ThermalDesignCalculator.calculateTubeSide"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.tube_outside_diameter]
 unit = "m"
@@ -381,6 +387,12 @@ jl = 1.0
 jb = 1.0
 js = 1.0
 jr = 1.0
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ThermalDesignCalculator.calculateTubeSide"
+
 [implementations]
 python = "azoth.thermal.shell_and_tube_rating"
 rust = "azoth_thermal::shell_and_tube_rating"

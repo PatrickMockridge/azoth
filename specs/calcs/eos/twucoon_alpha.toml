@@ -10,6 +10,12 @@ references = ["Twu, C. H.; Coon, J. E.; Cunningham, J. R. (1995). \"A new genera
 standard = "NeqSim master `AttractiveTermTwuCoon`"
 edition = "`alpha(temperature)`, ported verbatim"
 doi = "10.1016/0378-3812(94)02601-V"
+
+[source.neqsim]
+class = "AttractiveTermTwuCoon"
+members = ["AttractiveTermTwuCoon"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.omega]
 unit = "dimensionless"
@@ -36,6 +42,12 @@ omega = 0.152
 Tr = 0.7
 [worked_example.expected]
 alpha = 1.2469731129671788
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim AttractiveTermTwuCoon"
+
 [implementations]
 python = "azoth.eos.twucoon_alpha"
 rust = "azoth_eos::twucoon_alpha"

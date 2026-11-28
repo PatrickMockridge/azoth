@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim master `GTSurfaceTensionSimple`"
 edition = "`calcSurfaceTension`, ported: the linear density interpolation, the initial gradient solve, the inner Newton on `mu_equi - mu`, and the `sqrt(2 kappa mu_times_rho)` accumulation."
+
+[source.neqsim]
+class = "GTSurfaceTensionSimple"
+members = ["GTSurfaceTensionSimple.calcSurfaceTension"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "gt_simple_density_newton"
 initialisation = "linear_density_between_phases"
@@ -91,6 +97,39 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "A mole fraction cannot be negative.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim GTSurfaceTensionSimple.calcSurfaceTension"
+
+[provenance.algorithm.convergence]
+source = "NeqSim GTSurfaceTensionSimple.calcSurfaceTension"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim GTSurfaceTensionSimple.calcSurfaceTension"
+
+[provenance.algorithm."inner.convergence"]
+source = "NeqSim GTSurfaceTensionSimple.calcSurfaceTension"
+
+[provenance.algorithm."inner.max_iterations"]
+source = "NeqSim GTSurfaceTensionSimple.calcSurfaceTension"
+
+[provenance.algorithm."inner.scheme"]
+source = "NeqSim GTSurfaceTensionSimple.calcSurfaceTension"
+
+[provenance.algorithm."inner.tolerance"]
+source = "NeqSim GTSurfaceTensionSimple.calcSurfaceTension"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim GTSurfaceTensionSimple.calcSurfaceTension"
+
+[provenance.algorithm.scheme]
+source = "NeqSim GTSurfaceTensionSimple.calcSurfaceTension"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim GTSurfaceTensionSimple.calcSurfaceTension"
+
 [implementations]
 python = "azoth.eos.gt_surface_tension_simple"
 rust = "azoth_eos::gt_surface_tension_simple"

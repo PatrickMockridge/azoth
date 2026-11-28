@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/opendrain/OpenDrainReviewEngine.java"
 edition = "Its `evaluate`, the nineteen `check*` methods, `calculateConfidence` and the verdict cascade."
+
+[source.neqsim]
+class = "OpenDrainReviewEngine"
+members = ["OpenDrainReviewEngine.evaluate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "norsok_s001_open_drain_review"
 convergence = "absolute"
@@ -142,6 +148,24 @@ description = "the assessment's status.\n"
 type = "enum"
 values = ["low", "medium", "high", "critical"]
 description = "the class's severity band; a pass, info or not-applicable row is low.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim OpenDrainReviewEngine.evaluate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim OpenDrainReviewEngine.evaluate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim OpenDrainReviewEngine.evaluate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim OpenDrainReviewEngine.evaluate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim OpenDrainReviewEngine.evaluate"
+
 [implementations]
 python = "azoth.process.open_drain_review"
 rust = "azoth_process::open_drain_review"

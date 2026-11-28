@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/selfheating/SemenovSelfHeatingAnalyzer.java"
 edition = "Its `analyze`: the Semenov criticality parameter, the critical-temperature bisection and the verdict."
+
+[source.neqsim]
+class = "SemenovSelfHeatingAnalyzer"
+members = ["SemenovSelfHeatingAnalyzer.analyze"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "semenov_criticality"
 initialisation = "critical_temperature_bisection_150_2000_k"
@@ -121,6 +127,27 @@ max = 1
 max_inclusive = false
 severity = "error"
 rationale = "the class accepts a ratio strictly between zero and one"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SemenovSelfHeatingAnalyzer.analyze"
+
+[provenance.algorithm.convergence]
+source = "NeqSim SemenovSelfHeatingAnalyzer.analyze"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim SemenovSelfHeatingAnalyzer.analyze"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim SemenovSelfHeatingAnalyzer.analyze"
+
+[provenance.algorithm.scheme]
+source = "NeqSim SemenovSelfHeatingAnalyzer.analyze"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim SemenovSelfHeatingAnalyzer.analyze"
+
 [implementations]
 python = "azoth.process.semenov_self_heating"
 rust = "azoth_process::semenov_self_heating"

@@ -25,6 +25,12 @@ references = [
 [source]
 standard = "NeqSim master `TPmultiflash.stabilityAnalysis`"
 edition = "The override, which `TPmultiflash.run()` calls where a caller reaches `Flash.stabilityAnalysis` through the base class. Its succession-substitution iteration is ported; its three accelerators are named in the assumptions and are not."
+
+[source.neqsim]
+class = "TPmultiflash"
+members = ["TPmultiflash"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "multiflash_stability_seeding"
 initialisation = "wilson_pair_then_pure_component"
@@ -86,6 +92,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TPmultiflash"
+
+[provenance.algorithm.convergence]
+source = "NeqSim TPmultiflash"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim TPmultiflash"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim TPmultiflash"
+
+[provenance.algorithm.scheme]
+source = "NeqSim TPmultiflash"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim TPmultiflash"
+
 [implementations]
 python = "azoth.eos.multiflash_stability_test"
 rust = "azoth_eos::multiflash_stability_test"

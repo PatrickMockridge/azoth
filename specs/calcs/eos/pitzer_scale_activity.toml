@@ -13,6 +13,12 @@ references = [
 [source]
 standard = "NeqSim master `PitzerScaleActivityModel`"
 edition = "`getMeanActivityCoefficient`, `calculateIonActivityCoefficients`, `meanAtEquivalentIonicStrength`, `betaGammaTerm` and `temperatureParameter`, ported."
+
+[source.neqsim]
+class = "PitzerScaleActivityModel"
+members = ["PitzerScaleActivityModel.getMeanActivityCoefficient"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.temperature]
 unit = "K"
@@ -204,6 +210,12 @@ id = "round_trip_units"
 type = "property"
 property = "unit_round_trip"
 status = "active"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PitzerScaleActivityModel.getMeanActivityCoefficient"
+
 [implementations]
 python = "azoth.eos.pitzer_scale_activity"
 rust = "azoth_eos::pitzer_scale_activity"

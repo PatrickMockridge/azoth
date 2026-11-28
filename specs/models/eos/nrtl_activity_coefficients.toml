@@ -14,6 +14,12 @@ references = [
 standard = "Renon, H.; Prausnitz, J. M. (1968)"
 edition = "AIChE Journal 14(1), 135-144"
 doi = "10.1002/aic.690140124"
+
+[source.neqsim]
+class = "PhaseGENRTL"
+members = ["PhaseGENRTL"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -44,6 +50,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute temperature; zero and below are not states\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PhaseGENRTL"
+
 [implementations]
 python = "azoth.eos.nrtl_activity_coefficients"
 rust = "azoth_eos::nrtl_activity_coefficients"

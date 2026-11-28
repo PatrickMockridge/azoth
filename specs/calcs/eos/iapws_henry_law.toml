@@ -13,6 +13,12 @@ references = [
 [source]
 standard = "IAPWS G7-04"
 edition = "The guideline equation as NeqSim master implements it in `IapwsHenryLaw`, with its 14 gas rows and the fitted window each row carries."
+
+[source.neqsim]
+class = "IapwsHenryLaw"
+members = ["IapwsHenryLaw"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.gas]
 type = "enum"
@@ -70,6 +76,12 @@ gas = "ch4"
 T = 298.15
 [worked_example.expected]
 henry = 3947965646.000571
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim IapwsHenryLaw"
+
 [implementations]
 python = "azoth.eos.iapws_henry_law"
 rust = "azoth_eos::iapws_henry_law"

@@ -13,6 +13,12 @@ references = [
 [source]
 standard = "NeqSim master `EmulsionViscosityCalculator`"
 edition = "`calculate`, `calculateInversionPoint`, the six relative-viscosity models and the tightness and demulsifier corrections. The viscosity-curve sweep and the Gson report are compositions, and the unused setters are stored only."
+
+[source.neqsim]
+class = "EmulsionViscosityCalculator"
+members = ["EmulsionViscosityCalculator.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.oil_viscosity]
 unit = "Pa*s"
@@ -587,6 +593,12 @@ emulsion_type = "water_in_oil"
 id = "default_pal_worked_example"
 type = "worked_example"
 status = "active"
+
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim EmulsionViscosityCalculator.calculate"
 
 [implementations]
 python = "azoth.eos.emulsion_viscosity"

@@ -21,6 +21,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/fire/JetFireModel.java"
 edition = "Its `totalRadiativePowerW`, `transmissivity`, `incidentHeatFlux` and `distanceToFlux`."
+
+[source.neqsim]
+class = "JetFireModel"
+members = ["JetFireModel.totalRadiativePowerW"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "api521_point_source_wayne_transmissivity"
 initialisation = "inverse_square_first_guess"
@@ -105,6 +111,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class throws IllegalArgumentException for a non-positive target"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim JetFireModel.totalRadiativePowerW"
+
+[provenance.algorithm.convergence]
+source = "NeqSim JetFireModel.totalRadiativePowerW"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim JetFireModel.totalRadiativePowerW"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim JetFireModel.totalRadiativePowerW"
+
+[provenance.algorithm.scheme]
+source = "NeqSim JetFireModel.totalRadiativePowerW"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim JetFireModel.totalRadiativePowerW"
+
 [implementations]
 python = "azoth.process.jet_fire"
 rust = "azoth_process::jet_fire"

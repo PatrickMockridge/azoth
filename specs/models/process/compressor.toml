@@ -39,6 +39,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/compressor/Compressor.java"
 edition = "Its no-chart `run`; the fixed-speed chart branch - the reduced head and polytropic efficiency, the kappa ratio and the head's shaft work; the speed-solve mode's Newton; and `CompressorMechanicalDesign.calcDesign`'s API 617 sizing behind `mechanical_design`."
+
+[source.neqsim]
+class = "Compressor"
+members = ["Compressor.mechanical_design"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -466,6 +472,12 @@ parameter = "polytropic_method"
 value = "schultz"
 class = "Compressor"
 capture = "validation/neqsim/captures/process_compressor_polytropic.tsv"
+
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Compressor.mechanical_design"
 
 [implementations]
 python = "azoth.process.compressor"

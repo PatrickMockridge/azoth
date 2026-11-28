@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/pump/PumpDeadheadAnalyzer.java"
 edition = "Its `analyze`: the deadhead pressure, the rating verdict, the shut-off head and the minimum-flow rise."
+
+[source.neqsim]
+class = "PumpDeadheadAnalyzer"
+members = ["PumpDeadheadAnalyzer.analyze"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "centrifugal_pump_deadhead_screen"
 convergence = "absolute"
@@ -134,6 +140,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class refuses a non-positive allowable rise"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PumpDeadheadAnalyzer.analyze"
+
+[provenance.algorithm.convergence]
+source = "NeqSim PumpDeadheadAnalyzer.analyze"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim PumpDeadheadAnalyzer.analyze"
+
+[provenance.algorithm.scheme]
+source = "NeqSim PumpDeadheadAnalyzer.analyze"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim PumpDeadheadAnalyzer.analyze"
+
 [implementations]
 python = "azoth.process.pump_deadhead"
 rust = "azoth_process::pump_deadhead"

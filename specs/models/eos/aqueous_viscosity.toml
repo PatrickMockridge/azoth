@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim physicalproperties/methods/liquidphysicalproperties/viscosity/Viscosity.java"
 edition = "`calcViscosity` and `calcPureComponentViscosity`, ported verbatim; the `Gij` matrix is read as the zero the class leaves it at."
+
+[source.neqsim]
+class = "Viscosity"
+members = ["Viscosity.calcViscosity"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -50,6 +56,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Viscosity.calcViscosity"
+
 [implementations]
 python = "azoth.eos.aqueous_viscosity"
 rust = "azoth_eos::aqueous_viscosity"

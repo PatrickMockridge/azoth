@@ -15,6 +15,12 @@ references = [
 [source]
 standard = "NeqSim process/mechanicaldesign/heatexchanger/FoulingModel.java"
 edition = "`getFoulingResistance` at a time, `calcEbertPanchalFoulingRate`, `calcEbertPanchalResistance`, `calcKernSeatonResistance`, `calcThresholdTemperature`, `calcThresholdVelocity`, `getAsymptoticFoulingResistance`, `predictTimeToFouling` and `advanceTime`, with the three factories' parameter sets."
+
+[source.neqsim]
+class = "FoulingModel"
+members = ["FoulingModel.getFoulingResistance"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.model]
 type = "enum"
@@ -211,6 +217,12 @@ operating_time = 0.0
 fouling_rate = 7.5914481822639434e-6
 reynolds_number = 45720.0
 wall_shear_stress = 4.76675238185679
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim FoulingModel.getFoulingResistance"
+
 [implementations]
 python = "azoth.thermal.fouling_model"
 rust = "azoth_thermal::fouling_model"

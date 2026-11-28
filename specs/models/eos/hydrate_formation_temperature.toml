@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim master `HydrateFormationTemperatureFlash`"
 edition = "The path for a fluid that is not a `SystemPitzer`; the Pitzer route is `eos.pitzer_hydrate_formation_temperature` and `_pressure`. `hydrate_model` selects between the two component models."
+
+[source.neqsim]
+class = "HydrateFormationTemperatureFlash"
+members = ["HydrateFormationTemperatureFlash.hydrate_model"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "hydrate_temperature_bisection"
 initialisation = "linear_scan_for_sign_change"
@@ -79,6 +85,39 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute temperature; the answer cannot be at or below zero kelvin"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim HydrateFormationTemperatureFlash.hydrate_model"
+
+[provenance.algorithm."bracket.lower"]
+source = "NeqSim HydrateFormationTemperatureFlash.hydrate_model"
+
+[provenance.algorithm."bracket.scheme"]
+source = "NeqSim HydrateFormationTemperatureFlash.hydrate_model"
+
+[provenance.algorithm."bracket.steps"]
+source = "NeqSim HydrateFormationTemperatureFlash.hydrate_model"
+
+[provenance.algorithm."bracket.upper"]
+source = "NeqSim HydrateFormationTemperatureFlash.hydrate_model"
+
+[provenance.algorithm.convergence]
+source = "NeqSim HydrateFormationTemperatureFlash.hydrate_model"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim HydrateFormationTemperatureFlash.hydrate_model"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim HydrateFormationTemperatureFlash.hydrate_model"
+
+[provenance.algorithm.scheme]
+source = "NeqSim HydrateFormationTemperatureFlash.hydrate_model"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim HydrateFormationTemperatureFlash.hydrate_model"
+
 [implementations]
 python = "azoth.eos.hydrate_formation_temperature"
 rust = "azoth_eos::hydrate_formation_temperature"

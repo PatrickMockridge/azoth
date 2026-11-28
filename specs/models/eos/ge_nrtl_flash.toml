@@ -22,6 +22,12 @@ references = [
 standard = "NeqSim master `SystemEosGE`"
 edition = "the gamma-phi branch of `TPflash`, `sucsSubsGammaPhi`, whose K update is `phi_i^L / phi_i^V` with `presdiff` one because both phases are at the feed's pressure."
 doi = "10.1016/0378-3812(82)85001-2"
+
+[source.neqsim]
+class = "SystemEosGE"
+members = ["SystemEosGE.sucsSubsGammaPhi"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "successive_substitution_flash"
 initialisation = "wilson"
@@ -100,6 +106,39 @@ description = "successive-substitution steps taken, including the final evaluati
 [outputs.residual]
 unit = "dimensionless"
 description = "`rms_i |ln K_i - ln K_i_previous|` at the last step the loop completed. NaN when no step completed."
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SystemEosGE.sucsSubsGammaPhi"
+
+[provenance.algorithm.convergence]
+source = "NeqSim SystemEosGE.sucsSubsGammaPhi"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim SystemEosGE.sucsSubsGammaPhi"
+
+[provenance.algorithm."inner.convergence"]
+source = "NeqSim SystemEosGE.sucsSubsGammaPhi"
+
+[provenance.algorithm."inner.max_iterations"]
+source = "NeqSim SystemEosGE.sucsSubsGammaPhi"
+
+[provenance.algorithm."inner.scheme"]
+source = "NeqSim SystemEosGE.sucsSubsGammaPhi"
+
+[provenance.algorithm."inner.tolerance"]
+source = "NeqSim SystemEosGE.sucsSubsGammaPhi"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim SystemEosGE.sucsSubsGammaPhi"
+
+[provenance.algorithm.scheme]
+source = "NeqSim SystemEosGE.sucsSubsGammaPhi"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim SystemEosGE.sucsSubsGammaPhi"
+
 [implementations]
 python = "azoth.eos.ge_nrtl_flash"
 rust = "azoth_eos::ge_nrtl_flash"

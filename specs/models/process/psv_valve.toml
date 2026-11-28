@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/depressurization/PsvValveModel.java"
 edition = "Its `update` and `massFlowKgPerS`: the API 520 open/reseat hysteresis, the cycle counter and the choked/subcritical orifice relation."
+
+[source.neqsim]
+class = "PsvValveModel"
+members = ["PsvValveModel.update"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "psv_latch_one_step"
 convergence = "absolute"
@@ -140,6 +146,24 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "a counter cannot be negative"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PsvValveModel.update"
+
+[provenance.algorithm.convergence]
+source = "NeqSim PsvValveModel.update"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim PsvValveModel.update"
+
+[provenance.algorithm.scheme]
+source = "NeqSim PsvValveModel.update"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim PsvValveModel.update"
+
 [implementations]
 python = "azoth.process.psv_valve"
 rust = "azoth_process::psv_valve"
