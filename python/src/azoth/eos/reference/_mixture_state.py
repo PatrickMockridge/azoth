@@ -761,7 +761,13 @@ def _ge_state(
     if reduced.umr is not None:
         _, alpha_mix, b_der, _ = umr_ader(reduced, x)
         return alpha_mix, b_der
-    return _ge_alpha_mix(reduced, x), None
+    alpha = _ge_alpha_mix(reduced, x)
+    if alpha is None:
+        return None, None
+    # **The Huron-Vidal co-volume is linear in composition**, exactly as the Rust kernel's
+    # `ge_state` returns `reduced.b`; returning no derivative refused every Fürst phase
+    # after `phase_state_at` began checking for it.
+    return alpha, list(reduced.b)
 
 
 def _umr_alpha_mix(reduced: ReducedParameters, x: list[float]) -> float | None:

@@ -195,6 +195,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "eos.tp_multiflash" => azoth_eos::results::TpMultiflashResult::FIELDS.to_vec(),
         "eos.tp_multiflash_wax" => azoth_eos::results::TpMultiflashWaxResult::FIELDS.to_vec(),
         "eos.tp_solid_flash" => azoth_eos::results::TpSolidFlashResult::FIELDS.to_vec(),
+        "eos.transient_pipe" => azoth_eos::results::TransientPipeResult::FIELDS.to_vec(),
         "eos.ts_flash" => azoth_eos::results::TsFlashResult::FIELDS.to_vec(),
         "eos.tu_flash" => azoth_eos::results::TuFlashResult::FIELDS.to_vec(),
         "eos.tv_flash" => azoth_eos::results::TvFlashResult::FIELDS.to_vec(),

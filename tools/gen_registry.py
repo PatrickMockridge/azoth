@@ -200,6 +200,10 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # through `TestCase::matrix` and compares it row by row against the matrix the
         # operation built, so the specification is what constrains it either way.
         "a_matrix",
+        # `transient_pipe`'s pressure history is a matrix and has no field in `TestCase`.
+        # `crates/azoth-eos/tests/transient_pipe.rs` reads it through `TestCase::matrix`
+        # and `python/tests/models/test_transient_pipe.py` compares both backends to it.
+        "pressure_history",
         # `throttling_valve`'s two flags, which are booleans and have no slot in `TestCase`.
         # `crates/azoth-process/src/valve.rs`'s tests assert them against the capture, and
         # `test_cross_impl` compares them on both results.

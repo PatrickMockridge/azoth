@@ -4401,6 +4401,60 @@ pub fn tp_multiflash(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// Transient drift-flux pipeline march.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, inlet_z, inlet_mass_flow, inlet_p, inlet_t, length, diameter, number_of_sections, roughness, inlet_boundary, outlet_boundary, elevation_profile, inclination_profile, outlet_pressure, max_simulation_time, cfl, thermodynamic_update_interval, eos))]
+#[pyo3(
+    text_signature = "(components, inlet_z, inlet_mass_flow, inlet_p, inlet_t, length, diameter, number_of_sections, roughness, inlet_boundary, outlet_boundary, elevation_profile, inclination_profile, outlet_pressure, max_simulation_time, cfl, thermodynamic_update_interval, eos)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn transient_pipe(
+    py: Python<'_>,
+    components: Vec<String>,
+    inlet_z: Vec<f64>,
+    inlet_mass_flow: f64,
+    inlet_p: f64,
+    inlet_t: f64,
+    length: f64,
+    diameter: f64,
+    number_of_sections: usize,
+    roughness: f64,
+    inlet_boundary: &str,
+    outlet_boundary: &str,
+    elevation_profile: Option<Vec<f64>>,
+    inclination_profile: Option<Vec<f64>>,
+    outlet_pressure: Option<f64>,
+    max_simulation_time: Option<f64>,
+    cfl: Option<f64>,
+    thermodynamic_update_interval: Option<usize>,
+    eos: Option<&str>,
+) -> PyResult<crate::transport_gen::PyTransientPipeResult> {
+    azoth_eos::transient_pipe::transient_pipe(
+        &components,
+        &inlet_z,
+        kilograms_per_second(inlet_mass_flow),
+        pascals(inlet_p),
+        kelvins(inlet_t),
+        meters(length),
+        meters(diameter),
+        number_of_sections,
+        meters(roughness),
+        inlet_boundary,
+        outlet_boundary,
+        elevation_profile.as_deref(),
+        inclination_profile.as_deref(),
+        outlet_pressure.map(pascals),
+        max_simulation_time.map(seconds),
+        cfl,
+        thermodynamic_update_interval,
+        eos,
+    )
+    .map(|r| crate::transport_gen::PyTransientPipeResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Temperature-entropy flash.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

@@ -281,6 +281,7 @@ Five sections, and the difference between them is the point:
 - [`eos.tp_multiflash`](./eos/tp_multiflash.md) — Multiphase flash at fixed temperature and pressure
 - [`eos.tp_multiflash_wax`](./eos/tp_multiflash_wax.md) — Wax multiphase flash at fixed temperature and pressure
 - [`eos.tp_solid_flash`](./eos/tp_solid_flash.md) — Solid flash at fixed temperature and pressure
+- [`eos.transient_pipe`](./eos/transient_pipe.md) — Transient drift-flux pipeline march
 - [`eos.ts_flash`](./eos/ts_flash.md) — Temperature-entropy flash
 - [`eos.tu_flash`](./eos/tu_flash.md) — Temperature-internal-energy flash
 - [`eos.tv_flash`](./eos/tv_flash.md) — Temperature-volume flash

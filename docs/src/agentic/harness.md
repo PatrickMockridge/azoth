@@ -264,7 +264,7 @@ It writes JSON on stdout and diagnostics on stderr, in one of four envelopes (co
 elided):
 
 ```json
-{"schema":"azoth.harness/1","kind":"catalogue","total":401,"offset":0,"limit":100,"items":[…]}
+{"schema":"azoth.harness/1","kind":"catalogue","total":402,"offset":0,"limit":100,"items":[…]}
 {"schema":"azoth.harness/1","kind":"review","verdict":"refused","targets":[…],
  "register":[…],"requests":[…]}
 {"schema":"azoth.harness/1","kind":"result","id":"hydraulics.reynolds_number",

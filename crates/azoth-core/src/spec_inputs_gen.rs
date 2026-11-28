@@ -176,6 +176,7 @@
 //!   - specs/models/eos/tp_multiflash.toml
 //!   - specs/models/eos/tp_multiflash_wax.toml
 //!   - specs/models/eos/tp_solid_flash.toml
+//!   - specs/models/eos/transient_pipe.toml
 //!   - specs/models/eos/ts_flash.toml
 //!   - specs/models/eos/tu_flash.toml
 //!   - specs/models/eos/tv_flash.toml
@@ -2283,6 +2284,24 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("eos.tp_solid_flash", "T", "thermodynamic_temperature"),
     ("eos.tp_solid_flash", "P", "pressure"),
     ("eos.tp_solid_flash", "z", "dimensionless"),
+    ("eos.transient_pipe", "inlet_z", "dimensionless"),
+    ("eos.transient_pipe", "inlet_mass_flow", "mass_rate"),
+    ("eos.transient_pipe", "inlet_p", "pressure"),
+    ("eos.transient_pipe", "inlet_t", "thermodynamic_temperature"),
+    ("eos.transient_pipe", "length", "length"),
+    ("eos.transient_pipe", "diameter", "length"),
+    ("eos.transient_pipe", "number_of_sections", "dimensionless"),
+    ("eos.transient_pipe", "roughness", "length"),
+    ("eos.transient_pipe", "elevation_profile", "length"),
+    ("eos.transient_pipe", "inclination_profile", "dimensionless"),
+    ("eos.transient_pipe", "outlet_pressure", "pressure"),
+    ("eos.transient_pipe", "max_simulation_time", "time"),
+    ("eos.transient_pipe", "cfl", "dimensionless"),
+    (
+        "eos.transient_pipe",
+        "thermodynamic_update_interval",
+        "dimensionless",
+    ),
     ("eos.ts_flash", "T", "thermodynamic_temperature"),
     ("eos.ts_flash", "S", "molar_heat_capacity"),
     ("eos.ts_flash", "z", "dimensionless"),

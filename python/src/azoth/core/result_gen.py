@@ -4485,6 +4485,43 @@ class TpSolidFlashResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class TransientPipeResult(_HasWarnings):
+    """Result of ``eos.transient_pipe``."""
+
+    CALC_ID: ClassVar[str] = "eos.transient_pipe"
+
+    #: each cell's final pressure, `getPressureProfile`.
+    pressure_profile: tuple[Q, ...]
+
+    #: each cell's final temperature, `getTemperatureProfile`; the held inlet temperature.
+    temperature_profile: tuple[Q, ...]
+
+    #: each cell's final liquid holdup, `getLiquidHoldupProfile`.
+    liquid_holdup_profile: tuple[float, ...]
+
+    #: each cell's final gas velocity, `getGasVelocityProfile`.
+    gas_velocity_profile: tuple[Q, ...]
+
+    #: each cell's final liquid velocity, `getLiquidVelocityProfile`.
+    liquid_velocity_profile: tuple[Q, ...]
+
+    #: `getPressureHistory`: the allocated matrix, the initial row first, a row every ten steps while the allocation lasts, and zero in the rows never written.
+    pressure_history: tuple[tuple[Q, ...], ...]
+
+    #: `getSimulationTime`: the last step's accumulated time, which may pass `max_simulation_time` by one step.
+    simulation_time: Q
+
+    #: `getTotalTimeSteps`: the adaptive steps the march took.
+    total_time_steps: int
+
+    #: `getMassResidual`: the class's name for the summed mixture mass, not a residual.
+    mass_inventory: Q
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class TsFlashResult(_HasWarnings):
     """Result of ``eos.ts_flash``."""
 

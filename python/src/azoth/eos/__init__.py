@@ -226,6 +226,7 @@ from azoth.core.result import (
     TpMultiflashResult,
     TpMultiflashWaxResult,
     TpSolidFlashResult,
+    TransientPipeResult,
     TsFlashResult,
     TuFlashResult,
     TvFlashResult,
@@ -397,6 +398,7 @@ __all__ = [
     "tp_multiflash",
     "tp_multiflash_wax",
     "tp_solid_flash",
+    "transient_pipe",
     "ts_flash",
     "tu_flash",
     "tv_flash",
@@ -803,6 +805,71 @@ def pipe_beggs_and_brills(
         elevation=elevation,
         number_of_increments=number_of_increments,
         roughness=roughness,
+        eos=eos,
+    )
+
+
+def transient_pipe(
+    components: list[str],
+    inlet_z: list[float],
+    inlet_mass_flow: Q,
+    inlet_p: Q,
+    inlet_t: Q,
+    length: Q,
+    diameter: Q,
+    number_of_sections: int,
+    roughness: Q,
+    inlet_boundary: str,
+    outlet_boundary: str,
+    elevation_profile: list[float] | None = None,
+    inclination_profile: list[float] | None = None,
+    outlet_pressure: Q | None = None,
+    max_simulation_time: Q | None = None,
+    cfl: float | None = None,
+    thermodynamic_update_interval: int | None = None,
+    eos: str | None = None,
+) -> TransientPipeResult:
+    """NeqSim ``TransientPipe.run``: the isothermal drift-flux pipeline march.
+
+    The line is divided into cells; each carries gas and liquid mass, mixture momentum
+    and mixture energy. The march uses the class's face split, an adaptive CFL step, a
+    drift-flux phase-velocity split and an acoustic pressure update, with a TP flash of
+    every cell every ``thermodynamic_update_interval`` steps.
+
+    Args:
+        inlet_mass_flow: the inlet stream's mass flow, which initialises the state.
+        inlet_boundary: ``constant_flow``, ``constant_pressure`` or ``closed``.
+        outlet_boundary: ``constant_pressure``, ``constant_flow`` or ``closed``.
+        elevation_profile: each cell's elevation; absent is flat.
+        max_simulation_time: the march's end; absent is the class's 3600 s.
+        cfl: the CFL number; absent is 0.5.
+        eos: ``srk`` (the default) or ``pr``.
+
+    Raises:
+        OutOfRangeError: if an input is outside the spec's hard range.
+        InvalidInputError: for a three-phase flash, a low-point or riser-base elevation
+            profile, a boundary outside the three, or a profile of the wrong length.
+
+    See :func:`azoth.eos.reference.transient_pipe`.
+    """
+    return resolve("eos.transient_pipe")(  # type: ignore[no-any-return]
+        components=components,
+        inlet_z=inlet_z,
+        inlet_mass_flow=inlet_mass_flow,
+        inlet_p=inlet_p,
+        inlet_t=inlet_t,
+        length=length,
+        diameter=diameter,
+        number_of_sections=number_of_sections,
+        roughness=roughness,
+        inlet_boundary=inlet_boundary,
+        outlet_boundary=outlet_boundary,
+        elevation_profile=elevation_profile,
+        inclination_profile=inclination_profile,
+        outlet_pressure=outlet_pressure,
+        max_simulation_time=max_simulation_time,
+        cfl=cfl,
+        thermodynamic_update_interval=thermodynamic_update_interval,
         eos=eos,
     )
 

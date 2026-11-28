@@ -179,6 +179,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`eos.tp_multiflash`](./tp_multiflash.md) | `multiphase_fraction_newton` | NeqSim master `TPmultiflash` |
 | [`eos.tp_multiflash_wax`](./tp_multiflash_wax.md) | `multiphase_fraction_newton` | NeqSim master `TPmultiflashWAX` |
 | [`eos.tp_solid_flash`](./tp_solid_flash.md) | `solid_fraction_newton` | NeqSim master `SolidFlash` |
+| [`eos.transient_pipe`](./transient_pipe.md) | `direct composition` | NeqSim master `TransientPipe` |
 | [`eos.ts_flash`](./ts_flash.md) | `ts_flash_inverse_pressure_newton` | Standard thermodynamics, as in Michelsen & Mollerup |
 | [`eos.tu_flash`](./tu_flash.md) | `tu_flash_inverse_pressure_newton` | Standard thermodynamics, as in Michelsen & Mollerup |
 | [`eos.tv_flash`](./tv_flash.md) | `tv_flash_inverse_pressure_newton` | Standard thermodynamics, as in Michelsen & Mollerup |

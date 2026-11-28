@@ -4298,6 +4298,19 @@ class TpSolidFlashResult:
     warnings: list[Warning]
 
 @final
+class TransientPipeResult:
+    pressure_profile: list[Qty]
+    temperature_profile: list[Qty]
+    liquid_holdup_profile: list[float]
+    gas_velocity_profile: list[Qty]
+    liquid_velocity_profile: list[Qty]
+    pressure_history: list[list[Qty]]
+    simulation_time: Qty
+    total_time_steps: int
+    mass_inventory: Qty
+    warnings: list[Warning]
+
+@final
 class TsFlashResult:
     P: Qty
     vapour_fraction: float | None
@@ -9105,6 +9118,26 @@ def tp_solid_flash(
     z: list[float],
     eos: str | None = None,
 ) -> TpSolidFlashResult: ...
+def transient_pipe(
+    components: list[str],
+    inlet_z: list[float],
+    inlet_mass_flow: float,
+    inlet_p: float,
+    inlet_t: float,
+    length: float,
+    diameter: float,
+    number_of_sections: float,
+    roughness: float,
+    inlet_boundary: str,
+    outlet_boundary: str,
+    elevation_profile: list[float] | None = None,
+    inclination_profile: list[float] | None = None,
+    outlet_pressure: float | None = None,
+    max_simulation_time: float | None = None,
+    cfl: float | None = None,
+    thermodynamic_update_interval: float | None = None,
+    eos: str | None = None,
+) -> TransientPipeResult: ...
 def ts_flash(
     Tc: list[float],
     Pc: list[float],
