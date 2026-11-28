@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim master `TbpClosure.RIAZI_DAUBERT_1980.calcDensity`"
 edition = "The one member of four that can be inverted for specific gravity. The other three are refused by name below, which is what `supportsDensityFromMolarMass` reports and what the probe measures."
+
+[source.neqsim]
+class = "TbpClosure"
+members = ["TbpClosure.RIAZI_DAUBERT_1980.calcDensity"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [[unported]]
 parameter = "closure"
 value = "riazi_daubert_1987"
@@ -59,6 +65,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the correlation divides by it, so zero has no answer and below it the density has no meaning\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TbpClosure.RIAZI_DAUBERT_1980.calcDensity"
+
 [implementations]
 python = "azoth.characterization.tbp_density"
 rust = "azoth_characterization::tbp_density"

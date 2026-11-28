@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/release/IdealGasFannoPipeReleaseModel.java"
 edition = "Its `calculate`: the one-gas-phase check, the Fanno function and its two bisections, the `1/M` stagnation-pressure ratio, the stations and the mass-flux closure."
+
+[source.neqsim]
+class = "IdealGasFannoPipeReleaseModel"
+members = ["IdealGasFannoPipeReleaseModel.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "ideal_gas_fanno_pipe"
 initialisation = "stated_inlet_state"
@@ -203,6 +209,27 @@ max = 1
 max_inclusive = true
 severity = "error"
 rationale = "the request refuses a friction factor outside [0, 1]"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim IdealGasFannoPipeReleaseModel.calculate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim IdealGasFannoPipeReleaseModel.calculate"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim IdealGasFannoPipeReleaseModel.calculate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim IdealGasFannoPipeReleaseModel.calculate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim IdealGasFannoPipeReleaseModel.calculate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim IdealGasFannoPipeReleaseModel.calculate"
+
 [implementations]
 python = "azoth.process.ideal_gas_fanno_release"
 rust = "azoth_process::ideal_gas_fanno_release"

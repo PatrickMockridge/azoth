@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/distillation/RateBasedPackedColumn.java"
 edition = "`solveFixedPointProfile`, `calculateSegment`, `calculateTransportSnapshot`, `calculateInterfaceEquilibrium`, `applyInterphaseHeatTransfer` and the ten `DEFAULT_*` constants, ported verbatim, with the two solvers this spec's rows refuse named by the enums they belong to."
+
+[source.neqsim]
+class = "RateBasedPackedColumn"
+members = ["RateBasedPackedColumn.solveFixedPointProfile"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "counter_current_fixed_point_profile"
 initialisation = "uniform_liquid_profile"
@@ -341,6 +347,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "likewise\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim RateBasedPackedColumn.solveFixedPointProfile"
+
+[provenance.algorithm.convergence]
+source = "NeqSim RateBasedPackedColumn.solveFixedPointProfile"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim RateBasedPackedColumn.solveFixedPointProfile"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim RateBasedPackedColumn.solveFixedPointProfile"
+
+[provenance.algorithm.scheme]
+source = "NeqSim RateBasedPackedColumn.solveFixedPointProfile"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim RateBasedPackedColumn.solveFixedPointProfile"
+
 [implementations]
 python = "azoth.process.rate_based_packed_column"
 rust = "azoth_process::rate_based_packed_column"

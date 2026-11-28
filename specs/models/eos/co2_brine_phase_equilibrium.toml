@@ -21,6 +21,12 @@ references = [
 [source]
 standard = "NeqSim master `CO2BrinePhaseEquilibrium`"
 edition = "Its `run`: the single-aqueous reference, the two normalised tangent-plane trials, the ion-confined split with its constrained Rachford-Rice bisection, the Gibbs comparison between the roots, and `verify`'s four checks."
+
+[source.neqsim]
+class = "CO2BrinePhaseEquilibrium"
+members = ["CO2BrinePhaseEquilibrium.verify"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "normalized_tangent_plane_with_ion_confined_split"
 convergence = "absolute"
@@ -89,6 +95,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim CO2BrinePhaseEquilibrium.verify"
+
+[provenance.algorithm.convergence]
+source = "NeqSim CO2BrinePhaseEquilibrium.verify"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim CO2BrinePhaseEquilibrium.verify"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim CO2BrinePhaseEquilibrium.verify"
+
+[provenance.algorithm.scheme]
+source = "NeqSim CO2BrinePhaseEquilibrium.verify"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim CO2BrinePhaseEquilibrium.verify"
+
 [implementations]
 python = "azoth.eos.co2_brine_phase_equilibrium"
 rust = "azoth_eos::co2_brine_phase_equilibrium"

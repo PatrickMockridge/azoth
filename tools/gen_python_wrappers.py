@@ -323,11 +323,7 @@ BUILDER_TYPES = {
 
 #: The binding's mixture builders, tried in order. A kernel takes the expansion one of them
 #: defines; which one is decided by the emitted arity matching the bridge's call, not guessed.
-BUILDERS = (
-    "build_mixture",
-    "build_mixture_with_mass",
-    "build_mixture_with_mass_and_shift",
-)
+BUILDERS = ("build_mixture", "build_mixture_with_mass")
 
 
 def builder_parameters(name: str = "build_mixture") -> list[tuple[str, str, str]]:

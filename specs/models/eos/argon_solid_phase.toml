@@ -14,6 +14,12 @@ references = [
 [source]
 standard = "Maltby, V.; Hammer, M.; Wilhelmsen, O. (2024)"
 edition = "The fundamental Helmholtz equation for solid argon, evaluated in temperature and molar volume and differentiated to second order by forward automatic differentiation."
+
+[source.neqsim]
+class = "ArgonSolidHelmholtzEquation"
+members = ["ArgonSolidHelmholtzEquation"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "bracketed_log_volume_newton"
 initialisation = "zero_pressure_volume"
@@ -65,6 +71,27 @@ max = 16000000000.0
 max_inclusive = true
 severity = "error"
 rationale = "the published equation is stated for pressures to 16 GPa"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ArgonSolidHelmholtzEquation"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ArgonSolidHelmholtzEquation"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim ArgonSolidHelmholtzEquation"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ArgonSolidHelmholtzEquation"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ArgonSolidHelmholtzEquation"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ArgonSolidHelmholtzEquation"
+
 [implementations]
 python = "azoth.eos.argon_solid_phase"
 rust = "azoth_eos::argon_solid_phase"

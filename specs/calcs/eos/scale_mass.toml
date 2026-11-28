@@ -12,6 +12,12 @@ references = [
 [source]
 standard = "NeqSim master `ScaleMassCalculator`"
 edition = "`calcCaCO3Mass`, `calcBaSO4Mass`, `calcSrSO4Mass`, `calcCaSO4Mass` and `calcFeCO3Mass`, ported as one arm per mineral."
+
+[source.neqsim]
+class = "ScaleMassCalculator"
+members = ["ScaleMassCalculator.calcCaCO3Mass"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.mineral]
 type = "enum"
@@ -106,6 +112,12 @@ id = "round_trip_units"
 type = "property"
 property = "unit_round_trip"
 status = "active"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ScaleMassCalculator.calcCaCO3Mass"
+
 [implementations]
 python = "azoth.eos.scale_mass"
 rust = "azoth_eos::scale_mass"

@@ -21,6 +21,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/risk/sis/SILVerificationResult.java"
 edition = "Its `performVerification`, `analyzeArchitecture`, `checkForIssues` and the `VerificationIssue` record."
+
+[source.neqsim]
+class = "SILVerificationResult"
+members = ["SILVerificationResult.performVerification"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_sil_verification"
 convergence = "absolute"
@@ -114,6 +120,24 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "a negative interval is not an interval"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SILVerificationResult.performVerification"
+
+[provenance.algorithm.convergence]
+source = "NeqSim SILVerificationResult.performVerification"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim SILVerificationResult.performVerification"
+
+[provenance.algorithm.scheme]
+source = "NeqSim SILVerificationResult.performVerification"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim SILVerificationResult.performVerification"
+
 [implementations]
 python = "azoth.process.sil_verification"
 rust = "azoth_process::sil_verification"

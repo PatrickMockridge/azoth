@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/release/FiniteRateDriftFluxReleaseModel.java"
 edition = "Its `calculate`: the homogeneous base, the uniform phase-split relaxation, the component and stagnation-energy closures, the drift-flux solve and the closure's rate."
+
+[source.neqsim]
+class = "FiniteRateDriftFluxReleaseModel"
+members = ["FiniteRateDriftFluxReleaseModel.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "finite_rate_relaxation"
 initialisation = "hem_isentropic_pressure_scan"
@@ -200,6 +206,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class refuses a non-positive residence time"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim FiniteRateDriftFluxReleaseModel.calculate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim FiniteRateDriftFluxReleaseModel.calculate"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim FiniteRateDriftFluxReleaseModel.calculate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim FiniteRateDriftFluxReleaseModel.calculate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim FiniteRateDriftFluxReleaseModel.calculate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim FiniteRateDriftFluxReleaseModel.calculate"
+
 [implementations]
 python = "azoth.process.finite_rate_release"
 rust = "azoth_process::finite_rate_release"

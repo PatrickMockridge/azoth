@@ -15,6 +15,12 @@ references = [
 [source]
 standard = "NeqSim process/mechanicaldesign/heatexchanger/TwoPhasePressureDrop.java"
 edition = "`calcFriedelGradient`, `calcFriedelPressureDrop`, `calcFriedelAveragePressureDrop`, `calcMullerSteinhagenHeckGradient`, `calcGravitationalGradient` and `calcAccelerationPressureDrop`, with `calcFanningFriction` and `calcMomentumFlux` as their leaves."
+
+[source.neqsim]
+class = "TwoPhasePressureDrop"
+members = ["TwoPhasePressureDrop.calcFriedelGradient"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.mass_flux]
 unit = "kg/(m**2*s)"
@@ -142,6 +148,12 @@ friedel_average_pressure_drop = 3170.093601996102
 muller_steinhagen_heck_gradient = 526.3980843101883
 gravitational_gradient = 941.8239194720564
 acceleration_pressure_drop = 1374.35329863377
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TwoPhasePressureDrop.calcFriedelGradient"
+
 [implementations]
 python = "azoth.thermal.two_phase_pressure_drop"
 rust = "azoth_thermal::two_phase_pressure_drop"

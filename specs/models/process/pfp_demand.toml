@@ -24,6 +24,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/fire/PfpDemandCalculator.java"
 edition = "Its `steelMassPerAreaKgPerM2`, `bareSteelTimeToCriticalS`, `evaluate`, the `PfpRating` mapping and the `PfpDemandResult` getters."
+
+[source.neqsim]
+class = "PfpDemandCalculator"
+members = ["PfpDemandCalculator.steelMassPerAreaKgPerM2"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_steel_time_to_critical"
 convergence = "absolute"
@@ -136,6 +142,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class's setter refuses a non-positive conductivity"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PfpDemandCalculator.steelMassPerAreaKgPerM2"
+
+[provenance.algorithm.convergence]
+source = "NeqSim PfpDemandCalculator.steelMassPerAreaKgPerM2"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim PfpDemandCalculator.steelMassPerAreaKgPerM2"
+
+[provenance.algorithm.scheme]
+source = "NeqSim PfpDemandCalculator.steelMassPerAreaKgPerM2"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim PfpDemandCalculator.steelMassPerAreaKgPerM2"
+
 [implementations]
 python = "azoth.process.pfp_demand"
 rust = "azoth_process::pfp_demand"

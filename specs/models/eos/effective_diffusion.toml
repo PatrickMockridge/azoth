@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim master `Diffusivity`"
 edition = "`calcEffectiveDiffusionCoefficients`, the same eight lines in `commonphasephysicalproperties/diffusivity/Diffusivity` and in `liquidphysicalproperties/diffusivity/Diffusivity`."
+
+[source.neqsim]
+class = "Diffusivity"
+members = ["Diffusivity.calcEffectiveDiffusionCoefficients"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.binary_diffusion]
 type = "matrix"
@@ -40,6 +46,12 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "a mole fraction cannot be negative; the class does not check it, and a negative one silently subtracts from a sum\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Diffusivity.calcEffectiveDiffusionCoefficients"
+
 [implementations]
 python = "azoth.eos.effective_diffusion"
 rust = "azoth_eos::effective_diffusion"

@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim master `FrictionTheoryConductivityMethod`"
 edition = "`calcConductivity` and `initPureComponentProperties`, ported; the viscosity the class reads from the phase is an input here."
+
+[source.neqsim]
+class = "FrictionTheoryConductivityMethod"
+members = ["FrictionTheoryConductivityMethod.calcConductivity"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.cv0]
 type = "vector"
@@ -104,6 +110,12 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "A mole fraction cannot be negative.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim FrictionTheoryConductivityMethod.calcConductivity"
+
 [implementations]
 python = "azoth.eos.friction_theory_conductivity"
 rust = "azoth_eos::friction_theory_conductivity"

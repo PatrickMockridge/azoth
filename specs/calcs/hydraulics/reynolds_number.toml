@@ -8,6 +8,12 @@ references = ["Reynolds, O. (1883). \"An experimental investigation of the circu
 [source]
 standard = "Crane TP-410"
 edition = "2013"
+
+[source.neqsim]
+class = "AdiabaticPipe"
+members = ["AdiabaticPipe.getReynoldsNumber"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.rho]
 unit = "kg/m**3"
@@ -73,6 +79,12 @@ D = 0.1
 mu = 0.001002
 [worked_example.expected]
 re = 149401.19760479042
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim AdiabaticPipe.getReynoldsNumber"
+
 [implementations]
 python = "azoth.hydraulics.reynolds_number"
 rust = "azoth_hydraulics::reynolds_number"

@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/risk/eta/EventTreeAnalyzer.java"
 edition = "Its `addBranch` and `evaluate`: the full `2^n` enumeration in bit order, the path spelling and the product."
+
+[source.neqsim]
+class = "EventTreeAnalyzer"
+members = ["EventTreeAnalyzer.addBranch"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "full_binary_enumeration"
 initialisation = "leaf_index_zero"
@@ -58,6 +64,27 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "the class's constructor refuses a negative frequency"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim EventTreeAnalyzer.addBranch"
+
+[provenance.algorithm.convergence]
+source = "NeqSim EventTreeAnalyzer.addBranch"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim EventTreeAnalyzer.addBranch"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim EventTreeAnalyzer.addBranch"
+
+[provenance.algorithm.scheme]
+source = "NeqSim EventTreeAnalyzer.addBranch"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim EventTreeAnalyzer.addBranch"
+
 [implementations]
 python = "azoth.process.event_tree"
 rust = "azoth_process::event_tree"

@@ -23,6 +23,12 @@ references = [
 [source]
 standard = "NeqSim process/costestimation/CostEstimationCalculator.java"
 edition = "Its factor tables and correlation methods, `calcBareModuleCost`, `calcTotalModuleCost`, `calcGrassRootsCost`, `calcInstallationManHours`, `calcPipingInstallationManHours`, `generateVesselBOM` and `calculateCostEstimate`."
+
+[source.neqsim]
+class = "CostEstimationCalculator"
+members = ["CostEstimationCalculator.calcBareModuleCost"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "cost_correlation_dispatch"
 initialisation = "first_query_in_caller_order"
@@ -248,6 +254,27 @@ description = "the line's USD cost.\n"
 [outputs.bom.fields.source]
 type = "string"
 description = "the line's source, or the empty string.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim CostEstimationCalculator.calcBareModuleCost"
+
+[provenance.algorithm.convergence]
+source = "NeqSim CostEstimationCalculator.calcBareModuleCost"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim CostEstimationCalculator.calcBareModuleCost"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim CostEstimationCalculator.calcBareModuleCost"
+
+[provenance.algorithm.scheme]
+source = "NeqSim CostEstimationCalculator.calcBareModuleCost"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim CostEstimationCalculator.calcBareModuleCost"
+
 [implementations]
 python = "azoth.process.cost_estimation"
 rust = "azoth_process::cost_estimation"

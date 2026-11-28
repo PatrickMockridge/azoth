@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim pvtsimulation/reservoirproperties/materialbalance/FetkovichAquifer.java"
 edition = "The exact prescribed-pressure march, the within-interval extrema, the infinite-capacity and zero-capacity branches and the finite-inventory refusal."
+
+[source.neqsim]
+class = "FetkovichAquifer"
+members = ["FetkovichAquifer"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "fetkovich_exact_ramp_march"
 initialisation = "stated_initial_pressure_and_zero_influx"
@@ -77,6 +83,27 @@ description = "the smallest cumulative influx reached inside the interval.\n"
 [outputs.states.fields.interval_maximum_cumulative_influx]
 unit = "m**3"
 description = "the largest cumulative influx reached inside the interval.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim FetkovichAquifer"
+
+[provenance.algorithm.convergence]
+source = "NeqSim FetkovichAquifer"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim FetkovichAquifer"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim FetkovichAquifer"
+
+[provenance.algorithm.scheme]
+source = "NeqSim FetkovichAquifer"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim FetkovichAquifer"
+
 [implementations]
 python = "azoth.pvt.fetkovich_aquifer"
 rust = "azoth_pvt::fetkovich_aquifer"

@@ -29,6 +29,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/reactor/PlugFlowReactor.java"
 edition = "Its steady-state `run`: `ensureProductComponentsExist`, a `TPflash`, then `numberOfSteps` fixed steps over `[F1..Fn, T, P]`, flows clamped at zero and pressure at 0.1 bar after each, temperature overridden when isothermal, properties re-flashed every `propertyUpdateFrequency` steps."
+
+[source.neqsim]
+class = "PlugFlowReactor"
+members = ["PlugFlowReactor.ensureProductComponentsExist"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -232,6 +238,12 @@ max = 1
 max_inclusive = true
 severity = "error"
 rationale = "an activity factor scales a rate by a fraction of it\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PlugFlowReactor.ensureProductComponentsExist"
+
 [implementations]
 python = "azoth.process.plug_flow_reactor"
 rust = "azoth_process::plug_flow_reactor"

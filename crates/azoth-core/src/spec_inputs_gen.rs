@@ -130,10 +130,8 @@
 //!   - specs/calcs/eos/pr_peneloux_shift.toml
 //!   - specs/calcs/eos/pr_z_factor.toml
 //!   - specs/models/eos/production_chemical_scale_scenario.toml
-//!   - specs/calcs/eos/prsv_kappa.toml
 //!   - specs/models/eos/ps_flash.toml
 //!   - specs/models/eos/pt_flash.toml
-//!   - specs/models/eos/pt_flash_check.toml
 //!   - specs/models/eos/pt_phase_envelope.toml
 //!   - specs/models/eos/pu_flash.toml
 //!   - specs/models/eos/pure_saturation.toml
@@ -169,7 +167,6 @@
 //!   - specs/calcs/eos/srk_peneloux_shift.toml
 //!   - specs/calcs/eos/srk_z_factor.toml
 //!   - specs/models/eos/stability_test.toml
-//!   - specs/models/eos/state_at_tp.toml
 //!   - specs/models/eos/stream_scale_analyzer.toml
 //!   - specs/models/eos/surf_cooldown.toml
 //!   - specs/calcs/eos/tbp_fraction_properties.toml
@@ -1913,19 +1910,12 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "pitzer_ionic_strength_molal",
         "molality",
     ),
-    ("eos.prsv_kappa", "omega", "dimensionless"),
-    ("eos.prsv_kappa", "Tr", "dimensionless"),
-    ("eos.prsv_kappa", "kappa1", "dimensionless"),
     ("eos.ps_flash", "P", "pressure"),
     ("eos.ps_flash", "S", "molar_heat_capacity"),
     ("eos.ps_flash", "z", "dimensionless"),
     ("eos.pt_flash", "T", "thermodynamic_temperature"),
     ("eos.pt_flash", "P", "pressure"),
     ("eos.pt_flash", "z", "dimensionless"),
-    ("eos.pt_flash_check", "T", "thermodynamic_temperature"),
-    ("eos.pt_flash_check", "P", "pressure"),
-    ("eos.pt_flash_check", "z", "dimensionless"),
-    ("eos.pt_flash_check", "tolerance", "dimensionless"),
     ("eos.pt_phase_envelope", "P", "pressure"),
     ("eos.pt_phase_envelope", "z", "dimensionless"),
     ("eos.pu_flash", "P", "pressure"),
@@ -2204,10 +2194,6 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("eos.stability_test", "T", "thermodynamic_temperature"),
     ("eos.stability_test", "P", "pressure"),
     ("eos.stability_test", "z", "dimensionless"),
-    ("eos.state_at_tp", "T", "thermodynamic_temperature"),
-    ("eos.state_at_tp", "P", "pressure"),
-    ("eos.state_at_tp", "z", "dimensionless"),
-    ("eos.state_at_tp", "tolerance", "dimensionless"),
     ("eos.stream_scale_analyzer", "calcium", "mass_density"),
     ("eos.stream_scale_analyzer", "barium", "mass_density"),
     ("eos.stream_scale_analyzer", "strontium", "mass_density"),

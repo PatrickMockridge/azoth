@@ -32,6 +32,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/dispersion/GasDispersionAnalyzer.java"
 edition = "Its `analyze`: the ambient flash, the gas-phase fuel data, the model selection, the flammable and toxic endpoints with both arms, and the two cloud-volume estimates."
+
+[source.neqsim]
+class = "GasDispersionAnalyzer"
+members = ["GasDispersionAnalyzer.analyze"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "pasquill_gifford_or_britter_mcquaid_screening"
 initialisation = "ambient_tp_flash"
@@ -200,6 +206,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "a stated zero or negative limit is ignored by the class; the port refuses what it would silently discard"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim GasDispersionAnalyzer.analyze"
+
+[provenance.algorithm.convergence]
+source = "NeqSim GasDispersionAnalyzer.analyze"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim GasDispersionAnalyzer.analyze"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim GasDispersionAnalyzer.analyze"
+
+[provenance.algorithm.scheme]
+source = "NeqSim GasDispersionAnalyzer.analyze"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim GasDispersionAnalyzer.analyze"
+
 [implementations]
 python = "azoth.process.gas_dispersion"
 rust = "azoth_process::gas_dispersion"

@@ -23,6 +23,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/expander/TurboExpanderCompressor.java"
 edition = "Its `run`: the expander's isentropic head at the stated outlet, the velocity-ratio or 2-D-map efficiency, the Q/N-scaled compressor head and efficiency, the damped Newton on shaft speed, and the two outlet replays."
+
+[source.neqsim]
+class = "TurboExpanderCompressor"
+members = ["TurboExpanderCompressor"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.expander_components]
 type = "components"
@@ -480,6 +486,12 @@ max = 1
 max_inclusive = true
 severity = "error"
 rationale = "an efficiency is a fraction"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TurboExpanderCompressor"
+
 [implementations]
 python = "azoth.process.turbo_expander_compressor"
 rust = "azoth_process::turbo_expander_compressor"

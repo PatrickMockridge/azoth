@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/manifold/Manifold.java"
 edition = "Its `run`: the low-flow filter, `localmixer.run()`, the splitter re-attached to the mixture, and `localsplitter.run()`."
+
+[source.neqsim]
+class = "Manifold"
+members = ["Manifold"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -85,6 +91,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute temperature"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Manifold"
+
 [implementations]
 python = "azoth.process.manifold"
 rust = "azoth_process::manifold"

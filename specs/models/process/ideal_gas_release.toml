@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/release/IdealGasReleaseModel.java"
 edition = "Its `calculate`: the one-gas-phase check, the critical ratio, the isentropic stations, the choked test and the sound speed."
+
+[source.neqsim]
+class = "IdealGasReleaseModel"
+members = ["IdealGasReleaseModel.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "ideal_gas_isentropic_orifice"
 convergence = "absolute"
@@ -170,6 +176,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim IdealGasReleaseModel.calculate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim IdealGasReleaseModel.calculate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim IdealGasReleaseModel.calculate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim IdealGasReleaseModel.calculate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim IdealGasReleaseModel.calculate"
+
 [implementations]
 python = "azoth.process.ideal_gas_release"
 rust = "azoth_process::ideal_gas_release"

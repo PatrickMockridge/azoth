@@ -15,6 +15,12 @@ references = [
 standard = "Wilke, C. R. (1950); Chung et al. (1988)"
 edition = "Wilke's mixing rule is Wilke, J. Chem. Phys. 18(4), 517-519; the pure-component viscosity it mixes is Chung et al., Ind. Eng. Chem. Res. 27(4), 671-679."
 doi = "10.1063/1.1747673"
+
+[source.neqsim]
+class = "Phase"
+members = ["Phase.calcViscosity"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.Tc]
 type = "vector"
@@ -73,6 +79,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "`V` is the divisor in `y = Vc/(6*V)` inside the pure-component viscosity; a molar volume must be positive.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Phase.calcViscosity"
+
 [implementations]
 python = "azoth.eos.wilke_viscosity"
 rust = "azoth_eos::wilke_viscosity"

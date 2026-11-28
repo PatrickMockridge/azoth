@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/api14c/Api14cSafeChartBuilder.java"
 edition = "Its `classify`, `build`, `buildAssumingComplete` and the `Api14cSafetyAnalysisTable` table."
+
+[source.neqsim]
+class = "Api14cSafeChartBuilder"
+members = ["Api14cSafeChartBuilder.classify"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "api14c_safe_chart"
 convergence = "absolute"
@@ -93,6 +99,24 @@ description = "the total number of missing devices across the chart.\n"
 [outputs.complete]
 type = "boolean"
 description = "whether every chart row is complete; true for an empty chart.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Api14cSafeChartBuilder.classify"
+
+[provenance.algorithm.convergence]
+source = "NeqSim Api14cSafeChartBuilder.classify"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim Api14cSafeChartBuilder.classify"
+
+[provenance.algorithm.scheme]
+source = "NeqSim Api14cSafeChartBuilder.classify"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim Api14cSafeChartBuilder.classify"
+
 [implementations]
 python = "azoth.process.api14c_safe_chart"
 rust = "azoth_process::api14c_safe_chart"

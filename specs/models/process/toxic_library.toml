@@ -23,6 +23,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/dispersion/ToxicLibrary.java"
 edition = "Its `get` over the static threshold map and `ppmToKgPerM3`."
+
+[source.neqsim]
+class = "ToxicLibrary"
+members = ["ToxicLibrary.ppmToKgPerM3"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "toxic_threshold_lookup_and_ppm_conversion"
 convergence = "absolute"
@@ -98,6 +104,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class scales by the pressure, and zero is not a gas state"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ToxicLibrary.ppmToKgPerM3"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ToxicLibrary.ppmToKgPerM3"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ToxicLibrary.ppmToKgPerM3"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ToxicLibrary.ppmToKgPerM3"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ToxicLibrary.ppmToKgPerM3"
+
 [implementations]
 python = "azoth.process.toxic_library"
 rust = "azoth_process::toxic_library"

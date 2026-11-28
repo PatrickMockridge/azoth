@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/fire/Api537FlareFlameModel.java"
 edition = "Its `totalHeatReleaseW`, `totalRadiativePowerW`, `flameLengthM`, `flameTiltRad`, the centre and tip positions, `heatFluxAtGroundDistance`, `sterileZoneRadiusM`, `soundPowerLevelDb`, `soundPressureLevelDb` and `equivalentFlameTemperatureK`."
+
+[source.neqsim]
+class = "Api537FlareFlameModel"
+members = ["Api537FlareFlameModel.totalHeatReleaseW"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_flare_flame_and_radiation"
 convergence = "absolute"
@@ -179,6 +185,24 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "the class clamps a negative efficiency; the port refuses it instead"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Api537FlareFlameModel.totalHeatReleaseW"
+
+[provenance.algorithm.convergence]
+source = "NeqSim Api537FlareFlameModel.totalHeatReleaseW"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim Api537FlareFlameModel.totalHeatReleaseW"
+
+[provenance.algorithm.scheme]
+source = "NeqSim Api537FlareFlameModel.totalHeatReleaseW"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim Api537FlareFlameModel.totalHeatReleaseW"
+
 [implementations]
 python = "azoth.process.api537_flare_flame_model"
 rust = "azoth_process::api537_flare_flame_model"

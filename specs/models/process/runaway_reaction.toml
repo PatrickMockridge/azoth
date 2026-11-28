@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/reaction/RunawayReactionAnalyzer.java"
 edition = "Its `analyze`: the adiabatic rise, MTSR, margin, TMR, two-phase flag and verdict."
+
+[source.neqsim]
+class = "RunawayReactionAnalyzer"
+members = ["RunawayReactionAnalyzer.analyze"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "adiabatic_runaway_screen"
 convergence = "absolute"
@@ -112,6 +118,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class refuses a non-positive specific heat"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim RunawayReactionAnalyzer.analyze"
+
+[provenance.algorithm.convergence]
+source = "NeqSim RunawayReactionAnalyzer.analyze"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim RunawayReactionAnalyzer.analyze"
+
+[provenance.algorithm.scheme]
+source = "NeqSim RunawayReactionAnalyzer.analyze"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim RunawayReactionAnalyzer.analyze"
+
 [implementations]
 python = "azoth.process.runaway_reaction"
 rust = "azoth_process::runaway_reaction"

@@ -24,7 +24,7 @@ def test_version_reports_the_registry_and_backend(capsys: pytest.CaptureFixture[
     code, document = _run(capsys, "version")
     assert code == 0
     assert document["kind"] == "version"
-    assert document["calcs"] == 98
+    assert document["calcs"] == 97
     assert document["models"] == len(MODELS)
     assert document["backend"] in ("python", "rust")
 

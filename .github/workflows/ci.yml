@@ -158,6 +158,10 @@ jobs:
       # and declared ported by the spec, and no test could see it - the cross-language
       # test compares cases, and no case stated that value.
       - run: python tools/check_unported.py
+      # **The port law.** Every model and calc names a NeqSim class and a pinned commit in
+      # `source.neqsim`, and every input, output, algorithm leaf and constant has a
+      # provenance row. The class index is committed; the check needs no JVM.
+      - run: python tools/check_port.py
       # The skill catalog against the SKILL.md files it points at, and each SKILL.md
       # against the required sections. Needs no `azoth` import, so it runs before the
       # library is built.
@@ -373,9 +377,16 @@ jobs:
         env:
           PYTHONPATH: ""
         run: |
-          .venv/bin/python -m coverage json -o coverage.json
-          python tools/check_coverage.py \
-            --base "${{ needs.scope.outputs.base }}" --json coverage.json
+          # A diff that selects only the extension build (a Rust test file, say) runs no
+          # pytest target, so there is no coverage document and nothing to decide. The
+          # check says that rather than failing on `coverage json`'s "No data to report".
+          if [ -f .coverage ]; then
+            .venv/bin/python -m coverage json -o coverage.json
+            python tools/check_coverage.py \
+              --base "${{ needs.scope.outputs.base }}" --json coverage.json
+          else
+            echo "no Python test was selected, so there are no changed lines to cover"
+          fi
   notebooks:
     name: notebooks
     runs-on: ubuntu-latest

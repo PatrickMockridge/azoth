@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim master `OilAssayCharacterisation.apply`"
 edition = "Its per-cut derivation and its mass-balance gate, for the three routes it tries. The standard-component route reads the molar mass out of the component database by name, which is `azoth_eos::databank` here; the critical constants `addTBPfraction` sets are that id's work."
+
+[source.neqsim]
+class = "OilAssayCharacterisation"
+members = ["OilAssayCharacterisation.addTBPfraction"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.basis]
 type = "enum"
@@ -87,6 +93,12 @@ description = "The fluid's total mole amount, which is the sum of `moles`.\n"
 [outputs.mass_balance_error]
 unit = "dimensionless"
 description = "The class's own relative mass balance: `|sum(moles * molar_mass) - total_assay_mass| / total_assay_mass`, which its `1e-10` gate is taken on.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim OilAssayCharacterisation.addTBPfraction"
+
 [implementations]
 python = "azoth.characterization.oil_assay_derivation"
 rust = "azoth_characterization::oil_assay_derivation"

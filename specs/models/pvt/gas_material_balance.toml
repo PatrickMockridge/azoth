@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim reservoirproperties/materialbalance/GasMaterialBalance.java"
 edition = "The p/Z fit, the gravity route, the Cole plot and the Havlena-Odeh fit; the result struct's getters are the published fields."
+
+[source.neqsim]
+class = "GasMaterialBalance"
+members = ["GasMaterialBalance"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.calculation]
 type = "enum"
@@ -91,6 +97,12 @@ type = "vector"
 unit = "dimensionless"
 optional = true
 description = "the Cole plot's F/Eg, from the second history point.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim GasMaterialBalance"
+
 [implementations]
 python = "azoth.pvt.gas_material_balance"
 rust = "azoth_pvt::gas_material_balance"

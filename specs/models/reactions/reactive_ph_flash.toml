@@ -24,6 +24,12 @@ references = [
 [source]
 standard = "NeqSim master `ReactiveMultiphasePHflash`"
 edition = "`solveEnthalpySpec` ported as the loop, with the inner step left to `reactions.reactive_tp_flash` and the enthalpy to `azoth-eos`' `molar_enthalpy_entropy`. The entropy-specified variant and the `NR = 0` delegation to a standard PH flash are owed, and `ROADMAP.md` names both."
+
+[source.neqsim]
+class = "ReactiveMultiphasePHflash"
+members = ["ReactiveMultiphasePHflash.solveEnthalpySpec"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "ph_flash_secant_bisection"
 initialisation = "inner_reactive_flash"
@@ -87,6 +93,27 @@ min = 1
 min_inclusive = true
 severity = "error"
 rationale = "a phase ceiling below one is not a ceiling"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ReactiveMultiphasePHflash.solveEnthalpySpec"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ReactiveMultiphasePHflash.solveEnthalpySpec"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim ReactiveMultiphasePHflash.solveEnthalpySpec"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ReactiveMultiphasePHflash.solveEnthalpySpec"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ReactiveMultiphasePHflash.solveEnthalpySpec"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ReactiveMultiphasePHflash.solveEnthalpySpec"
+
 [implementations]
 python = "azoth.reactions.reactive_ph_flash"
 rust = "azoth_reactions::reactive_ph_flash"

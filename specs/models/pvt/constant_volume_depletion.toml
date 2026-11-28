@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim pvtsimulation/simulation/ConstantVolumeDepletion.java"
 edition = "The upward saturation scan, the restore loop, the cumulative mole accounting, the material-balance residual, Zmix and Zgas, the liquid volume and the per-step K-values."
+
+[source.neqsim]
+class = "ConstantVolumeDepletion"
+members = ["ConstantVolumeDepletion"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "record_list"
@@ -191,6 +197,12 @@ description = "the oil phase's volume-corrected volume; absent without an oil ph
 unit = "dimensionless"
 optional = true
 description = "the oil volume over the saturation volume, which is the class's liquid dropout curve; absent without an oil phase.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ConstantVolumeDepletion"
+
 [implementations]
 python = "azoth.pvt.constant_volume_depletion"
 rust = "azoth_pvt::constant_volume_depletion"

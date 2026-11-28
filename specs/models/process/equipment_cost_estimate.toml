@@ -25,6 +25,12 @@ references = [
 [source]
 standard = "NeqSim process/costestimation/UnitCostEstimateBaseClass.java"
 edition = "Its `calculateCostEstimate`, `calcPurchasedEquipmentCost`, `getTotalCost`, `calcAnnualOperatingCost` and `generateBillOfMaterials`, over `SeparatorCostEstimate`, `ColumnCostEstimate` and `AbsorberCostEstimate`."
+
+[source.neqsim]
+class = "UnitCostEstimateBaseClass"
+members = ["UnitCostEstimateBaseClass.calculateCostEstimate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "equipment_cost_dispatch"
 initialisation = "first_equipment_in_caller_order"
@@ -701,6 +707,27 @@ description = "the equipment row the flag belongs to.\n"
 [outputs.quality_flags.fields.message]
 type = "string"
 description = "the flag's message.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim UnitCostEstimateBaseClass.calculateCostEstimate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim UnitCostEstimateBaseClass.calculateCostEstimate"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim UnitCostEstimateBaseClass.calculateCostEstimate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim UnitCostEstimateBaseClass.calculateCostEstimate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim UnitCostEstimateBaseClass.calculateCostEstimate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim UnitCostEstimateBaseClass.calculateCostEstimate"
+
 [implementations]
 python = "azoth.process.equipment_cost_estimate"
 rust = "azoth_process::equipment_cost_estimate"

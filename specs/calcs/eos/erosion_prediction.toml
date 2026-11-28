@@ -13,6 +13,12 @@ references = [
 [source]
 standard = "NeqSim master `ErosionPredictionCalculator`"
 edition = "`calculate`, the material constants and densities, the geometry factors and areas, the impact-angle function, the particle-velocity estimate and `assessRisk`. The corrosion-protection velocity helper, the sand-load defaults and the Gson report are separate surfaces."
+
+[source.neqsim]
+class = "ErosionPredictionCalculator"
+members = ["ErosionPredictionCalculator.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.mixture_density]
 unit = "kg/m**3"
@@ -709,6 +715,12 @@ risk_level = "high"
 id = "api_base_worked_example"
 type = "worked_example"
 status = "active"
+
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ErosionPredictionCalculator.calculate"
 
 [implementations]
 python = "azoth.eos.erosion_prediction"

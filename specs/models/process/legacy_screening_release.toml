@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/release/LegacyScreeningReleaseModel.java"
 edition = "Its `calculate`: the flashed upstream aliases, the delegated historical rate, the gamma default, the opening velocity and the screening diagnostics."
+
+[source.neqsim]
+class = "LegacyScreeningReleaseModel"
+members = ["LegacyScreeningReleaseModel.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "legacy_orifice_screening"
 convergence = "absolute"
@@ -169,6 +175,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim LegacyScreeningReleaseModel.calculate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim LegacyScreeningReleaseModel.calculate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim LegacyScreeningReleaseModel.calculate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim LegacyScreeningReleaseModel.calculate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim LegacyScreeningReleaseModel.calculate"
+
 [implementations]
 python = "azoth.process.legacy_screening_release"
 rust = "azoth_process::legacy_screening_release"

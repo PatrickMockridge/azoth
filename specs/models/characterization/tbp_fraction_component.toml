@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim master `SystemThermo.addTBPfraction`"
 edition = "Its reference-system flash and `calcRacketZ`, and the block after it that sets the critical volume, parachor, critical viscosity, triple point, heat of fusion, formation enthalpy, heat-capacity coefficients and Lennard-Jones pair, composed over `TBPFractionModel.PedersenTBPModelSRK`."
+
+[source.neqsim]
+class = "TBPfractionModel"
+members = ["TBPfractionModel.calcRacketZ"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.molar_mass]
 unit = "kg/mol"
@@ -99,6 +105,12 @@ description = "The Lennard-Jones collision diameter, Tee-Gotoh-Stewart's correla
 [outputs.lennard_jones_energy]
 unit = "K"
 description = "The Lennard-Jones energy over Boltzmann's constant, in kelvin.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TBPfractionModel.calcRacketZ"
+
 [implementations]
 python = "azoth.characterization.tbp_fraction_component"
 rust = "azoth_characterization::tbp_fraction_component"

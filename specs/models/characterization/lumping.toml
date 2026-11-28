@@ -25,6 +25,12 @@ references = [
 [source]
 standard = "NeqSim master `LumpingModel.StandardLumpingModel`"
 edition = "`generateLumpedComposition`, for a fluid whose only TBP or plus row is the one plus fraction `characterization.pedersen_plus_split` or `.whitson_gamma_split` divided. `PVTLumpingModel` and `NoLumpingModel` are the sibling models and are not this id."
+
+[source.neqsim]
+class = "LumpingModel"
+members = ["LumpingModel.generateLumpedComposition"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.molar_mass]
 unit = "kg/mol"
@@ -92,6 +98,12 @@ min = 1
 min_inclusive = true
 severity = "error"
 rationale = "a lump count; a table to group into no groups is not a grouping\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim LumpingModel.generateLumpedComposition"
+
 [implementations]
 python = "azoth.characterization.lumping"
 rust = "azoth_characterization::lumping"

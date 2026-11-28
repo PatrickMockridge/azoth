@@ -21,6 +21,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/dispersion/HazardousAreaCalculator.java"
 edition = "Its `effectiveDiameterM`, `lflMassFraction`, `hazardousDistanceM`, the `ReleaseGrade` zone mapping and the constructor and setters."
+
+[source.neqsim]
+class = "HazardousAreaCalculator"
+members = ["HazardousAreaCalculator.effectiveDiameterM"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "iec_60079_10_1_jet_axial_decay"
 convergence = "absolute"
@@ -117,6 +123,24 @@ max = 1
 max_inclusive = true
 severity = "error"
 rationale = "the class's setter refuses a factor outside (0, 1]"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim HazardousAreaCalculator.effectiveDiameterM"
+
+[provenance.algorithm.convergence]
+source = "NeqSim HazardousAreaCalculator.effectiveDiameterM"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim HazardousAreaCalculator.effectiveDiameterM"
+
+[provenance.algorithm.scheme]
+source = "NeqSim HazardousAreaCalculator.effectiveDiameterM"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim HazardousAreaCalculator.effectiveDiameterM"
+
 [implementations]
 python = "azoth.process.hazardous_area"
 rust = "azoth_process::hazardous_area"

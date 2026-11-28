@@ -24,12 +24,39 @@ references = [
 [source]
 standard = "NeqSim process/safety/release/HomogeneousEquilibriumReleaseModel.java"
 edition = "Its `calculate`: the log-spaced pressure scan, the fixed-entropy sample at each pressure, the golden-section refinement of every sampled local maximum, the maximum-flux throat, the choked test, the throat equilibrium sound speed and its Mach warning, and the four stations."
+
+[source.neqsim]
+class = "HomogeneousEquilibriumReleaseModel"
+members = ["HomogeneousEquilibriumReleaseModel.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "log_pressure_scan_golden_section"
 initialisation = "log_spaced_pressure_scan"
 convergence = "relative"
 tolerance = 1.0e-7
 max_iterations = 80
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim HomogeneousEquilibriumReleaseModel.calculate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim HomogeneousEquilibriumReleaseModel.calculate"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim HomogeneousEquilibriumReleaseModel.calculate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim HomogeneousEquilibriumReleaseModel.calculate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim HomogeneousEquilibriumReleaseModel.calculate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim HomogeneousEquilibriumReleaseModel.calculate"
+
 [implementations]
 python = "azoth.process.hem_release"
 rust = "azoth_process::hem_release"

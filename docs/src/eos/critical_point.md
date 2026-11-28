@@ -49,15 +49,14 @@ not an equation, and both implementations read it from here.
 | `pc` | Pa | the critical pressure, evaluated from the equation of state at the returned volume |
 | `vc` | m**3/mol | the critical molar volume |
 | `z_c` | dimensionless | the critical compressibility, `pc vc/(R tc)` |
-| `converged` | - | whether the nested Newton met its tolerance. False means the four state fields are NaN and the warning carries the residual; a critical point that was not reached is a refusal, not an exception. |
 | `iterations` | dimensionless | outer iterations the critical-point search took |
 | `residual` | dimensionless | the convergence residual at the returned state, against `algorithm.tolerance` |
 
 | Bound | On violation | Why |
 |---|---|---|
-| `tc > 0` | warns `OUT_OF_VALID_RANGE` | a refusal reports NaN here with `converged = false`; the warning, not the value, is the answer. A converged non-positive temperature would still be a defect. |
-| `pc > 0` | warns `OUT_OF_VALID_RANGE` | a refusal reports NaN here with `converged = false`; a converged non-positive pressure would mean the volume is inside the co-volume. |
-| `z_c > 0` | warns `OUT_OF_VALID_RANGE` | a refusal reports NaN here with `converged = false`; a sign error in a converged answer would show up here first. |
+| `tc > 0` | raises | the iteration can leave the region where the equation of state has a critical point and converge on a temperature that is not a state. |
+| `pc > 0` | raises | a non-positive pressure at the returned volume means the volume is inside the co-volume and the state is not one. |
+| `z_c > 0` | raises | a sign error in any of the three quantities above shows up as a negative `z_c` before it shows up anywhere else. |
 
 ## Assumptions
 

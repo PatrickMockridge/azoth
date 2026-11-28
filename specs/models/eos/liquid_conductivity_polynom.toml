@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim master `liquidphysicalproperties/conductivity/Conductivity`"
 edition = "`calcConductivity` and `calcPureComponentConductivity`, ported verbatim."
+
+[source.neqsim]
+class = "Conductivity"
+members = ["Conductivity.calcConductivity"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.liquid_conductivity]
 type = "matrix"
@@ -51,6 +57,12 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "a mole fraction cannot be negative, and the class reads one without checking\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Conductivity.calcConductivity"
+
 [implementations]
 python = "azoth.eos.liquid_conductivity_polynom"
 rust = "azoth_eos::liquid_conductivity_polynom"

@@ -26,6 +26,12 @@ references = [
 [source]
 standard = "NeqSim master `Characterise.characterisePlusFraction`"
 edition = "Its four statements: `init(0)`, `hasPlusFraction()`, the `getMPlus() > getMaxPlusMolarMass()` replacement, and `generateLumpedComposition` gated on the split's boolean."
+
+[source.neqsim]
+class = "Characterise"
+members = ["Characterise.generateLumpedComposition"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.plus_model]
 type = "enum"
@@ -68,6 +74,12 @@ type = "vector"
 unit = "kg/m**3"
 length = "one per lump, aligned with `fraction_of_heavy_end`"
 description = "Each lump's mass-weighted harmonic mean density over the cuts it holds.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Characterise.generateLumpedComposition"
+
 [implementations]
 python = "azoth.characterization.characterise_plus_fraction"
 rust = "azoth_characterization::characterise_plus_fraction"

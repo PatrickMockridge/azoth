@@ -9,6 +9,12 @@ references = ["Soreide, I.; Whitson, C. H. (1992). \"Peng-Robinson predictions f
 [source]
 standard = "NeqSim master `AttractiveTermSoreideWhitson`"
 edition = "`alpha(temperature)`, water branch ported verbatim"
+
+[source.neqsim]
+class = "AttractiveTermSoreideWhitson"
+members = ["AttractiveTermSoreideWhitson"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.salinity]
 unit = "dimensionless"
@@ -41,6 +47,12 @@ salinity = 1.0
 Tr = 0.7
 [worked_example.expected]
 alpha = 1.3125796067429514
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim AttractiveTermSoreideWhitson"
+
 [implementations]
 python = "azoth.eos.soreide_whitson_alpha"
 rust = "azoth_eos::soreide_whitson_alpha"

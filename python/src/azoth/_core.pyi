@@ -12,7 +12,7 @@ see `azoth._rust_bridge`.
 
 from typing import TypedDict, final
 
-from azoth.core.result_base import BeggsBrillRegime, BlowbyVerdict, ConvergenceReason, CooldownVerdict, CorrosionSeverity, DeadheadVerdict, EmulsionType, ErosionRiskLevel, FailureMode, FeSMorphology, FivLikelihood, FlowRegime, FluidBasis, GoverningCriterion, HenryStatus, HydrateRiskLevel, HydrateStructure, MultiflashSeedPath, OpenDrainVerdict, OverallVerdict, PerformanceVerdict, Phase, PhaseClass, PlusModel, ReliefPhase, RootStructure, RunawayVerdict, RuptureStatus, SelfHeatingGeometry, SelfHeatingVerdict, SettleOutVerdict, StabilityVerdict, SupplyVerdict, TpMultiflashSeed, VacuumVerdict
+from azoth.core.result_base import BeggsBrillRegime, BlowbyVerdict, ConvergenceReason, CooldownVerdict, CorrosionSeverity, DeadheadVerdict, EmulsionType, ErosionRiskLevel, FailureMode, FeSMorphology, FivLikelihood, FlowRegime, FluidBasis, GoverningCriterion, HenryStatus, HydrateRiskLevel, HydrateStructure, MultiflashSeedPath, OpenDrainVerdict, OverallVerdict, PerformanceVerdict, Phase, PlusModel, ReliefPhase, RootStructure, RunawayVerdict, RuptureStatus, SelfHeatingGeometry, SelfHeatingVerdict, SettleOutVerdict, StabilityVerdict, SupplyVerdict, TpMultiflashSeed, VacuumVerdict
 
 # --- transport types ------------------------------------------------------
 # The values that cross the boundary and are not results. Hand-written here
@@ -3091,7 +3091,6 @@ class CriticalPointResult:
     pc: Qty
     vc: Qty
     z_c: float
-    converged: bool
     iterations: int
     residual: float
     warnings: list[Warning]
@@ -3846,11 +3845,6 @@ class ProductionChemicalScaleScenarioResult:
     warnings: list[Warning]
 
 @final
-class PrsvKappaResult:
-    kappa: float
-    warnings: list[Warning]
-
-@final
 class PsFlashResult:
     T: Qty
     vapour_fraction: float | None
@@ -3876,23 +3870,6 @@ class PtFlashResult:
     z_vapour: float
     min_t_over_tc: float
     phase: str
-    iterations: int
-    residual: float
-    warnings: list[Warning]
-
-@final
-class PtFlashCheckResult:
-    vapour_fraction: float | None
-    x: list[float]
-    y: list[float]
-    k: list[float]
-    ln_phi_liquid: list[float]
-    ln_phi_vapour: list[float]
-    z_liquid: float
-    z_vapour: float
-    min_t_over_tc: float
-    phase: str
-    converged: bool
     iterations: int
     residual: float
     warnings: list[Warning]
@@ -4214,26 +4191,6 @@ class StabilityTestResult:
     warnings: list[Warning]
 
 @final
-class StateAtTpResult:
-    phase: str
-    phase_class: PhaseClass
-    converged: bool
-    vapour_fraction: float | None
-    x: list[float]
-    y: list[float]
-    molar_mass: Qty
-    molar_volume: Qty
-    density: Qty
-    internal_energy: Qty
-    enthalpy: Qty
-    cp: Qty
-    cv: Qty
-    compressibility: float
-    system_sound_speed: Qty | None
-    interface_tension: Qty | None
-    warnings: list[Warning]
-
-@final
 class StreamScaleAnalyzerResult:
     minerals: list[StreamScaleMineralRow]
     total_scale_mass: Qty
@@ -4443,7 +4400,6 @@ class UmrPruFlashResult:
     z_vapour: float
     min_t_over_tc: float
     phase: str
-    converged: bool
     iterations: int
     residual: float
     warnings: list[Warning]
@@ -8720,7 +8676,6 @@ def production_chemical_scale_scenario(
     chemicals: list[ProductionChemicalDose],
     pitzer_ionic_strength_molal: float | None = None,
 ) -> ProductionChemicalScaleScenarioResult: ...
-def prsv_kappa(omega: float, Tr: float, kappa1: float) -> PrsvKappaResult: ...
 def ps_flash(
     Tc: list[float],
     Pc: list[float],
@@ -8754,22 +8709,6 @@ def pt_flash(
     alpha: str = "pr",
     alpha_params: list[list[float]] | None = None,
 ) -> PtFlashResult: ...
-def pt_flash_check(
-    Tc: list[float],
-    Pc: list[float],
-    omega: list[float],
-    classes: list[str],
-    kij: list[float],
-    association: AssociationSpec,
-    T: float,
-    P: float,
-    z: list[float],
-    tolerance: float | None = None,
-    strict: bool | None = None,
-    eos: str = "pr",
-    alpha: str = "pr",
-    alpha_params: list[list[float]] | None = None,
-) -> PtFlashCheckResult: ...
 def pt_phase_envelope(
     Tc: list[float],
     Pc: list[float],
@@ -9046,30 +8985,6 @@ def stability_test(
     alpha: str = "pr",
     alpha_params: list[list[float]] | None = None,
 ) -> StabilityTestResult: ...
-def state_at_tp(
-    Tc: list[float],
-    Pc: list[float],
-    omega: list[float],
-    classes: list[str],
-    kij: list[float],
-    association: AssociationSpec,
-    molar_mass: list[float],
-    volume_shift: list[float],
-    volume_shift_srk: list[float],
-    cp_a: list[float],
-    cp_b: list[float],
-    cp_c: list[float],
-    cp_d: list[float],
-    cp_e: list[float],
-    T: float,
-    P: float,
-    z: list[float],
-    tolerance: float | None = None,
-    strict: bool | None = None,
-    eos: str = "pr",
-    alpha: str = "pr",
-    alpha_params: list[list[float]] | None = None,
-) -> StateAtTpResult: ...
 def stream_scale_analyzer(
     calcium: float,
     barium: float,

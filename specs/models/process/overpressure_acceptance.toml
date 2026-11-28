@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/overpressure/OverpressureAcceptanceChecker.java"
 edition = "Its `accumulationFactor` and `check`."
+
+[source.neqsim]
+class = "OverpressureAcceptanceChecker"
+members = ["OverpressureAcceptanceChecker.accumulationFactor"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_overpressure_acceptance"
 convergence = "absolute"
@@ -77,6 +83,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class compares any number; a non-positive MAWP is not a protected item"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim OverpressureAcceptanceChecker.accumulationFactor"
+
+[provenance.algorithm.convergence]
+source = "NeqSim OverpressureAcceptanceChecker.accumulationFactor"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim OverpressureAcceptanceChecker.accumulationFactor"
+
+[provenance.algorithm.scheme]
+source = "NeqSim OverpressureAcceptanceChecker.accumulationFactor"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim OverpressureAcceptanceChecker.accumulationFactor"
+
 [implementations]
 python = "azoth.process.overpressure_acceptance"
 rust = "azoth_process::overpressure_acceptance"

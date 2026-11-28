@@ -18,6 +18,12 @@ references = [
 standard = "Fredenslund et al. (1975); Hansen et al. (1991)"
 edition = "AIChE Journal 21(6), 1086-1099; Ind. Eng. Chem. Res. 30(10), 2352-2355"
 doi = "10.1002/aic.690210607"
+
+[source.neqsim]
+class = "ComponentGEUnifac"
+members = ["ComponentGEUnifac.getGamma"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -48,6 +54,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute temperature; zero and below are not states\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ComponentGEUnifac.getGamma"
+
 [implementations]
 python = "azoth.eos.unifac_activity_coefficients"
 rust = "azoth_eos::unifac_activity_coefficients"

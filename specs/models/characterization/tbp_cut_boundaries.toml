@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim master `OilAssayCharacterisation.addTBPCutBoundariesKelvin`"
 edition = "Its interval arithmetic, its cut naming and the range each cut keeps. What it answers is the cut table itself, and `characterization.oil_assay_derivation` is the id that reads one."
+
+[source.neqsim]
+class = "OilAssayCharacterisation"
+members = ["OilAssayCharacterisation.addTBPCutBoundariesKelvin"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.name_prefix]
 type = "string"
@@ -66,6 +72,12 @@ type = "vector"
 unit = "K"
 length = "one per cut, aligned with `cut_name`"
 description = "Each cut's average normal boiling point, the midpoint of its two boundaries.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim OilAssayCharacterisation.addTBPCutBoundariesKelvin"
+
 [implementations]
 python = "azoth.characterization.tbp_cut_boundaries"
 rust = "azoth_characterization::tbp_cut_boundaries"

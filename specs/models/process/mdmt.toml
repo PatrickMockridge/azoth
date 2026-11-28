@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/mdmt/MDMTCalculator.java"
 edition = "Its `getMDMT_C` and `isAcceptable`: the analytic curve, the stress-ratio reduction and the verdict."
+
+[source.neqsim]
+class = "MDMTCalculator"
+members = ["MDMTCalculator.getMDMT_C"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "ucs66_analytic_mdmt"
 convergence = "absolute"
@@ -60,6 +66,24 @@ max = 1
 max_inclusive = true
 severity = "error"
 rationale = "the class refuses a stress ratio outside (0, 1]"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim MDMTCalculator.getMDMT_C"
+
+[provenance.algorithm.convergence]
+source = "NeqSim MDMTCalculator.getMDMT_C"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim MDMTCalculator.getMDMT_C"
+
+[provenance.algorithm.scheme]
+source = "NeqSim MDMTCalculator.getMDMT_C"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim MDMTCalculator.getMDMT_C"
+
 [implementations]
 python = "azoth.process.mdmt"
 rust = "azoth_process::mdmt"

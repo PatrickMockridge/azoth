@@ -36,6 +36,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/pump/Pump.java and process/equipment/pump/PumpChart.java"
 edition = "Its steady-state `run`: the isentropic flash to a stated outlet pressure, and the `isUsePumpChart` branch that solves the pressure from the reduced head; and `PumpMechanicalDesign.calcDesign`'s API 610 sizing behind `mechanical_design`."
+
+[source.neqsim]
+class = "Pump"
+members = ["Pump.isUsePumpChart"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -438,6 +444,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the reduced variables divide by the speed\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Pump.isUsePumpChart"
+
 [implementations]
 python = "azoth.process.pump"
 rust = "azoth_process::pump"

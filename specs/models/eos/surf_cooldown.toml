@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim master `SurfCooldownAnalyzer`"
 edition = "`calculate`, `detectWater`, `extractFluidProperties`, `computeHydrateEquilibriumTemperature`, `evaluateNoTouchTime` and the getters. The Gson report is a composition."
+
+[source.neqsim]
+class = "SurfCooldownAnalyzer"
+members = ["SurfCooldownAnalyzer.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -158,6 +164,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "An absolute temperature; zero and below are not states.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SurfCooldownAnalyzer.calculate"
+
 [implementations]
 python = "azoth.eos.surf_cooldown"
 rust = "azoth_eos::surf_cooldown"

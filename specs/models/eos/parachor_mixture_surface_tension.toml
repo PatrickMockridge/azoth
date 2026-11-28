@@ -18,6 +18,12 @@ references = [
 standard = "NeqSim master `ParachorSurfaceTension`"
 edition = "`calcSurfaceTension(interface1, interface2)`, the mixture form, reached through `InterfaceProperties`' three interface calculators."
 doi = "10.1021/ie50398a028"
+
+[source.neqsim]
+class = "ParachorSurfaceTension"
+members = ["ParachorSurfaceTension"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.parachors]
 type = "vector"
@@ -74,6 +80,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "`rho/M` divides by it\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ParachorSurfaceTension"
+
 [implementations]
 python = "azoth.eos.parachor_mixture_surface_tension"
 rust = "azoth_eos::parachor_mixture_surface_tension"

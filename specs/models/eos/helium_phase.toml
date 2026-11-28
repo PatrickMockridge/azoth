@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "Vega (NIST IR 8474) helium equation of state"
 edition = "The multiparameter Helmholtz equation for helium, evaluated in the reduced variables tau = Tc/T and delta = rho/rho_c and differentiated for the full property set."
+
+[source.neqsim]
+class = "Vega"
+members = ["Vega"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "newton_density_solve"
 initialisation = "ideal_gas"
@@ -63,6 +69,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Vega"
+
+[provenance.algorithm.convergence]
+source = "NeqSim Vega"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim Vega"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim Vega"
+
+[provenance.algorithm.scheme]
+source = "NeqSim Vega"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim Vega"
+
 [implementations]
 python = "azoth.eos.helium_phase"
 rust = "azoth_eos::helium_phase"

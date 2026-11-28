@@ -21,6 +21,12 @@ references = [
 [source]
 standard = "NeqSim master `FreezingPointTemperatureFlash`"
 edition = "Both routes the operation has: the one that requires a `PhaseSolidHelmholtzEos`, and the tabulated solid every other system builds. Its two legacy variants are unreachable upstream rather than carried."
+
+[source.neqsim]
+class = "FreezingPointTemperatureFlash"
+members = ["FreezingPointTemperatureFlash"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "freezing_point_bracket_bisection"
 initialisation = "span_expansion_from_the_start"
@@ -68,6 +74,42 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim FreezingPointTemperatureFlash"
+
+[provenance.algorithm."bracket.lower"]
+source = "NeqSim FreezingPointTemperatureFlash"
+
+[provenance.algorithm."bracket.scheme"]
+source = "NeqSim FreezingPointTemperatureFlash"
+
+[provenance.algorithm."bracket.steps"]
+source = "NeqSim FreezingPointTemperatureFlash"
+
+[provenance.algorithm."bracket.upper"]
+source = "NeqSim FreezingPointTemperatureFlash"
+
+[provenance.algorithm.convergence]
+source = "NeqSim FreezingPointTemperatureFlash"
+
+[provenance.algorithm.initial_temperature]
+source = "NeqSim FreezingPointTemperatureFlash"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim FreezingPointTemperatureFlash"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim FreezingPointTemperatureFlash"
+
+[provenance.algorithm.scheme]
+source = "NeqSim FreezingPointTemperatureFlash"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim FreezingPointTemperatureFlash"
+
 [implementations]
 python = "azoth.eos.freezing_point"
 rust = "azoth_eos::freezing_point"

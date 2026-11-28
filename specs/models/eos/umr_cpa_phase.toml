@@ -21,6 +21,12 @@ references = [
 standard = "Voutsas, E. et al. (2004)"
 edition = "The Peng-Robinson cubic mixed by the UMR universal rule over UNIFAC-UMR-PRU activity coefficients, with the Wertheim association contribution added to the residual Helmholtz energy."
 doi = "10.1021/ie049580s"
+
+[source.neqsim]
+class = "PhaseUMRCPA"
+members = ["PhaseUMRCPA"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -68,6 +74,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PhaseUMRCPA"
+
 [implementations]
 python = "azoth.eos.umr_cpa_phase"
 rust = "azoth_eos::umr_cpa_phase"

@@ -21,6 +21,12 @@ references = [
 [source]
 standard = "NeqSim pvtsimulation/simulation/DifferentialLiberation.java"
 edition = "The gas-removal ledger, the stock-tank oil volume from the final standard flash, and Bo, Bg, Rs, Zgas, the gas gravity, the standard gas volume and the oil density."
+
+[source.neqsim]
+class = "DifferentialLiberation"
+members = ["DifferentialLiberation"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "record_list"
@@ -201,6 +207,12 @@ description = "the gas formation volume factor; absent in a single phase.\n"
 unit = "dimensionless"
 optional = true
 description = "the remaining solution gas per stock-tank oil volume; absent without one.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim DifferentialLiberation"
+
 [implementations]
 python = "azoth.pvt.differential_liberation"
 rust = "azoth_pvt::differential_liberation"

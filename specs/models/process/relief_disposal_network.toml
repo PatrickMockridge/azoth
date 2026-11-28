@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/overpressure/ReliefDisposalNetwork.java"
 edition = "Its `addContribution` and `calculate`, with `ReliefLoadContribution`'s hourly rate."
+
+[source.neqsim]
+class = "ReliefDisposalNetwork"
+members = ["ReliefDisposalNetwork.addContribution"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_relief_disposal_network"
 convergence = "absolute"
@@ -110,6 +116,24 @@ description = "the rate times 3600.\n"
 [outputs.contributions.fields.simultaneous]
 type = "boolean"
 description = "whether the load is concurrent.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ReliefDisposalNetwork.addContribution"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ReliefDisposalNetwork.addContribution"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ReliefDisposalNetwork.addContribution"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ReliefDisposalNetwork.addContribution"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ReliefDisposalNetwork.addContribution"
+
 [implementations]
 python = "azoth.process.relief_disposal_network"
 rust = "azoth_process::relief_disposal_network"

@@ -21,6 +21,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/risk/RiskMatrix.java"
 edition = "Its `ProbabilityCategory.fromFrequency`, `ConsequenceCategory.fromProductionLoss`, `RiskLevel.fromScore`, `RiskAssessment.setProbabilityData`, `calculateRisk` and `calculateCost`."
+
+[source.neqsim]
+class = "RiskMatrix"
+members = ["RiskMatrix.calculateRisk"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_risk_matrix"
 convergence = "absolute"
@@ -121,6 +127,24 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "a negative cost is not a cost"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim RiskMatrix.calculateRisk"
+
+[provenance.algorithm.convergence]
+source = "NeqSim RiskMatrix.calculateRisk"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim RiskMatrix.calculateRisk"
+
+[provenance.algorithm.scheme]
+source = "NeqSim RiskMatrix.calculateRisk"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim RiskMatrix.calculateRisk"
+
 [implementations]
 python = "azoth.process.risk_matrix"
 rust = "azoth_process::risk_matrix"

@@ -25,7 +25,7 @@ from azoth.core.numerics import divide
 from azoth.core.range import apply_checks, checks_for
 from azoth.core.result import Phase, PtPhaseEnvelopeResult
 from azoth.core.units import Q, from_si, input_to_si, quantity
-from azoth.core.warnings import Warning, WarningCode
+from azoth.core.warnings import Warning
 from azoth.eos.mixture import Mixture
 from azoth.eos.reference._mixture_state import (
     WILSON_CONSTANT,
@@ -35,7 +35,7 @@ from azoth.eos.reference._mixture_state import (
     wilson_saturation_pressures,
 )
 from azoth.eos.reference.critical_point import critical_point
-from azoth.eos.reference.pt_flash_check import pt_flash_check
+from azoth.eos.reference.pt_flash import pt_flash
 
 MODEL_ID = "eos.pt_phase_envelope"
 
@@ -279,187 +279,7 @@ def _critical(mixture: Mixture, z: list[float]) -> tuple[float, float] | None:
         point = critical_point(mixture, z)
     except Exception:
         return None
-    if not point.converged:
-        return None
     return (point.tc.to_base_units().magnitude, point.pc.to_base_units().magnitude)
-
-
-#: The direct-flash fallback's window and resolution. The continuation is preferred; this
-#: is the answer when it cannot start or truncates on a trace heavy. NeqSim's
-#: `RobustPhaseEnvelope` uses the same construction.
-_GRID_T_MIN = 150.0
-_GRID_T_MAX = 500.0
-_GRID_T_STEPS = 40
-_GRID_P_MIN = 1.0e5
-_GRID_P_MAX = 400.0e5
-_GRID_P_STEPS = 40
-_GRID_BISECTIONS = 16
-_GRID_FLASH_TOLERANCE = 1.0e-6
-
-
-def _two_phase_at(mixture: Mixture, z: list[float], t: float, p: float) -> bool:
-    """Whether the feed splits at ``(T, P)`` by the cheap flash label.
-
-    The tangent-plane test is the arbiter where it converges, but it fails at the
-    envelope's corners; this is the criterion the study's direct-flash envelope used.
-    """
-    try:
-        flash = pt_flash_check(
-            mixture,
-            quantity(t, "K"),
-            quantity(p, "Pa"),
-            z,
-            tolerance=_GRID_FLASH_TOLERANCE,
-            strict=False,
-        )
-    except Exception:  # a flash that cannot answer is outside the region
-        return False
-    if not flash.converged:
-        return False
-    beta = flash.vapour_fraction
-    return flash.phase is Phase.TWO_PHASE and beta is not None and 1.0e-9 < beta < 1.0 - 1.0e-9
-
-
-def _bisect_boundary(
-    mixture: Mixture,
-    z: list[float],
-    t: float,
-    inside: float,
-    outside: float,
-) -> float:
-    """Refine a pressure boundary between a two-phase and a single-phase pressure."""
-    for _ in range(_GRID_BISECTIONS):
-        mid = 0.5 * (inside + outside)
-        if _two_phase_at(mixture, z, t, mid):
-            inside = mid
-        else:
-            outside = mid
-    return 0.5 * (inside + outside)
-
-
-def _boundaries_at(
-    mixture: Mixture, z: list[float], t: float, pressures: list[float]
-) -> tuple[float, float] | None:
-    """The lower and upper two-phase pressures at ``t``, or ``None`` if single phase."""
-    flags = [_two_phase_at(mixture, z, t, p) for p in pressures]
-    if not any(flags):
-        return None
-    first = flags.index(True)
-    last = len(flags) - 1 - flags[::-1].index(True)
-    lower = (
-        pressures[0]
-        if first == 0
-        else _bisect_boundary(mixture, z, t, pressures[first], pressures[first - 1])
-    )
-    upper = (
-        pressures[-1]
-        if last == len(pressures) - 1
-        else _bisect_boundary(mixture, z, t, pressures[last], pressures[last + 1])
-    )
-    return lower, upper
-
-
-def _robust_grid(
-    mixture: Mixture, z: list[float]
-) -> tuple[
-    tuple[list[float], list[float], tuple[float, float], tuple[float, float], None],
-    tuple[list[float], list[float], tuple[float, float], tuple[float, float], None],
-    int,
-    int,
-]:
-    """The direct-flash envelope: upper and lower boundaries, cricondenbar, cricondentherm.
-
-    The continuation answers a trace with a critical point; this answers a boundary and
-    reports no critical point. The cricondenbar is a maximum, so its temperature is
-    refined by a golden-section search around the coarse grid maximum.
-    """
-    pressures = [
-        _GRID_P_MIN + (_GRID_P_MAX - _GRID_P_MIN) * i / (_GRID_P_STEPS - 1)
-        for i in range(_GRID_P_STEPS)
-    ]
-    step = (_GRID_T_MAX - _GRID_T_MIN) / (_GRID_T_STEPS - 1)
-    lower_t: list[float] = []
-    lower_p: list[float] = []
-    upper_t: list[float] = []
-    upper_p: list[float] = []
-    best_t = _GRID_T_MIN
-    best_p = 0.0
-    last_two_phase_t: float | None = None
-
-    for i in range(_GRID_T_STEPS):
-        t = _GRID_T_MIN + i * step
-        boundaries = _boundaries_at(mixture, z, t, pressures)
-        if boundaries is None:
-            continue
-        lower, upper = boundaries
-        lower_t.append(t)
-        lower_p.append(lower)
-        upper_t.append(t)
-        upper_p.append(upper)
-        last_two_phase_t = t
-        if upper > best_p:
-            best_t, best_p = t, upper
-
-    if last_two_phase_t is None:
-        raise SolverNotConvergedError(0, math.nan, NEWTON_TOL)
-
-    def upper_only(t: float) -> float | None:
-        boundaries = _boundaries_at(mixture, z, t, pressures)
-        return None if boundaries is None else boundaries[1]
-
-    # The cricondenbar temperature: the coarse maximum is within one grid step, and the
-    # top is flat enough that a local 0.5 K scan followed by a 0.1 K scan is more
-    # reliable than a golden-section search over a 36 K window.
-    cricondenbar_t, cricondenbar_p = best_t, best_p
-    for k in range(-6, 7):
-        t = best_t + 0.5 * k
-        if t < _GRID_T_MIN or t > _GRID_T_MAX:
-            continue
-        u = upper_only(t)
-        if u is not None and u > cricondenbar_p:
-            cricondenbar_t, cricondenbar_p = t, u
-    coarse_t = cricondenbar_t
-    for k in range(-5, 6):
-        t = coarse_t + 0.1 * k
-        if t < _GRID_T_MIN or t > _GRID_T_MAX:
-            continue
-        u = upper_only(t)
-        if u is not None and u > cricondenbar_p:
-            cricondenbar_t, cricondenbar_p = t, u
-
-    # The cricondentherm: the highest two-phase temperature, refined against the first
-    # single-phase temperature above it.
-    cricondentherm_t = last_two_phase_t
-    cricondentherm_p = upper_only(last_two_phase_t)
-    if cricondentherm_p is not None and last_two_phase_t < _GRID_T_MAX:
-        a = last_two_phase_t
-        b = min(_GRID_T_MAX, last_two_phase_t + step)
-        for _ in range(_GRID_BISECTIONS):
-            mid = 0.5 * (a + b)
-            if upper_only(mid) is None:
-                b = mid
-            else:
-                a = mid
-        cricondentherm_t = a
-        cricondentherm_p = upper_only(a) or cricondentherm_p
-    if cricondentherm_p is None:
-        raise SolverNotConvergedError(0, math.nan, NEWTON_TOL)
-
-    bubble = (
-        lower_t,
-        lower_p,
-        (cricondenbar_t, cricondenbar_p),
-        (cricondentherm_t, cricondentherm_p),
-        None,
-    )
-    dew = (
-        upper_t,
-        upper_p,
-        (cricondenbar_t, cricondenbar_p),
-        (cricondentherm_t, cricondentherm_p),
-        None,
-    )
-    return bubble, dew, _GRID_T_STEPS * _GRID_P_STEPS, 0
 
 
 def _sensitivity(
@@ -657,6 +477,166 @@ def _trace_branch(
     return t_vec, p_vec, cricondenbar, cricondentherm, stopped
 
 
+#: NeqSim `RobustPhaseEnvelope`'s own window and resolution: 150-500 K, 1-400 bar,
+#: 60 x 60 grid points and 24 bisections. The class is the fallback when the
+#: continuation cannot answer; these are its defaults, not a choice made here.
+_GRID_T_MIN = 150.0
+_GRID_T_MAX = 500.0
+_GRID_T_STEPS = 60
+_GRID_P_MIN = 1.0e5
+_GRID_P_MAX = 400.0e5
+_GRID_P_STEPS = 60
+_GRID_BISECTIONS = 24
+
+
+def _two_phase_at(mixture: Mixture, z: list[float], t: float, p: float) -> bool:
+    """Whether the feed splits at ``(T, P)``, as ``RobustPhaseEnvelope.isTwoPhase`` asks it.
+
+    A flash that throws is treated as single phase, which is the class's own catch.
+    """
+    try:
+        flash = pt_flash(mixture, quantity(t, "K"), quantity(p, "Pa"), z)
+    except Exception:  # the class catches every flash failure the same way
+        return False
+    return flash.phase is Phase.TWO_PHASE
+
+
+def _bisect_boundary(
+    mixture: Mixture,
+    z: list[float],
+    t: float,
+    inside: float,
+    outside: float,
+) -> float:
+    """Refine a boundary pressure between a two-phase and a single-phase pressure."""
+    for _ in range(_GRID_BISECTIONS):
+        mid = 0.5 * (inside + outside)
+        if _two_phase_at(mixture, z, t, mid):
+            inside = mid
+        else:
+            outside = mid
+    return 0.5 * (inside + outside)
+
+
+def _boundaries_at(
+    mixture: Mixture, z: list[float], t: float, pressures: list[float]
+) -> tuple[float, float] | None:
+    """The lower and upper two-phase pressures at ``t``, or ``None`` if single phase."""
+    flags = [_two_phase_at(mixture, z, t, p) for p in pressures]
+    if not any(flags):
+        return None
+    first = flags.index(True)
+    last = len(flags) - 1 - flags[::-1].index(True)
+    lower = (
+        pressures[0]
+        if first == 0
+        else _bisect_boundary(mixture, z, t, pressures[first], pressures[first - 1])
+    )
+    upper = (
+        pressures[-1]
+        if last == len(pressures) - 1
+        else _bisect_boundary(mixture, z, t, pressures[last], pressures[last + 1])
+    )
+    return lower, upper
+
+
+def _robust_grid(
+    mixture: Mixture, z: list[float]
+) -> tuple[
+    tuple[list[float], list[float], tuple[float, float], tuple[float, float], None],
+    tuple[list[float], list[float], tuple[float, float], tuple[float, float], None],
+    int,
+]:
+    """The direct-flash envelope: upper and lower boundaries, cricondenbar, cricondentherm.
+
+    ``RobustPhaseEnvelope``'s algorithm, at its own parameters. It answers a boundary and
+    reports no critical point; the cricondenbar is resampled over one coarse step on each
+    side, and the cricondentherm is bisected to the first single-phase temperature above
+    the highest two-phase one.
+    """
+    pressures = [
+        _GRID_P_MIN + (_GRID_P_MAX - _GRID_P_MIN) * i / (_GRID_P_STEPS - 1)
+        for i in range(_GRID_P_STEPS)
+    ]
+    step = (_GRID_T_MAX - _GRID_T_MIN) / (_GRID_T_STEPS - 1)
+    lower_t: list[float] = []
+    lower_p: list[float] = []
+    upper_t: list[float] = []
+    upper_p: list[float] = []
+    best_t = _GRID_T_MIN
+    best_p = 0.0
+    last_two_phase_t: float | None = None
+    first_single_phase_t: float | None = None
+
+    for i in range(_GRID_T_STEPS):
+        t = _GRID_T_MIN + i * step
+        boundaries = _boundaries_at(mixture, z, t, pressures)
+        if boundaries is None:
+            if last_two_phase_t is not None and first_single_phase_t is None:
+                first_single_phase_t = t
+            continue
+        lower, upper = boundaries
+        lower_t.append(t)
+        lower_p.append(lower)
+        upper_t.append(t)
+        upper_p.append(upper)
+        last_two_phase_t = t
+        if upper > best_p:
+            best_t, best_p = t, upper
+
+    if last_two_phase_t is None:
+        raise SolverNotConvergedError(0, math.nan, NEWTON_TOL)
+
+    def upper_only(t: float) -> float | None:
+        boundaries = _boundaries_at(mixture, z, t, pressures)
+        return None if boundaries is None else boundaries[1]
+
+    # `refineCricondenbar`: resample the upper boundary over +/- one coarse step.
+    low = max(_GRID_T_MIN, best_t - step)
+    high = min(_GRID_T_MAX, best_t + step)
+    cricondenbar_t, cricondenbar_p = best_t, best_p
+    for k in range(13):
+        t = low + (high - low) * k / 12.0
+        u = upper_only(t)
+        if u is not None and u > cricondenbar_p:
+            cricondenbar_t, cricondenbar_p = t, u
+
+    # `refineCricondentherm`: bisect between the last two-phase temperature and the first
+    # single-phase temperature above it.
+    cricondentherm_t = last_two_phase_t
+    cricondentherm_p = upper_only(last_two_phase_t)
+    if cricondentherm_p is not None and first_single_phase_t is not None:
+        a = last_two_phase_t
+        b = first_single_phase_t
+        for _ in range(_GRID_BISECTIONS):
+            mid = 0.5 * (a + b)
+            u = upper_only(mid)
+            if u is None:
+                b = mid
+            else:
+                a = mid
+                cricondentherm_p = u
+        cricondentherm_t = a
+    if cricondentherm_p is None:
+        raise SolverNotConvergedError(0, math.nan, NEWTON_TOL)
+
+    bubble = (
+        lower_t,
+        lower_p,
+        (cricondenbar_t, cricondenbar_p),
+        (cricondentherm_t, cricondentherm_p),
+        None,
+    )
+    dew = (
+        upper_t,
+        upper_p,
+        (cricondenbar_t, cricondenbar_p),
+        (cricondentherm_t, cricondentherm_p),
+        None,
+    )
+    return bubble, dew, _GRID_T_STEPS * _GRID_P_STEPS
+
+
 def pt_phase_envelope(mixture: Mixture, P: Q, z: list[float]) -> PtPhaseEnvelopeResult:
     """The PT phase envelope of a mixture of composition ``z``, traced from ``P``.
 
@@ -706,50 +686,34 @@ def pt_phase_envelope(mixture: Mixture, P: Q, z: list[float]) -> PtPhaseEnvelope
         bubble = _trace_branch(mixture, pressure, list(z), BUBBLE_BETA)
         dew = _trace_branch(mixture, pressure, list(z), DEW_BETA)
     except SolverNotConvergedError:
-        bubble, dew, grid_evaluations, _ = _robust_grid(mixture, list(z))
+        bubble, dew, grid_evaluations = _robust_grid(mixture, list(z))
         grid_used = True
-        warnings.append(
-            Warning(
-                code=WarningCode.SOLVER_NOT_CONVERGED,
-                message=(
-                    "the Michelsen continuation did not converge; the envelope is the "
-                    f"direct-flash grid on {_GRID_T_MIN:.0f}-{_GRID_T_MAX:.0f} K and "
-                    f"{_GRID_P_MIN / 1e5:.0f}-{_GRID_P_MAX / 1e5:.0f} bar, which reports "
-                    "no critical point"
-                ),
-            )
-        )
 
+    critical: tuple[float, float] | None
     if grid_used:
+        # `RobustPhaseEnvelope` reports no critical point; it has no trace to refine.
         cricondenbar = bubble[2]
         cricondentherm = bubble[3]
+        critical = (math.nan, math.nan)
+        residual = math.nan
         iterations = grid_evaluations
     else:
         cricondenbar = bubble[2] if bubble[2][1] >= dew[2][1] else dew[2]
         cricondentherm = bubble[3] if bubble[3][0] >= dew[3][0] else dew[3]
+
+        # **The critical point is computed, not read off the trace**, and it is one point: the
+        # two phases become one there, so a branch cannot have its own. It is computed only when
+        # a branch actually ran into the critical region; a trace that never got near it reports
+        # where it stopped rather than a critical point it never found.
+        critical = _critical(mixture, list(z)) if (bubble[4] or dew[4]) else None
+        critical = critical or bubble[4] or dew[4]
+        if critical is None:
+            critical = (bubble[0][-1], bubble[1][-1]) if bubble[0] else (math.nan, math.nan)
+
+        # The residual is how far apart the two branches stopped. They approach the critical
+        # point from opposite sides, so the gap is the width of the bracket they put around it.
+        residual = abs(bubble[4][0] - dew[4][0]) if (bubble[4] and dew[4]) else math.nan
         iterations = len(bubble[0]) + len(dew[0])
-
-    # **The critical point is computed, not read off the trace**, and it is one point: the two
-    # phases become one there, so a branch cannot have its own.
-    critical = _critical(mixture, list(z))
-    if critical is None:
-        critical = (math.nan, math.nan)
-        warnings.append(
-            Warning(
-                code=WarningCode.SOLVER_NOT_CONVERGED,
-                message=(
-                    "the mixture critical point did not converge; the critical fields are "
-                    "NaN. The envelope's cricondenbar and cricondentherm do not depend on it"
-                ),
-            )
-        )
-
-    # The residual is how far apart the two branches stopped. They approach the critical point
-    # from opposite sides, so the gap is the width of the bracket they put around it. A grid
-    # answer has no trace and no bracket.
-    residual = (
-        abs(bubble[4][0] - dew[4][0]) if (not grid_used and bubble[4] and dew[4]) else math.nan
-    )
 
     return PtPhaseEnvelopeResult(
         dew_temperature=tuple(from_si(_v, "K") for _v in tuple(dew[0])),

@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/release/PredictiveBubbleTransferZoneReleaseModel.java"
 edition = "Its `calculate`: the drift base, the predicted diameter, relative velocity and residence time, the fixed-point iteration over the Ranz-Marshall delegate, and its bounding limits."
+
+[source.neqsim]
+class = "PredictiveBubbleTransferZoneReleaseModel"
+members = ["PredictiveBubbleTransferZoneReleaseModel.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "bubble_transfer_zone_fixed_point"
 initialisation = "hem_isentropic_pressure_scan"
@@ -213,6 +219,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class refuses a non-positive vertical length"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PredictiveBubbleTransferZoneReleaseModel.calculate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim PredictiveBubbleTransferZoneReleaseModel.calculate"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim PredictiveBubbleTransferZoneReleaseModel.calculate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim PredictiveBubbleTransferZoneReleaseModel.calculate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim PredictiveBubbleTransferZoneReleaseModel.calculate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim PredictiveBubbleTransferZoneReleaseModel.calculate"
+
 [implementations]
 python = "azoth.process.bubble_transfer_zone_release"
 rust = "azoth_process::bubble_transfer_zone_release"

@@ -20,6 +20,12 @@ references = ["Soave, G. (1972). \\\"Equilibrium constants from a modified Redli
 standard = "Soave, G. (1972)"
 edition = "Equilibrium constants from a modified Redlich-Kwong equation of state. Chemical Engineering Science, 27(6), 1197-1203"
 doi = "10.1016/0009-2509(72)80096-4"
+
+[source.neqsim]
+class = "PhaseSrkEos"
+members = ["PhaseSrkEos"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.a_reduced]
 unit = "dimensionless"
@@ -77,6 +83,12 @@ ln_phi = -0.1798730824039273
 h_dep_rt = -0.5758065027791224
 s_dep_r = -0.3959334203751951
 cp_dep_r = 1.359843414975507
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PhaseSrkEos"
+
 [implementations]
 python = "azoth.eos.srk_departure"
 rust = "azoth_eos::srk_departure"

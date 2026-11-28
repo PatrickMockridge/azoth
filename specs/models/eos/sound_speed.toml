@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim thermo/phase/PhaseEos.java"
 edition = "Its `getSoundSpeed`: `bs = -(1/V) Cv/Cp / dPdVTn`, `sqrt(V/Mw/bs)`, with the derivative analytic in the cubic's Helmholtz residual; and `SystemThermo.getSoundSpeed`'s beta-weighted sum."
+
+[source.neqsim]
+class = "PhaseEos"
+members = ["PhaseEos.getSoundSpeed"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -57,6 +63,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PhaseEos.getSoundSpeed"
+
 [implementations]
 python = "azoth.eos.sound_speed"
 rust = "azoth_eos::sound_speed"

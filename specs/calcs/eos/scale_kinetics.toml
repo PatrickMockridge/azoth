@@ -12,6 +12,12 @@ references = [
 [source]
 standard = "NeqSim master `ScaleKinetics`"
 edition = "`evaluate` and the four setters' clamps, ported. The Gson report and the setters' storage are not."
+
+[source.neqsim]
+class = "ScaleKinetics"
+members = ["ScaleKinetics.evaluate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.saturation_index]
 unit = "dimensionless"
@@ -257,6 +263,12 @@ id = "round_trip_units"
 type = "property"
 property = "unit_round_trip"
 status = "active"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ScaleKinetics.evaluate"
+
 [implementations]
 python = "azoth.eos.scale_kinetics"
 rust = "azoth_eos::scale_kinetics"

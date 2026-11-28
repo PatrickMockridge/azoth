@@ -13,6 +13,12 @@ edition = """\
     Procedure for Use of Electronic Digital Computers in Calculating Flash Vaporization \
     Hydrocarbon Equilibrium. Journal of Petroleum Technology, 4(10), 19-3"""
 doi = "10.2118/952327-G"
+
+[source.neqsim]
+class = "RachfordRice"
+members = ["RachfordRice.calcBeta"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.z1]
 unit = "dimensionless"
@@ -76,6 +82,12 @@ K1 = 4.0
 K2 = 0.25
 [worked_example.expected]
 vapour_fraction = 0.6666666666666665
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim RachfordRice.calcBeta"
+
 [implementations]
 python = "azoth.eos.rachford_rice_binary"
 rust = "azoth_eos::rachford_rice_binary"

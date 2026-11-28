@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/rupture/BlowdownPressureProfile.java"
 edition = "Its `pressureBaraAt` and `pressureBargAt`, over its `InterpolationMode` pair."
+
+[source.neqsim]
+class = "BlowdownPressureProfile"
+members = ["BlowdownPressureProfile.pressureBaraAt"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "piecewise_step_or_linear_pressure_profile"
 convergence = "absolute"
@@ -63,6 +69,24 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "the class's constructor refuses a negative gauge offset"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim BlowdownPressureProfile.pressureBaraAt"
+
+[provenance.algorithm.convergence]
+source = "NeqSim BlowdownPressureProfile.pressureBaraAt"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim BlowdownPressureProfile.pressureBaraAt"
+
+[provenance.algorithm.scheme]
+source = "NeqSim BlowdownPressureProfile.pressureBaraAt"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim BlowdownPressureProfile.pressureBaraAt"
+
 [implementations]
 python = "azoth.process.blowdown_pressure_profile"
 rust = "azoth_process::blowdown_pressure_profile"

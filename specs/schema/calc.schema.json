@@ -15,7 +15,9 @@
     "outputs",
     "implementations",
     "worked_example",
-    "tests"
+    "tests",
+    "source",
+    "provenance"
   ],
   "properties": {
     "id": {
@@ -56,6 +58,30 @@
           "minLength": 1,
           "description": "Name of the standard, textbook, or paper."
         },
+        "neqsim": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["class", "members", "commit"],
+          "description": "The NeqSim source of the port: the class, the members it reads and the pinned commit. A composition of classes names each one in `members`.",
+          "properties": {
+            "class": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Za-z0-9_.]*$",
+              "description": "The NeqSim class or member that is the port's source."
+            },
+            "members": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string", "minLength": 1 },
+              "description": "The methods, constructors or fields the kernels read."
+            },
+            "commit": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{7,40}$",
+              "description": "The NeqSim commit the class was read at - the databank pin or a capture's jar."
+            }
+          }
+        },
         "edition": { "type": "string" },
         "equation": {
           "type": "string",
@@ -65,6 +91,7 @@
         "url": { "type": "string", "format": "uri" }
       }
     },
+    "provenance": { "$ref": "#/$defs/provenance" },
     "inputs": {
       "type": "object",
       "minProperties": 1,
@@ -194,6 +221,57 @@
   },
 
   "$defs": {
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["inputs", "outputs"],
+      "description": "Where every declared value comes from. `inputs` and `outputs` carry a default source and per-name overrides; every algorithm leaf and every named constant has its own source. `caller` means the caller supplies it; anything else names a NeqSim member at the pin or a citation.",
+      "properties": {
+        "inputs": { "$ref": "#/$defs/provenance_values" },
+        "outputs": { "$ref": "#/$defs/provenance_values" },
+        "algorithm": {
+          "type": "object",
+          "description": "One entry per leaf of the spec's algorithm block, keyed by its dotted path.",
+          "additionalProperties": { "$ref": "#/$defs/provenance_entry" }
+        },
+        "constants": {
+          "type": "array",
+          "description": "One row per named numeric constant the kernel reads and the spec declares.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "value", "source"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "value": { "type": "number" },
+              "source": { "type": "string", "minLength": 1 },
+              "note": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "provenance_values": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default"],
+      "properties": {
+        "default": { "type": "string", "minLength": 1 },
+        "overrides": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/provenance_entry" }
+        }
+      }
+    },
+    "provenance_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source"],
+      "properties": {
+        "source": { "type": "string", "minLength": 1 },
+        "note": { "type": "string" }
+      }
+    },
     "citation": {
       "type": "string",
       "description": "Where a value came from, for a reader. Optional everywhere and validated nowhere: the engineer supplying data is responsible for knowing its provenance and whether they may use it."

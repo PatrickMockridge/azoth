@@ -15,6 +15,12 @@ references = [
 [source]
 standard = "NeqSim master `WaterDewPointEquilibriumLine`"
 edition = "The class's own sweep, which its field `hydratePoints` misnames: it holds water dew points and not hydrate points."
+
+[source.neqsim]
+class = "WaterDewPointEquilibriumLine"
+members = ["WaterDewPointEquilibriumLine.hydratePoints"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "water_dew_point_pressure_sweep"
 initialisation = "ten_equal_pressure_increments"
@@ -68,6 +74,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim WaterDewPointEquilibriumLine.hydratePoints"
+
+[provenance.algorithm.convergence]
+source = "NeqSim WaterDewPointEquilibriumLine.hydratePoints"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim WaterDewPointEquilibriumLine.hydratePoints"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim WaterDewPointEquilibriumLine.hydratePoints"
+
+[provenance.algorithm.scheme]
+source = "NeqSim WaterDewPointEquilibriumLine.hydratePoints"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim WaterDewPointEquilibriumLine.hydratePoints"
+
 [implementations]
 python = "azoth.eos.water_dew_point_line"
 rust = "azoth_eos::water_dew_point_line"

@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim pvtsimulation/simulation/SwellingTest.java"
 edition = "The base bubble point, the cumulative gas additions and the relative oil volume at each bubble point."
+
+[source.neqsim]
+class = "SwellingTest"
+members = ["SwellingTest"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "record_list"
@@ -245,6 +251,12 @@ description = "the bubble-point pressure.\n"
 [outputs.points.fields.relative_oil_volume]
 unit = "dimensionless"
 description = "the bubble-point volume over the base oil's.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SwellingTest"
+
 [implementations]
 python = "azoth.pvt.swelling_test"
 rust = "azoth_pvt::swelling_test"

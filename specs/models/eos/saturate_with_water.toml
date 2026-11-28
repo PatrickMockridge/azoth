@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim master `SaturateWithWater`"
 edition = "The flood, the dissolved-water correction and the residual-phase removal, over this library's own multiphase flash and phase label."
+
+[source.neqsim]
+class = "SaturateWithWater"
+members = ["SaturateWithWater.indexOfAqueousPhase"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "water_flood_then_dissolved_amount"
 convergence = "absolute"
@@ -82,6 +88,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "a non-positive pressure is not a state the cubic can be evaluated at"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SaturateWithWater.indexOfAqueousPhase"
+
+[provenance.algorithm.convergence]
+source = "NeqSim SaturateWithWater.indexOfAqueousPhase"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim SaturateWithWater.indexOfAqueousPhase"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim SaturateWithWater.indexOfAqueousPhase"
+
+[provenance.algorithm.scheme]
+source = "NeqSim SaturateWithWater.indexOfAqueousPhase"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim SaturateWithWater.indexOfAqueousPhase"
+
 [implementations]
 python = "azoth.eos.saturate_with_water"
 rust = "azoth_eos::saturate_with_water"

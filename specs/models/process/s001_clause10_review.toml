@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/processsafetysystem/ProcessSafetySystemReviewEngine.java"
 edition = "Its `evaluate`, the fifteen `check*` methods, `evaluateCoverage` and `calculateConfidence`."
+
+[source.neqsim]
+class = "ProcessSafetySystemReviewEngine"
+members = ["ProcessSafetySystemReviewEngine.evaluate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "norsok_s001_clause10_review"
 convergence = "absolute"
@@ -137,6 +143,24 @@ description = "the number of failing assessments.\n"
 [outputs.warning_assessment_count]
 unit = "dimensionless"
 description = "the number of warning assessments.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ProcessSafetySystemReviewEngine.evaluate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ProcessSafetySystemReviewEngine.evaluate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ProcessSafetySystemReviewEngine.evaluate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ProcessSafetySystemReviewEngine.evaluate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ProcessSafetySystemReviewEngine.evaluate"
+
 [implementations]
 python = "azoth.process.s001_clause10_review"
 rust = "azoth_process::s001_clause10_review"

@@ -21,6 +21,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/escalation/EscalationGraphAnalyzer.java"
 edition = "Its `addItem`, `addExposure`, `propagate` and `worstCaseEscalation`."
+
+[source.neqsim]
+class = "EscalationGraphAnalyzer"
+members = ["EscalationGraphAnalyzer.addItem"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "domino_failure_propagation"
 convergence = "absolute"
@@ -75,6 +81,24 @@ description = "the failed item's identifier.\n"
 [outputs.worst_case_count]
 unit = "dimensionless"
 description = "the number of items in the worst case.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim EscalationGraphAnalyzer.addItem"
+
+[provenance.algorithm.convergence]
+source = "NeqSim EscalationGraphAnalyzer.addItem"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim EscalationGraphAnalyzer.addItem"
+
+[provenance.algorithm.scheme]
+source = "NeqSim EscalationGraphAnalyzer.addItem"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim EscalationGraphAnalyzer.addItem"
+
 [implementations]
 python = "azoth.process.escalation_graph"
 rust = "azoth_process::escalation_graph"

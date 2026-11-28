@@ -27,6 +27,12 @@ references = [
 [source]
 standard = "NeqSim pvtsimulation/util/ZFactorCorrelations.java, GasPseudoCriticalProperties.java, GasPseudoPressure.java and reservoirproperties/CompositionEstimation.java"
 edition = "The static correlation routes; the EOS pseudo-pressure instance methods are named in the assumptions rather than ported."
+
+[source.neqsim]
+class = "ZFactorCorrelations"
+members = ["ZFactorCorrelations"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "gas_correlation_dispatch"
 initialisation = "first_query_in_caller_order"
@@ -146,6 +152,27 @@ description = "the pseudopressure in the class's bara^2/cP.\n"
 unit = "dimensionless"
 optional = true
 description = "the Haaland H2S estimate, in the class's dimensionless fraction.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ZFactorCorrelations"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ZFactorCorrelations"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim ZFactorCorrelations"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ZFactorCorrelations"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ZFactorCorrelations"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ZFactorCorrelations"
+
 [implementations]
 python = "azoth.pvt.gas_correlations"
 rust = "azoth_pvt::gas_correlations"

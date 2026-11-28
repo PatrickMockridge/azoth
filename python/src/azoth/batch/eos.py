@@ -61,7 +61,6 @@ __all__ = [
     "PrMolarVolumeBatch",
     "PrPenelouxShiftBatch",
     "PrZFactorBatch",
-    "PrsvKappaBatch",
     "RachfordRiceBinaryBatch",
     "RackettMolarVolumeBatch",
     "RkAlphaAbBatch",
@@ -114,7 +113,6 @@ __all__ = [
     "pr_molar_volume",
     "pr_peneloux_shift",
     "pr_z_factor",
-    "prsv_kappa",
     "rachford_rice_binary",
     "rackett_molar_volume",
     "rk_alpha_ab",
@@ -151,7 +149,6 @@ _PR_DELFT1998_ALPHA = "eos.pr_delft1998_alpha"
 _PR_GASSEM2001_ALPHA = "eos.pr_gassem2001_alpha"
 _PR_LEE_KESLER_ALPHA = "eos.pr_lee_kesler_alpha"
 _PR_Z_FACTOR = "eos.pr_z_factor"
-_PRSV_KAPPA = "eos.prsv_kappa"
 _PR_DEPARTURE = "eos.pr_departure"
 _VDW1F_MIX_BINARY = "eos.vdw1f_mix_binary"
 _CHUNG_CONDUCTIVITY = "eos.chung_conductivity"
@@ -1145,46 +1142,6 @@ def pr_z_factor(*, a_reduced: Sequence[float], b_reduced: Sequence[float]) -> Pr
             "b_reduced": sequence(b_reduced, "b_reduced"),
         },
         _build_z_factor,
-    )
-    return result
-
-
-@dataclass(frozen=True, slots=True, eq=False, repr=False)
-class PrsvKappaBatch(BatchResult):
-    """Result of a batch :func:`azoth.eos.prsv_kappa`."""
-
-    #: The PRSV alpha-function coefficient per element. Dimensionless.
-    kappa: array[float]
-
-
-def _build_prsv(
-    columns: dict[str, object],
-    units: dict[str, str],
-    warnings: tuple[tuple[Warning, ...], ...],
-) -> PrsvKappaBatch:
-    return PrsvKappaBatch(warnings=warnings, units=units, kappa=columns["kappa"])  # type: ignore[arg-type]
-
-
-def prsv_kappa(
-    *,
-    omega: Sequence[float],
-    Tr: Sequence[float],
-    kappa1: Sequence[float],
-) -> PrsvKappaBatch:
-    """The PRSV alpha-function coefficient, over arrays.
-
-    ``kappa1`` is the per-substance parameter this library ships no values for, so
-    a batch call needs one array of them from the caller - there is nothing to
-    broadcast from. See :func:`azoth.eos.prsv_kappa` for the calculation itself.
-    """
-    result: PrsvKappaBatch = run(
-        _PRSV_KAPPA,
-        {
-            "omega": sequence(omega, "omega"),
-            "Tr": sequence(Tr, "Tr"),
-            "kappa1": sequence(kappa1, "kappa1"),
-        },
-        _build_prsv,
     )
     return result
 

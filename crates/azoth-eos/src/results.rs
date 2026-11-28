@@ -540,25 +540,6 @@ pub struct PrZFactorResult {
     pub warnings: Vec<Warning>,
 }
 
-/// Result of `eos.prsv_kappa`.
-#[derive(Debug, Clone, PartialEq)]
-pub struct PrsvKappaResult {
-    /// The PRSV alpha-function coefficient. Dimensionless, and unlike
-    /// Peng-Robinson's it varies with temperature.
-    pub kappa: f64,
-    /// Caveats.
-    pub warnings: Vec<Warning>,
-}
-
-impl CalcResult for PrsvKappaResult {
-    const CALC_ID: &'static str = "eos.prsv_kappa";
-    const FIELDS: &'static [&'static str] = &["kappa", "warnings"];
-
-    fn warnings(&self) -> &[Warning] {
-        &self.warnings
-    }
-}
-
 /// Result of `eos.pr_departure`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct PrDepartureResult {
@@ -2597,44 +2578,6 @@ impl Phase {
     }
 }
 
-/// How a state sits in the phase diagram, as a screening label.
-///
-/// `Phase` is the flash's own verdict; this is the caller-facing classification. The
-/// dense labels are azoth's, derived from the mixture's Kay pseudo-critical point when
-/// a true `eos.critical_point` is not available: they say the flash's `all_vapour` is
-/// the negative flash on a dense fluid rather than a vapour.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PhaseClass {
-    /// A genuine split.
-    TwoPhase,
-    /// A single phase the flash calls vapour, below the dense band.
-    SinglePhaseGas,
-    /// A single phase the flash calls liquid.
-    SinglePhaseLiquid,
-    /// A single phase above the pseudo-critical pressure but not both reduced
-    /// coordinates.
-    DenseSinglePhase,
-    /// Above both pseudo-critical coordinates.
-    DenseSupercritical,
-    /// The classification could not be made.
-    Undetermined,
-}
-
-impl PhaseClass {
-    /// The spec's spelling.
-    #[must_use]
-    pub fn as_str(self) -> &'static str {
-        match self {
-            Self::TwoPhase => "two_phase",
-            Self::SinglePhaseGas => "single_phase_gas",
-            Self::SinglePhaseLiquid => "single_phase_liquid",
-            Self::DenseSinglePhase => "dense_single_phase",
-            Self::DenseSupercritical => "dense_supercritical",
-            Self::Undetermined => "undetermined",
-        }
-    }
-}
-
 /// Result of `eos.pt_flash`.
 ///
 /// # Why `beta` is optional here and nowhere else in this crate
@@ -2690,199 +2633,6 @@ impl CalcResult for PtFlashResult {
         "phase",
         "iterations",
         "residual",
-        "warnings",
-    ];
-
-    fn warnings(&self) -> &[Warning] {
-        &self.warnings
-    }
-}
-
-/// Result of `eos.pt_flash_check`.
-///
-/// The same state as [`PtFlashResult`] with the iteration's own verdict: `converged`
-/// is false exactly when `strict = false` and the loop hit its cap, in which case the
-/// split is the last iterate and the warning says so.
-#[derive(Debug, Clone)]
-pub struct PtFlashCheckResult {
-    /// The vapour fraction, or `None` when the solution is trivial.
-    pub vapour_fraction: Option<f64>,
-    /// Liquid-phase mole fractions.
-    pub x: Vec<f64>,
-    /// Vapour-phase mole fractions.
-    pub y: Vec<f64>,
-    /// `K_i = y_i / x_i`, the iterate the loop converges on.
-    pub k: Vec<f64>,
-    /// `ln phi_i` in the liquid phase.
-    pub ln_phi_liquid: Vec<f64>,
-    /// `ln phi_i` in the vapour phase.
-    pub ln_phi_vapour: Vec<f64>,
-    /// The liquid root of the cubic, the smallest admissible one.
-    pub z_liquid: f64,
-    /// The vapour root, the largest admissible one.
-    pub z_vapour: f64,
-    /// The smallest `T / Tc_i` over the components.
-    pub min_t_over_tc: f64,
-    /// What the state is.
-    pub phase: Phase,
-    /// Whether the iteration met its tolerance or settled by proof.
-    pub converged: bool,
-    /// Outer steps taken.
-    pub iterations: u32,
-    /// The last step's convergence measure.
-    pub residual: f64,
-    /// Caveats.
-    pub warnings: Vec<Warning>,
-}
-
-impl CalcResult for PtFlashCheckResult {
-    const CALC_ID: &'static str = "eos.pt_flash_check";
-    const FIELDS: &'static [&'static str] = &[
-        "vapour_fraction",
-        "x",
-        "y",
-        "k",
-        "ln_phi_liquid",
-        "ln_phi_vapour",
-        "z_liquid",
-        "z_vapour",
-        "min_t_over_tc",
-        "phase",
-        "converged",
-        "iterations",
-        "residual",
-        "warnings",
-    ];
-
-    fn warnings(&self) -> &[Warning] {
-        &self.warnings
-    }
-}
-
-/// Result of `eos.umr_pru_flash`.
-///
-/// The same state as [`PtFlashResult`] with the iteration's own verdict. The loop is
-/// successive substitution only: the UMR rule has no `phase_derivatives`, which the
-/// second-order fallback needs, and the spec declares no fallback.
-#[derive(Debug, Clone, PartialEq)]
-pub struct UmrPruFlashResult {
-    /// The vapour fraction, or `None` when the solution is trivial.
-    pub vapour_fraction: Option<f64>,
-    /// Liquid-phase mole fractions.
-    pub x: Vec<f64>,
-    /// Vapour-phase mole fractions.
-    pub y: Vec<f64>,
-    /// `K_i = y_i / x_i`, the iterate the loop converges on.
-    pub k: Vec<f64>,
-    /// `ln phi_i` in the liquid phase.
-    pub ln_phi_liquid: Vec<f64>,
-    /// `ln phi_i` in the vapour phase.
-    pub ln_phi_vapour: Vec<f64>,
-    /// The liquid root of the cubic.
-    pub z_liquid: f64,
-    /// The vapour root.
-    pub z_vapour: f64,
-    /// The smallest `T / Tc_i` over the components.
-    pub min_t_over_tc: f64,
-    /// What the state is.
-    pub phase: Phase,
-    /// Whether the iteration met its tolerance or settled by proof.
-    pub converged: bool,
-    /// Outer steps taken.
-    pub iterations: u32,
-    /// The last step's convergence measure.
-    pub residual: f64,
-    /// Caveats.
-    pub warnings: Vec<Warning>,
-}
-
-impl CalcResult for UmrPruFlashResult {
-    const CALC_ID: &'static str = "eos.umr_pru_flash";
-    const FIELDS: &'static [&'static str] = &[
-        "vapour_fraction",
-        "x",
-        "y",
-        "k",
-        "ln_phi_liquid",
-        "ln_phi_vapour",
-        "z_liquid",
-        "z_vapour",
-        "min_t_over_tc",
-        "phase",
-        "converged",
-        "iterations",
-        "residual",
-        "warnings",
-    ];
-
-    fn warnings(&self) -> &[Warning] {
-        &self.warnings
-    }
-}
-
-/// Result of `eos.state_at_tp`.
-///
-/// One state in one call: the split, the bulk volumetric and caloric properties, and
-/// the screening phase class. The per-phase rows are a later tranche's; this is the
-/// aggregate a time march or a report needs.
-#[derive(Debug, Clone, PartialEq)]
-pub struct StateAtTpResult {
-    /// What the flash found.
-    pub phase: Phase,
-    /// The caller-facing screening label.
-    pub phase_class: PhaseClass,
-    /// Whether the flash met its tolerance.
-    pub converged: bool,
-    /// The vapour fraction where there is a split.
-    pub vapour_fraction: Option<f64>,
-    /// Liquid-phase mole fractions.
-    pub x: Vec<f64>,
-    /// Vapour-phase mole fractions.
-    pub y: Vec<f64>,
-    /// Bulk molar mass, kg/mol.
-    pub molar_mass: f64,
-    /// Bulk molar volume, m**3/mol.
-    pub molar_volume: f64,
-    /// Bulk mass density, kg/m**3.
-    pub density: f64,
-    /// Bulk molar internal energy, J/mol.
-    pub internal_energy: f64,
-    /// Bulk molar enthalpy, J/mol.
-    pub enthalpy: f64,
-    /// Bulk molar isobaric heat capacity, J/(mol*K).
-    pub cp: f64,
-    /// Bulk molar isochoric heat capacity, J/(mol*K).
-    pub cv: f64,
-    /// Bulk compressibility `P v / (R T)`.
-    pub compressibility: f64,
-    /// The equilibrium sound speed, m/s; absent where the derivative surface cannot
-    /// produce one.
-    pub system_sound_speed: Option<f64>,
-    /// The interfacial tension, N/m; absent for a single phase.
-    pub interface_tension: Option<f64>,
-    /// Caveats.
-    pub warnings: Vec<Warning>,
-}
-
-impl CalcResult for StateAtTpResult {
-    const CALC_ID: &'static str = "eos.state_at_tp";
-    const FIELDS: &'static [&'static str] = &[
-        "phase",
-        "phase_class",
-        "converged",
-        "vapour_fraction",
-        "x",
-        "y",
-        "molar_mass",
-        "molar_volume",
-        "density",
-        "internal_energy",
-        "enthalpy",
-        "cp",
-        "cv",
-        "compressibility",
-        "system_sound_speed",
-        "interface_tension",
         "warnings",
     ];
 
@@ -5763,9 +5513,6 @@ pub struct CriticalPointResult {
     pub vc: MolarVolume,
     /// `Pc Vc/(R Tc)`.
     pub z_c: f64,
-    /// Whether the nested Newton met its tolerance. False means the state fields are NaN
-    /// and the warning carries the residual.
-    pub converged: bool,
     /// Outer iterations taken.
     pub iterations: u32,
     /// `max(|smallest eigenvalue|, |cubic form|)` at the returned state.
@@ -5781,7 +5528,6 @@ impl CalcResult for CriticalPointResult {
         "pc",
         "vc",
         "z_c",
-        "converged",
         "iterations",
         "residual",
         "warnings",
@@ -6736,6 +6482,64 @@ impl CalcResult for EquilibriumSoundSpeedResult {
         "phase_boundary_encountered",
         "flash_evaluations",
         "samples",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+/// Result of `eos.umr_pru_flash`.
+///
+/// The state the UMR-PRU flash finds: the split, both phases' fugacity coefficients and
+/// the cubic roots. The loop is successive substitution only; the UMR rule has no
+/// `phase_derivatives`, which the second-order fallback needs.
+#[derive(Debug, Clone, PartialEq)]
+pub struct UmrPruFlashResult {
+    /// The vapour fraction, or `None` when the solution is trivial.
+    pub vapour_fraction: Option<f64>,
+    /// Liquid-phase mole fractions.
+    pub x: Vec<f64>,
+    /// Vapour-phase mole fractions.
+    pub y: Vec<f64>,
+    /// `K_i = y_i / x_i`, the iterate the loop converges on.
+    pub k: Vec<f64>,
+    /// `ln phi_i` in the liquid phase.
+    pub ln_phi_liquid: Vec<f64>,
+    /// `ln phi_i` in the vapour phase.
+    pub ln_phi_vapour: Vec<f64>,
+    /// The liquid root of the cubic.
+    pub z_liquid: f64,
+    /// The vapour root.
+    pub z_vapour: f64,
+    /// The smallest `T / Tc_i` over the components.
+    pub min_t_over_tc: f64,
+    /// What the state is.
+    pub phase: Phase,
+    /// Outer steps taken.
+    pub iterations: u32,
+    /// The last step's convergence measure.
+    pub residual: f64,
+    /// Caveats.
+    pub warnings: Vec<Warning>,
+}
+
+impl CalcResult for UmrPruFlashResult {
+    const CALC_ID: &'static str = "eos.umr_pru_flash";
+    const FIELDS: &'static [&'static str] = &[
+        "vapour_fraction",
+        "x",
+        "y",
+        "k",
+        "ln_phi_liquid",
+        "ln_phi_vapour",
+        "z_liquid",
+        "z_vapour",
+        "min_t_over_tc",
+        "phase",
+        "iterations",
+        "residual",
         "warnings",
     ];
 

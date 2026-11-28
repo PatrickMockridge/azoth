@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim pvtsimulation/reservoirproperties/materialbalance/GeneralizedMaterialBalance.java"
 edition = "The initial-PVT coefficients, the four fits, the column-scaled least squares and condition gate, the inventory checks and the result's volumes and residuals."
+
+[source.neqsim]
+class = "GeneralizedMaterialBalance"
+members = ["GeneralizedMaterialBalance"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "scaled_least_squares_condition_gate"
 initialisation = "stated_initial_pvt"
@@ -116,6 +122,27 @@ description = "the root-mean-square volume residual.\n"
 [outputs.condition_number]
 unit = "dimensionless"
 description = "the 2-norm condition number of the column-scaled predictor matrix.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim GeneralizedMaterialBalance"
+
+[provenance.algorithm.convergence]
+source = "NeqSim GeneralizedMaterialBalance"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim GeneralizedMaterialBalance"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim GeneralizedMaterialBalance"
+
+[provenance.algorithm.scheme]
+source = "NeqSim GeneralizedMaterialBalance"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim GeneralizedMaterialBalance"
+
 [implementations]
 python = "azoth.pvt.generalized_material_balance"
 rust = "azoth_pvt::generalized_material_balance"

@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/hazid/HazopConsequenceAutoPopulator.java"
 edition = "Its `mappingFor`, the two catalogues, the neutral flow fallback, `populate` and the two cell-fill rules."
+
+[source.neqsim]
+class = "HazopConsequenceAutoPopulator"
+members = ["HazopConsequenceAutoPopulator.mappingFor"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "hazop_consequence_catalogue"
 convergence = "absolute"
@@ -83,6 +89,24 @@ description = "the recommendation, cited when the source cell was a placeholder;
 [outputs.mapped_count]
 unit = "dimensionless"
 description = "the number of rows a catalogue mapping was found for, the neutral fallback included.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim HazopConsequenceAutoPopulator.mappingFor"
+
+[provenance.algorithm.convergence]
+source = "NeqSim HazopConsequenceAutoPopulator.mappingFor"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim HazopConsequenceAutoPopulator.mappingFor"
+
+[provenance.algorithm.scheme]
+source = "NeqSim HazopConsequenceAutoPopulator.mappingFor"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim HazopConsequenceAutoPopulator.mappingFor"
+
 [implementations]
 python = "azoth.process.hazop_consequence_population"
 rust = "azoth_process::hazop_consequence_population"

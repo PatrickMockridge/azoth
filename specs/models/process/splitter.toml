@@ -26,6 +26,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/splitter/Splitter.java"
 edition = "Its steady-state `run`, its `splitterCapacityConstraints` and `SplitterMechanicalDesign.calcDesign`'s sizing, wall, volume, drop and weights. **The capture's outlet enthalpies are not used**; its feed row is. `calculateSplitterCost` and `runTransient` are out."
+
+[source.neqsim]
+class = "Splitter"
+members = ["Splitter.splitterCapacityConstraints"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -197,6 +203,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute temperature\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Splitter.splitterCapacityConstraints"
+
 [implementations]
 python = "azoth.process.splitter"
 rust = "azoth_process::splitter"

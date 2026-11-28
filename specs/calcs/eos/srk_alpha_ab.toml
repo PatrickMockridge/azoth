@@ -17,6 +17,12 @@ references = ["Soave, G. (1972). \\\"Equilibrium constants from a modified Redli
 standard = "Soave, G. (1972)"
 edition = "Equilibrium constants from a modified Redlich-Kwong equation of state. Chemical Engineering Science, 27(6), 1197-1203"
 doi = "10.1016/0009-2509(72)80096-4"
+
+[source.neqsim]
+class = "AttractiveTermSrk"
+members = ["AttractiveTermSrk.alpha", "AttractiveTermSrk.aT"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.kappa]
 unit = "dimensionless"
@@ -61,6 +67,12 @@ Pr = 0.25
 alpha = 1.1567082960277375
 a_reduced = 0.19315231739218255
 b_reduced = 0.02707510936404929
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim AttractiveTermSrk"
+
 [implementations]
 python = "azoth.eos.srk_alpha_ab"
 rust = "azoth_eos::srk_alpha_ab"

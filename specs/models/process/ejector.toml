@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/ejector/Ejector.java"
 edition = "Its steady-state `run`: each stream expands isentropically to the estimated mixing pressure, drops by its nozzle efficiency, gets `sqrt(2 dh)`, is mixed by momentum, and is diffused to the discharge pressure; `updateDesign` then stores the areas, lengths and volumes."
+
+[source.neqsim]
+class = "Ejector"
+members = ["Ejector.updateDesign"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.motive_components]
 type = "components"
@@ -191,6 +197,12 @@ max = 1
 max_inclusive = true
 severity = "error"
 rationale = "a pressure-recovery efficiency, in (0, 1]\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Ejector.updateDesign"
+
 [implementations]
 python = "azoth.process.ejector"
 rust = "azoth_process::ejector"

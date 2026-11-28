@@ -18,6 +18,12 @@ assumptions = [
 [source]
 standard = "Standard thermodynamics, as in Smith, Van Ness & Abbott; Michelsen & Mollerup"
 edition = "The procedure is the ordinary one: the enthalpy of a mixture at fixed pressure is a strictly increasing function of temperature."
+
+[source.neqsim]
+class = "PHflash"
+members = ["PHflash.run"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "ph_flash_inverse_temperature_newton"
 convergence = "relative"
@@ -101,6 +107,54 @@ rationale = """\
     an absolute pressure; zero and below are not states, and the cubic's reduced variables \
     divide by it.\n\
     """
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PHflash.run"
+
+[provenance.algorithm.convergence]
+source = "NeqSim PHflash.run"
+
+[provenance.algorithm.initial_temperature]
+source = "NeqSim PHflash.run"
+
+[provenance.algorithm."inner.convergence"]
+source = "NeqSim PHflash.run"
+
+[provenance.algorithm."inner.initialisation"]
+source = "NeqSim PHflash.run"
+
+[provenance.algorithm."inner.inner.convergence"]
+source = "NeqSim PHflash.run"
+
+[provenance.algorithm."inner.inner.max_iterations"]
+source = "NeqSim PHflash.run"
+
+[provenance.algorithm."inner.inner.scheme"]
+source = "NeqSim PHflash.run"
+
+[provenance.algorithm."inner.inner.tolerance"]
+source = "NeqSim PHflash.run"
+
+[provenance.algorithm."inner.max_iterations"]
+source = "NeqSim PHflash.run"
+
+[provenance.algorithm."inner.scheme"]
+source = "NeqSim PHflash.run"
+
+[provenance.algorithm."inner.tolerance"]
+source = "NeqSim PHflash.run"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim PHflash.run"
+
+[provenance.algorithm.scheme]
+source = "NeqSim PHflash.run"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim PHflash.run"
+
 [implementations]
 python = "azoth.eos.ph_flash"
 rust = "azoth_eos::ph_flash"

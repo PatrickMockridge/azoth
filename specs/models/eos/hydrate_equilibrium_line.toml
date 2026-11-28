@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim master `HydrateEquilibriumLine`"
 edition = "The grid and nothing else: the points are `HydrateFormationTemperatureFlash`'s, and the seeding between them is left out because it changes no answer."
+
+[source.neqsim]
+class = "HydrateEquilibriumLine"
+members = ["HydrateEquilibriumLine"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "hydrate_equilibrium_grid"
 initialisation = "uniform_pressure_grid"
@@ -74,6 +80,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure, and it must be above the minimum"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim HydrateEquilibriumLine"
+
+[provenance.algorithm.convergence]
+source = "NeqSim HydrateEquilibriumLine"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim HydrateEquilibriumLine"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim HydrateEquilibriumLine"
+
+[provenance.algorithm.scheme]
+source = "NeqSim HydrateEquilibriumLine"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim HydrateEquilibriumLine"
+
 [implementations]
 python = "azoth.eos.hydrate_equilibrium_line"
 rust = "azoth_eos::hydrate_equilibrium_line"

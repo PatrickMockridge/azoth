@@ -19,6 +19,5 @@ z_liquid = 0.09234067630193084
 z_vapour = 0.8721328711439305
 min_t_over_tc = 0.7762514113662025
 phase = "two_phase"
-converged = true
 iterations = 13
 residual = 1.9025594551795078e-11

@@ -2579,9 +2579,6 @@ pub struct PyCriticalPointResult {
     /// the critical compressibility, `pc vc/(R tc)`
     #[pyo3(get)]
     pub z_c: f64,
-    /// whether the nested Newton met its tolerance. False means the four state fields are NaN and the warning carries the residual; a critical point that was not reached is a refusal, not an exception.
-    #[pyo3(get)]
-    pub converged: bool,
     /// outer iterations the critical-point search took
     #[pyo3(get)]
     pub iterations: u32,
@@ -2597,12 +2594,11 @@ pub struct PyCriticalPointResult {
 impl PyCriticalPointResult {
     fn __repr__(&self) -> String {
         format!(
-            "CriticalPointResult(tc={:?}, pc={:?}, vc={:?}, z_c={:?}, converged={:?}, iterations={:?}, residual={:?}, {} warning(s))",
+            "CriticalPointResult(tc={:?}, pc={:?}, vc={:?}, z_c={:?}, iterations={:?}, residual={:?}, {} warning(s))",
             self.tc,
             self.pc,
             self.vc,
             self.z_c,
-            self.converged,
             self.iterations,
             self.residual,
             self.warnings.len()
@@ -2626,7 +2622,6 @@ impl From<&azoth_eos::results::CriticalPointResult> for PyCriticalPointResult {
                 unit: "m**3/mol".to_string(),
             },
             z_c: r.z_c,
-            converged: r.converged,
             iterations: r.iterations,
             residual: r.residual,
             warnings: transport(&r.warnings),
@@ -7981,42 +7976,6 @@ impl From<&azoth_eos::results::ProductionChemicalScaleScenarioResult>
         }
     }
 }
-/// Result of `eos.prsv_kappa`, transported.
-#[pyclass(
-    frozen,
-    skip_from_py_object,
-    module = "azoth._core",
-    name = "PrsvKappaResult"
-)]
-#[derive(Debug, Clone, PartialEq)]
-pub struct PyPrsvKappaResult {
-    /// The PRSV alpha-function coefficient, which feeds the same alpha function as Peng-Robinson's, `alpha = (1 + kappa*(1 - sqrt(Tr)))**2`. Unlike Peng-Robinson's, it varies with `Tr`.
-    #[pyo3(get)]
-    pub kappa: f64,
-    /// Caveats, deduplicated.
-    #[pyo3(get)]
-    pub warnings: Vec<PyWarning>,
-}
-
-#[pymethods]
-impl PyPrsvKappaResult {
-    fn __repr__(&self) -> String {
-        format!(
-            "PrsvKappaResult(kappa={:?}, {} warning(s))",
-            self.kappa,
-            self.warnings.len()
-        )
-    }
-}
-
-impl From<&azoth_eos::results::PrsvKappaResult> for PyPrsvKappaResult {
-    fn from(r: &azoth_eos::results::PrsvKappaResult) -> Self {
-        Self {
-            kappa: r.kappa,
-            warnings: transport(&r.warnings),
-        }
-    }
-}
 /// Result of `eos.ps_flash`, transported.
 #[pyclass(
     frozen,
@@ -8196,102 +8155,6 @@ impl From<&azoth_eos::results::PtFlashResult> for PyPtFlashResult {
         }
     }
 }
-/// Result of `eos.pt_flash_check`, transported.
-#[pyclass(
-    frozen,
-    skip_from_py_object,
-    module = "azoth._core",
-    name = "PtFlashCheckResult"
-)]
-#[derive(Debug, Clone, PartialEq)]
-pub struct PyPtFlashCheckResult {
-    /// The vapour fraction, in `[0, 1]` for a two-phase split; outside that it is the negative-flash value and the feed is single phase. Absent where there is genuinely no vapour fraction.
-    #[pyo3(get)]
-    pub vapour_fraction: Option<f64>,
-    /// liquid-phase mole fractions
-    #[pyo3(get)]
-    pub x: Vec<f64>,
-    /// vapour-phase mole fractions
-    #[pyo3(get)]
-    pub y: Vec<f64>,
-    /// `K_i = y_i / x_i = phi_i^L / phi_i^V`.
-    #[pyo3(get)]
-    pub k: Vec<f64>,
-    /// fugacity coefficients in the liquid phase, as logarithms.
-    #[pyo3(get)]
-    pub ln_phi_liquid: Vec<f64>,
-    /// fugacity coefficients in the vapour phase, as logarithms.
-    #[pyo3(get)]
-    pub ln_phi_vapour: Vec<f64>,
-    /// the liquid root of the cubic at the liquid composition.
-    #[pyo3(get)]
-    pub z_liquid: f64,
-    /// the vapour root at the vapour composition.
-    #[pyo3(get)]
-    pub z_vapour: f64,
-    /// the smallest `T / Tc_i` over the components.
-    #[pyo3(get)]
-    pub min_t_over_tc: f64,
-    /// What the state is: `two_phase`, `all_liquid`, `all_vapour`, or `trivial` (the iteration converged to `x = y = z`).
-    #[pyo3(get)]
-    pub phase: String,
-    /// whether the iteration met its tolerance, or settled on a trivial or single-phase state by proof. False only when `strict = false` and the loop hit its cap; the split is then the last iterate, not a converged state.
-    #[pyo3(get)]
-    pub converged: bool,
-    /// outer steps taken.
-    #[pyo3(get)]
-    pub iterations: u32,
-    /// the last step's convergence measure.
-    #[pyo3(get)]
-    pub residual: f64,
-    /// Caveats, deduplicated.
-    #[pyo3(get)]
-    pub warnings: Vec<PyWarning>,
-}
-
-#[pymethods]
-impl PyPtFlashCheckResult {
-    fn __repr__(&self) -> String {
-        format!(
-            "PtFlashCheckResult(vapour_fraction={:?}, x={:?}, y={:?}, k={:?}, ln_phi_liquid={:?}, ln_phi_vapour={:?}, z_liquid={:?}, z_vapour={:?}, min_t_over_tc={:?}, phase={:?}, converged={:?}, iterations={:?}, residual={:?}, {} warning(s))",
-            self.vapour_fraction,
-            self.x,
-            self.y,
-            self.k,
-            self.ln_phi_liquid,
-            self.ln_phi_vapour,
-            self.z_liquid,
-            self.z_vapour,
-            self.min_t_over_tc,
-            self.phase,
-            self.converged,
-            self.iterations,
-            self.residual,
-            self.warnings.len()
-        )
-    }
-}
-
-impl From<&azoth_eos::results::PtFlashCheckResult> for PyPtFlashCheckResult {
-    fn from(r: &azoth_eos::results::PtFlashCheckResult) -> Self {
-        Self {
-            vapour_fraction: r.vapour_fraction,
-            x: r.x.clone(),
-            y: r.y.clone(),
-            k: r.k.clone(),
-            ln_phi_liquid: r.ln_phi_liquid.clone(),
-            ln_phi_vapour: r.ln_phi_vapour.clone(),
-            z_liquid: r.z_liquid,
-            z_vapour: r.z_vapour,
-            min_t_over_tc: r.min_t_over_tc,
-            phase: r.phase.as_str().to_string(),
-            converged: r.converged,
-            iterations: r.iterations,
-            residual: r.residual,
-            warnings: transport(&r.warnings),
-        }
-    }
-}
 /// Result of `eos.pt_phase_envelope`, transported.
 #[pyclass(
     frozen,
@@ -8325,10 +8188,10 @@ pub struct PyPtPhaseEnvelopeResult {
     /// the pressure at the cricondentherm
     #[pyo3(get)]
     pub cricondentherm_pressure: PyQty,
-    /// the critical temperature, from `eos.critical_point` on the feed. On the validated case it is `0.21 K` from NeqSim's `374.3214 K`.
+    /// the critical temperature, from `eos.critical_point` on the continuation; NaN when the fallback grid answered.
     #[pyo3(get)]
     pub critical_temperature: PyQty,
-    /// the critical pressure, from the same construction
+    /// the critical pressure, from the same construction; NaN when the fallback grid answered.
     #[pyo3(get)]
     pub critical_pressure: PyQty,
     /// the continuation points traced, or the flash count when the grid answered.
@@ -10434,144 +10297,6 @@ impl From<&azoth_eos::results::StabilityTestResult> for PyStabilityTestResult {
         }
     }
 }
-/// Result of `eos.state_at_tp`, transported.
-#[pyclass(
-    frozen,
-    skip_from_py_object,
-    module = "azoth._core",
-    name = "StateAtTpResult"
-)]
-#[derive(Debug, Clone, PartialEq)]
-pub struct PyStateAtTpResult {
-    /// what the flash found.
-    #[pyo3(get)]
-    pub phase: String,
-    /// the screening label; see the assumptions.
-    #[pyo3(get)]
-    pub phase_class: String,
-    /// whether the flash met its tolerance.
-    #[pyo3(get)]
-    pub converged: bool,
-    /// the vapour fraction where there is a split; absent for a single phase.
-    #[pyo3(get)]
-    pub vapour_fraction: Option<f64>,
-    /// liquid-phase mole fractions; equal to the feed when single phase.
-    #[pyo3(get)]
-    pub x: Vec<f64>,
-    /// vapour-phase mole fractions; equal to the feed when single phase.
-    #[pyo3(get)]
-    pub y: Vec<f64>,
-    /// bulk molar mass.
-    #[pyo3(get)]
-    pub molar_mass: PyQty,
-    /// bulk molar volume, phase-fraction weighted.
-    #[pyo3(get)]
-    pub molar_volume: PyQty,
-    /// bulk mass density, the molar mass over the molar volume.
-    #[pyo3(get)]
-    pub density: PyQty,
-    /// bulk molar internal energy, `h - P v`.
-    #[pyo3(get)]
-    pub internal_energy: PyQty,
-    /// bulk molar enthalpy.
-    #[pyo3(get)]
-    pub enthalpy: PyQty,
-    /// bulk molar isobaric heat capacity.
-    #[pyo3(get)]
-    pub cp: PyQty,
-    /// bulk molar isochoric heat capacity.
-    #[pyo3(get)]
-    pub cv: PyQty,
-    /// bulk compressibility `P v / (R T)`.
-    #[pyo3(get)]
-    pub compressibility: f64,
-    /// absent in this tranche; the caller uses `eos.equilibrium_sound_speed`.
-    #[pyo3(get)]
-    pub system_sound_speed: Option<PyQty>,
-    /// absent in this tranche; the caller uses the surface-tension model.
-    #[pyo3(get)]
-    pub interface_tension: Option<PyQty>,
-    /// Caveats, deduplicated.
-    #[pyo3(get)]
-    pub warnings: Vec<PyWarning>,
-}
-
-#[pymethods]
-impl PyStateAtTpResult {
-    fn __repr__(&self) -> String {
-        format!(
-            "StateAtTpResult(phase={:?}, phase_class={:?}, converged={:?}, vapour_fraction={:?}, x={:?}, y={:?}, molar_mass={:?}, molar_volume={:?}, density={:?}, internal_energy={:?}, enthalpy={:?}, cp={:?}, cv={:?}, compressibility={:?}, system_sound_speed={:?}, interface_tension={:?}, {} warning(s))",
-            self.phase,
-            self.phase_class,
-            self.converged,
-            self.vapour_fraction,
-            self.x,
-            self.y,
-            self.molar_mass,
-            self.molar_volume,
-            self.density,
-            self.internal_energy,
-            self.enthalpy,
-            self.cp,
-            self.cv,
-            self.compressibility,
-            self.system_sound_speed,
-            self.interface_tension,
-            self.warnings.len()
-        )
-    }
-}
-
-impl From<&azoth_eos::results::StateAtTpResult> for PyStateAtTpResult {
-    fn from(r: &azoth_eos::results::StateAtTpResult) -> Self {
-        Self {
-            phase: r.phase.as_str().to_string(),
-            phase_class: r.phase_class.as_str().to_string(),
-            converged: r.converged,
-            vapour_fraction: r.vapour_fraction,
-            x: r.x.clone(),
-            y: r.y.clone(),
-            molar_mass: PyQty {
-                magnitude_si: r.molar_mass,
-                unit: "kg/mol".to_string(),
-            },
-            molar_volume: PyQty {
-                magnitude_si: r.molar_volume,
-                unit: "m**3/mol".to_string(),
-            },
-            density: PyQty {
-                magnitude_si: r.density,
-                unit: "kg/m**3".to_string(),
-            },
-            internal_energy: PyQty {
-                magnitude_si: r.internal_energy,
-                unit: "J/mol".to_string(),
-            },
-            enthalpy: PyQty {
-                magnitude_si: r.enthalpy,
-                unit: "J/mol".to_string(),
-            },
-            cp: PyQty {
-                magnitude_si: r.cp,
-                unit: "J/(mol*K)".to_string(),
-            },
-            cv: PyQty {
-                magnitude_si: r.cv,
-                unit: "J/(mol*K)".to_string(),
-            },
-            compressibility: r.compressibility,
-            system_sound_speed: r.system_sound_speed.map(|v| PyQty {
-                magnitude_si: v,
-                unit: "m/s".to_string(),
-            }),
-            interface_tension: r.interface_tension.map(|v| PyQty {
-                magnitude_si: v,
-                unit: "N/m".to_string(),
-            }),
-            warnings: transport(&r.warnings),
-        }
-    }
-}
 /// Result of `eos.stream_scale_analyzer`, transported.
 #[pyclass(
     frozen,
@@ -11897,9 +11622,6 @@ pub struct PyUmrPruFlashResult {
     /// What the state is: `two_phase`, `all_liquid`, `all_vapour`, or `trivial` (the iteration converged to `x = y = z`).
     #[pyo3(get)]
     pub phase: String,
-    /// whether the iteration met its tolerance, or settled on a trivial or single-phase state by proof. False only on the cap, where the split is the last iterate.
-    #[pyo3(get)]
-    pub converged: bool,
     /// outer steps taken.
     #[pyo3(get)]
     pub iterations: u32,
@@ -11915,7 +11637,7 @@ pub struct PyUmrPruFlashResult {
 impl PyUmrPruFlashResult {
     fn __repr__(&self) -> String {
         format!(
-            "UmrPruFlashResult(vapour_fraction={:?}, x={:?}, y={:?}, k={:?}, ln_phi_liquid={:?}, ln_phi_vapour={:?}, z_liquid={:?}, z_vapour={:?}, min_t_over_tc={:?}, phase={:?}, converged={:?}, iterations={:?}, residual={:?}, {} warning(s))",
+            "UmrPruFlashResult(vapour_fraction={:?}, x={:?}, y={:?}, k={:?}, ln_phi_liquid={:?}, ln_phi_vapour={:?}, z_liquid={:?}, z_vapour={:?}, min_t_over_tc={:?}, phase={:?}, iterations={:?}, residual={:?}, {} warning(s))",
             self.vapour_fraction,
             self.x,
             self.y,
@@ -11926,7 +11648,6 @@ impl PyUmrPruFlashResult {
             self.z_vapour,
             self.min_t_over_tc,
             self.phase,
-            self.converged,
             self.iterations,
             self.residual,
             self.warnings.len()
@@ -11947,7 +11668,6 @@ impl From<&azoth_eos::results::UmrPruFlashResult> for PyUmrPruFlashResult {
             z_vapour: r.z_vapour,
             min_t_over_tc: r.min_t_over_tc,
             phase: r.phase.as_str().to_string(),
-            converged: r.converged,
             iterations: r.iterations,
             residual: r.residual,
             warnings: transport(&r.warnings),

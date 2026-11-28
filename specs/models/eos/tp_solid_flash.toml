@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim master `SolidFlash`"
 edition = "The tabulated `ComponentSolid` route: `ComponentSolid.fugcoef2` over the component's own `HEATOFFUSION`, `TRIPLEPOINTTEMPERATURE`, `CPsolid`, `CPliquid`, `SOLIDDENSITYCOEFS` and `LIQUIDDENSITYCOEFS` columns. The Helmholtz solid routes are carried, and `SolidFlash12` is unreachable upstream."
+
+[source.neqsim]
+class = "SolidFlash"
+members = ["SolidFlash"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "solid_fraction_newton"
 initialisation = "two_phase_flash_plus_solid"
@@ -93,6 +99,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SolidFlash"
+
+[provenance.algorithm.convergence]
+source = "NeqSim SolidFlash"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim SolidFlash"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim SolidFlash"
+
+[provenance.algorithm.scheme]
+source = "NeqSim SolidFlash"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim SolidFlash"
+
 [implementations]
 python = "azoth.eos.tp_solid_flash"
 rust = "azoth_eos::tp_solid_flash"

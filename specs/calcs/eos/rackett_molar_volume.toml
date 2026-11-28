@@ -10,6 +10,12 @@ references = ["Rackett, H. G. (1970). \\\"Equation of state for saturated liquid
 standard = "Spencer, C. F.; Danner, R. P. (1972)"
 edition = "Improved equation for prediction of saturated liquid density. J. Chem. Eng. Data, 17(2), 236-241"
 doi = "10.1021/je60053a012"
+
+[source.neqsim]
+class = "Rackett"
+members = ["Rackett.calcDensity"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.omega]
 unit = "dimensionless"
@@ -56,6 +62,12 @@ Pc = 4248000.0
 T = 298.15
 [worked_example.expected]
 v = 8.991467403942754e-05
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Rackett.calcDensity"
+
 [implementations]
 python = "azoth.eos.rackett_molar_volume"
 rust = "azoth_eos::rackett_molar_volume"

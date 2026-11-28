@@ -27,6 +27,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/heatexchanger/Cooler.java"
 edition = "No `run` of its own: the port is `Heater.run` reached through `Cooler`, on the three setters this palette entry declares, **and `runTransient`'s configured dynamic branch as one step**."
+
+[source.neqsim]
+class = "Cooler"
+members = ["Cooler.runTransient"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -218,6 +224,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute temperature; a carried sub-zero state is not one the ODE moves.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Cooler.runTransient"
+
 [implementations]
 python = "azoth.process.cooler"
 rust = "azoth_process::cooler"

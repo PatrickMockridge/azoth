@@ -16,6 +16,12 @@ references = [
 standard = '''Michelsen, M. L. (1982), "The isothermal flash problem. Part I. Stability"'''
 edition = "Fluid Phase Equilibria 9(1), 1-19"
 doi = "10.1016/0378-3812(82)85001-2"
+
+[source.neqsim]
+class = "Flash"
+members = ["Flash.stabilityAnalysis"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "tangent_plane_stability"
 initialisation = "wilson"
@@ -82,6 +88,27 @@ max = 0.9
 max_inclusive = true
 severity = "warning"
 rationale = "Above `T / Tc = 0.9` for every component the cubic's roots are close to coalescing and the two phases stop being distinguishable, so a `stable` verdict near the critical point is the one to distrust."
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Flash.stabilityAnalysis"
+
+[provenance.algorithm.convergence]
+source = "NeqSim Flash.stabilityAnalysis"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim Flash.stabilityAnalysis"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim Flash.stabilityAnalysis"
+
+[provenance.algorithm.scheme]
+source = "NeqSim Flash.stabilityAnalysis"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim Flash.stabilityAnalysis"
+
 [implementations]
 python = "azoth.eos.stability_test"
 rust = "azoth_eos::stability_test"

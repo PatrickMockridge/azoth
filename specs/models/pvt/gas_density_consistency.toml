@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim pvtsimulation/util/PvtGasDensityConsistency.java"
 edition = "The outward-rounded interval propagation of the gas-density identity, the lower-endpoint floor and the closed-interval overlap test."
+
+[source.neqsim]
+class = "PvtGasDensityConsistency"
+members = ["PvtGasDensityConsistency"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.observations]
 type = "record_list"
@@ -73,6 +79,12 @@ description = "Whether the observed interval overlaps the implied one, endpoints
 [outputs.all_compatible]
 type = "boolean"
 description = "Whether every row is compatible.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PvtGasDensityConsistency"
+
 [implementations]
 python = "azoth.pvt.gas_density_consistency"
 rust = "azoth_pvt::gas_density_consistency"

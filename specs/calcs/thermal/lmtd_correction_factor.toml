@@ -15,6 +15,12 @@ references = [
 [source]
 standard = "NeqSim process/mechanicaldesign/heatexchanger/LMTDcorrectionFactor.java"
 edition = "`calcFt`, `calcFtFromRP` and the four helpers behind them - `calcR`, `calcP`, `calcFtSingleShell`, `convertPtoPerShell` - plus `requiredShellPasses`."
+
+[source.neqsim]
+class = "LMTDcorrectionFactor"
+members = ["LMTDcorrectionFactor.calcFt"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.hot_inlet_temperature]
 unit = "K"
@@ -92,6 +98,12 @@ ft = 0.8669282341207655
 ft_1_shell_pass = 0.8669282341207655
 ft_2_shell_passes = 0.969546690791266
 required_shell_passes = 1.0
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim LMTDcorrectionFactor.calcFt"
+
 [implementations]
 python = "azoth.thermal.lmtd_correction_factor"
 rust = "azoth_thermal::lmtd_correction_factor"

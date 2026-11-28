@@ -24,6 +24,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/separator/entrainment/SeparatorPerformanceCalculator.java"
 edition = "`calculate`'s standard path: the gas-liquid gravity and mist-eliminator stages, the gas-bubble carry-under, the liquid-liquid gravity and coalescer stages, and the three calibration multipliers."
+
+[source.neqsim]
+class = "SeparatorPerformanceCalculator"
+members = ["SeparatorPerformanceCalculator.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.gas_density]
 unit = "kg/m**3"
@@ -574,6 +580,12 @@ max = 1
 max_inclusive = true
 severity = "error"
 rationale = "an efficiency is a fraction"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SeparatorPerformanceCalculator.calculate"
+
 [implementations]
 python = "azoth.process.separator_performance"
 rust = "azoth_process::separator_performance"

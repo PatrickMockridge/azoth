@@ -24,12 +24,39 @@ references = [
 [source]
 standard = "NeqSim process/safety/release/LeakModel.java"
 edition = "Its `calculateSourceTerm`: the inventory scaled by the EOS volume, the 1% substep loop, the VU flash at fixed volume and internal energy, the receiving-pressure bisection, the choked/subsonic rate, the capped jet velocity, the unclamped momentum, and the totals."
+
+[source.neqsim]
+class = "LeakModel"
+members = ["LeakModel.calculateSourceTerm"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "substepped_vu_blowdown"
 initialisation = "tp_flash_at_the_initial_state"
 convergence = "relative"
 tolerance = 1.0e-7
 max_iterations = 1000000
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim LeakModel.calculateSourceTerm"
+
+[provenance.algorithm.convergence]
+source = "NeqSim LeakModel.calculateSourceTerm"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim LeakModel.calculateSourceTerm"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim LeakModel.calculateSourceTerm"
+
+[provenance.algorithm.scheme]
+source = "NeqSim LeakModel.calculateSourceTerm"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim LeakModel.calculateSourceTerm"
+
 [implementations]
 python = "azoth.process.leak_blowdown"
 rust = "azoth_process::leak_blowdown"

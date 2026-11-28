@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/dispersion/HeavyGasDispersion.java"
 edition = "Its `reducedGravity`, `britterParameter` and `distanceToConcentrationRatio`."
+
+[source.neqsim]
+class = "HeavyGasDispersion"
+members = ["HeavyGasDispersion.reducedGravity"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "britter_mcquaid_continuous_dense_gas"
 convergence = "absolute"
@@ -84,6 +90,24 @@ max = 1
 max_inclusive = false
 severity = "error"
 rationale = "the class's distance refuses a ratio outside (0, 1)"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim HeavyGasDispersion.reducedGravity"
+
+[provenance.algorithm.convergence]
+source = "NeqSim HeavyGasDispersion.reducedGravity"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim HeavyGasDispersion.reducedGravity"
+
+[provenance.algorithm.scheme]
+source = "NeqSim HeavyGasDispersion.reducedGravity"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim HeavyGasDispersion.reducedGravity"
+
 [implementations]
 python = "azoth.process.heavy_gas_dispersion"
 rust = "azoth_process::heavy_gas_dispersion"

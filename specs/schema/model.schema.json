@@ -11,7 +11,9 @@
     "kind",
     "inputs",
     "outputs",
-    "implementations"
+    "implementations",
+    "source",
+    "provenance"
   ],
   "properties": {
     "id": {
@@ -20,6 +22,7 @@
     },
     "name": { "$ref": "calc.schema.json#/properties/name" },
     "source": { "$ref": "calc.schema.json#/properties/source" },
+    "provenance": { "$ref": "calc.schema.json#/$defs/provenance" },
     "kind": {
       "enum": ["procedure", "direct"],
       "description": "What this model's spec fixes. `procedure` means a loop: a scheme, a convergence rule, a tolerance and a cap, which both implementations run. `direct` means a computation over vectors with no iteration, and no `algorithm` block."

@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/firewater/FireWaterCoverageAssessment.java"
 edition = "Its `coverageGapM2`, `coverageFraction`, `flowDeficitLpm`, `isFlowFeasible`, `isPressureFeasible` and `verdict`."
+
+[source.neqsim]
+class = "FireWaterCoverageAssessment"
+members = ["FireWaterCoverageAssessment.coverageGapM2"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_fire_water_coverage_assessment"
 convergence = "absolute"
@@ -106,6 +112,24 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "the class's setter refuses a negative required margin"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim FireWaterCoverageAssessment.coverageGapM2"
+
+[provenance.algorithm.convergence]
+source = "NeqSim FireWaterCoverageAssessment.coverageGapM2"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim FireWaterCoverageAssessment.coverageGapM2"
+
+[provenance.algorithm.scheme]
+source = "NeqSim FireWaterCoverageAssessment.coverageGapM2"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim FireWaterCoverageAssessment.coverageGapM2"
+
 [implementations]
 python = "azoth.process.fire_water_coverage_assessment"
 rust = "azoth_process::fire_water_coverage_assessment"

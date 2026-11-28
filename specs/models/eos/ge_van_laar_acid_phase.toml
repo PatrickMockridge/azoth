@@ -17,6 +17,12 @@ references = [
 standard = "NeqSim master `PhaseGEVanLaarAcid`"
 edition = "`ComponentGEVanLaarAcid.fugcoef`, ported verbatim, including its `NON_MODELED_COMPONENT_PENALTY` and its Raoult-reference override."
 doi = "10.1029/96JD02155"
+
+[source.neqsim]
+class = "PhaseGEVanLaarAcid"
+members = ["PhaseGEVanLaarAcid"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -54,6 +60,12 @@ type = "vector"
 unit = "Pa"
 length = "one per component"
 description = "the pure-component saturation pressure: the Taleb correlation for water and the two acids, the databank Antoine otherwise"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PhaseGEVanLaarAcid"
+
 [implementations]
 python = "azoth.eos.ge_van_laar_acid_phase"
 rust = "azoth_eos::ge_van_laar_acid_phase"

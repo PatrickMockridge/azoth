@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/barrier/SafetySystemPerformanceAnalyzer.java"
 edition = "Its `analyze`, the five check families and the category and matching helpers."
+
+[source.neqsim]
+class = "SafetySystemPerformanceAnalyzer"
+members = ["SafetySystemPerformanceAnalyzer.analyze"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "safety_system_performance"
 convergence = "absolute"
@@ -555,6 +561,24 @@ description = "the quantitative SIF's proof-test interval.\n"
 unit = "dimensionless"
 optional = true
 description = "the number of protected equipment tags the SIF names.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SafetySystemPerformanceAnalyzer.analyze"
+
+[provenance.algorithm.convergence]
+source = "NeqSim SafetySystemPerformanceAnalyzer.analyze"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim SafetySystemPerformanceAnalyzer.analyze"
+
+[provenance.algorithm.scheme]
+source = "NeqSim SafetySystemPerformanceAnalyzer.analyze"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim SafetySystemPerformanceAnalyzer.analyze"
+
 [implementations]
 python = "azoth.process.safety_system_performance"
 rust = "azoth_process::safety_system_performance"

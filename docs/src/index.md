@@ -153,7 +153,6 @@ Five sections, and the difference between them is the point:
 - [`eos.pr_molar_volume`](./eos/pr_molar_volume.md)
 - [`eos.pr_peneloux_shift`](./eos/pr_peneloux_shift.md)
 - [`eos.pr_z_factor`](./eos/pr_z_factor.md)
-- [`eos.prsv_kappa`](./eos/prsv_kappa.md)
 - [`eos.rachford_rice_binary`](./eos/rachford_rice_binary.md)
 - [`eos.rackett_molar_volume`](./eos/rackett_molar_volume.md)
 - [`eos.rk_alpha_ab`](./eos/rk_alpha_ab.md)
@@ -257,7 +256,6 @@ Five sections, and the difference between them is the point:
 - [`eos.production_chemical_scale_scenario`](./eos/production_chemical_scale_scenario.md) — Treatment-aware mineral-scale scenario for a produced water
 - [`eos.ps_flash`](./eos/ps_flash.md) — Pressure-entropy flash
 - [`eos.pt_flash`](./eos/pt_flash.md) — Pressure-temperature flash
-- [`eos.pt_flash_check`](./eos/pt_flash_check.md) — Pressure-temperature flash with a convergence flag
 - [`eos.pt_phase_envelope`](./eos/pt_phase_envelope.md) — PT phase envelope
 - [`eos.pu_flash`](./eos/pu_flash.md) — Pressure-internal-energy flash
 - [`eos.pure_saturation`](./eos/pure_saturation.md) — Pure-component saturation pressure
@@ -275,7 +273,6 @@ Five sections, and the difference between them is the point:
 - [`eos.sound_speed`](./eos/sound_speed.md) — Speed of sound of a mixture
 - [`eos.srk_cpa_phase`](./eos/srk_cpa_phase.md) — Soave-Redlich-Kwong CPA phase state
 - [`eos.stability_test`](./eos/stability_test.md) — Tangent-plane stability test
-- [`eos.state_at_tp`](./eos/state_at_tp.md) — Thermodynamic state at a temperature and pressure
 - [`eos.stream_scale_analyzer`](./eos/stream_scale_analyzer.md) — Scale mass rates of an aqueous stream from its coupled mineral equilibrium
 - [`eos.surf_cooldown`](./eos/surf_cooldown.md) — Surface flowline cooldown and no-touch time
 - [`eos.th_flash`](./eos/th_flash.md) — Temperature-enthalpy flash

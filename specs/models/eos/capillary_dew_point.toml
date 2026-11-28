@@ -21,6 +21,12 @@ references = [
 [source]
 standard = "NeqSim master `CapillaryDewPointFlash`"
 edition = "The K-value shift and the temperature iteration are ported from `CapillaryDewPointFlash` and `ConstantDutyTemperatureFlash`; the surface tension is an argument here and an interphase property there, and that difference is in the assumptions."
+
+[source.neqsim]
+class = "CapillaryDewPointFlash"
+members = ["CapillaryDewPointFlash"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "capillary_dew_point_newton"
 initialisation = "wilson_raoult"
@@ -105,6 +111,27 @@ max = 0.9
 max_inclusive = true
 severity = "warning"
 rationale = "Above `T / Tc = 0.9` for every component the cubic's roots are close to coalescing and the two phases stop being distinguishable, so a dew point near the critical point is the one to distrust."
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim CapillaryDewPointFlash"
+
+[provenance.algorithm.convergence]
+source = "NeqSim CapillaryDewPointFlash"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim CapillaryDewPointFlash"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim CapillaryDewPointFlash"
+
+[provenance.algorithm.scheme]
+source = "NeqSim CapillaryDewPointFlash"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim CapillaryDewPointFlash"
+
 [implementations]
 python = "azoth.eos.capillary_dew_point"
 rust = "azoth_eos::capillary_dew_point"

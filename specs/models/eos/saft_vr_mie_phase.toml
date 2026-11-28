@@ -21,6 +21,12 @@ references = [
 standard = "Lafitte, T. et al. (2013)"
 edition = "The variable-range Mie potential in a statistical associating fluid theory, without its association term: a chain term from the hard-sphere pair correlation and a third-order perturbation expansion in the dispersion."
 doi = "10.1063/1.4819786"
+
+[source.neqsim]
+class = "PhaseSAFTVRMie"
+members = ["PhaseSAFTVRMie"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -71,6 +77,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PhaseSAFTVRMie"
+
 [implementations]
 python = "azoth.eos.saft_vr_mie_phase"
 rust = "azoth_eos::saft_vr_mie_phase"

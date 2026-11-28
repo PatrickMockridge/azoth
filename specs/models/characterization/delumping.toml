@@ -23,6 +23,12 @@ references = [
 [source]
 standard = "NeqSim master `PseudoComponentCombiner.delumpContributions`"
 edition = "Its `delumpContributions`, the delumping stage `characterizeToReferenceCore` runs under `delumpBeforeRecharacterization`. It is `private static` and no public entry point answers with the delumped rows, so the capture reads it out of the class.\n"
+
+[source.neqsim]
+class = "PseudoComponentCombiner"
+members = ["PseudoComponentCombiner.delumpContributions"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.lumps]
 type = "record_list"
@@ -69,6 +75,12 @@ description = "The sub-fraction's normal liquid density, which is its parent's u
 unit = "K"
 optional = true
 description = "The sub-fraction's normal boiling point, spread with its molar mass. Absent where its parent states none.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PseudoComponentCombiner.delumpContributions"
+
 [implementations]
 python = "azoth.characterization.delumping"
 rust = "azoth_characterization::delumping"

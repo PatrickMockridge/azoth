@@ -35,6 +35,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/reactor/GibbsReactor.java"
 edition = "Its steady-state `run`: clone the inlet, take the element balance, freeze the species that need an element the feed lacks, floor every database species at `1e-6` mol, then a damped Newton iteration on `[n_i, lambda_j]`."
+
+[source.neqsim]
+class = "GibbsReactor"
+members = ["GibbsReactor.solveGibbsEquilibrium"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -307,6 +313,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class tests this against zero before reading it, and a non-positive Kelvin limit is not a temperature\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim GibbsReactor.solveGibbsEquilibrium"
+
 [implementations]
 python = "azoth.process.gibbs_reactor"
 rust = "azoth_process::gibbs_reactor"

@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim master `PhysicalProperties` and its per-phase subclasses"
 edition = "The phase-type dispatch, with each subclass's own model assignments; `PFCTViscosityMethodHeavyOil`, `PFCTConductivityMethodMod86`, the polynom `Viscosity` and `Conductivity`, `Diffusivity` and `SiddiqiLucasMethod` behind it."
+
+[source.neqsim]
+class = "PhysicalProperties"
+members = ["PhysicalProperties"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -73,6 +79,12 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "a mole fraction cannot be negative, and NeqSim reads one without checking it\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PhysicalProperties"
+
 [implementations]
 python = "azoth.eos.phase_transport"
 rust = "azoth_eos::phase_transport"

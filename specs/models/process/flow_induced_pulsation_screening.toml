@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/vibration/FlowInducedPulsationScreening.java"
 edition = "Its `screen`, `eigenFrequency`, `effectiveWidth` and `bandFor`."
+
+[source.neqsim]
+class = "FlowInducedPulsationScreening"
+members = ["FlowInducedPulsationScreening.screen"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "side_branch_acoustic_resonance"
 convergence = "absolute"
@@ -176,6 +182,24 @@ min = 1
 min_inclusive = true
 severity = "error"
 rationale = "the class refuses fewer than one mode"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim FlowInducedPulsationScreening.screen"
+
+[provenance.algorithm.convergence]
+source = "NeqSim FlowInducedPulsationScreening.screen"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim FlowInducedPulsationScreening.screen"
+
+[provenance.algorithm.scheme]
+source = "NeqSim FlowInducedPulsationScreening.screen"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim FlowInducedPulsationScreening.screen"
+
 [implementations]
 python = "azoth.process.flow_induced_pulsation_screening"
 rust = "azoth_process::flow_induced_pulsation_screening"

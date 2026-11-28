@@ -23,6 +23,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/dispersion/GaussianPlume.java"
 edition = "Its `sigmaY`, `sigmaZ`, `concentration`, `centerlineGroundConcentration` and `distanceToConcentration`."
+
+[source.neqsim]
+class = "GaussianPlume"
+members = ["GaussianPlume.sigmaY"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "briggs_pasquill_gifford_two_image_gaussian"
 initialisation = "log_spaced_scan_from_one_metre"
@@ -100,6 +106,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class answers NaN for a non-positive threshold, which is a refusal rather than a distance"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim GaussianPlume.sigmaY"
+
+[provenance.algorithm.convergence]
+source = "NeqSim GaussianPlume.sigmaY"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim GaussianPlume.sigmaY"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim GaussianPlume.sigmaY"
+
+[provenance.algorithm.scheme]
+source = "NeqSim GaussianPlume.sigmaY"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim GaussianPlume.sigmaY"
+
 [implementations]
 python = "azoth.process.gaussian_plume"
 rust = "azoth_process::gaussian_plume"

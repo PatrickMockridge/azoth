@@ -148,10 +148,8 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyPrPenelouxShiftResult>()?;
     m.add_class::<crate::transport_gen::PyPrZFactorResult>()?;
     m.add_class::<crate::transport_gen::PyProductionChemicalScaleScenarioResult>()?;
-    m.add_class::<crate::transport_gen::PyPrsvKappaResult>()?;
     m.add_class::<crate::transport_gen::PyPsFlashResult>()?;
     m.add_class::<crate::transport_gen::PyPtFlashResult>()?;
-    m.add_class::<crate::transport_gen::PyPtFlashCheckResult>()?;
     m.add_class::<crate::transport_gen::PyPtPhaseEnvelopeResult>()?;
     m.add_class::<crate::transport_gen::PyPuFlashResult>()?;
     m.add_class::<crate::transport_gen::PyPureSaturationResult>()?;
@@ -187,7 +185,6 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PySrkPenelouxShiftResult>()?;
     m.add_class::<crate::transport_gen::PySrkZFactorResult>()?;
     m.add_class::<crate::transport_gen::PyStabilityTestResult>()?;
-    m.add_class::<crate::transport_gen::PyStateAtTpResult>()?;
     m.add_class::<crate::transport_gen::PyStreamScaleAnalyzerResult>()?;
     m.add_class::<crate::transport_gen::PySurfCooldownResult>()?;
     m.add_class::<crate::transport_gen::PyTbpFractionPropertiesResult>()?;
@@ -892,10 +889,8 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         crate::wrappers_gen::production_chemical_scale_scenario,
         m
     )?)?;
-    m.add_function(wrap_pyfunction!(crate::wrappers_gen::prsv_kappa, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::ps_flash, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::pt_flash, m)?)?;
-    m.add_function(wrap_pyfunction!(crate::wrappers_gen::pt_flash_check, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::pt_phase_envelope, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::pu_flash, m)?)?;
     m.add_function(wrap_pyfunction!(crate::eos::pure_saturation, m)?)?;
@@ -970,7 +965,6 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::srk_z_factor, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::stability_test, m)?)?;
-    m.add_function(wrap_pyfunction!(crate::wrappers_gen::state_at_tp, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::stream_scale_analyzer,
         m

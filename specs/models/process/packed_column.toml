@@ -25,6 +25,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/distillation/PackedColumn.java"
 edition = "Its `estimateStages` and its three constructors, over `DistillationColumn`'s `run`; and `ColumnInternalsDesigner.calculatePacked`'s report, read at the middle tray. Both halves of the designer are ported; what this id still owes is the mechanical design's wiring, which `ROADMAP.md` names."
+
+[source.neqsim]
+class = "PackedColumn"
+members = ["PackedColumn.estimateStages"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "sequential_substitution_sweeps"
 initialisation = "linear_temperature_profile"
@@ -399,6 +405,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute temperature\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PackedColumn.estimateStages"
+
+[provenance.algorithm.convergence]
+source = "NeqSim PackedColumn.estimateStages"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim PackedColumn.estimateStages"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim PackedColumn.estimateStages"
+
+[provenance.algorithm.scheme]
+source = "NeqSim PackedColumn.estimateStages"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim PackedColumn.estimateStages"
+
 [implementations]
 python = "azoth.process.packed_column"
 rust = "azoth_process::packed_column"

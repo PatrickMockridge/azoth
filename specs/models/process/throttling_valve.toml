@@ -28,6 +28,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/valve/ThrottlingValve.java"
 edition = "Its steady-state `run`: the isenthalpic drop to the stated pressure, with the selected standard sizing the trim on the first pass - `calcKv`, the flow inverse and the `isCalcPressure` solve - and the four opening characteristics. **All nine standards are carried.**"
+
+[source.neqsim]
+class = "ThrottlingValve"
+members = ["ThrottlingValve.calcKv"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -143,6 +149,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute temperature\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ThrottlingValve.calcKv"
+
 [implementations]
 python = "azoth.process.throttling_valve"
 rust = "azoth_process::throttling_valve"

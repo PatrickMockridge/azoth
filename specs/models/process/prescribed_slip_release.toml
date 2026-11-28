@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/release/SlipCorrectedHomogeneousEquilibriumReleaseModel.java"
 edition = "Its `calculate`: the homogeneous base, the exactly-two-phase opening check, the prescribed-slip partition, the phase-area and kinetic-energy closures and the closure's rate."
+
+[source.neqsim]
+class = "SlipCorrectedHomogeneousEquilibriumReleaseModel"
+members = ["SlipCorrectedHomogeneousEquilibriumReleaseModel.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "prescribed_slip_partition"
 initialisation = "hem_isentropic_pressure_scan"
@@ -178,6 +184,27 @@ min = 1
 min_inclusive = true
 severity = "error"
 rationale = "the class refuses a slip ratio below one"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SlipCorrectedHomogeneousEquilibriumReleaseModel.calculate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim SlipCorrectedHomogeneousEquilibriumReleaseModel.calculate"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim SlipCorrectedHomogeneousEquilibriumReleaseModel.calculate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim SlipCorrectedHomogeneousEquilibriumReleaseModel.calculate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim SlipCorrectedHomogeneousEquilibriumReleaseModel.calculate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim SlipCorrectedHomogeneousEquilibriumReleaseModel.calculate"
+
 [implementations]
 python = "azoth.process.prescribed_slip_release"
 rust = "azoth_process::prescribed_slip_release"

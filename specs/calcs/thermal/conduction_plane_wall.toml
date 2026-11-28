@@ -8,6 +8,12 @@ references = ["Fourier, J. (1822). \"Théorie analytique de la chaleur.\" Paris:
 [source]
 standard = "Fourier, J. (1822)"
 edition = "Théorie analytique de la chaleur, Paris: Firmin Didot"
+
+[source.neqsim]
+class = "CompositeWallConduction"
+members = ["CompositeWallConduction"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.k]
 unit = "W/(m*K)"
@@ -61,6 +67,12 @@ dT = 30.0
 L = 0.05
 [worked_example.expected]
 q = 54000.0
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim CompositeWallConduction"
+
 [implementations]
 python = "azoth.thermal.conduction_plane_wall"
 rust = "azoth_thermal::conduction_plane_wall"

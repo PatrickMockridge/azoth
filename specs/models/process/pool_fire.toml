@@ -21,6 +21,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/fire/PoolFireModel.java"
 edition = "Its `totalBurnRateKgPerS`, `flameHeightM`, `surfaceEmissivePowerWPerM2`, `viewFactorVertical`, `incidentHeatFlux` and `distanceToFlux`."
+
+[source.neqsim]
+class = "PoolFireModel"
+members = ["PoolFireModel.totalBurnRateKgPerS"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "api521_mudan_pool_fire"
 initialisation = "near_bound_pool_radius"
@@ -98,6 +104,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "a non-positive target is not a contour; the class answers the search's far bound for zero"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PoolFireModel.totalBurnRateKgPerS"
+
+[provenance.algorithm.convergence]
+source = "NeqSim PoolFireModel.totalBurnRateKgPerS"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim PoolFireModel.totalBurnRateKgPerS"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim PoolFireModel.totalBurnRateKgPerS"
+
+[provenance.algorithm.scheme]
+source = "NeqSim PoolFireModel.totalBurnRateKgPerS"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim PoolFireModel.totalBurnRateKgPerS"
+
 [implementations]
 python = "azoth.process.pool_fire"
 rust = "azoth_process::pool_fire"

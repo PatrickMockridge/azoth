@@ -23,6 +23,12 @@ references = [
 [source]
 standard = "NeqSim master `PseudoComponentCombiner.characterizeToCommonSlate`"
 edition = "Its two `characterizeToCommonSlate` overloads through `resolveWeights`, `inferCommonSlateSize`, `buildWeightedImaginaryPool`, `determineQuantileBoundaries`, `distributeToProfiles` and `computeCommonSlate`. The class returns re-characterized clones; the rows they carry are this id's answer."
+
+[source.neqsim]
+class = "PseudoComponentCombiner"
+members = ["PseudoComponentCombiner.characterizeToCommonSlate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "record_list"
@@ -227,6 +233,12 @@ description = "Each fluid's total mole amount after re-characterization. A fluid
 [outputs.resolved_pseudo_components]
 unit = "dimensionless"
 description = "How many shared cuts the answer has: the requested count, or the largest pseudo-component count among the fluids when none was requested.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PseudoComponentCombiner.characterizeToCommonSlate"
+
 [implementations]
 python = "azoth.characterization.characterize_to_common_slate"
 rust = "azoth_characterization::characterize_to_common_slate"

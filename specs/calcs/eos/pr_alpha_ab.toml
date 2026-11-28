@@ -19,6 +19,12 @@ edition = """\
     A New Two-Constant Equation of State. Industrial & Engineering Chemistry Fundamentals, \
     15(1), 59-64"""
 doi = "10.1021/i160057a011"
+
+[source.neqsim]
+class = "AttractiveTermPr"
+members = ["AttractiveTermPr.alpha", "AttractiveTermPr.aT"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.kappa]
 unit = "dimensionless"
@@ -63,6 +69,12 @@ Pr = 0.25
 alpha = 1.1313346661636197
 a_reduced = 0.20206845072985785
 b_reduced = 0.0243135415625
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim AttractiveTermPr"
+
 [implementations]
 python = "azoth.eos.pr_alpha_ab"
 rust = "azoth_eos::pr_alpha_ab"

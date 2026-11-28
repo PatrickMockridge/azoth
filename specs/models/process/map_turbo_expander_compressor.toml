@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/expander/MapTurboExpanderCompressor.java"
 edition = "Its `run`: the expander's power less the mechanical and bearing losses, the specified-pressure run, and the bisection over the compressor chart's measured speed range, with `UNDER_POWER_SURGE`/`OVER_POWER_MAX_SPEED` at the bounds."
+
+[source.neqsim]
+class = "MapTurboExpanderCompressor"
+members = ["MapTurboExpanderCompressor"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.expander_components]
 type = "components"
@@ -216,6 +222,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim MapTurboExpanderCompressor"
+
 [implementations]
 python = "azoth.process.map_turbo_expander_compressor"
 rust = "azoth_process::map_turbo_expander_compressor"

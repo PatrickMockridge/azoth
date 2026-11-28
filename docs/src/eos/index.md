@@ -43,11 +43,10 @@ Every calculation in this section is generated from its specification. Each page
 | [`eos.pr_gassem2001_alpha`](./pr_gassem2001_alpha.md) | Gassem (2001) alpha function for a cubic equation of state. Use it when the attraction term follows this exponential temperature form. | NeqSim master `AttractiveTermPrGassem2001` |
 | [`eos.pr_kappa`](./pr_kappa.md) | Peng-Robinson attraction-parameter coefficient from the acentric factor. Use it when assembling a Peng-Robinson EOS with the standard kappa form. | Peng, D. Y.; Robinson, D. B. (1976) |
 | [`eos.pr_lee_kesler_alpha`](./pr_lee_kesler_alpha.md) | Peng-Robinson alpha function with a Soave-form m-factor. Use it when a Peng-Robinson EOS is fitted with the Lee-Kesler m correlation. | NeqSim master `AttractiveTermPrLeeKesler` |
-| [`eos.pr_mass_density`](./pr_mass_density.md) | Mass density from a molar volume and molar mass. Use it to convert a cubic EOS molar volume into the density a hydraulic calculation needs. | The definition of molar mass |
+| [`eos.pr_mass_density`](./pr_mass_density.md) | Mass density from a molar volume and molar mass. Use it to convert a cubic EOS molar volume into the density a hydraulic calculation needs. | NeqSim `Phase.getDensity`, which divides the molar mass by the molar volume |
 | [`eos.pr_molar_volume`](./pr_molar_volume.md) | Molar volume from a compressibility factor, temperature and pressure. Use it to turn a cubic EOS root into a volume. | The ideal-gas law with the compressibility factor as the departure from it |
 | [`eos.pr_peneloux_shift`](./pr_peneloux_shift.md) | Peng-Robinson Peneloux volume-translation parameter. Use it to correct a Peng-Robinson molar volume for the Peneloux shift. | Péneloux, A.; Rauzy, E.; Fréze, R. (1982) |
 | [`eos.pr_z_factor`](./pr_z_factor.md) | Peng-Robinson compressibility factor at a temperature and pressure. Use it for gas and liquid density and volumetric-flow estimates with a cubic EOS. | Peng, D. Y.; Robinson, D. B. (1976) |
-| [`eos.prsv_kappa`](./prsv_kappa.md) | Peng-Robinson-Stryjek-Vera attraction-parameter coefficient. Use it when a cubic EOS needs the PRSV kappa form. | Stryjek, R.; Vera, J. H. (1986) |
 | [`eos.rachford_rice_binary`](./rachford_rice_binary.md) | Vapour fraction of a two-component mixture from its composition and K-values. Use it for a binary flash when the phase split is needed. | Rachford, H. H.; Rice, J. D. (1952) |
 | [`eos.rackett_molar_volume`](./rackett_molar_volume.md) | Saturated liquid molar volume from the Rackett equation. Use it for liquid density estimates when critical properties and an acentric factor are known. | Spencer, C. F.; Danner, R. P. (1972) |
 | [`eos.rk_alpha_ab`](./rk_alpha_ab.md) | Redlich-Kwong alpha function and reduced attraction parameters. Use it to evaluate the RK attraction term at a reduced temperature and pressure. | Redlich, O.; Kwong, J. N. S. (1949) |
@@ -155,8 +154,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`eos.production_chemical_scale_scenario`](./production_chemical_scale_scenario.md) | `direct composition` | NeqSim master `ProductionChemicalScaleScenario` |
 | [`eos.ps_flash`](./ps_flash.md) | `ps_flash_temperature_newton` | Standard thermodynamics, as in Smith, Van Ness & Abbott; Michelsen & Mollerup |
 | [`eos.pt_flash`](./pt_flash.md) | `successive_substitution_flash` | Rachford, H. H.; Rice, J. D. (1952); Michelsen, M. L. (1982) |
-| [`eos.pt_flash_check`](./pt_flash_check.md) | `successive_substitution_flash` | Rachford, H. H.; Rice, J. D. (1952); Michelsen, M. L. (1982) |
-| [`eos.pt_phase_envelope`](./pt_phase_envelope.md) | `phase_envelope_continuation` | Michelsen, M. L. (1980), with `eos.critical_point` for the critical point |
+| [`eos.pt_phase_envelope`](./pt_phase_envelope.md) | `phase_envelope_continuation` | Michelsen, M. L. (1980), with NeqSim `RobustPhaseEnvelope` for the fallback and `eos.critical_point` for the critical point |
 | [`eos.pu_flash`](./pu_flash.md) | `pu_flash_inverse_temperature_newton` | Standard thermodynamics, as in Michelsen & Mollerup |
 | [`eos.pure_saturation`](./pure_saturation.md) | `saturation_pressure_bisection` | Peng, D. Y.; Robinson, D. B. (1976) |
 | [`eos.pv_flash`](./pv_flash.md) | `pv_flash_inverse_temperature_newton` | Standard thermodynamics, as in Michelsen & Mollerup |
@@ -173,7 +171,6 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`eos.sound_speed`](./sound_speed.md) | `direct composition` | NeqSim thermo/phase/PhaseEos.java |
 | [`eos.srk_cpa_phase`](./srk_cpa_phase.md) | `direct composition` | Kontogeorgis, G. M. et al. (1996) |
 | [`eos.stability_test`](./stability_test.md) | `tangent_plane_stability` | Michelsen, M. L. (1982), "The isothermal flash problem. Part I. Stability" |
-| [`eos.state_at_tp`](./state_at_tp.md) | `successive_substitution_flash` | Michelsen, M. L. (1982); NeqSim `ThermodynamicCoupling.ThermoProperties` |
 | [`eos.stream_scale_analyzer`](./stream_scale_analyzer.md) | `direct composition` | NeqSim master `StreamScaleAnalyzer` |
 | [`eos.surf_cooldown`](./surf_cooldown.md) | `direct composition` | NeqSim master `SurfCooldownAnalyzer` |
 | [`eos.th_flash`](./th_flash.md) | `th_flash_inverse_pressure_newton` | Standard thermodynamics, as in Michelsen & Mollerup |

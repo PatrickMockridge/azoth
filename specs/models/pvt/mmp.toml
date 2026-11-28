@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim pvtsimulation/simulation/MMPCalculator.java"
 edition = "The slim-tube recovery curve and its MMP interpolation, the key tie line's bisection, the mechanism heuristic, and the rising-bubble delegation."
+
+[source.neqsim]
+class = "MMPCalculator"
+members = ["MMPCalculator"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.oil_components]
 type = "record_list"
@@ -264,6 +270,12 @@ description = "the grid pressure.\n"
 [outputs.points.fields.recovery]
 unit = "dimensionless"
 description = "the recovery at that pressure, 0 to 1.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim MMPCalculator"
+
 [implementations]
 python = "azoth.pvt.mmp"
 rust = "azoth_pvt::mmp"

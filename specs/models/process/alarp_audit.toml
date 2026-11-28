@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/alarp/ALARPAuditReport.java"
 edition = "Its `setValueOfStatisticalLife`, `setDisproportionFactor`, `addMeasure` and `evaluate`."
+
+[source.neqsim]
+class = "ALARPAuditReport"
+members = ["ALARPAuditReport.setValueOfStatisticalLife"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "alarp_icaf_audit"
 convergence = "absolute"
@@ -66,6 +72,24 @@ description = "`value_of_statistical_life * disproportion_factor`, in NOK.\n"
 [outputs.measure_count]
 unit = "dimensionless"
 description = "the number of evaluated measures.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ALARPAuditReport.setValueOfStatisticalLife"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ALARPAuditReport.setValueOfStatisticalLife"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ALARPAuditReport.setValueOfStatisticalLife"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ALARPAuditReport.setValueOfStatisticalLife"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ALARPAuditReport.setValueOfStatisticalLife"
+
 [implementations]
 python = "azoth.process.alarp_audit"
 rust = "azoth_process::alarp_audit"

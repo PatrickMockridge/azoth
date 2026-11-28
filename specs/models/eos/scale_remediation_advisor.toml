@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim master `ScaleRemediationAdvisor`"
 edition = "`canonicalKey`, `recommendFor`, `recommendForMinerals`'s single-key loop, `loadFromResource`, `parseDouble` and `effectivenessRank`, ported, over `data/scale/scale_remediation.csv` vendored from the same commit. The Gson report and the disclaimer are not."
+
+[source.neqsim]
+class = "ScaleRemediationAdvisor"
+members = ["ScaleRemediationAdvisor.canonicalKey"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.deposit]
 type = "string"
@@ -58,6 +64,12 @@ description = "the operational and safety cautions.\n"
 [outputs.options.fields.standard]
 type = "string"
 description = "the informational standard reference.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ScaleRemediationAdvisor.canonicalKey"
+
 [implementations]
 python = "azoth.eos.scale_remediation_advisor"
 rust = "azoth_eos::scale_remediation_advisor"

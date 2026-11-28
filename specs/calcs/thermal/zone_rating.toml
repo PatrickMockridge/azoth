@@ -12,6 +12,12 @@ references = [
 [source]
 standard = "NeqSim process/mechanicaldesign/heatexchanger/ThermalDesignCalculator.java"
 edition = "`calculateZones(ZoneDefinition[])` over the permissive `calculate()`; the per-zone rating arithmetic is `thermal.shell_and_tube_rating`'s, reused rather than transcribed twice."
+
+[source.neqsim]
+class = "ThermalDesignCalculator"
+members = ["ThermalDesignCalculator.calculateZones"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.tube_outside_diameter]
 unit = "m"
@@ -303,6 +309,12 @@ zones = [{ zone_name = "desuperheating", duty_fraction = 0.15, total_duty = 1500
 [worked_example.expected]
 zone_count = 1
 zones = [{ zone_name = "desuperheating", duty_fraction = 0.15, tube_side_heat_transfer_coefficient = 3313.408891395497, shell_side_heat_transfer_coefficient = 2642.339167648388, overall_heat_transfer_coefficient = 823.6629043830286, lmtd = 40.0, required_area = 0.6829250133843835 }]
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ThermalDesignCalculator.calculateZones"
+
 [implementations]
 python = "azoth.thermal.zone_rating"
 rust = "azoth_thermal::zone_rating"

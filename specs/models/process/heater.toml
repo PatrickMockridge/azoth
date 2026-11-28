@@ -31,6 +31,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/heatexchanger/Heater.java"
 edition = "Its steady-state `run`, the two outlet-temperature constraints, the instrument list, the motor/electrical sizing, the cable, switchgear and VFD, the utility-specification predicates and the mechanical thermal estimate. `runTransient` is the steady re-run plus the clock, recorded rather than ported."
+
+[source.neqsim]
+class = "Heater"
+members = ["Heater.runTransient"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -553,6 +559,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute temperature"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Heater.runTransient"
+
 [implementations]
 python = "azoth.process.heater"
 rust = "azoth_process::heater"

@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/depressurization/MultiVesselBlowdownStudy.java"
 edition = "Its `run` over `addSourceResult` sources: the grid, the interpolation, the peak total and the header Mach check."
+
+[source.neqsim]
+class = "MultiVesselBlowdownStudy"
+members = ["MultiVesselBlowdownStudy.addSourceResult"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "profile_superposition"
 convergence = "absolute"
@@ -114,6 +120,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class refuses a non-positive grid step"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim MultiVesselBlowdownStudy.addSourceResult"
+
+[provenance.algorithm.convergence]
+source = "NeqSim MultiVesselBlowdownStudy.addSourceResult"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim MultiVesselBlowdownStudy.addSourceResult"
+
+[provenance.algorithm.scheme]
+source = "NeqSim MultiVesselBlowdownStudy.addSourceResult"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim MultiVesselBlowdownStudy.addSourceResult"
+
 [implementations]
 python = "azoth.process.multi_vessel_blowdown_study"
 rust = "azoth_process::multi_vessel_blowdown_study"

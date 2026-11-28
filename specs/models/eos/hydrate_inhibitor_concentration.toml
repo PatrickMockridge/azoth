@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim master `HydrateInhibitorConcentrationFlash`"
 edition = "The secant and its two branches, over this library's own hydrate formation temperature. NeqSim's inner call takes a starting-temperature guess this ignores, as `eos.hydrate_equilibrium_line` ignores its own seeding - measured inert in both."
+
+[source.neqsim]
+class = "HydrateInhibitorConcentrationFlash"
+members = ["HydrateInhibitorConcentrationFlash"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "inhibitor_moles_secant"
 initialisation = "feed_inventory"
@@ -88,6 +94,27 @@ min_inclusive = true
 max_inclusive = true
 severity = "error"
 rationale = "a mass fraction of two things"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim HydrateInhibitorConcentrationFlash"
+
+[provenance.algorithm.convergence]
+source = "NeqSim HydrateInhibitorConcentrationFlash"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim HydrateInhibitorConcentrationFlash"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim HydrateInhibitorConcentrationFlash"
+
+[provenance.algorithm.scheme]
+source = "NeqSim HydrateInhibitorConcentrationFlash"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim HydrateInhibitorConcentrationFlash"
+
 [implementations]
 python = "azoth.eos.hydrate_inhibitor_concentration"
 rust = "azoth_eos::hydrate_inhibitor_concentration"

@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim master `FlowlineScaleProfile`"
 edition = "`calculate`, `getMaxSI`, `getSIByName` and `setNumberOfSegments`'s clamp, ported. The pH setter's stored value, the JSON report and the index accessor are not."
+
+[source.neqsim]
+class = "FlowlineScaleProfile"
+members = ["FlowlineScaleProfile.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.calcium]
 unit = "kg/m**3"
@@ -208,6 +214,12 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "A negative segment count is not a grid; below two the class clamps rather than refuses.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim FlowlineScaleProfile.calculate"
+
 [implementations]
 python = "azoth.eos.flowline_scale_profile"
 rust = "azoth_eos::flowline_scale_profile"

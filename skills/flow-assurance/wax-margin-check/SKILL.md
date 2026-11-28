@@ -54,7 +54,7 @@ components = ["methane", "n-heptane", "nc14", "nc20"]
 z = [0.7, 0.1, 0.1, 0.1]
 
 formed = azoth.eos.tp_multiflash_wax(components, T=q(265.0, "K"), P=q(5.0, "bar"), z=z, eos="srk")
-print(formed.wax_fraction)  # 0.0707
+print(formed.wax_fraction)  # 0.0690
 
 absent = azoth.eos.tp_multiflash_wax(components, T=q(275.0, "K"), P=q(5.0, "bar"), z=z, eos="srk")
 print(absent.wax_fraction, absent.converged)  # 0.0, False

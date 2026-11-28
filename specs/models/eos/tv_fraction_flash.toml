@@ -15,6 +15,12 @@ references = [
 [source]
 standard = "ASTM D6377-20"
 edition = "NeqSim master `thermodynamicoperations/flashops/TVfractionFlash`: its residual, its adaptive damping, its step cap and its pressure walk are this model's loop."
+
+[source.neqsim]
+class = "TVfractionFlash"
+members = ["TVfractionFlash.run"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "volume_fraction_newton_pressure"
 initialisation = "from_the_feed_pressure"
@@ -108,6 +114,54 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TVfractionFlash.run"
+
+[provenance.algorithm.convergence]
+source = "NeqSim TVfractionFlash.run"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim TVfractionFlash.run"
+
+[provenance.algorithm."inner.convergence"]
+source = "NeqSim TVfractionFlash.run"
+
+[provenance.algorithm."inner.initialisation"]
+source = "NeqSim TVfractionFlash.run"
+
+[provenance.algorithm."inner.inner.convergence"]
+source = "NeqSim TVfractionFlash.run"
+
+[provenance.algorithm."inner.inner.max_iterations"]
+source = "NeqSim TVfractionFlash.run"
+
+[provenance.algorithm."inner.inner.scheme"]
+source = "NeqSim TVfractionFlash.run"
+
+[provenance.algorithm."inner.inner.tolerance"]
+source = "NeqSim TVfractionFlash.run"
+
+[provenance.algorithm."inner.max_iterations"]
+source = "NeqSim TVfractionFlash.run"
+
+[provenance.algorithm."inner.scheme"]
+source = "NeqSim TVfractionFlash.run"
+
+[provenance.algorithm."inner.tolerance"]
+source = "NeqSim TVfractionFlash.run"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim TVfractionFlash.run"
+
+[provenance.algorithm.scheme]
+source = "NeqSim TVfractionFlash.run"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim TVfractionFlash.run"
+
 [implementations]
 python = "azoth.eos.tv_fraction_flash"
 rust = "azoth_eos::tv_fraction_flash"

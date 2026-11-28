@@ -8,12 +8,16 @@ references = ["""\
     BIPM. \"The International System of Units (SI)\", 9th edition (2019). (the mole and the \
     kilogram, and therefore the units this calc divides)"""]
 [source]
-# source-ok: molar mass is a definition, and there is no paper to cite for one - which is
-# what `edition` says in as many words.
-standard = "The definition of molar mass"
+standard = "NeqSim `Phase.getDensity`, which divides the molar mass by the molar volume"
 edition = """\
     Molar mass is the mass per amount of substance, so a mass density is a molar mass \
     divided by a molar volume. There is no paper to cite for that."""
+
+[source.neqsim]
+class = "Phase"
+members = ["Phase.getDensity"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.M]
 unit = "kg/mol"
@@ -48,6 +52,12 @@ M = 0.0440956
 v = 0.0018317107825229842
 [worked_example.expected]
 rho = 24.073451125981286
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Phase.getDensity"
+
 [implementations]
 python = "azoth.eos.pr_mass_density"
 rust = "azoth_eos::pr_mass_density"

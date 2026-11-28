@@ -9,6 +9,12 @@ references = ["Schwartzentruber, J.; Renon, H. (1989). \"Extension of UNIFAC to 
 [source]
 standard = "NeqSim master `AttractiveTermSchwartzentruber`"
 edition = "`alpha(temperature)`, ported verbatim"
+
+[source.neqsim]
+class = "AttractiveTermSchwartzentruber"
+members = ["AttractiveTermSchwartzentruber"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.omega]
 unit = "dimensionless"
@@ -47,6 +53,12 @@ p3 = 0.1
 Tr = 0.7
 [worked_example.expected]
 alpha = 0.9946408503265206
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim AttractiveTermSchwartzentruber"
+
 [implementations]
 python = "azoth.eos.schwartzentruber_alpha"
 rust = "azoth_eos::schwartzentruber_alpha"

@@ -9,6 +9,12 @@ references = ["Eckert, J. S. (1975). \"How tower packings behave.\" Chem. Eng. 8
 [source]
 standard = "NeqSim master `PackingHydraulicsCalculator`"
 edition = "`sizeColumnDiameter` and `roundToStandardDiameter`, ported verbatim, over the packing table `hydraulics.packing_hydraulics` already carries. The class returns only the diameter; the four intermediates are the arithmetic it performs inline, which the probe prints as derived."
+
+[source.neqsim]
+class = "PackingHydraulicsCalculator"
+members = ["PackingHydraulicsCalculator.sizeColumnDiameter"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.packing]
 type = "string"
@@ -122,6 +128,12 @@ vapor_volumetric_flow = 0.0077777777777777776
 required_area = 0.06571310180775293
 required_diameter = 0.2892551120185065
 column_diameter = 0.3
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PackingHydraulicsCalculator.sizeColumnDiameter"
+
 [implementations]
 python = "azoth.hydraulics.packing_sizing"
 rust = "azoth_hydraulics::packing_sizing"

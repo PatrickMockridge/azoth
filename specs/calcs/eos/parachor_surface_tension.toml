@@ -10,6 +10,12 @@ references = ["Macleod, D. B. (1923). \"On a relation between surface tension an
 standard = "NeqSim master `ParachorSurfaceTension`"
 edition = "`calcPureComponentSurfaceTension`, ported verbatim: `1e-3 * pow(parachor*1e-6 * (rho_l/M - rho_v/M), 4)`"
 doi = "10.1039/TF9231900038"
+
+[source.neqsim]
+class = "ParachorSurfaceTension"
+members = ["ParachorSurfaceTension.calcPureComponentSurfaceTension"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.parachor]
 unit = "dimensionless"
@@ -56,6 +62,12 @@ rho_v = 1.82
 M = 0.016043
 [worked_example.expected]
 sigma = 0.016800304320340388
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ParachorSurfaceTension.calcPureComponentSurfaceTension"
+
 [implementations]
 python = "azoth.eos.parachor_surface_tension"
 rust = "azoth_eos::parachor_surface_tension"

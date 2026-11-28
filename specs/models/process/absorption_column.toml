@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/absorber/AbsorptionColumn.java"
 edition = "Its constructor and its two inlet methods. The class adds no arithmetic to `DistillationColumn.run`; what it adds is the gas-load-factor design surface, which this entry now publishes as `gas_load_factor` and its three siblings, read after the solve."
+
+[source.neqsim]
+class = "AbsorptionColumn"
+members = ["AbsorptionColumn.gas_load_factor"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.gas_components]
 type = "components"
@@ -382,6 +388,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "`calcDesign` divides the tray count by it with no guard, so a non-positive efficiency is a number its own integer cast saturates rather than a tray count\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim AbsorptionColumn.gas_load_factor"
+
 [implementations]
 python = "azoth.process.absorption_column"
 rust = "azoth_process::absorption_column"

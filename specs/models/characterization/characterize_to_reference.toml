@@ -31,6 +31,12 @@ references = [
 [source]
 standard = "NeqSim master `PseudoComponentCombiner.characterizeToReference`"
 edition = "Its `characterizeToReferenceCore` through `determineReferenceBoundaries`, `determineReferenceEqualMassBoundaries` and `distributeToProfiles`, with the class's own delumping and shared-boundary options as inputs. The class's multi-fluid methods are their own ids."
+
+[source.neqsim]
+class = "PseudoComponentCombiner"
+members = ["PseudoComponentCombiner.characterizeToReferenceCore"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.source]
 type = "record_list"
@@ -106,6 +112,12 @@ type = "vector"
 unit = "kg/m**3"
 length = "one per non-empty group, aligned with `reference_index`"
 description = "Each group's density, the mass over the volume its rows occupy.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PseudoComponentCombiner.characterizeToReferenceCore"
+
 [implementations]
 python = "azoth.characterization.characterize_to_reference"
 rust = "azoth_characterization::characterize_to_reference"

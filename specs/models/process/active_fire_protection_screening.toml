@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/firewater/ActiveFireProtectionScreening.java"
 edition = "Its `isWaterExtinguishing`, `isBlowdownFasterThanFailure`, `blowdownMarginS` and `selectiveProtectionSavingFraction`."
+
+[source.neqsim]
+class = "ActiveFireProtectionScreening"
+members = ["ActiveFireProtectionScreening.isWaterExtinguishing"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_active_fire_protection_screening"
 convergence = "absolute"
@@ -83,6 +89,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class's ratio is NaN against a zero area demand"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ActiveFireProtectionScreening.isWaterExtinguishing"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ActiveFireProtectionScreening.isWaterExtinguishing"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ActiveFireProtectionScreening.isWaterExtinguishing"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ActiveFireProtectionScreening.isWaterExtinguishing"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ActiveFireProtectionScreening.isWaterExtinguishing"
+
 [implementations]
 python = "azoth.process.active_fire_protection_screening"
 rust = "azoth_process::active_fire_protection_screening"

@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/vibration/AcousticInducedVibrationScreening.java"
 edition = "Its `screen` and `bandFor`."
+
+[source.neqsim]
+class = "AcousticInducedVibrationScreening"
+members = ["AcousticInducedVibrationScreening.screen"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_carucci_mueller_acoustic_vibration"
 convergence = "absolute"
@@ -107,6 +113,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class refuses a non-positive wall thickness"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim AcousticInducedVibrationScreening.screen"
+
+[provenance.algorithm.convergence]
+source = "NeqSim AcousticInducedVibrationScreening.screen"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim AcousticInducedVibrationScreening.screen"
+
+[provenance.algorithm.scheme]
+source = "NeqSim AcousticInducedVibrationScreening.screen"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim AcousticInducedVibrationScreening.screen"
+
 [implementations]
 python = "azoth.process.acoustic_induced_vibration_screening"
 rust = "azoth_process::acoustic_induced_vibration_screening"

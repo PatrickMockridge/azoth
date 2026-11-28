@@ -14,6 +14,12 @@ references = [
 [source]
 standard = "NeqSim master `ElectrolyteScaleCalculator`"
 edition = "`calculate`, `daviesLogGamma`, `saturationIndex`, `applyPressureCorrection`, `pKsp`, the five Ksp correlations and `pKw`, ported. The setters' storage, the eleven-name activity map and the Gson report are not."
+
+[source.neqsim]
+class = "ElectrolyteScaleCalculator"
+members = ["ElectrolyteScaleCalculator.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.calcium]
 unit = "kg/m**3"
@@ -369,6 +375,12 @@ id = "round_trip_units"
 type = "property"
 property = "unit_round_trip"
 status = "active"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ElectrolyteScaleCalculator.calculate"
+
 [implementations]
 python = "azoth.eos.electrolyte_scale_calculator"
 rust = "azoth_eos::electrolyte_scale_calculator"

@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "NeqSim master `PipelineCooldownCalculator`"
 edition = "`calculate`, `getTimeHours`, `getFluidTemperature`, `getTimeConstantHours`, `getCalculatedUValue` and `getTimeToReachTemperature`. `getTemperatureAtTime` is a linear interpolation of the returned arrays, and the Gson report is a composition."
+
+[source.neqsim]
+class = "PipelineCooldownCalculator"
+members = ["PipelineCooldownCalculator.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.internal_diameter]
 unit = "m"
@@ -173,6 +179,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "The horizon divides by the step.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PipelineCooldownCalculator.calculate"
+
 [implementations]
 python = "azoth.eos.pipeline_cooldown"
 rust = "azoth_eos::pipeline_cooldown"

@@ -9,6 +9,12 @@ references = ["Soave, G. (1972). \"Equilibrium constants from a modified Redlich
 [source]
 standard = "NeqSim master `AttractiveTermPrLeeKesler`"
 edition = "`alpha(temperature)`, ported verbatim"
+
+[source.neqsim]
+class = "AttractiveTermPrLeeKesler"
+members = ["AttractiveTermPrLeeKesler"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.omega]
 unit = "dimensionless"
@@ -35,6 +41,12 @@ omega = 0.1
 Tr = 0.7
 [worked_example.expected]
 alpha = 1.2184305594583278
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim AttractiveTermPrLeeKesler"
+
 [implementations]
 python = "azoth.eos.pr_lee_kesler_alpha"
 rust = "azoth_eos::pr_lee_kesler_alpha"

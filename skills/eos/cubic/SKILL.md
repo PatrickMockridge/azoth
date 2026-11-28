@@ -69,7 +69,7 @@ with `OUT_OF_VALID_RANGE`, not an error — a value out of range is still a valu
 ## Related Azoth functionality
 
 `eos.pr_kappa`, `eos.srk_kappa`, `eos.rk_alpha_ab`, `eos.pr78_kappa`, `eos.twu_kappa`,
-`eos.prsv_kappa`, `eos.pr_alpha_ab`, `eos.srk_alpha_ab`, `eos.pr_z_factor`,
+`eos.pr_alpha_ab`, `eos.srk_alpha_ab`, `eos.pr_z_factor`,
 `eos.srk_z_factor`, `eos.pr_departure`, `eos.srk_departure`, `eos.rk_departure`,
 `eos.pr_molar_volume`, `eos.pr_mass_density`, `eos.pr_peneloux_shift`,
 `eos.srk_peneloux_shift`, `eos.vdw1f_mix_binary`, `eos.rachford_rice_binary` — pages

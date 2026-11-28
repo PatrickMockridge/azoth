@@ -15,6 +15,12 @@ assumptions = [
 [source]
 standard = "Standard thermodynamics, as in Michelsen & Mollerup"
 edition = "The procedure is the ordinary one: the molar volume of a mixture at fixed pressure is a strictly increasing function of temperature."
+
+[source.neqsim]
+class = "PVflash"
+members = ["PVflash.run"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "pv_flash_inverse_temperature_newton"
 convergence = "absolute"
@@ -98,6 +104,54 @@ min = 0.0
 min_inclusive = false
 severity = "error"
 rationale = "a molar volume; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PVflash.run"
+
+[provenance.algorithm.convergence]
+source = "NeqSim PVflash.run"
+
+[provenance.algorithm.initial_temperature]
+source = "NeqSim PVflash.run"
+
+[provenance.algorithm."inner.convergence"]
+source = "NeqSim PVflash.run"
+
+[provenance.algorithm."inner.initialisation"]
+source = "NeqSim PVflash.run"
+
+[provenance.algorithm."inner.inner.convergence"]
+source = "NeqSim PVflash.run"
+
+[provenance.algorithm."inner.inner.max_iterations"]
+source = "NeqSim PVflash.run"
+
+[provenance.algorithm."inner.inner.scheme"]
+source = "NeqSim PVflash.run"
+
+[provenance.algorithm."inner.inner.tolerance"]
+source = "NeqSim PVflash.run"
+
+[provenance.algorithm."inner.max_iterations"]
+source = "NeqSim PVflash.run"
+
+[provenance.algorithm."inner.scheme"]
+source = "NeqSim PVflash.run"
+
+[provenance.algorithm."inner.tolerance"]
+source = "NeqSim PVflash.run"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim PVflash.run"
+
+[provenance.algorithm.scheme]
+source = "NeqSim PVflash.run"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim PVflash.run"
+
 [implementations]
 python = "azoth.eos.pv_flash"
 rust = "azoth_eos::pv_flash"

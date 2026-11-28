@@ -13,6 +13,12 @@ references = [
 [source]
 standard = "NeqSim master `TBPfractionModel.PedersenTBPModelSRK`"
 edition = "`calcTC`, `calcPC`, `calcTB`, `calcm` and the base class's `calcAcentricFactor`, as `addTBPfraction` composes them."
+
+[source.neqsim]
+class = "TBPfractionModel"
+members = ["TBPfractionModel.PedersenTBPModelSRK"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.molar_mass]
 unit = "kg/mol"
@@ -69,6 +75,12 @@ pc = 1196293.59599742
 boiling_temperature = 746.89
 acentric_factor = 1.36586663262266
 attraction_exponent = 2.228110216
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TBPfractionModel.PedersenTBPModelSRK"
+
 [implementations]
 python = "azoth.eos.tbp_fraction_properties"
 rust = "azoth_eos::tbp_fraction_properties"

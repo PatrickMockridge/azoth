@@ -15,6 +15,12 @@ references = [
 [source]
 standard = "NeqSim process/mechanicaldesign/heatexchanger/ShellAndTubeDesignCalculator.java"
 edition = "`calculate()` single pass: tube bundle, shell dimensions, baffles, UHX-13, UG-37, UG-27, UG-99, the NACE assessment, the thermal and vibration block, weights and costs; the lookup is `loadMaterialFromDB`."
+
+[source.neqsim]
+class = "ShellAndTubeDesignCalculator"
+members = ["ShellAndTubeDesignCalculator.loadMaterialFromDB"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.tema_designation]
 type = "string"
@@ -540,6 +546,12 @@ applied_standards = [
   { name = "ASME VIII Div.1 UG-27 (MAWP)" },
   { name = "ASME VIII Div.1 UG-99 (Hydrostatic Test)" },
 ]
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ShellAndTubeDesignCalculator.loadMaterialFromDB"
+
 [implementations]
 python = "azoth.thermal.shell_and_tube_design"
 rust = "azoth_thermal::shell_and_tube_design"

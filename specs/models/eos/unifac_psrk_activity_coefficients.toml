@@ -19,6 +19,12 @@ references = [
 standard = "Holderbaum, T.; Gmehling, J. (1991)"
 edition = "Fluid Phase Equilibria 70(2-3), 251-265"
 doi = "10.1016/0378-3812(91)80033-8"
+
+[source.neqsim]
+class = "ComponentGEUnifacPSRK"
+members = ["ComponentGEUnifacPSRK"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -49,6 +55,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute temperature; zero and below are not states\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ComponentGEUnifacPSRK"
+
 [implementations]
 python = "azoth.eos.unifac_psrk_activity_coefficients"
 rust = "azoth_eos::unifac_psrk_activity_coefficients"

@@ -10,6 +10,12 @@ references = ["Chapman, S.; Enskog, D. (1917). \\\"The kinetic theory of gases.\
 standard = "Chapman, S.; Enskog, D. (1917)"
 edition = "The first-approximation gas pair diffusivity, with Neufeld's collision-integral fit; ported from NeqSim's `physicalproperties/methods/gasphysicalproperties/diffusivity/Diffusivity.calcBinaryDiffusionCoefficient`."
 doi = "10.1063/1.1678363"
+
+[source.neqsim]
+class = "Diffusivity"
+members = ["Diffusivity.calcBinaryDiffusionCoefficient"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.MA]
 unit = "kg/mol"
@@ -72,6 +78,12 @@ T = 298.15
 P = 101325.0
 [worked_example.expected]
 d = 3.555070057344887e-5
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Diffusivity.calcBinaryDiffusionCoefficient"
+
 [implementations]
 python = "azoth.eos.chapman_enskog_diffusivity"
 rust = "azoth_eos::chapman_enskog_diffusivity"

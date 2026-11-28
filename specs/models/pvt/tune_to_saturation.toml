@@ -15,6 +15,12 @@ references = [
 [source]
 standard = "NeqSim pvtsimulation/modeltuning/TuneToSaturation.java"
 edition = "Its `run` loop over `SaturationPressure.calcSaturationPressure`, with the plus molar mass as the tuned variable."
+
+[source.neqsim]
+class = "TuneToSaturation"
+members = ["TuneToSaturation"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "plus_molar_mass_search"
 convergence = "absolute"
@@ -176,6 +182,27 @@ min = 1
 min_inclusive = true
 severity = "error"
 rationale = "the loop needs at least one step budget\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TuneToSaturation"
+
+[provenance.algorithm.convergence]
+source = "NeqSim TuneToSaturation"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim TuneToSaturation"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim TuneToSaturation"
+
+[provenance.algorithm.scheme]
+source = "NeqSim TuneToSaturation"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim TuneToSaturation"
+
 [implementations]
 python = "azoth.pvt.tune_to_saturation"
 rust = "azoth_pvt::tune_to_saturation"

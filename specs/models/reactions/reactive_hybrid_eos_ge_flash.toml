@@ -26,6 +26,12 @@ references = [
 [source]
 standard = "NeqSim master `TPHybridEosGeFlash`'s reactive route"
 edition = "`run`'s outer loop, `solveAqueousChemicalEquilibrium`, `updateCoupledOverallComposition` and `getConservativeReactionDeltas`, ported over `eos.hybrid_eos_ge_flash`'s fixed-topology solve."
+
+[source.neqsim]
+class = "TPHybridEosGeFlash"
+members = ["TPHybridEosGeFlash.solveAqueousChemicalEquilibrium"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "coupled_chemistry_fraction_loop"
 convergence = "absolute"
@@ -106,6 +112,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TPHybridEosGeFlash.solveAqueousChemicalEquilibrium"
+
+[provenance.algorithm.convergence]
+source = "NeqSim TPHybridEosGeFlash.solveAqueousChemicalEquilibrium"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim TPHybridEosGeFlash.solveAqueousChemicalEquilibrium"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim TPHybridEosGeFlash.solveAqueousChemicalEquilibrium"
+
+[provenance.algorithm.scheme]
+source = "NeqSim TPHybridEosGeFlash.solveAqueousChemicalEquilibrium"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim TPHybridEosGeFlash.solveAqueousChemicalEquilibrium"
+
 [implementations]
 python = "azoth.reactions.reactive_hybrid_eos_ge_flash"
 rust = "azoth_reactions::reactive_hybrid_eos_ge_flash"

@@ -15,6 +15,12 @@ references = [
 standard = "NeqSim master `PFCTViscosityMethodHeavyOil`"
 edition = "`calcViscosity` and `getRefComponentViscosity`, ported verbatim"
 doi = "10.1016/0009-2509(84)87009-8"
+
+[source.neqsim]
+class = "PFCTViscosityMethodHeavyOil"
+members = ["PFCTViscosityMethodHeavyOil.calcViscosity"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -47,6 +53,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PFCTViscosityMethodHeavyOil.calcViscosity"
+
 [implementations]
 python = "azoth.eos.viscosity"
 rust = "azoth_eos::viscosity"

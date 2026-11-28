@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim master `MultiMineralScaleEquilibrium`"
 edition = "`solve`, `divalentActivityCoefficient`, `activityProduct`, `estimatePitzerIonicStrengthMolal`, `putPitzerActivityCoefficients` and `saturationIndex`, ported. The Gson report and the lazy `ensureSolved` flag are not."
+
+[source.neqsim]
+class = "MultiMineralScaleEquilibrium"
+members = ["MultiMineralScaleEquilibrium.solve"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "greedy_coordinate_descent"
 initialisation = "predictor_free_ions"
@@ -292,6 +298,27 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "The class's threshold is an extent in mol/L and cannot be negative.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim MultiMineralScaleEquilibrium.solve"
+
+[provenance.algorithm.convergence]
+source = "NeqSim MultiMineralScaleEquilibrium.solve"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim MultiMineralScaleEquilibrium.solve"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim MultiMineralScaleEquilibrium.solve"
+
+[provenance.algorithm.scheme]
+source = "NeqSim MultiMineralScaleEquilibrium.solve"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim MultiMineralScaleEquilibrium.solve"
+
 [implementations]
 python = "azoth.eos.multi_mineral_scale_equilibrium"
 rust = "azoth_eos::multi_mineral_scale_equilibrium"

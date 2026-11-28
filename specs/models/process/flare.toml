@@ -21,6 +21,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/flare/Flare.java"
 edition = "Its steady-state `run`: the inlet cloned to the outlet, `heatDuty = inStream.LCV() * flowSm3sec`, and `co2Emission` from the gas's carbon; then the point-source radiation model, the tip's dispersion surrogate and the three-axis capacity check."
+
+[source.neqsim]
+class = "Flare"
+members = ["Flare.co2Emission"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -158,6 +164,12 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "a flux the distance is solved for; the class answers zero below it, which is the no-contour branch\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Flare.co2Emission"
+
 [implementations]
 python = "azoth.process.flare"
 rust = "azoth_process::flare"

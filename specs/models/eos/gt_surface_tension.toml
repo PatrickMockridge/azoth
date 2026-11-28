@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim master `GTSurfaceTensionFullGT`"
 edition = "`runcase`, `Newton`, `directsolve`, `sigmaCalc`, `calc_std_integral`, `delta_mu` and `linspace`, ported; the block-tridiagonal solve is a block Thomas algorithm where the class uses a banded LU."
+
+[source.neqsim]
+class = "GTSurfaceTensionFullGT"
+members = ["GTSurfaceTensionFullGT.runcase"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "gt_full_density_newton"
 initialisation = "step_profile_between_phases"
@@ -82,6 +88,39 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "A mole fraction cannot be negative.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim GTSurfaceTensionFullGT.runcase"
+
+[provenance.algorithm.convergence]
+source = "NeqSim GTSurfaceTensionFullGT.runcase"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim GTSurfaceTensionFullGT.runcase"
+
+[provenance.algorithm."inner.convergence"]
+source = "NeqSim GTSurfaceTensionFullGT.runcase"
+
+[provenance.algorithm."inner.max_iterations"]
+source = "NeqSim GTSurfaceTensionFullGT.runcase"
+
+[provenance.algorithm."inner.scheme"]
+source = "NeqSim GTSurfaceTensionFullGT.runcase"
+
+[provenance.algorithm."inner.tolerance"]
+source = "NeqSim GTSurfaceTensionFullGT.runcase"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim GTSurfaceTensionFullGT.runcase"
+
+[provenance.algorithm.scheme]
+source = "NeqSim GTSurfaceTensionFullGT.runcase"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim GTSurfaceTensionFullGT.runcase"
+
 [implementations]
 python = "azoth.eos.gt_surface_tension"
 rust = "azoth_eos::gt_surface_tension"

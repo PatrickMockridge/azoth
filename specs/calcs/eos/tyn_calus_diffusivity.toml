@@ -10,6 +10,12 @@ references = ["Tyn, M. T.; Calus, W. F. (1975). \\\"Diffusion coefficients in di
 standard = "Tyn, M. T.; Calus, W. F. (1975)"
 edition = "Diffusion coefficients in dilute binary liquid mixtures. J. Chem. Eng. Data 20(1), 106-109"
 doi = "10.1021/je60064a006"
+
+[source.neqsim]
+class = "TynCalusDiffusivity"
+members = ["TynCalusDiffusivity.calcBinaryDiffusionCoefficient"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.VA]
 unit = "m**3/mol"
@@ -44,6 +50,12 @@ T = 298.15
 eta = 9.163501315189954e-4
 [worked_example.expected]
 d = 1.4502274002446276e-9
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TynCalusDiffusivity.calcBinaryDiffusionCoefficient"
+
 [implementations]
 python = "azoth.eos.tyn_calus_diffusivity"
 rust = "azoth_eos::tyn_calus_diffusivity"

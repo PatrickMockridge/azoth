@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim master `HydrateRiskMapper`"
 edition = "`calculate` and the `RiskProfile` getters. The failure-reason strings have no counterpart here, and the Gson report is a composition."
+
+[source.neqsim]
+class = "HydrateRiskMapper"
+members = ["HydrateRiskMapper.calculate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -103,6 +109,12 @@ description = "the number of profile points.\n"
 [outputs.all_points_evaluated]
 type = "boolean"
 description = "whether every point produced a hydrate temperature.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim HydrateRiskMapper.calculate"
+
 [implementations]
 python = "azoth.eos.hydrate_risk_map"
 rust = "azoth_eos::hydrate_risk_map"

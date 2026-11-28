@@ -15,6 +15,12 @@ references = [
 standard = "Standard thermodynamics, as in Michelsen & Mollerup"
 edition = "NeqSim master `thermodynamicoperations/flashops/VUflashSingleComp`: the saturation temperature at the pressure, then `beta = (U - u_liq)/(u_gas - u_liq)` on the two saturated internal energies."
 doi = "10.1016/S0378-3812(01)00701-1"
+
+[source.neqsim]
+class = "VUflashSingleComp"
+members = ["VUflashSingleComp"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "saturation_temperature_bisection"
 convergence = "relative"
@@ -59,6 +65,36 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim VUflashSingleComp"
+
+[provenance.algorithm."bracket.lower"]
+source = "NeqSim VUflashSingleComp"
+
+[provenance.algorithm."bracket.scheme"]
+source = "NeqSim VUflashSingleComp"
+
+[provenance.algorithm."bracket.steps"]
+source = "NeqSim VUflashSingleComp"
+
+[provenance.algorithm."bracket.upper"]
+source = "NeqSim VUflashSingleComp"
+
+[provenance.algorithm.convergence]
+source = "NeqSim VUflashSingleComp"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim VUflashSingleComp"
+
+[provenance.algorithm.scheme]
+source = "NeqSim VUflashSingleComp"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim VUflashSingleComp"
+
 [implementations]
 python = "azoth.eos.vu_flash_single_comp"
 rust = "azoth_eos::vu_flash_single_comp"

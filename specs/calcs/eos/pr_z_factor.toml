@@ -15,6 +15,12 @@ edition = """\
     A New Two-Constant Equation of State. Industrial & Engineering Chemistry Fundamentals, \
     15(1), 59-64"""
 doi = "10.1021/i160057a011"
+
+[source.neqsim]
+class = "Phase"
+members = ["Phase.getZ"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.a_reduced]
 unit = "dimensionless"
@@ -72,6 +78,24 @@ b_reduced = 0.02431127309496514
 [worked_example.expected]
 z_min = 0.036765449656896015
 z_max = 0.7907789662973796
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Phase.getZ"
+
+[provenance.algorithm.convergence]
+source = "NeqSim Phase.getZ"
+
+[provenance.algorithm.kind]
+source = "NeqSim Phase.getZ"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim Phase.getZ"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim Phase.getZ"
+
 [implementations]
 python = "azoth.eos.pr_z_factor"
 rust = "azoth_eos::pr_z_factor"

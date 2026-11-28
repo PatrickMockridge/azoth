@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim process/util/fire/ReliefValveSizing.java"
 edition = "Its `dynamicFireSizing`, `calculateBlowdownPressure`, `calculateCv`, `getNextLargerOrifice` and the `calculateRequiredArea` call it makes."
+
+[source.neqsim]
+class = "ReliefValveSizing"
+members = ["ReliefValveSizing.dynamicFireSizing"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_psv_fire_sizing"
 convergence = "absolute"
@@ -197,6 +203,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the Cv relation multiplies the coefficient"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ReliefValveSizing.dynamicFireSizing"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ReliefValveSizing.dynamicFireSizing"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ReliefValveSizing.dynamicFireSizing"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ReliefValveSizing.dynamicFireSizing"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ReliefValveSizing.dynamicFireSizing"
+
 [implementations]
 python = "azoth.process.psv_fire_sizing"
 rust = "azoth_process::psv_fire_sizing"

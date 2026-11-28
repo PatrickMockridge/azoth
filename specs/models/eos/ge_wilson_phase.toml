@@ -22,6 +22,12 @@ references = [
 standard = "NeqSim master `PhaseGEWilson`"
 edition = "`ComponentGE.fugcoef`, ported verbatim; the activity coefficient is `eos.wilson_activity_coefficients`', ported from `ComponentGEWilson.getWilsonActivityCoefficient`."
 doi = "10.1021/ja01056a002"
+
+[source.neqsim]
+class = "PhaseGEWilson"
+members = ["PhaseGEWilson"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -69,6 +75,12 @@ type = "vector"
 unit = "dimensionless"
 length = "one per component"
 description = "the infinite-dilution activity coefficient each component's Henry arm divided by, and **one where the arm does not divide by one**"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PhaseGEWilson"
+
 [implementations]
 python = "azoth.eos.ge_wilson_phase"
 rust = "azoth_eos::ge_wilson_phase"

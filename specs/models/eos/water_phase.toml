@@ -15,6 +15,12 @@ references = [
 [source]
 standard = "Wagner, W.; Kretzschmar, H.-J. (2008); IAPWS (2007)"
 edition = "The IAPWS-IF97 Gibbs formulation: Regions 1 and 2 as dimensionless functions of `pi = p/p*` and `tau = T*/T`, selected by the Region 4 saturation curve, differentiated for the full property set and converted mass-to-molar."
+
+[source.neqsim]
+class = "Iapws_if97"
+members = ["Iapws_if97"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.T]
 unit = "K"
@@ -59,6 +65,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Iapws_if97"
+
 [implementations]
 python = "azoth.eos.water_phase"
 rust = "azoth_eos::water_phase"

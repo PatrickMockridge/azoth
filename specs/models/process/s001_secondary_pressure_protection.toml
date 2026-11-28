@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/processsafetysystem/S001SecondaryPressureProtectionCriteria.java"
 edition = "Its `evaluate` and `getDefaultTargetFrequencyPerYear`."
+
+[source.neqsim]
+class = "S001SecondaryPressureProtectionCriteria"
+members = ["S001SecondaryPressureProtectionCriteria.evaluate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "norsok_s001_secondary_pressure_protection"
 convergence = "absolute"
@@ -127,6 +133,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class's `<= 12` test passes zero and negative intervals; a proof-test interval must be positive, and the capture keeps the class's answer at -6 and 0 as the divergence evidence"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim S001SecondaryPressureProtectionCriteria.evaluate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim S001SecondaryPressureProtectionCriteria.evaluate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim S001SecondaryPressureProtectionCriteria.evaluate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim S001SecondaryPressureProtectionCriteria.evaluate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim S001SecondaryPressureProtectionCriteria.evaluate"
+
 [implementations]
 python = "azoth.process.s001_secondary_pressure_protection"
 rust = "azoth_process::s001_secondary_pressure_protection"

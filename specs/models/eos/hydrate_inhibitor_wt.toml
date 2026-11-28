@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim master `HydrateInhibitorwtFlash`"
 edition = "The secant, over this library's own two-phase flash and its own reading of `PhaseEos.init`'s phase label."
+
+[source.neqsim]
+class = "HydrateInhibitorwtFlash"
+members = ["HydrateInhibitorwtFlash"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "inhibitor_moles_secant"
 initialisation = "feed_inventory"
@@ -87,6 +93,27 @@ min_inclusive = false
 max_inclusive = false
 severity = "error"
 rationale = "a mass fraction of two things, and neither a feed of pure inhibitor nor one of pure water has an aqueous pair to fraction"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim HydrateInhibitorwtFlash"
+
+[provenance.algorithm.convergence]
+source = "NeqSim HydrateInhibitorwtFlash"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim HydrateInhibitorwtFlash"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim HydrateInhibitorwtFlash"
+
+[provenance.algorithm.scheme]
+source = "NeqSim HydrateInhibitorwtFlash"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim HydrateInhibitorwtFlash"
+
 [implementations]
 python = "azoth.eos.hydrate_inhibitor_wt"
 rust = "azoth_eos::hydrate_inhibitor_wt"

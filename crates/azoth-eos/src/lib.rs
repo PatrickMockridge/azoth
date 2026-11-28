@@ -193,10 +193,8 @@ pub mod pr_molar_volume;
 pub mod pr_peneloux_shift;
 pub mod pr_z_factor;
 pub mod production_chemical_scale_scenario;
-pub mod prsv_kappa;
 pub mod ps_flash;
 pub mod pt_flash;
-pub mod pt_flash_check;
 pub mod pt_phase_envelope;
 pub mod pu_flash;
 pub mod pure_saturation;
@@ -233,7 +231,6 @@ pub mod spec_gen;
 pub mod srk_alpha_ab;
 pub mod srk_cpa_phase;
 pub mod srk_departure;
-pub mod state_at_tp;
 pub mod tbp_fraction_properties;
 // The CPA phase state's shared arithmetic, private: the two models that use it are
 // `srk_cpa_phase` and `pr_cpa_phase`, which name the family and the result type.
@@ -390,7 +387,6 @@ pub use pr_molar_volume::{MOLAR_GAS_CONSTANT, pr_molar_volume};
 pub use pr_peneloux_shift::pr_peneloux_shift;
 pub use pr_z_factor::pr_z_factor;
 pub use pr78_kappa::pr78_kappa;
-pub use prsv_kappa::prsv_kappa;
 pub use ps_flash::ps_flash;
 pub use pt_flash::pt_flash;
 pub use pt_phase_envelope::pt_phase_envelope;
@@ -426,12 +422,11 @@ pub use results::{
     MatcopPrumrAlphaResult, MatcopPrumrNewAlphaResult, MolarEnthalpyEntropyResult,
     MollerupAlphaResult, NitricSulfuricAcidVaporPressureResult, NrtlActivityCoefficientsResult,
     ParachorMixtureSurfaceTensionResult, ParachorSurfaceTensionResult,
-    ParahydrogenSolidPhaseResult, Phase, PhaseClass, PhaseTransportResult,
-    PipeBeggsAndBrillsResult, PipelineCooldownResult, PitzerDataset, PitzerPhaseResult,
-    Pr78KappaResult, PrAlphaAbResult, PrDaneshAlphaResult, PrDelft1998AlphaResult,
-    PrDepartureResult, PrGassem2001AlphaResult, PrKappaResult, PrLeeKeslerAlphaResult,
-    PrMassDensityResult, PrMolarVolumeResult, PrPenelouxShiftResult, PrZFactorResult,
-    ProductionChemicalScaleScenarioResult, PrsvKappaResult, PsFlashResult, PtFlashCheckResult,
+    ParahydrogenSolidPhaseResult, Phase, PhaseTransportResult, PipeBeggsAndBrillsResult,
+    PipelineCooldownResult, PitzerDataset, PitzerPhaseResult, Pr78KappaResult, PrAlphaAbResult,
+    PrDaneshAlphaResult, PrDelft1998AlphaResult, PrDepartureResult, PrGassem2001AlphaResult,
+    PrKappaResult, PrLeeKeslerAlphaResult, PrMassDensityResult, PrMolarVolumeResult,
+    PrPenelouxShiftResult, PrZFactorResult, ProductionChemicalScaleScenarioResult, PsFlashResult,
     PtFlashResult, PtPhaseEnvelopeResult, PuFlashResult, PureSaturationResult, PvRefluxFlashResult,
     PvfFlashResult, RachfordRiceBinaryResult, RachfordRiceResult, RackettMolarVolumeResult,
     RemediationOptionRow, RkAlphaAbResult, RkDepartureResult, RootStructure,
@@ -441,9 +436,9 @@ pub use results::{
     SchwartzentruberAlphaResult, SiddiqiLucasDiffusivityResult, SoreideWhitsonAlphaResult,
     SoreideWhitsonPhaseResult, SoundSpeedResult, SrkAlphaAbResult, SrkDepartureResult,
     SrkKappaResult, SrkPenelouxShiftResult, SrkZFactorResult, StabilityTestResult,
-    StabilityVerdict, StateAtTpResult, StreamScaleAnalyzerResult, StreamScaleMineralRow,
-    SurfCooldownResult, ThFlashResult, ThermalConductivityResult, TsFlashResult, TuFlashResult,
-    TwuKappaResult, TwucoonAlphaResult, TwucoonParamAlphaResult, TwucoonStatoilAlphaResult,
+    StabilityVerdict, StreamScaleAnalyzerResult, StreamScaleMineralRow, SurfCooldownResult,
+    ThFlashResult, ThermalConductivityResult, TsFlashResult, TuFlashResult, TwuKappaResult,
+    TwucoonAlphaResult, TwucoonParamAlphaResult, TwucoonStatoilAlphaResult,
     TynCalusDiffusivityResult, UmrCpaPhaseResult, UmrPruFlashResult, UmrprAlphaResult,
     UnifacActivityCoefficientsResult, UnifacPsrkActivityCoefficientsResult,
     UnifacUmrpruActivityCoefficientsResult, UniquacActivityCoefficientsResult,

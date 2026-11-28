@@ -10,6 +10,12 @@ references = ["Onda, K.; Takeuchi, H.; Okumoto, Y. (1968). \\\"Mass transfer coe
 standard = "NeqSim master `PackingHydraulicsCalculator`"
 edition = "`calculateFloodingVelocity`, `calculateActualVelocity`, `calculatePressureDrop`, `calculateMassTransfer`, `calculateHETP`, `calculateWettingCheck` and `assessDesign`, ported verbatim; the packing table is `PackingSpecificationLibrary`'s built-ins plus `designdata/Packing.csv`."
 doi = "10.1252/jcej.1.56"
+
+[source.neqsim]
+class = "PackingHydraulicsCalculator"
+members = ["PackingHydraulicsCalculator.calculateFloodingVelocity"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.packing]
 type = "string"
@@ -228,6 +234,12 @@ theoretical_stages = 3.4722222222222223
 specific_surface_area = 120.0
 void_fraction = 0.96
 packing_factor = 66.0
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PackingHydraulicsCalculator.calculateFloodingVelocity"
+
 [implementations]
 python = "azoth.hydraulics.packing_hydraulics"
 rust = "azoth_hydraulics::packing_hydraulics"

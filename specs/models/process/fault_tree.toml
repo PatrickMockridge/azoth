@@ -23,6 +23,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/risk/fta/FaultTreeAnalyzer.java"
 edition = "Its `topEventProbability` and `minimalCutSets`, and the factories and `withCCF` in `FaultTreeNode`."
+
+[source.neqsim]
+class = "FaultTreeAnalyzer"
+members = ["FaultTreeAnalyzer.topEventProbability"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "recursive_gate_evaluation"
 initialisation = "stated_leaf_probabilities"
@@ -81,6 +87,27 @@ min = 1
 min_inclusive = true
 severity = "error"
 rationale = "the class's mask loop starts at one and can never return the empty cut set"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim FaultTreeAnalyzer.topEventProbability"
+
+[provenance.algorithm.convergence]
+source = "NeqSim FaultTreeAnalyzer.topEventProbability"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim FaultTreeAnalyzer.topEventProbability"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim FaultTreeAnalyzer.topEventProbability"
+
+[provenance.algorithm.scheme]
+source = "NeqSim FaultTreeAnalyzer.topEventProbability"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim FaultTreeAnalyzer.topEventProbability"
+
 [implementations]
 python = "azoth.process.fault_tree"
 rust = "azoth_process::fault_tree"

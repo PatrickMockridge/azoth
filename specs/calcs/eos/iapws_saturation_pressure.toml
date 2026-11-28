@@ -13,6 +13,12 @@ references = [
 [source]
 standard = "IAPWS (2007), Region 4"
 edition = "The revised release's saturation equation, as NeqSim master implements it in `Iapws_if97.p4_T`."
+
+[source.neqsim]
+class = "Iapws_if97"
+members = ["Iapws_if97.p4_T"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.T]
 unit = "K"
@@ -37,6 +43,12 @@ tolerance = 1e-12
 T = 373.15
 [worked_example.expected]
 p_sat = 101417.977921310
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Iapws_if97.p4_T"
+
 [implementations]
 python = "azoth.eos.iapws_saturation_pressure"
 rust = "azoth_eos::iapws_saturation_pressure"

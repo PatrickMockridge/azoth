@@ -32,6 +32,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/separator/Separator.java"
 edition = "`run`: the pressure less `pressureDrop`, a `TPflash` at the feed's temperature or a `PHflash` at the `heatInput` enthalpy, the entrainment calls, each outlet from its flash phase unless re-run; the five capacity getters; `getGasLoadFactor(int)`; and `sizeFromFlow(safety)`."
+
+[source.neqsim]
+class = "Separator"
+members = ["Separator.pressureDrop"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -414,6 +420,12 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "an allowance adds metal; a negative one removes it\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Separator.pressureDrop"
+
 [implementations]
 python = "azoth.process.separator"
 rust = "azoth_process::separator"

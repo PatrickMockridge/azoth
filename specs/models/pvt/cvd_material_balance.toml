@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim pvtsimulation/util/CvdMaterialBalance.java"
 edition = "The vapor inventory from the pressure and Z ratios, the produced/remaining/liquid component accounting, the four closures and the liquid-state resolution; the class's temperature and provenance strings are read by no formula."
+
+[source.neqsim]
+class = "CvdMaterialBalance"
+members = ["CvdMaterialBalance"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.component_names]
 type = "vector_string"
@@ -102,6 +108,12 @@ description = "The liquid component amount per initial mole, signed; the composi
 [outputs.compatible]
 type = "boolean"
 description = "Whether every stage is compatible.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim CvdMaterialBalance"
+
 [implementations]
 python = "azoth.pvt.cvd_material_balance"
 rust = "azoth_pvt::cvd_material_balance"

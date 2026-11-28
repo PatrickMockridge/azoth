@@ -19,6 +19,12 @@ references = [
 standard = "Taleb, D.; Ponche, J. L.; Mirabel, P. (1996)"
 edition = "The three pure-component correlations of section 3, as NeqSim master implements them in `NitricSulfuricAcidVaporPressure`. The nitric-acid coefficients are NeqSim's refit, not the paper's."
 doi = "10.1029/96JD02155"
+
+[source.neqsim]
+class = "NitricSulfuricAcidVaporPressure"
+members = ["NitricSulfuricAcidVaporPressure"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.T]
 unit = "K"
@@ -47,6 +53,12 @@ min_inclusive = true
 max_inclusive = true
 severity = "warning"
 rationale = "the range the correlations are stated for; outside it the model extrapolates\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim NitricSulfuricAcidVaporPressure"
+
 [implementations]
 python = "azoth.eos.nitric_sulfuric_acid_vapor_pressure"
 rust = "azoth_eos::nitric_sulfuric_acid_vapor_pressure"

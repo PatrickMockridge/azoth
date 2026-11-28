@@ -55,7 +55,7 @@ DOI: [10.1021/i160057a011](https://doi.org/10.1021/i160057a011)
 | `a_reduced` | dimensionless | the cubic's attraction parameter `A`, from `eos.pr_alpha_ab` |
 | `b_reduced` | dimensionless | the cubic's repulsion parameter `B`, from `eos.pr_alpha_ab` |
 | `z` | dimensionless | The compressibility factor, from `eos.pr_z_factor`. This calc does not check that `z` is a root of the cubic `A` and `B` define. |
-| `kappa` | dimensionless | The alpha-function coefficient, from `eos.pr_kappa` or `eos.prsv_kappa`; both supply a coefficient for the same alpha function. |
+| `kappa` | dimensionless | The alpha-function coefficient, from `eos.pr_kappa`. |
 | `Tr` | dimensionless | reduced temperature, T / Tc |
 
 

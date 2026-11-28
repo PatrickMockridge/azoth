@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim master `SystemElectrolyteCPAstatoil`"
 edition = "`PhaseElectrolyteCPA` and its two subclasses, over `SystemFurstElectrolyteEos`'s fluid. The association is `PhaseCPAInterface`'s and the distribution function is the override the statoil phase installs."
+
+[source.neqsim]
+class = "SystemElectrolyteCPAstatoil"
+members = ["SystemElectrolyteCPAstatoil"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -63,6 +69,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SystemElectrolyteCPAstatoil"
+
 [implementations]
 python = "azoth.eos.electrolyte_cpa_statoil_phase"
 rust = "azoth_eos::electrolyte_cpa_statoil_phase"

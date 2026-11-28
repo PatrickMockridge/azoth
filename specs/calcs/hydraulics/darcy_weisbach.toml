@@ -8,6 +8,12 @@ references = ["Darcy, H. (1857). \"Recherches expérimentales relatives au mouve
 [source]
 standard = "Crane TP-410"
 edition = "2013"
+
+[source.neqsim]
+class = "FrictionFactorCalculator"
+members = ["FrictionFactorCalculator.calcPressureDropPerLength"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.f]
 unit = "dimensionless"
@@ -93,6 +99,12 @@ rho = 998.0
 v = 1.5
 [worked_example.expected]
 dp = 22455.0
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim FrictionFactorCalculator.calcPressureDropPerLength"
+
 [implementations]
 python = "azoth.hydraulics.darcy_weisbach"
 rust = "azoth_hydraulics::darcy_weisbach"

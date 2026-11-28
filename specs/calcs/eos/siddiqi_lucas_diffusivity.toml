@@ -10,6 +10,12 @@ references = ["Siddiqi, M. A.; Lucas, K. (1986). \\\"Correlations for prediction
 standard = "Siddiqi, M. A.; Lucas, K. (1986)"
 edition = "Correlations for prediction of diffusion in liquids. Can. J. Chem. Eng. 64(5), 839-843"
 doi = "10.1002/cjce.5450640519"
+
+[source.neqsim]
+class = "SiddiqiLucasMethod"
+members = ["SiddiqiLucasMethod"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.form]
 type = "enum"
@@ -49,6 +55,12 @@ T = 298.15
 eta = 9.163064908813372e-4
 [worked_example.expected]
 d = 1.984475615508378e-9
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SiddiqiLucasMethod"
+
 [implementations]
 python = "azoth.eos.siddiqi_lucas_diffusivity"
 rust = "azoth_eos::siddiqi_lucas_diffusivity"

@@ -15,6 +15,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/depressurization/BlockedOutletOverpressureAnalyzer.java"
 edition = "Its `run`: the filling simulator with the relief set pressure as its target and the first crossing sample."
+
+[source.neqsim]
+class = "BlockedOutletOverpressureAnalyzer"
+members = ["BlockedOutletOverpressureAnalyzer"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "vessel_pressure_transient"
 initialisation = "stated_initial_state"
@@ -139,6 +145,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class refuses a non-positive horizon"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim BlockedOutletOverpressureAnalyzer"
+
+[provenance.algorithm.convergence]
+source = "NeqSim BlockedOutletOverpressureAnalyzer"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim BlockedOutletOverpressureAnalyzer"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim BlockedOutletOverpressureAnalyzer"
+
+[provenance.algorithm.scheme]
+source = "NeqSim BlockedOutletOverpressureAnalyzer"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim BlockedOutletOverpressureAnalyzer"
+
 [implementations]
 python = "azoth.process.blocked_outlet_overpressure"
 rust = "azoth_process::blocked_outlet_overpressure"

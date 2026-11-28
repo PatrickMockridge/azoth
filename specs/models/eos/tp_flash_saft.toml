@@ -20,6 +20,12 @@ references = [
 standard = "Lafitte, T. et al. (2013)"
 edition = "NeqSim's own flash for this family: Wilson K-values to seed, successive substitution with Rachford-Rice inside, and each phase's fugacity coefficients from a separate single-phase solve."
 doi = "10.1063/1.4819786"
+
+[source.neqsim]
+class = "TPflashSAFT"
+members = ["TPflashSAFT"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "successive_substitution_flash"
 initialisation = "wilson"
@@ -105,6 +111,39 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TPflashSAFT"
+
+[provenance.algorithm.convergence]
+source = "NeqSim TPflashSAFT"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim TPflashSAFT"
+
+[provenance.algorithm."inner.convergence"]
+source = "NeqSim TPflashSAFT"
+
+[provenance.algorithm."inner.max_iterations"]
+source = "NeqSim TPflashSAFT"
+
+[provenance.algorithm."inner.scheme"]
+source = "NeqSim TPflashSAFT"
+
+[provenance.algorithm."inner.tolerance"]
+source = "NeqSim TPflashSAFT"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim TPflashSAFT"
+
+[provenance.algorithm.scheme]
+source = "NeqSim TPflashSAFT"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim TPflashSAFT"
+
 [implementations]
 python = "azoth.eos.tp_flash_saft"
 rust = "azoth_eos::tp_flash_saft"

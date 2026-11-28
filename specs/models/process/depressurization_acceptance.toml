@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/depressurization/STS0131AcceptanceCriteria.java"
 edition = "Its `evaluate`: the limiting time, the interpolations, the peak rate, the three configured criteria and the acceptance verdict."
+
+[source.neqsim]
+class = "STS0131AcceptanceCriteria"
+members = ["STS0131AcceptanceCriteria.evaluate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "trajectory_acceptance"
 convergence = "absolute"
@@ -92,6 +98,24 @@ description = "whether the peak rate is at or below its limit, or the limit is a
 [outputs.acceptable]
 type = "boolean"
 description = "whether all three criteria pass.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim STS0131AcceptanceCriteria.evaluate"
+
+[provenance.algorithm.convergence]
+source = "NeqSim STS0131AcceptanceCriteria.evaluate"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim STS0131AcceptanceCriteria.evaluate"
+
+[provenance.algorithm.scheme]
+source = "NeqSim STS0131AcceptanceCriteria.evaluate"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim STS0131AcceptanceCriteria.evaluate"
+
 [implementations]
 python = "azoth.process.depressurization_acceptance"
 rust = "azoth_process::depressurization_acceptance"

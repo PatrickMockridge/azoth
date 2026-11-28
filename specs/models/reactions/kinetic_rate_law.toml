@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim master `ChemicalReaction`"
 edition = "`getRateFactor`'s two branches: the legacy temperature correlation, whose constants are the method's own literals, and the reference Arrhenius law, which reads a reference rate, an activation energy and a reference temperature."
+
+[source.neqsim]
+class = "ChemicalReaction"
+members = ["ChemicalReaction.getRateFactor"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.law]
 type = "enum"
@@ -58,6 +64,12 @@ min = 0
 min_inclusive = true
 severity = "error"
 rationale = "a negative rate has no meaning and the class refuses it rather than taking its magnitude\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ChemicalReaction.getRateFactor"
+
 [implementations]
 python = "azoth.reactions.kinetic_rate_law"
 rust = "azoth_reactions::kinetic_rate_law"

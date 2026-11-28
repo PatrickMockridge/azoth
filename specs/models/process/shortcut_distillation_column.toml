@@ -36,6 +36,12 @@ references = [
 [source]
 standard = "NeqSim process/equipment/distillation/ShortcutDistillationColumn.java"
 edition = "Its `run`: the feed's TP flash, the Wilson fallback, `alpha_i = K_i/K_HK`, Fenske, Underwood's root by bisection, Gilliland through Molokanov, Kirkbride's feed tray, and both products from the split fractions."
+
+[source.neqsim]
+class = "ShortcutDistillationColumn"
+members = ["ShortcutDistillationColumn"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "underwood_bisection"
 convergence = "absolute"
@@ -169,6 +175,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute temperature\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ShortcutDistillationColumn"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ShortcutDistillationColumn"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ShortcutDistillationColumn"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ShortcutDistillationColumn"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ShortcutDistillationColumn"
+
 [implementations]
 python = "azoth.process.shortcut_distillation_column"
 rust = "azoth_process::shortcut_distillation_column"

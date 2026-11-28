@@ -49,7 +49,7 @@ r.provenance.rust_sha256  # the bytes of the kernel that produced this number
 
 The last line is the one that changes what is possible. It is not a claim in a manual; it is
 a claim a machine can check against the tree, and
-`python/tests/test_provenance.py` recomputes all 404 of them. `r.to_json()`
+`python/tests/test_provenance.py` recomputes all 401 of them. `r.to_json()`
 carries the block, so the same holds for a result written to a file, served over MCP, or
 handed to an agent.
 
@@ -106,7 +106,7 @@ a browser front end. `--persona software` leaves DSH's coding preset in place.
 
 | Surface | Names | What it exposes |
 |---|---|---|
-| calculation plugin | `azoth_help`, `azoth_catalogue`, `azoth_spec`, `azoth_intake`, `azoth_calc` | the glossary, an intake review of the supplied evidence, then every registered id — 98 calculations and 306 models — through `python -m azoth.harness`; a result carries warnings and provenance, and a dossier adds a sibling intake block |
+| calculation plugin | `azoth_help`, `azoth_catalogue`, `azoth_spec`, `azoth_intake`, `azoth_calc` | the glossary, an intake review of the supplied evidence, then every registered id — 97 calculations and 304 models — through `python -m azoth.harness`; a result carries warnings and provenance, and a dossier adds a sibling intake block |
 | flowsheet MCP | `mcp__azoth__*` | the 20 `azoth mcp --flowsheet F` edit commands, and the `azoth://document`, `azoth://diagnostics`, `azoth://report` and `azoth://catalogue` resources |
 | skills and teams | `/azoth-hazop` and `/intake`, four presets each | the 90 catalog skills, a curated subset, over the Agent Teams board (web profile) |
 
@@ -250,7 +250,7 @@ Units cross the API as `pint` quantities; a bare number where a length is expect
 
 ## The book
 
-The full catalog — 98 calculations and 306 models, each with its equation, source, valid
+The full catalog — 97 calculations and 304 models, each with its equation, source, valid
 range and a worked example — is in [the book](docs/src/index.md), generated from the same
 spec files as the code.
 

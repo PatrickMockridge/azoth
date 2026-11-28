@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim master `SystemSoreideWhitson`"
 edition = "`PhaseSoreideWhitson` and `EosMixingRuleHandler`'s rule 11, ported with the legacy aqueous parameterisation. The water alpha is `eos.soreide_whitson_alpha`'s."
+
+[source.neqsim]
+class = "SystemSoreideWhitson"
+members = ["SystemSoreideWhitson"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -69,6 +75,12 @@ quantity = "salinity"
 min = 0
 severity = "error"
 rationale = "a molality; the correlation's `s**0.75` and `s**1.1` are real for a negative salinity and would return a fitted value for a brine that cannot exist"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim SystemSoreideWhitson"
+
 [implementations]
 python = "azoth.eos.soreide_whitson_phase"
 rust = "azoth_eos::soreide_whitson_phase"

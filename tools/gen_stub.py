@@ -75,10 +75,6 @@ MOLAR_MASS_MODELS = frozenset(
         # why it is here as well as by its own name.
         "eos.multiflash_stability_test",
         "eos.tp_multiflash",
-        # The state aggregate divides a molar volume into a mass density, so a boundary
-        # that drops the masses cannot report `density` at all. A keycard-defined
-        # pseudo-component is exactly the case the masses have to cross for.
-        "eos.state_at_tp",
     }
 )
 
@@ -92,11 +88,6 @@ MOLAR_MASS_MODELS = frozenset(
 #: one model that reads them rather than added to every mixture, because a vector no
 #: function takes is a parameter a caller would pass and nothing would read.
 LIQUID_VISCOSITY_MODELS = frozenset({"eos.aqueous_viscosity"})
-
-#: The models whose boundary must carry the Peneloux translations: a density is a molar
-#: mass over a corrected molar volume, and the correction is the composition-weighted
-#: sum of these. A mixture built without them reports an untranslated volume.
-VOLUME_SHIFT_MODELS = frozenset({"eos.state_at_tp"})
 
 STUB = ROOT / "python" / "src" / "azoth" / "_core.pyi"
 
@@ -787,9 +778,6 @@ def transport_parameters(model: dict[str, Any]) -> list[str]:
             params.append(f"{prefix}association: AssociationSpec")
             if model["id"] in MOLAR_MASS_MODELS:
                 params.append(f"{prefix}molar_mass: list[float]")
-            if model["id"] in VOLUME_SHIFT_MODELS:
-                params.append(f"{prefix}volume_shift: list[float]")
-                params.append(f"{prefix}volume_shift_srk: list[float]")
             if model["id"] in LIQUID_VISCOSITY_MODELS:
                 params.append(f"{prefix}liqvisc: list[float]")
                 params.append(f"{prefix}liqvisc_model: list[int]")

@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/compliance/Sts0131Gate.java"
 edition = "Its six `add...` methods, `isAcceptable` and `countFailures`."
+
+[source.neqsim]
+class = "Sts0131Gate"
+members = ["Sts0131Gate.isAcceptable"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "sts0131_acceptance_gate"
 convergence = "absolute"
@@ -113,6 +119,24 @@ description = "whether no finding fails.\n"
 [outputs.failure_count]
 unit = "dimensionless"
 description = "the number of failing findings.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Sts0131Gate.isAcceptable"
+
+[provenance.algorithm.convergence]
+source = "NeqSim Sts0131Gate.isAcceptable"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim Sts0131Gate.isAcceptable"
+
+[provenance.algorithm.scheme]
+source = "NeqSim Sts0131Gate.isAcceptable"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim Sts0131Gate.isAcceptable"
+
 [implementations]
 python = "azoth.process.sts0131_gate"
 rust = "azoth_process::sts0131_gate"

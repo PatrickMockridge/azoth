@@ -13,6 +13,12 @@ references = [
 [source]
 standard = "NeqSim master `ChemicalReaction`"
 edition = "Its `getK(PhaseInterface)` and `getReactionHeat(PhaseInterface)`, over the `REACTIONDATA` family. The coefficients are read from the row named in the `reaction` input rather than supplied by the caller, which is why no coefficient unit appears in this calc's inputs."
+
+[source.neqsim]
+class = "ChemicalReaction"
+members = ["ChemicalReaction.reaction"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.reaction]
 type = "string"
@@ -58,6 +64,12 @@ T = 298.15
 ln_k = -14.633690407708798
 k = 4.412340363006617e-07
 reaction_heat = 9199.128566216192
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ChemicalReaction.reaction"
+
 [implementations]
 python = "azoth.reactions.equilibrium_constant"
 rust = "azoth_reactions::equilibrium_constant"

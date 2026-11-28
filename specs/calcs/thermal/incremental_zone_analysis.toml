@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim process/mechanicaldesign/heatexchanger/IncrementalZoneAnalysis.java"
 edition = "`calculate()` with `calcTubeSideHTC`, `calcShellSideHTC`, `calcSinglePhaseHTC`, `calcOverallU`, `calcZoneLMTD`, `calcTubeSideMassFlux`, both zone pressure drops and the totals; the correlations are `ShahCondensation`, `BoilingHeatTransfer`, `TwoPhasePressureDrop` and `BellDelawareMethod`'s."
+
+[source.neqsim]
+class = "IncrementalZoneAnalysis"
+members = ["IncrementalZoneAnalysis.calcTubeSideHTC"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.tube_inside_diameter]
 unit = "m"
@@ -321,6 +327,12 @@ total_tube_side_pressure_drop = 7796.3518705404385
 total_shell_side_pressure_drop = 28723.954482953133
 minimum_approach_temperature = 80.0
 zones = [{ zone_index = 1, zone_name = "liquid", tube_phase_regime = "LIQUID", shell_phase_regime = "LIQUID", tube_side_heat_transfer_coefficient = 2353.2086219276475, shell_side_heat_transfer_coefficient = 5663.977997811559, overall_heat_transfer_coefficient = 854.4225155154656, lmtd = 80.0, duty = 150000.0, required_area = 2.1944646424361007, tube_side_pressure_drop = 7796.3518705404385, shell_side_pressure_drop = 28723.954482953133, hot_inlet_temp = 400.0, hot_outlet_temp = 380.0, cold_inlet_temp = 300.0, cold_outlet_temp = 320.0 }]
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim IncrementalZoneAnalysis.calcTubeSideHTC"
+
 [implementations]
 python = "azoth.thermal.incremental_zone_analysis"
 rust = "azoth_thermal::incremental_zone_analysis"

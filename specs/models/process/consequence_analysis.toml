@@ -23,6 +23,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/qra/ConsequenceAnalysisEngine.java"
 edition = "Its `addJetFire`, `addPoolFire`, `addVCE`, `addToxicDispersion`, `evaluate` and `individualFatalityRiskPerYear`."
+
+[source.neqsim]
+class = "ConsequenceAnalysisEngine"
+members = ["ConsequenceAnalysisEngine.addJetFire"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "outcome_frequency_composition"
 initialisation = "first_outcome_in_caller_order"
@@ -168,6 +174,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the composed jet and VCE kernels refuse zero, where the class answers an infinite flux and overpressure"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ConsequenceAnalysisEngine.addJetFire"
+
+[provenance.algorithm.convergence]
+source = "NeqSim ConsequenceAnalysisEngine.addJetFire"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim ConsequenceAnalysisEngine.addJetFire"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim ConsequenceAnalysisEngine.addJetFire"
+
+[provenance.algorithm.scheme]
+source = "NeqSim ConsequenceAnalysisEngine.addJetFire"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim ConsequenceAnalysisEngine.addJetFire"
+
 [implementations]
 python = "azoth.process.consequence_analysis"
 rust = "azoth_process::consequence_analysis"

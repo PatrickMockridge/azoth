@@ -9,6 +9,12 @@ references = ["ISO 5167-1 and -2, Measurement of fluid flow by means of pressure
 standard = """\
     the orifice equation; ISO 5167 for the discharge coefficient, which this calc does not \
     implement"""
+
+[source.neqsim]
+class = "Orifice"
+members = ["Orifice"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.d]
 unit = "mm"
@@ -79,6 +85,12 @@ rho = 998.0
 Cd = 0.62
 [worked_example.expected]
 q = 0.008616706712060997
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim Orifice"
+
 [implementations]
 python = "azoth.hydraulics.orifice_flow"
 rust = "azoth_hydraulics::orifice_flow"

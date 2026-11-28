@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/risk/sis/LOPAResult.java"
 edition = "Its `updateTargetStatus`, `getTotalRRF`, `getRequiredAdditionalRRF`, `getRequiredAdditionalSIL`, the `ProtectionLayer` row and the STS0131 static pair."
+
+[source.neqsim]
+class = "LOPAResult"
+members = ["LOPAResult.updateTargetStatus"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_lopa"
 convergence = "absolute"
@@ -154,6 +160,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class refuses a non-positive pressure"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim LOPAResult.updateTargetStatus"
+
+[provenance.algorithm.convergence]
+source = "NeqSim LOPAResult.updateTargetStatus"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim LOPAResult.updateTargetStatus"
+
+[provenance.algorithm.scheme]
+source = "NeqSim LOPAResult.updateTargetStatus"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim LOPAResult.updateTargetStatus"
+
 [implementations]
 python = "azoth.process.lopa"
 rust = "azoth_process::lopa"

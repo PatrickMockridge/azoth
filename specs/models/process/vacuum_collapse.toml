@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/vacuum/VacuumCollapseAnalyzer.java"
 edition = "Its `analyze`: the constant-volume cooling sweep, the minimum pressure, the rating verdict and the make-up gas."
+
+[source.neqsim]
+class = "VacuumCollapseAnalyzer"
+members = ["VacuumCollapseAnalyzer.analyze"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "constant_volume_cooling_sweep"
 initialisation = "stated_initial_state"
@@ -123,6 +129,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "at least one step is needed for a sweep"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim VacuumCollapseAnalyzer.analyze"
+
+[provenance.algorithm.convergence]
+source = "NeqSim VacuumCollapseAnalyzer.analyze"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim VacuumCollapseAnalyzer.analyze"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim VacuumCollapseAnalyzer.analyze"
+
+[provenance.algorithm.scheme]
+source = "NeqSim VacuumCollapseAnalyzer.analyze"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim VacuumCollapseAnalyzer.analyze"
+
 [implementations]
 python = "azoth.process.vacuum_collapse"
 rust = "azoth_process::vacuum_collapse"

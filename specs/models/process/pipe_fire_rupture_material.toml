@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/rupture/PipeFireRuptureMaterial.java"
 edition = "Its `heatCapacityAt`, `thermalConductivityAt`, `ultimateTensileStrengthAt`, `strainEffectAt`, `ruptureStrainLimitAt`, `temperatureCorrectionFactor` and `strainRatePerMinute`."
+
+[source.neqsim]
+class = "PipeFireRuptureMaterial"
+members = ["PipeFireRuptureMaterial.heatCapacityAt"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "sellars_tegart_pipe_material_curves"
 initialisation = "stated_history_first_row"
@@ -161,6 +167,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class's correction limit is an absolute temperature"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PipeFireRuptureMaterial.heatCapacityAt"
+
+[provenance.algorithm.convergence]
+source = "NeqSim PipeFireRuptureMaterial.heatCapacityAt"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim PipeFireRuptureMaterial.heatCapacityAt"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim PipeFireRuptureMaterial.heatCapacityAt"
+
+[provenance.algorithm.scheme]
+source = "NeqSim PipeFireRuptureMaterial.heatCapacityAt"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim PipeFireRuptureMaterial.heatCapacityAt"
+
 [implementations]
 python = "azoth.process.pipe_fire_rupture_material"
 rust = "azoth_process::pipe_fire_rupture_material"

@@ -20,6 +20,12 @@ references = [
 [source]
 standard = "NeqSim master `FrictionTheoryViscosityMethod`"
 edition = "`calcViscosity`, `calcDiluteGasMixtureViscosityMicroPoise`, `initChungPureComponentViscosity` and the three reduced-constant evaluations, ported verbatim."
+
+[source.neqsim]
+class = "FrictionTheoryViscosityMethod"
+members = ["FrictionTheoryViscosityMethod.calcViscosity"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.tc]
 type = "vector"
@@ -141,6 +147,12 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "`RT/(v-b)` is positive at every state a cubic admits.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim FrictionTheoryViscosityMethod.calcViscosity"
+
 [implementations]
 python = "azoth.eos.friction_theory_viscosity"
 rust = "azoth_eos::friction_theory_viscosity"

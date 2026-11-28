@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim pvtsimulation/util/WaterPropertyCorrelations.java and SolutionGasWaterRatio.java"
 edition = "Every water-property correlation and the McCain Rsw; the Søreide-Whitson and electrolyte-CPA Rsw paths are named in the assumptions rather than ported."
+
+[source.neqsim]
+class = "WaterPropertyCorrelations"
+members = ["WaterPropertyCorrelations"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "water_correlation_dispatch"
 initialisation = "first_query_in_caller_order"
@@ -99,6 +105,27 @@ description = "the solution gas-water ratio in Sm3/Sm3.\n"
 unit = "N/m"
 optional = true
 description = "the water-gas surface tension.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim WaterPropertyCorrelations"
+
+[provenance.algorithm.convergence]
+source = "NeqSim WaterPropertyCorrelations"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim WaterPropertyCorrelations"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim WaterPropertyCorrelations"
+
+[provenance.algorithm.scheme]
+source = "NeqSim WaterPropertyCorrelations"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim WaterPropertyCorrelations"
+
 [implementations]
 python = "azoth.pvt.water_correlations"
 rust = "azoth_pvt::water_correlations"

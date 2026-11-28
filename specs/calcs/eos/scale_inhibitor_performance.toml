@@ -14,6 +14,12 @@ references = [
 [source]
 standard = "NeqSim master `ScaleInhibitorPerformance`"
 edition = "`evaluate`, `baseMic`, `temperatureFactor`, `ionicStrengthFactor`, `saturationFactor`, `calciumFactor` and the warning predicates, ported. The enum setters' storage, the message strings and the Gson report are not."
+
+[source.neqsim]
+class = "ScaleInhibitorPerformance"
+members = ["ScaleInhibitorPerformance.evaluate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.scale_type]
 type = "enum"
@@ -283,6 +289,12 @@ id = "round_trip_units"
 type = "property"
 property = "unit_round_trip"
 status = "active"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ScaleInhibitorPerformance.evaluate"
+
 [implementations]
 python = "azoth.eos.scale_inhibitor_performance"
 rust = "azoth_eos::scale_inhibitor_performance"

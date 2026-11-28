@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim master `PseudoComponentCombiner.transferBinaryInteractionParameters`"
 edition = "Its base-name and pseudo-position loops, and the two refusals `SystemInterface.setBinaryInteractionParameter` makes: an unknown component's name. The class mutates two fluids; this takes their tables."
+
+[source.neqsim]
+class = "PseudoComponentCombiner"
+members = ["PseudoComponentCombiner.transferBinaryInteractionParameters"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.reference_components]
 type = "record_list"
@@ -56,6 +62,12 @@ type = "matrix"
 unit = "dimensionless"
 shape = "one row and one column per target component, symmetric, zero diagonal"
 description = "The target's matrix after the transfer: its own values, with the reference's nonzero pairs written over them in both triangles.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PseudoComponentCombiner.transferBinaryInteractionParameters"
+
 [implementations]
 python = "azoth.characterization.transfer_binary_interaction_parameters"
 rust = "azoth_characterization::transfer_binary_interaction_parameters"

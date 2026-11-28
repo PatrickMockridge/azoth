@@ -22,6 +22,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/overpressure/TR3001ComplianceChecker.java"
 edition = "Its `check` over an `OverpressureStudyResult` and `isCompliant`."
+
+[source.neqsim]
+class = "TR3001ComplianceChecker"
+members = ["TR3001ComplianceChecker.check"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "closed_form_tr3001_compliance"
 convergence = "absolute"
@@ -123,6 +129,24 @@ max = 1
 max_inclusive = true
 severity = "error"
 rationale = "a fraction above one is not an accumulation basis"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TR3001ComplianceChecker.check"
+
+[provenance.algorithm.convergence]
+source = "NeqSim TR3001ComplianceChecker.check"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim TR3001ComplianceChecker.check"
+
+[provenance.algorithm.scheme]
+source = "NeqSim TR3001ComplianceChecker.check"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim TR3001ComplianceChecker.check"
+
 [implementations]
 python = "azoth.process.tr3001_compliance"
 rust = "azoth_process::tr3001_compliance"

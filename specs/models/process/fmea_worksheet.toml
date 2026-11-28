@@ -16,6 +16,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/hazid/FMEAWorksheet.java"
 edition = "Its `addEntry` validation, `sortedByRPN` and `entriesAboveRPN`."
+
+[source.neqsim]
+class = "FMEAWorksheet"
+members = ["FMEAWorksheet.addEntry"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "fmea_rpn"
 convergence = "absolute"
@@ -112,6 +118,24 @@ description = "the largest RPN; absent on an empty worksheet.\n"
 [outputs.entry_count]
 unit = "dimensionless"
 description = "the number of entries.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim FMEAWorksheet.addEntry"
+
+[provenance.algorithm.convergence]
+source = "NeqSim FMEAWorksheet.addEntry"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim FMEAWorksheet.addEntry"
+
+[provenance.algorithm.scheme]
+source = "NeqSim FMEAWorksheet.addEntry"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim FMEAWorksheet.addEntry"
+
 [implementations]
 python = "azoth.process.fmea_worksheet"
 rust = "azoth_process::fmea_worksheet"

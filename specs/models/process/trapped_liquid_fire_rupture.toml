@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/rupture/TrappedLiquidFireRuptureStudy.java"
 edition = "Its `run`, the event recorders and the builder's validation, with the wall and fire helper classes."
+
+[source.neqsim]
+class = "TrappedLiquidFireRuptureStudy"
+members = ["TrappedLiquidFireRuptureStudy"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "trapped_liquid_fire_rupture"
 convergence = "absolute"
@@ -321,6 +327,24 @@ max = 1
 max_inclusive = true
 severity = "error"
 rationale = "the class refuses a multiplier outside [0, 1]"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TrappedLiquidFireRuptureStudy"
+
+[provenance.algorithm.convergence]
+source = "NeqSim TrappedLiquidFireRuptureStudy"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim TrappedLiquidFireRuptureStudy"
+
+[provenance.algorithm.scheme]
+source = "NeqSim TrappedLiquidFireRuptureStudy"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim TrappedLiquidFireRuptureStudy"
+
 [implementations]
 python = "azoth.process.trapped_liquid_fire_rupture"
 rust = "azoth_process::trapped_liquid_fire_rupture"

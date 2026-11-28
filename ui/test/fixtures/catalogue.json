@@ -161,7 +161,7 @@
       "provenance": {
         "python_sha256": "4e7c1d07b54ae71126ad0fe3e9fedbe2a67966c963cb4b4c950c5a14fd9f1a71",
         "rust_sha256": "219c4fbc978c617bed91ffccf9e9d238c47b9ec9e6423406f2dd7d6de505686c",
-        "spec_sha256": "7d4d0713c70c4811ba7667e69284af0ff6eb1558fb9d9cb3cf9cb229011ef564",
+        "spec_sha256": "c340b3ba6a2a7c3b49d586e5e52e3a56b40154702ee9296e82a5c8c22c3a1bf8",
         "tests_active": 9,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -349,7 +349,7 @@
       "provenance": {
         "python_sha256": "191c4adf63171ce844a85801e420a7f89c45ff7547737cc6d647cebbdd1b1103",
         "rust_sha256": "d1eb7f4acb1e4dcd4cbb9ef578c75ee67485ab741343a957df9f1ff3c21612b3",
-        "spec_sha256": "54515faa5785f9ae483f44471e23dda67a65927781fc236f90c46424c5929290",
+        "spec_sha256": "cfa680effc43a7fc409ee59c723765bd69cbce6a52abe2d148b41ce36f768514",
         "tests_active": 5,
         "tests_skipped": 0,
         "validation_cases": 5,
@@ -776,7 +776,7 @@
       "provenance": {
         "python_sha256": "577d1a0845bb250b11fa95e5d62a762c0f805784fb108e9c810c34e4b6d42df2",
         "rust_sha256": "5874b8b22a30f758db9cf5654a71bccdf557b6dbac385bce1829f0ed2aed30bf",
-        "spec_sha256": "362280d9c813ddf0b478069b8ae7503d37d3e3ba8b6cb90235722ff9250bf0c5",
+        "spec_sha256": "bd0d17cc3ab50d0c94c037f731413abe0b29c26ae4c4ebf9edc7909338beb00f",
         "tests_active": 8,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -940,7 +940,7 @@
       "provenance": {
         "python_sha256": "12aa2951865a0e6696c66978dad4b627ca38b6b7701da6d635726e7ff384d218",
         "rust_sha256": "846f78dc977e4a8e19201141a4b66921d31b3e116c44ea44f5de5f6726e772dd",
-        "spec_sha256": "f29b7a7fd379a1ef1c074fbac2d5f97773e3ec7b72353251d7ed975efc3a171e",
+        "spec_sha256": "49c8fe6fa488b57d339b04b914fb77c98cbafcf155d89c2169768ce176059738",
         "tests_active": 4,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -1112,7 +1112,7 @@
       "provenance": {
         "python_sha256": "4fc525cab271f639ac632a68838561e501c680b84365e42edf0ada76dc7aed3f",
         "rust_sha256": "ee9669f1aac92d3d660718be3beace983dda5e82a97aa2ae8d6aeb7ce82cfe20",
-        "spec_sha256": "2d8b0bf4f46f6d026f9e958dadadeacc64def0481feb508b458ce883020040bb",
+        "spec_sha256": "605642e057eaeba0a0ea56c61a1750b6c20ed3f83c902c834a5770fc17f6972a",
         "tests_active": 4,
         "tests_skipped": 0,
         "validation_cases": 1,
@@ -1297,7 +1297,7 @@
       "provenance": {
         "python_sha256": "4fdc5c474188432d5dc9d75d1773a65ddf434290c3865621829e441cd447cced",
         "rust_sha256": "65dd0e33ce4d3776d8b3812dc5f6f1a4955e4a406a597b4fb54397f1471b9c74",
-        "spec_sha256": "e4571b0ab97c340101b491ca0b33f0a6fc53eb8c1df5fd8fbb027551a57cff8d",
+        "spec_sha256": "e8f5f47e1b31944bf8eb274bf7da49c390e96656eca6b6064c069bc39a1375d7",
         "tests_active": 4,
         "tests_skipped": 0,
         "validation_cases": 1,
@@ -1367,7 +1367,7 @@
       "provenance": {
         "python_sha256": "05f00ffe12f75366500c44b4897de3b2dd52bee828b379b3c334d34fe862f3d5",
         "rust_sha256": "d9786794b3a56546e73764f6166d44f3f67b8bfc72c8e2173fe91d0a04979f07",
-        "spec_sha256": "2f48f2af277c5c199882806f9754ca848e77d45d8c8284f7c522e470ccb82631",
+        "spec_sha256": "0f2dd2996f19d435d655ffc3b357f7b8ce1a75041c1bc5134614299fff8136c5",
         "tests_active": 3,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -1511,7 +1511,7 @@
       "provenance": {
         "python_sha256": "33ad3cd68cf479dc20a199bba6f6f7732e0f1f58e3b5cb2aafad252c4db2ec3d",
         "rust_sha256": "6196b7e27fd58c06ef660f71d0325f05ae15c12aa5eaea697e8b044e8b3d956e",
-        "spec_sha256": "d578955dc60a0e00d6d4b34f6a297f1f34d0a17122ea4d7b3b1dfe5c3bc2781b",
+        "spec_sha256": "e7a479c2a56200b36d0c63943c1232994bdacd42a3e1ebe4c28df55b56b0a10d",
         "tests_active": 3,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -1869,7 +1869,7 @@
       "provenance": {
         "python_sha256": "8a7e3676204ee9cb6021c76c799b19644472216854aa0b04586c6485aae39f26",
         "rust_sha256": "aaee715f2336acdeb70eb2a9457708776683864a5175b3b3cc1d1fb0eb36ef29",
-        "spec_sha256": "2f024066c84714f66c65866be5dd5a77b8d05b2ef31fc181b717b812721fb64b",
+        "spec_sha256": "f3e77eef1027a694d32a8d9a77982a80d63de761c8cef940fb7eb5b338bf9c16",
         "tests_active": 16,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -2320,7 +2320,7 @@
       "provenance": {
         "python_sha256": "887f227fb5c4b7fef5104ce5763a752af3cd348c2c1016978ebdbc473713c13f",
         "rust_sha256": "bc4e233a3cda2f7e60b1e7088cbd3f2b9bc8c4d0a5ce60b9993f5dc6232a85b1",
-        "spec_sha256": "41b0965d548e9cc12beed63b5eb3cbf68ae9aa8d3444058232a1439a84674519",
+        "spec_sha256": "e77378e0cd3e9d605f65d17be7a4673bb08fd461f76a6a834d145c1ecfec9ff7",
         "tests_active": 8,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -2610,7 +2610,7 @@
       "provenance": {
         "python_sha256": "0d4d5d669850e72327db539f9a078c3c4ae7067539d48879c11acb1bdfcc30a4",
         "rust_sha256": "19546d7abfa89c58c14730c132e8309a468c4857caea5580e84927e68b0a601e",
-        "spec_sha256": "f03272e6d3600bfb4c0f1c42480c2aa9a8cf8c4ca5fed762d8d27636da63e4b0",
+        "spec_sha256": "9c22492346d4824e7c513b5283cc6e3482e51de3dbf093cdd29e3c9ee88e0ec6",
         "tests_active": 20,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -3041,7 +3041,7 @@
       "provenance": {
         "python_sha256": "b1969b3d3e93432587ed910c557eec2ebb22fc40908bc8d4f32d4a5d37daafd8",
         "rust_sha256": "bdd1c7f268a5825f545e9bdfa4e576c9526b8717837e91e17fbdc55282aa5c50",
-        "spec_sha256": "91ecad0740705cf7a0f4a535d852ed2367e3e1b66e73fd322c563c0c05560072",
+        "spec_sha256": "5249a42fa926756ef8e559e191e24abd1182b4b8593fecd3119711b4f38d479f",
         "tests_active": 19,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -3186,7 +3186,7 @@
       "provenance": {
         "python_sha256": "0b6478df00a00c60ee6f33f5903d98993d9dbe3d7e0737ff56e18de3bf4a787a",
         "rust_sha256": "42f3f193c34fc308fecddb1add64a53ce7ebc0071ef1e187475840e5bbdc1c32",
-        "spec_sha256": "b269baefee98eae6ad705f35bdd23354b0c1f386c181ba60a39396a51eab6f55",
+        "spec_sha256": "8337d5d8351e7b15d8f025803a2aa6ebef7f06dde6c05a1beb15458e5d4b79d0",
         "tests_active": 4,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -3317,7 +3317,7 @@
       "provenance": {
         "python_sha256": "c1873e34dc34feb18b2f6ec82e993bbd21bab0bacdcf45d3927fd66a03d891be",
         "rust_sha256": "f719bc7febc0ec100a6d96656ec1269d23753a0698272f5a8b4839058d530a5b",
-        "spec_sha256": "08f60271552d7aaf4d7e77105367c90a124410d1ec6ffa6dcccfe6ffce620280",
+        "spec_sha256": "8c5d7b9dde563959d4eac7930a00b3ae81fe3d2475c62bc501f3fcfa4c79123a",
         "tests_active": 7,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -3425,7 +3425,7 @@
       "provenance": {
         "python_sha256": "f6ee5df7024662c9102f73baeaad6e08bf35b57b1bd8c0044e1346a9fea430c7",
         "rust_sha256": "1283fe136da2fe66473e3584d37a62add5188fc06de2e7cb68f8d8f63ddbac57",
-        "spec_sha256": "03bea28c2e60717cc31bd7cba6b78c6552c52b311ea17d655ccf2273c408371d",
+        "spec_sha256": "edae8e27012add4820e3716b322bfa9f037b14da90d9345dafcc5796e5d7364c",
         "tests_active": 3,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -3560,7 +3560,7 @@
       "provenance": {
         "python_sha256": "905d48e1a218bd35b93ed0738fb801a351b29fbb076a57a4662384665a4612d2",
         "rust_sha256": "14b296df206e56e7bd620fd574e110791b0b872638ff9fd56e9c6d526b947c6f",
-        "spec_sha256": "4029f6992d926a023d9767b4f39a91e3b5aaa80a0153052979b50e48428684e7",
+        "spec_sha256": "b270c87df00633c3e12d9bde554b026f54def17b713b4681a8fdf2c9b3b663f2",
         "tests_active": 3,
         "tests_skipped": 0,
         "validation_cases": 1,
@@ -3695,7 +3695,7 @@
       "provenance": {
         "python_sha256": "542101031b3ee8210b858b8e1c82d115c7a869a13e52b03685fbc3be482f7c76",
         "rust_sha256": "b9fcc0c2044b51f02c6b53fe44ceccfd0f8eacf635523c294f76127bcdb82607",
-        "spec_sha256": "e176e6e46e1a37694c6936af1f0e4da5a246eb36dc4563b62458dcc97e11a621",
+        "spec_sha256": "b7820806927a9ae0eddb010055ce8057d2a6a2d8b555411c6e829ce4a8c38ab0",
         "tests_active": 6,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -3759,7 +3759,7 @@
       "provenance": {
         "python_sha256": "4b34aee618c29c3121af6d848754884af24b35189a5afb70f643067cdbcbc3f3",
         "rust_sha256": "ee8b3e222be24c1398e200a82c676b9ba90f4f88e580f298e0242e179afda928",
-        "spec_sha256": "9b0658a5290ebd82406de10d1e8c92179bea3f634bb3247bfbcfcbe661454c1d",
+        "spec_sha256": "e7ced6ac60c5ad203c1385c961f5fc0cfe6b2f666683fcbb5cfecdf6b96d9ac7",
         "tests_active": 5,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -3880,7 +3880,7 @@
       "provenance": {
         "python_sha256": "6981d5361d9ba67e861de78ccaa3cee53175f438800606c25de2ca8a4c982b87",
         "rust_sha256": "b4831ac1b984f9164cd4864acdae6120ad7b996be2afcf8c21ad7ccf425128aa",
-        "spec_sha256": "76e46908d2e1c5ab689c9cd6df2209a07bc24ce8fc6e50b12ed3420ad7ecda00",
+        "spec_sha256": "017de216fc85fe17c2a9de9cf94857acd82d1651ce1574d6f80a4ede2fd8ec82",
         "tests_active": 4,
         "tests_skipped": 1,
         "validation_cases": 0,
@@ -4002,7 +4002,7 @@
       "provenance": {
         "python_sha256": "a91ae4a5d72544eb65d2c99434160553dc97a4abe5f3444f96729b8796665d24",
         "rust_sha256": "ca7f047ffadcb530aa352616addb15baf99bfe45c442c32bcbfee2f0615dea63",
-        "spec_sha256": "aea362df730c34576833aa6faea10ec0059b880370d1325f8bdafaceaccb7154",
+        "spec_sha256": "fb77d0f3d4363a768c6b2a32a19d28be2ca3e86891b2c7dff8f93edd6ff3ba3f",
         "tests_active": 3,
         "tests_skipped": 0,
         "validation_cases": 1,
@@ -4208,7 +4208,7 @@
       "provenance": {
         "python_sha256": "fcac1523f084335107f459940294016c59b6df2aea36c29a1aebe861ed47cef2",
         "rust_sha256": "e4fc41f7e9a468fbd789b760e5817827bbadec1e4a2181c2ed1b1399cb61a265",
-        "spec_sha256": "ad014a55d42a144490714694c83c2694e4082bb24db8ac42de08e0a2b213d4bd",
+        "spec_sha256": "33af905dcc006db94f570d2c27bfe3074be118942a8417c28c8098234174a3d5",
         "tests_active": 4,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -4347,7 +4347,7 @@
       "provenance": {
         "python_sha256": "d6267c08edf2b7b9416debd4b64f360546d9d8c23e7da037e5128f0e73e73043",
         "rust_sha256": "e6c9e5684d7e1e473b0931af9fd20c10dc2cb656dd23e0ab3f37168929b3bb50",
-        "spec_sha256": "b4f41f71ab6cebd0e29246194ce2ebe534fb6db874a89b732fb34f33a26b855c",
+        "spec_sha256": "bc06f6194225151d1c49bc23463f24539cbe1c16055d719c0d343cfeb09b4e15",
         "tests_active": 3,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -4451,7 +4451,7 @@
       "provenance": {
         "python_sha256": "30a770b72e644245f5878788569700c9bb44c03451c9c75ebf9c25fff51b4fb5",
         "rust_sha256": "408c1a3d9c86c17569e8dce9737ae46922fa0236f8ed98a9e23d061ff85b93ad",
-        "spec_sha256": "6e024e20a80b37f1197cf897c6c1db510a8bfec94d3b9a7b007b22585368ae0c",
+        "spec_sha256": "9f6f43519609184395a41ee1a96364745a60d387231733b07a32ac7a74ffe26a",
         "tests_active": 2,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -4561,7 +4561,7 @@
       "provenance": {
         "python_sha256": "13bac55dde0ad97f4b7fe187e70562b37cd319e7ea6aabe7495b3f37f0a81cee",
         "rust_sha256": "755fc391819a98b14c07d698d7a71b38700217e3a2a5e38b0086320c76dc565e",
-        "spec_sha256": "90e1b6ebb3367238f65430f553466492b81017df49446040d0864910419de588",
+        "spec_sha256": "6e6ee7906eef80293da3759395a4bf83ee8930589bb849fc6a41ec7ba58b88f7",
         "tests_active": 3,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -4672,7 +4672,7 @@
       "provenance": {
         "python_sha256": "d0615f2842a5820eaba767ec9dfd2083ab539b8e0496ea76cbb46810efc3c181",
         "rust_sha256": "ee2429af30118a634bbc9e6a8681d0fff8fe489b5ffb47d1d3a6d405a2526944",
-        "spec_sha256": "d0fa97bd9b9f2a9ac93a906d427b42818a6e62cbd2fa74b0a9602476262a960e",
+        "spec_sha256": "7c5939241ffbb6b114ae8dd5db45a3b01f8af0d64ca74d28f65191b08e8a635c",
         "tests_active": 3,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -4805,7 +4805,7 @@
       "provenance": {
         "python_sha256": "66664eff03e3095b56cb33b80489c71c6235217c9fe3fee0d274f802978d4460",
         "rust_sha256": "3dff3ee427f3393bc37dab40d2cc79951d7c167118a11037f2338d45367a0d85",
-        "spec_sha256": "65731a2fb1a09227361ac07ef2e1d0e61c68c1d3a04275d266f42f0a9997ed9c",
+        "spec_sha256": "3bf92a05d79efe70085cfb8febe43de87539758a382a83ec32b218d3dabcf9c1",
         "tests_active": 3,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -4908,7 +4908,7 @@
       "provenance": {
         "python_sha256": "6313d1dffd305ae5975bee22be5f6b9dca5240e6cb277f8ca785271b28f75f9b",
         "rust_sha256": "231cc21315b268c7ad4e6bdc0a51c30b5391fff5eda5d0e52a534c9321207267",
-        "spec_sha256": "f4fd16604e09e2608ac29d11db72066a438035d00ae916288689b7d7d6926c10",
+        "spec_sha256": "343959dc23b8a357fa5d83f2e7db0de0989bbe7a0bdbb1055cc6aa238dc4575d",
         "tests_active": 2,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -5004,7 +5004,7 @@
       "provenance": {
         "python_sha256": "6adf4e40e16d85dc63c535e675f8d33bca489bc8ae3068c2129bd7655b70e605",
         "rust_sha256": "8c2f97228b3252f115e2fcb3e245c63d18fbf9dd3ec4d44226921dc78ca275b9",
-        "spec_sha256": "5c9c50f94935d4dd31dd6d0e804131054a5aec48345c41c7d2c82f11b88233bb",
+        "spec_sha256": "138e883b8c5e35c1418b4edcc76eda1be7c848927ab1cbf87ef51500ce8f2475",
         "tests_active": 4,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -5127,7 +5127,7 @@
       "provenance": {
         "python_sha256": "2041dc232651bdac6c1c2eaaa913e63a936ef1634a07622ce479c0dc3851e235",
         "rust_sha256": "df5a5cff44c22742a0dec4c813716f47724e47cca93c9467a258b40e892875a3",
-        "spec_sha256": "6ae28de3d19441542e1f7360925d41499b4b85b1f7629efbdbd57b22084271d8",
+        "spec_sha256": "137e612947bbf6c17e7632617e44e6a5f555379b152e13386f2f799874caa27c",
         "tests_active": 2,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -5432,7 +5432,7 @@
       "provenance": {
         "python_sha256": "7c04967eae7a074eebc4351c022e045bae36773cb11f1332caef496f58ae776c",
         "rust_sha256": "1b2f2cdf4f1891eabf97538f83be32ced9a1225258ea67870e803c81a5ea450d",
-        "spec_sha256": "45180147768a1097ca8223f8bfaebcacb537d9340a4e30016aaf9287bff30c54",
+        "spec_sha256": "ca1b99b1f746f1a9644e04c6c6a73ab14325a684cd6c50e51feae60c3facc0a4",
         "tests_active": 6,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -5492,7 +5492,7 @@
       "provenance": {
         "python_sha256": "914abebf9302e0ae5adc7ec7f814a3297660dc1b9e61e07bab346880400c37ee",
         "rust_sha256": "f615df5267a99f80d568d4f78310bd137b3949c645d59ba6ea9fdd0f2b03057f",
-        "spec_sha256": "97ce874ca8149c6d07de1ba9fde7128da1f142e5208ebe8d6869bf579fe2dfe8",
+        "spec_sha256": "ae05f7b9e78621c633bcdf71190e0e02003f7e9b1658e0c46209518bd752c2d5",
         "tests_active": 2,
         "tests_skipped": 1,
         "validation_cases": 0,
@@ -5612,7 +5612,7 @@
       "provenance": {
         "python_sha256": "a2fae6664620765dd401f99573ba586f73abdc09715d9f36f3b831b54321ed76",
         "rust_sha256": "39ecfc817a7f0ed937947e860a6dadf38e2107d6a864ed27748b7678b5cf69b4",
-        "spec_sha256": "69c782c95899b90d599ce1d239e3827351d1895ed3305f599ba908b90487bcb0",
+        "spec_sha256": "93316c6a9f7874dd5e0ed48f9e397a5abc2ec5f91e9d0b76ce86e1759426a65b",
         "tests_active": 4,
         "tests_skipped": 1,
         "validation_cases": 0,
@@ -5688,7 +5688,7 @@
       "provenance": {
         "python_sha256": "d0d73d75b09055578a15bedb739f5ab75b49c49a15d63c8932f4aa3957563cd6",
         "rust_sha256": "e3f1e810a7ad606e3179e1df8602fa4a5bc3f073d5dcf90ff4af0e0270a8f9f1",
-        "spec_sha256": "63407bea131e99ff85bf935c766d3221aae01c5a819e895495f48292916b9fee",
+        "spec_sha256": "67e9f8ea7eb9d2472abdb11d1726f6cfdd7c92350aa51bcdd09a2b4ec0aaeaf6",
         "tests_active": 3,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -5763,7 +5763,7 @@
       "provenance": {
         "python_sha256": "1671edf7b79932b25e850e2b6dd02c905e5d490c7fa0ed1499f57050a53bbf36",
         "rust_sha256": "bb0d51ba1878a67488692f1a987d101f14be973807c3d19653cd3fa123ad52d7",
-        "spec_sha256": "ad21befbc32e7586bb5ca3e63d479ebb7538ef517ae0792e95194ecc2e505afc",
+        "spec_sha256": "96b9efc28f085dcb8716cd52b38b2b85aacc0c5aafced8043aeec964d4b344bd",
         "tests_active": 3,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -5839,7 +5839,7 @@
         },
         {
           "default": null,
-          "description": "The alpha-function coefficient, from `eos.pr_kappa` or `eos.prsv_kappa`; both supply a coefficient for the same alpha function.\n",
+          "description": "The alpha-function coefficient, from `eos.pr_kappa`.\n",
           "dimension": "dimensionless",
           "kind": "quantity",
           "name": "kappa",
@@ -5901,9 +5901,9 @@
         }
       ],
       "provenance": {
-        "python_sha256": "8f98d41ab98a5dc9a06cc1c4991f3b83a7bc422d284da5a7002f249d7ee6d7a7",
-        "rust_sha256": "264c55abb6731864609b3a3df27bd6215fbb84ff9e65d90d460f0d90ff32e8d3",
-        "spec_sha256": "53a3a1f27fa795a1725f902e2b1adef993aded3f26438357339648c7bf2d85ae",
+        "python_sha256": "9e50d0df5b1ad39ea87ea4c3880f8b17ad00213c2baecceb45035003f2c27a44",
+        "rust_sha256": "2e77e59c6628bc06c00cb3c85791fe9cdc9bd706bedbddcaffa59b616c2dffa3",
+        "spec_sha256": "71ea730c6722c6f29499b018ce8861ca02e84447dbba995e76219d04b9f2e360",
         "tests_active": 5,
         "tests_skipped": 1,
         "validation_cases": 0,
@@ -5981,7 +5981,7 @@
       "provenance": {
         "python_sha256": "5c70a200435310f9c352e381154baa2aa94e244e66b6a4f4b3ee9e8b5051d4cf",
         "rust_sha256": "ab51be138f25a178e6a57cad714551f32231b577abfec1440e7f2e72e75dd547",
-        "spec_sha256": "68eaa9cfac780b5f619c3f7a4d5259ea68c2ce5570175c2689a186941743c8b6",
+        "spec_sha256": "d92607dec8336036a817c300743dd74641f067abfbb981c9453b77706b515060",
         "tests_active": 2,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -6037,7 +6037,7 @@
       "provenance": {
         "python_sha256": "34466077239d56814a9d56ecc6cfa7b3af4de6c0b59effa5a070402b970dc715",
         "rust_sha256": "386a7eb2f853952e8d4d1934e6f76715b1dc80f0d06539ebf73fff6b5b7d1839",
-        "spec_sha256": "2041bdd614af6f2bbb07806180d748d3396c129592fbd3c6611a4750a44a88e1",
+        "spec_sha256": "6fb66f95dc65433870d1023b3d538981ae3f76fcab8043dfdae131bf2d667bac",
         "tests_active": 4,
         "tests_skipped": 1,
         "validation_cases": 0,
@@ -6112,7 +6112,7 @@
       "provenance": {
         "python_sha256": "31d1eb55af9ba48879e114a5ac0013d4df330b5238875fcff867aa71f385ecb3",
         "rust_sha256": "a170918446252bc0edde433e84bc0b7c6c752785c35867074894e1afb0d074f1",
-        "spec_sha256": "ad78d74d60f5d820df482578dd111fc2a9602c152d28bbdd72787974a2a81595",
+        "spec_sha256": "367a2a8b31cfe7abb424eccff89b6e4c981261a58210455255ff0c6de77e5b92",
         "tests_active": 2,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -6201,7 +6201,7 @@
       "provenance": {
         "python_sha256": "fd6877f4be631a9246c3fbf49e81ad4d75b16a0f63e48650c3685f71e692c2f1",
         "rust_sha256": "3aa2c2ac0aed081300bf51d6e8bebd0630cc333a3ff1b8dda754d16c19618b0a",
-        "spec_sha256": "99b7a6d067f93584afd0d7e01f1a315fb940cffa56a8f027093bc1c49abc0fbf",
+        "spec_sha256": "348592db19e62b8c4bad87ef92dcaf5958c1118145f32ad8b2c7832d0c556ba8",
         "tests_active": 4,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -6315,7 +6315,7 @@
       "provenance": {
         "python_sha256": "f7606d9986f82a6b9422a85f956985de50829eaf3bdc13b0cb4665668fd7cd09",
         "rust_sha256": "be2cc84a951b6389dcd4359c74cbea406a22da5edab75a24870b5d4fa9dfa032",
-        "spec_sha256": "b92731d984b8d864da39b48b3ddc3f944fe29b57009866d11657a8f07de7d116",
+        "spec_sha256": "9170d37394c968c9cccb201a1ee6c637168ac13d02c2a5059ba08c4f41ee9884",
         "tests_active": 5,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -6429,7 +6429,7 @@
       "provenance": {
         "python_sha256": "aa9364c60f514ee60259c2fbf443a173d53658987248ac68bffc81b65e5d6646",
         "rust_sha256": "8a130b4461ce2abc9b5806655acd6563d0184f30ccfe7ca665700fa5ce835c54",
-        "spec_sha256": "9ca932388b6783abc5b988d4436c29a1dea6e8fa7e6fc4301c1846aa7468ec72",
+        "spec_sha256": "f071c4c30ab0b7c29ca135196684e5d1d8926169c4c58eece78b8c317683fb1b",
         "tests_active": 4,
         "tests_skipped": 0,
         "validation_cases": 1,
@@ -6569,7 +6569,7 @@
       "provenance": {
         "python_sha256": "451cdd4b22495bce7cf55d85bf38eca6cb085559fe970661fd62b9f53452effc",
         "rust_sha256": "861b7e0f10aa40ff6a1900d7186a126d490704d3040ab3588575c10865293190",
-        "spec_sha256": "0d18eede59df3d3e609a87365c60b64fe5dee692937bbc85805299a9e03919e7",
+        "spec_sha256": "a118a692165744b15646a31267f5b2a9f68cf6b648c13f118810aa9bde63e787",
         "tests_active": 8,
         "tests_skipped": 1,
         "validation_cases": 0,
@@ -6583,98 +6583,6 @@
       "worked_example": {
         "a_reduced": 0.20206500174625697,
         "b_reduced": 0.02431127309496514
-      }
-    },
-    {
-      "assumptions": [
-        "`kappa1` is a fitted parameter for the substance intended, and its correctness is NOT CHECKED - this library ships no values for it.\n",
-        "**`kappa1 = 0` is not the same as Peng-Robinson.** The acentric-only polynomial here, `0.378893 + 1.4897153*omega - ...`, is a different correlation from `eos.pr_kappa`'s.\n",
-        "the alpha function this coefficient feeds is unchanged from Peng-Robinson, so `eos.pr_alpha_ab` serves both.\n",
-        "the range of reduced temperatures and acentric factors over which the correlation was fitted is NOT established, and no bound asserts one.",
-        "this is the 1986 PRSV of the cited paper; PRSV2 is a later revision of the pure-compound parameter.\n"
-      ],
-      "available": true,
-      "equation": "kappa = 0.378893 + 1.4897153*omega - 0.17131848*omega**2 + 0.0196554*omega**3 + kappa1*(1 + Tr**0.5)*(0.7 - Tr)",
-      "id": "eos.prsv_kappa",
-      "inputs": [
-        {
-          "default": null,
-          "description": "Acentric factor, as in `eos.pr_kappa`. A property of the substance, supplied by the caller.\n",
-          "dimension": "dimensionless",
-          "kind": "quantity",
-          "name": "omega",
-          "range": [],
-          "required": true,
-          "unit": "dimensionless",
-          "values": []
-        },
-        {
-          "default": null,
-          "description": "Reduced temperature, T / Tc.\n",
-          "dimension": "dimensionless",
-          "kind": "quantity",
-          "name": "Tr",
-          "range": [
-            {
-              "band": "outside",
-              "code": "OUT_OF_VALID_RANGE",
-              "equals": null,
-              "max": null,
-              "max_inclusive": true,
-              "min": 0.0,
-              "min_inclusive": false,
-              "rationale": "`Tr` appears as a square root; Tr = 0 is finite but a negative Tr makes the root undefined, and a reduced temperature at or below zero is not a state.\n",
-              "severity": "error"
-            }
-          ],
-          "required": true,
-          "unit": "dimensionless",
-          "values": []
-        },
-        {
-          "default": null,
-          "description": "The pure-compound parameter PRSV adds, fitted per substance to vapour pressure data, supplied by the caller; its sign is unconstrained.\n",
-          "dimension": "dimensionless",
-          "kind": "quantity",
-          "name": "kappa1",
-          "range": [],
-          "required": true,
-          "unit": "dimensionless",
-          "values": []
-        }
-      ],
-      "name": "Peng-Robinson-Stryjek-Vera alpha-function coefficient",
-      "namespace": "eos",
-      "outputs": [
-        {
-          "description": "The PRSV alpha-function coefficient, which feeds the same alpha function as Peng-Robinson's, `alpha = (1 + kappa*(1 - sqrt(Tr)))**2`. Unlike Peng-Robinson's, it varies with `Tr`.\n",
-          "dimension": "dimensionless",
-          "kind": "quantity",
-          "name": "kappa",
-          "optional": false,
-          "unit": "dimensionless",
-          "values": []
-        }
-      ],
-      "provenance": {
-        "python_sha256": "cd266fcfd51d4933e633b4ff8e082168b097c0cdaf2dd604760cf038fb4cde79",
-        "rust_sha256": "f15846459755fa82fa51133aed07d08f907079407c3ae786eee76f563efae784",
-        "spec_sha256": "993e50641c38b1a196e9e2650428f3ed692b0bdaa02cf0efe48a183c1556624b",
-        "tests_active": 5,
-        "tests_skipped": 1,
-        "validation_cases": 0,
-        "verification": "partially_verified"
-      },
-      "references": [
-        "Stryjek, R.; Vera, J. H. (1986). \\\"PRSV: An improved Peng-Robinson equation of state for pure compounds and mixtures.\\\" Can. J. Chem. Eng. 64(2), 323-333. DOI 10.1002/cjce.5450640224.",
-        "Pitzer, K. S. (1955). \\\"The Volumetric and Thermodynamic Properties of Fluids. I. Theoretical Basis and Virial Coefficients.\\\" J. Am. Chem. Soc. 77(13), 3427-3433. DOI 10.1021/ja01618a002."
-      ],
-      "refusal": null,
-      "summary": "Peng-Robinson-Stryjek-Vera attraction-parameter coefficient. Use it when a cubic EOS needs the PRSV kappa form.",
-      "worked_example": {
-        "Tr": 0.8,
-        "kappa1": 0.05,
-        "omega": 0.152
       }
     },
     {
@@ -6796,7 +6704,7 @@
       "provenance": {
         "python_sha256": "f649eb5733497253d0315db5a4edc01f2e3a77e02ce2afd5f9003a51670d44a6",
         "rust_sha256": "23fb94da32f0011255fe169918c65252150a4c6d280aa451052b5a823b44628c",
-        "spec_sha256": "301ad8f1da5b24db931e9c224ee82ec15393533c14a434fd57073e45f54643a3",
+        "spec_sha256": "78d7419bce981fa9cd2dd434a9bce7dcad6aba7cd511dbabda8faf0ec700d3fc",
         "tests_active": 4,
         "tests_skipped": 1,
         "validation_cases": 0,
@@ -6921,7 +6829,7 @@
       "provenance": {
         "python_sha256": "fc0c75670fb12a642d4fe543bb2233881e509fa37333d71a28acf6891b9d9a27",
         "rust_sha256": "0acf6c5eab311ed2f00112966e1bdd0a0350c08373abfadfbcade1777f478f38",
-        "spec_sha256": "8cf65e75aeebb03d0517d55e634b6d167694a593fa158e5eceb6843c351048e7",
+        "spec_sha256": "676ff28523c112f33e95ee7da5ebd53ecc387d463c9e918356846667a640d35a",
         "tests_active": 3,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -7032,7 +6940,7 @@
       "provenance": {
         "python_sha256": "1f6a8d58a8b0a5c4fabaf0373f3afb61b3fc9a7a89ab85636f2dc792cdfd08c6",
         "rust_sha256": "ac264135b0d9e05cd7eb337ce1dc5a3c1b829844f187c52b27f44e8dbf0b8435",
-        "spec_sha256": "7d22c2c5619a6cb49b4a6faac38895966a47c573c196eae9635cd5319ce170da",
+        "spec_sha256": "14640bf4ea2af96b860db4471684fc7d107b075ebff6dcd6ec3259dbc3dec05f",
         "tests_active": 2,
         "tests_skipped": 1,
         "validation_cases": 0,
@@ -7147,7 +7055,7 @@
       "provenance": {
         "python_sha256": "83294acd15d6386327be98a19cd80480a56672b8ae2970ba087e42e6f0a7ad0b",
         "rust_sha256": "8ea7b8a4127858ce7d7ac0a371b6bb55c4b506f67e7284032c044a209627ab19",
-        "spec_sha256": "c9279349519ec38a133fecf7a13ace097e16e372e9a89347691a3b270cbd2416",
+        "spec_sha256": "ccd6fb5a50d8d2e70665e3535ffbaa89546580cf39b53a8ddd54982b24d01351",
         "tests_active": 2,
         "tests_skipped": 1,
         "validation_cases": 0,
@@ -7401,7 +7309,7 @@
       "provenance": {
         "python_sha256": "5d1cff7e925986342964e6b954ddd0c0d4cefe3ab503e47eeba79f27bb9af0db",
         "rust_sha256": "f6b843dac0f00bd244e009fc6c5f56587aac217bda3533e7258d55c6ac7da2e4",
-        "spec_sha256": "5e2d1fc009783b7d8f6045dca95585ce4165c872ff6d66d186c2cf7ac6f1d6d0",
+        "spec_sha256": "981d3c5e293771608f3b726936da1e94abd85a968d4b3c53c913c435c6945e33",
         "tests_active": 12,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -7641,7 +7549,7 @@
       "provenance": {
         "python_sha256": "9dda4caf0e105196ecaa7153a530c8ed6cb1b7f160423e2e8560efc4eb459e7a",
         "rust_sha256": "b7f8e1a912ebd7d9e102a7e241540e93d3b75664eb3e4ea2b88a0aa8fc326a14",
-        "spec_sha256": "3011a11fe286e36d377d557578073855ee4fd8af816ded2ea835b490be9cd846",
+        "spec_sha256": "a24950ea1308f8ced58bd0cfc9a1c0b841d523bc128b0c708902bc660aec1147",
         "tests_active": 9,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -7787,7 +7695,7 @@
       "provenance": {
         "python_sha256": "d7fc4504c05d0a31b665a89e43309870ba5f1bec405f9ab299980fa0f0b123b3",
         "rust_sha256": "108903f16b0b442a662344d75d996519c5d6bd4c94e2df7d44f6630a816d05f8",
-        "spec_sha256": "cf7b589e239a6eb4bf892347a0c06fd5e9aa271b80623d363c99cfd68906d668",
+        "spec_sha256": "72916440881e0c8fea9ff6c34dda79f5952005f4f13c9d54dcb9fa9e8d1a1f45",
         "tests_active": 4,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -8413,7 +8321,7 @@
       "provenance": {
         "python_sha256": "2c5ee948642c391a66e004093aa31cb9692a55747cb0ea537a095c53e062bb65",
         "rust_sha256": "fea4252e864721b4c16e3186cec6788305b387cdf66a56a83fb4238c0a935dca",
-        "spec_sha256": "b4504e5ea75cccb264b0a478848e40f57a849d9a75e3ecd0a87366a6af25e728",
+        "spec_sha256": "ddcbd2b01c7ca5b5addaf659851d63a27565912b343a6e1b69613913d4a9905a",
         "tests_active": 5,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -8621,7 +8529,7 @@
       "provenance": {
         "python_sha256": "8955de904a6e870bd41159a599844b20615ada3ee780f45065d2c077a25423d6",
         "rust_sha256": "6775c089eece5d5714a2af1a14cf346acec1e997465b231f6cfc50282a3a39ed",
-        "spec_sha256": "293bdf494cf91f4b7da801ed8944cadeab9db45bbcaeef3b96d181b3afaf99d5",
+        "spec_sha256": "e3fde8e89660634810b346314d447d1dcde34ef64b1f659abed6170e92b42205",
         "tests_active": 3,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -8738,7 +8646,7 @@
       "provenance": {
         "python_sha256": "2c5581883118b3ae30e04a92de9a1064afc941bfa2179e79e2033fdb4a6be9fa",
         "rust_sha256": "93460168074027e66b2b710e3c24edc63d876b37872eaf0bb4f2ec8364a83415",
-        "spec_sha256": "4b0c4e6076b7c95c594882edcca34b7ada34d7d561b61de767f92d6a65ca03d7",
+        "spec_sha256": "6bd5a503c330bf56cf71465b6fc9de402d8a5e6aa6a7e40b82ab3412d4bb1ec5",
         "tests_active": 2,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -8854,7 +8762,7 @@
       "provenance": {
         "python_sha256": "96840c40e37e44f5495608b9c9d7ada983bafad9ad318d70b67c744bdb7d4817",
         "rust_sha256": "190ebb38de0a19560265ff8a6e8a25a635cb42573e79e61a0a73cc2be808a800",
-        "spec_sha256": "7e8196c5f55e81aba4e19111eb13ce33469927308a70acf9f44016864d42201e",
+        "spec_sha256": "2d9b2a7db5167c96de3156adde13d6e8d31bd779072fba3f52d489e5db5d6aec",
         "tests_active": 3,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -9059,7 +8967,7 @@
       "provenance": {
         "python_sha256": "04d1d0485234275bf05e66d2e018418d4ef145b3a60e721b36197024e2ed050d",
         "rust_sha256": "ce04e7769a459d39463f4b0dfc91b1d9fef87f8f14d6dcdcf822ed211dee9854",
-        "spec_sha256": "01867f096d7f3a27c2a63e8541ba5f998b67baaaa1a945a87e4a0c12f882e443",
+        "spec_sha256": "b799e61c83a1f886554fe646309f6e4f75dbb02e1459f4dd9ccfbc6caf8f132d",
         "tests_active": 2,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -9154,7 +9062,7 @@
       "provenance": {
         "python_sha256": "06601060faa676e8ed583a877544cc2f0c52ad1b0e1bbd63311edd4a9610ca2f",
         "rust_sha256": "f24728cc3f2b07cd33c3c6570775582852628fba7753b8c848bd0c977e0cf110",
-        "spec_sha256": "c0249958403ee43ca58b70df69f1579db9cc9bba661bf5d0be85932bdcd83995",
+        "spec_sha256": "39379806058dfbd5ed6ef091cd345cc2116a0428d9369f752b09d202f26b1481",
         "tests_active": 2,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -9274,7 +9182,7 @@
       "provenance": {
         "python_sha256": "45c9a95d7928fca499b5cf68a4a50a4276f06e6841d7064aca759ec52b3a1276",
         "rust_sha256": "f9d9451cbd1202c5bc8a46b0014d49d0feba154ac5af58886c54ff5ee63f3579",
-        "spec_sha256": "fad60333763045c59e17d82d1fabc34bc115d1be0bf782e8e4ef3cf7757e8290",
+        "spec_sha256": "c450e32255af591d79571b7f92b3324858d0fda3f8ffb5ae45e65fd08e953114",
         "tests_active": 2,
         "tests_skipped": 1,
         "validation_cases": 0,
@@ -9414,7 +9322,7 @@
       "provenance": {
         "python_sha256": "8d667e8f03c793fd36592d9d880d5cb01efe6e91d478b0a7a816f3dcaa232c4c",
         "rust_sha256": "b73cba376037e9b2e34a536ab2c65cea70012c55ee22fc5190cf7fd18f8801d6",
-        "spec_sha256": "4ed606362cb5c27d34040687971e680a7e819116a3518f739c002d5df845bba9",
+        "spec_sha256": "df87c5555129136e4749b5d4ca4a03795165e656cafb92536605f1c702c4d394",
         "tests_active": 2,
         "tests_skipped": 1,
         "validation_cases": 0,
@@ -9473,7 +9381,7 @@
       "provenance": {
         "python_sha256": "33e790da3b3b0e150bdd903d6dfbbb3169d701c2b62f3ed7865a7418c669d94b",
         "rust_sha256": "4778ba612cfa4b75c0620ae4efc6aa5de0e9da6420006be72069edda9176a5b4",
-        "spec_sha256": "53c928347ae75b7e8164773171c0b2920f80673d241ba2d185bd7af1ef629b69",
+        "spec_sha256": "52ec2b82b6424e336226ac1b8c14ec5f9e3449b38583f7b9ac960807372e0227",
         "tests_active": 2,
         "tests_skipped": 1,
         "validation_cases": 0,
@@ -9584,7 +9492,7 @@
       "provenance": {
         "python_sha256": "f6a57825d2df6ca6fd7b1b7cdb327aad1216b573e29621438953097b3331ebf0",
         "rust_sha256": "ec2a7e25e907f9334e9de0a1ef3757680d25f771c7c24441ddaff74a96963126",
-        "spec_sha256": "89c58d20548352029381cec13599ee666b868243336556c02e7cafcffe17aa2f",
+        "spec_sha256": "949106616f5cb08a2e6df5c6d252080d5dc8abc5333509c93ea03c16f1cbbcba",
         "tests_active": 3,
         "tests_skipped": 0,
         "validation_cases": 1,
@@ -9724,7 +9632,7 @@
       "provenance": {
         "python_sha256": "52a3e2e51d26c26615598d3d22beb1a57f3ed1d7aab8ed8652d3ee3958dca851",
         "rust_sha256": "6cbd6feb8a63b7d98ac5a193b0dc5e9babced87690f555f94c90f5f0432d9060",
-        "spec_sha256": "30cb651a54bb58f70fad1a7fb9f8d2728e1b647f59a98bde065c457b95c299c7",
+        "spec_sha256": "bea02d54715346008b393a426b226c02f6f3b86ba63264e65940f8fe7c0c77b7",
         "tests_active": 2,
         "tests_skipped": 1,
         "validation_cases": 0,
@@ -9849,7 +9757,7 @@
       "provenance": {
         "python_sha256": "0a400886e6751be64d30206e4b118523cd700bc87f728b228b9b9fbcfa26026c",
         "rust_sha256": "6123d83d373a1ec8eb90385371ab116c153123ddbae910fd962f76c4ccab8d7d",
-        "spec_sha256": "634db941f1f550ca599069f03efe1f701bd4bc19954984eac6a89eecede6ddfe",
+        "spec_sha256": "e9951b3571522cae936ef22bb250825fad6f426908c6742b17518332881c6454",
         "tests_active": 4,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -9904,7 +9812,7 @@
       "provenance": {
         "python_sha256": "0b321fbcf5857893262a2057cec3fa533b91a65f634d3ffb395b381df5dd460d",
         "rust_sha256": "b2906d72fc8f1ce7f291d1de5a08f3c5449e1448f02068e6ee47e0ff2283d190",
-        "spec_sha256": "6191f97f59a9d74707d8297aedd460cd3ed9c194da23cae085d457dd0c70faab",
+        "spec_sha256": "1fb6eb6b034ec427402a6e46d2517322d3357a4b2cde50259c6b52eb1aba6818",
         "tests_active": 2,
         "tests_skipped": 1,
         "validation_cases": 0,
@@ -9978,7 +9886,7 @@
       "provenance": {
         "python_sha256": "f6548c1d87154909ae4ff510c4130644bcafde7fd79b816833cf23d68590d0ce",
         "rust_sha256": "c0d88a3a4c92b1b80187e642be3b8bf7eb8468a4ae4609a564cd473451448b68",
-        "spec_sha256": "f9a47be1ada94680845e438056b4be50be44437e0f7d93df473ab1258893acb4",
+        "spec_sha256": "e2384bb57cc4eeabdb5ef65f39aed0cacd3d8f282427d75ebf0000400377c21f",
         "tests_active": 2,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -10076,7 +9984,7 @@
       "provenance": {
         "python_sha256": "a6f2d83b32ca506d782ed67fb2f27129f0dd7c85bc7793b21ef0f1dec166b8f7",
         "rust_sha256": "b7a5e76ccc786ca203d6f0135243a34fb4df95ac6287de13fb1f6b716cbdf7fe",
-        "spec_sha256": "f966acfb4b5647996984e32759a8a0e42362cf1977f8e7720bbbb89fdc641d49",
+        "spec_sha256": "e573562e294142918df07138491d74ea47b1386cc3093de2677543d8c2c0750c",
         "tests_active": 2,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -10176,7 +10084,7 @@
       "provenance": {
         "python_sha256": "dbbe8e9ce05e6bb4ca2c363b5f8a46ec6e9d8b483ea82a4160f1168ebaac2238",
         "rust_sha256": "3d7ddd57c1c4eb851cb9b72a75cd6973eddb8bf0fbdc8e9e1f166e799231bb2d",
-        "spec_sha256": "2bafd2beddb858426d573e5c24baad5dd8f563a617687427818d407c19961038",
+        "spec_sha256": "c6d3ee10d9705303ee0d7115b93a2418f5ae8d3b9d8e739450f7d28a156a0ab9",
         "tests_active": 2,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -10277,7 +10185,7 @@
       "provenance": {
         "python_sha256": "6d7da916d9c73dc02d011bfcaeafbd96c4dfbbb2d3530063d889b6941e253362",
         "rust_sha256": "cdc02fc4d4a21692e4b536b8d53eb66eacfc423616b158b8685eccdf94d534b8",
-        "spec_sha256": "5c3703f6ffdbea544a346bc07648cdde8ac74a5a9a0fd1032df2c79449b86706",
+        "spec_sha256": "9c55e8b185d8645002e004f7e7e9efdf55c45432ec08c88a4051582dda09c59b",
         "tests_active": 4,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -10354,7 +10262,7 @@
       "provenance": {
         "python_sha256": "ad6430e2e2a4a1c0c95885fc0a16f917401adfb93d8a26add847df220fef8ded",
         "rust_sha256": "f4e04fb028ead382c0d63636fe5c4b91d71b1ddafd4b755c3d3a744317ed66da",
-        "spec_sha256": "8f12f616a64a293e948ad7b2f8edf20d02d09e80f7fac6201ec538c527c08a03",
+        "spec_sha256": "a6029807237066ab27f801916aaf45bfce5728e2cbf922b1ce5abe283f684152",
         "tests_active": 2,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -10486,7 +10394,7 @@
       "provenance": {
         "python_sha256": "7840a2f7db645f4b861b7caa5a98a01076dd4a9b046bedcc8770bedc663bd28b",
         "rust_sha256": "21fff8d7e435bd57ea9553591daa526eb1cd0abb24be5d11f551ac5d639aa690",
-        "spec_sha256": "582b85842d6eb00ceb9ea61e2324a06487c37f6a95b934911095d863c0cd646e",
+        "spec_sha256": "8dfef320bbc3bd3f10bffdc510993bb5f7d9de9a61a8c7f0c8e9930d8d6acff7",
         "tests_active": 4,
         "tests_skipped": 1,
         "validation_cases": 0,
@@ -10718,7 +10626,7 @@
       "provenance": {
         "python_sha256": "8d68db580d544eb7dba01eabab06b91d27d42d417125d96e5b718b46e6a16481",
         "rust_sha256": "7d9aee091f647af821f7fec42cabd750773b67c088d7a0c6970856455770522c",
-        "spec_sha256": "ed112fc7d00fe2307f89e62a360441b790651f251c21789d4cc3a97350189602",
+        "spec_sha256": "ce710e6558bf75a52bbe45eb1a4ca23413af7b2adc4eda500e6459755916caf4",
         "tests_active": 3,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -10837,7 +10745,7 @@
       "provenance": {
         "python_sha256": "57fb0412c7d29a1e66f9ac483614d4c5b55b6147e1b5145066e2eb38f1387ffb",
         "rust_sha256": "50d8efe8bbd3c53e9ec485698aa3da27ce0fcb23ac03fcc689cac0d9a03b1135",
-        "spec_sha256": "dc24384414fad8953f4c8f8de3c57da15b2e76f418921158778297c7ce89571f",
+        "spec_sha256": "0f8b2d674026347640234b4e2fef17ed3f8b49b4bab858bd2c966e8f5448afb2",
         "tests_active": 4,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -10991,7 +10899,7 @@
       "provenance": {
         "python_sha256": "d5043e4e6073fdca2920928094d5ce3877fd43c8a5efff9b07cfe3cdfcc41445",
         "rust_sha256": "4780b548e8a7a05fc2834a349d38509fcd730a3f54a33903a992bf4a6fad3863",
-        "spec_sha256": "7e3d92eb97c22f9b3f0228f204b53c50b1388cdf1ab98349315790a3bc38ad29",
+        "spec_sha256": "2f18069262313bfb497c913639ba74598183b8f86d7e899c816317535e0683f2",
         "tests_active": 5,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -11110,7 +11018,7 @@
       "provenance": {
         "python_sha256": "aa396f3f8577fd24247c41b0a8953c7b1f53819a69a32d65dd38b99a25089c78",
         "rust_sha256": "ee9760ca547642f92299aab6cce32cfc3a7620b0186be71831ec48797a751ac7",
-        "spec_sha256": "76a0bbf9901d7bbee11dd61fdad9ce9d5791b8aa6cfe8806871c3ba0c8c206f0",
+        "spec_sha256": "8aadb764aa9eee8f2689d1da15118698ba34213b467dff89478a9c556fd1f1a9",
         "tests_active": 6,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -11211,7 +11119,7 @@
       "provenance": {
         "python_sha256": "da3c2817aac4a8a31485f7e9e18375a74067d3663b649782da08e61f93da1ab7",
         "rust_sha256": "67500619b58a96c6098b0cbed9e1312c0a2a917b6de56008ebe5b6a8016a7613",
-        "spec_sha256": "e8a3bd6e9f7ef270397ee2c91cc2d3c05a2ed230de1f836187faff9c977f0bb1",
+        "spec_sha256": "ddcb8d55a03f43585916bb91345a9cd4feb740554df14c0612cb94c57b6a4f89",
         "tests_active": 4,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -11414,7 +11322,7 @@
       "provenance": {
         "python_sha256": "bc58e0c3099a8a3d2d455051e79f7f740048e760ccc66ea50e5a4943416601ec",
         "rust_sha256": "545fbab9e66481f673f2c8fba273fabdcaed2d20cf2b9ab33aa063996739915c",
-        "spec_sha256": "034066c6179089039cb53a2cf080e9e4da82926dc1f05caabf506caf392aa2c0",
+        "spec_sha256": "4fe3feb009f703300e9b4016948937badb28cf59d7fb9b491c52aab53bd1856e",
         "tests_active": 4,
         "tests_skipped": 2,
         "validation_cases": 1,
@@ -11559,7 +11467,7 @@
       "provenance": {
         "python_sha256": "49e7dfd46475302ee9c2f4ab453eaa2b257f8c66fdb6863f90aad33d17f4ac6c",
         "rust_sha256": "8a74a50d0f23f4ac2b7470006255945def3e630507d87c04e531801a911d6976",
-        "spec_sha256": "278e225aba6e8f1b07cf9bf4334f89691bd33e1bff798f0d0384f47077aff0c4",
+        "spec_sha256": "03da4847fd1a171dfcef37d323ba2b8a81b4a192f52baa1cda43e56ea90149db",
         "tests_active": 4,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -11675,7 +11583,7 @@
       "provenance": {
         "python_sha256": "f7bf843500d16c516f03eeaadb3fec6a3ad03cbb017d2f8fc1dcbeb2c1b6e4cb",
         "rust_sha256": "c0ad14e1bef821a93718a15d19eefac58263e14de491d3d69c6fccfcf3808b07",
-        "spec_sha256": "eca04b226d1b455abb7836302a33e111852d30ae98569bed6703abe80ac56c85",
+        "spec_sha256": "aef7d8088123a6558d12e59654bd8d18b7d15db68bc6d7f41efb0833b4209fe7",
         "tests_active": 4,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -11812,7 +11720,7 @@
       "provenance": {
         "python_sha256": "bf2f43d615307330e4fc866355a38c8e978293a4be60666844b1e2d1e6f544d9",
         "rust_sha256": "40cdea3d935a062f7e5bf7868de3f56f386d42608e51d1b092613143435a144b",
-        "spec_sha256": "222359d3e45219dabf3f01bc2251397bf7cf22e988c0b44db3afdd56d053aa67",
+        "spec_sha256": "b4430230a691fe5b4efee335b3c88d03e3140b03a716a7fc94d0c930d1d663d2",
         "tests_active": 4,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -11964,7 +11872,7 @@
       "provenance": {
         "python_sha256": "5263873bd2f90f78dede8f47df82c7b563ee80932de893fd1b207899045f0cd4",
         "rust_sha256": "3839da0d4767805ef3861e3ce9043be09a570203ae2d00e19541bb15aa6ba6ab",
-        "spec_sha256": "baf5e28120bcb2a39dc022e88abee637555cddbac90b79edc5e8ebd83ac59c73",
+        "spec_sha256": "114c789b43eb9221cb196b36e760672825c3dbc274d8cc629deddf78cfcd0bfd",
         "tests_active": 5,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -12502,7 +12410,7 @@
       "provenance": {
         "python_sha256": "588f41d1a0a5d27549d5989384e1faee4335c413f0735223726f565af23d32d0",
         "rust_sha256": "8e8902f68880f78ca840023ad9f35dfb0afaeaf595c1824c6deca2e1e8725311",
-        "spec_sha256": "8994e3a1ee404f536cf3c7c11d15837eeaee102d4eb48621f766f97c48fd6c79",
+        "spec_sha256": "8827eff92bd51486723e961c349a5b5af12d59cadab7711abd0b93633ba7d6f3",
         "tests_active": 5,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -12767,7 +12675,7 @@
       "provenance": {
         "python_sha256": "25ce8a2ded69400d2a368041b83ee446f8680ff452d25180cb59f0074b83dcf1",
         "rust_sha256": "28ea50f75bfcf27b5d54f69869e87a46cec10eb225236d91b9962ff42943bbbb",
-        "spec_sha256": "010dba090177031b024923298772cb4257702a9160b75521b6ec7aa5f0b872c2",
+        "spec_sha256": "74d98eb5c2d5261db81d296d4c314eab7be3e69bf2f43b458609b380ccb5afe9",
         "tests_active": 7,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -12923,15 +12831,14 @@
       "provenance": {
         "python_sha256": "1bfe9e3e720c07ea24b35fd8fefddf8a2eac2316875aabfc9ec5683be40cb9a8",
         "rust_sha256": "fbd0ee2cda141c1578fcfa8ebdcfa0b4130e645e54170fa9d288fb5f04ec5963",
-        "spec_sha256": "7306114ce326506ab2ed6763c532844f30cca0c84fec3be89a8d5655307dabf2",
+        "spec_sha256": "cb9476f8e8c4bcce77a3af585a5071c77947352d1239f7094d0d1ddce0d6c4b2",
         "tests_active": 5,
         "tests_skipped": 0,
         "validation_cases": 0,
         "verification": "partially_verified"
       },
       "references": [
-        "Standard gravity: the 1901 CGPM resolution fixed it at exactly 9.80665 m/s**2.",
-        "No specific source is claimed: the relation is general pump engineering."
+        "Standard gravity: the 1901 CGPM resolution fixed it at exactly 9.80665 m/s**2."
       ],
       "refusal": null,
       "summary": "Shaft power a pump needs from flow, head and efficiency at its operating point. Use it to size a driver or check a pump duty before a hydraulic study.",
@@ -13076,7 +12983,7 @@
       "provenance": {
         "python_sha256": "5be9c9707bc530763db47bf842635165ef5149bf05a5adecb65f37c293a9a830",
         "rust_sha256": "4e7fb5bae8f374eaf9195a0c6267a1c6225b37ba801896ff1ae98e54fc86ff74",
-        "spec_sha256": "9c558ab4462221e20e3d93fbe5419282ce66d6a34499aaf6b2128845fed2c734",
+        "spec_sha256": "8ce05995f31497450d3ab3af18c6220f7532d06d3bbdbbfc4550a96df70d27f2",
         "tests_active": 3,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -13663,7 +13570,7 @@
       "provenance": {
         "python_sha256": "badc9da8e452d7b906ef2664fd8aca675992769fd6bc0e6ed3e7d00ff2f957c7",
         "rust_sha256": "85e24b93a8e38cea7f1d6e0d714be2e44035eb971e8914fcdf242b7a8c57ef8d",
-        "spec_sha256": "479a2bfc6c54e44108270e5619003274be96bf9764622244c28c5e4efb023d8e",
+        "spec_sha256": "2b214cc4b5e78e6d82a5f81e9cc2b4e5fc4c588a02a29f246491a1edfa705bc9",
         "tests_active": 9,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -13807,7 +13714,7 @@
       "provenance": {
         "python_sha256": "a8ddc43a2e15fbc3cc4682a7f2321821a58e5f58ceffc6c057d648a046727686",
         "rust_sha256": "20a9bb06ee6fb8a2b2d0c394b3757a1ece3573606b9da973b7fd0684030c6842",
-        "spec_sha256": "f32596d9a5fc9b07aab4a3c92b36c968988dec0195c448d16ceb52ff8c52ea7e",
+        "spec_sha256": "e60fda86bf36cd6ffcbda46321ce98a9a57d8863710a1fa220f7fd47fbfda3ea",
         "tests_active": 4,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -14258,7 +14165,7 @@
       "provenance": {
         "python_sha256": "9a08df5df6bc77f0af17a5df6da7ef8b6ef30ef9cd2149bd4bb6406584ff829b",
         "rust_sha256": "3c8ca1a9042cf5d8a06734a5c4b983ae7734a343c9dc07d93f4ccdf949b6d0c2",
-        "spec_sha256": "c4f4287e6c62806b160f7bd4b6e1379708ab445ee74794596fa2b6e04453c602",
+        "spec_sha256": "adda595adc587022de225927bda2c95bf0b1e61fbe3b7b209d8a02b67b1c4825",
         "tests_active": 8,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -14406,7 +14313,7 @@
       "provenance": {
         "python_sha256": "0c529e2ab3cf9eb34f324c6beb6967d547a9e9f1688758a4b4a318ff57997132",
         "rust_sha256": "7a0b5e996728267812b82f71be8dbea3c4341bbab9e0f07916e0dfc60647cfd1",
-        "spec_sha256": "2fd9aa43e9ac7c4b80ef82c2ea821e941d2430286e0d7559085fac5829d6cb7d",
+        "spec_sha256": "2feb9d0fc3a7f8ffeadea76b84e9044464a7e04133f812466ad2b12d45933614",
         "tests_active": 5,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -14900,7 +14807,7 @@
       "provenance": {
         "python_sha256": "4dd2f2004b91d582036b41a246b37aa5c653a20722b747311badbf88c6fe8c54",
         "rust_sha256": "2cbf70175dff50e3786e78b1b093dd2c3afb1ac987a55b385aa008924d49cdbe",
-        "spec_sha256": "b51f17bb81d3c983e8e82550443fbd84bb1bc1fe392fb6296f67da8d258576dd",
+        "spec_sha256": "f2a50e6d2c219cf1647f770f118d109c2c5ebf72f4d995c4a0005e6a1b195d13",
         "tests_active": 13,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -15295,7 +15202,7 @@
       "provenance": {
         "python_sha256": "569615cc5aa9a1e86c381e2015e4b7825ca37a54ff9e99ce6de29fb6b2f71e85",
         "rust_sha256": "cad10fc6a066471fb6a955c1d2dafcff532065ac595cd60c4b36f2c9de4c76c6",
-        "spec_sha256": "41f4f367fee09b8c020e61ae785d9a32eb2b28fb2281cb10a15f559444fd80ab",
+        "spec_sha256": "f2fb19e4874816087b9bb73ea6bec7f287682e1677b05fe5a61437f11c723d4f",
         "tests_active": 6,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -15497,7 +15404,7 @@
       "provenance": {
         "python_sha256": "489b4371f3447a6839858ec436645b043e4f943f791eddb51c1640f7227666e3",
         "rust_sha256": "3d17f857269509a7966e31aebf60465e01bdd12d54d27602bab5b9665c2e790b",
-        "spec_sha256": "b8c6279478f73924daeb1e41f13c3d46c6c3b69ca3a44e1f600c72d7cc67f56b",
+        "spec_sha256": "4bdafc29d1d8c6d3df447ee0b31a9ef51d2c8a4bd75d256a55b4a040c188a9e6",
         "tests_active": 6,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -15816,7 +15723,7 @@
       "provenance": {
         "python_sha256": "3b4f858ecc659310aa9958b764e6bdb485daa80532c08638011d30702caba9d4",
         "rust_sha256": "d456a61024ba1344803900eca3e444aeede5a84a3cca4fc17b633afe4e3c1be9",
-        "spec_sha256": "d77b1c34f0743e04a465a6706254b3a8144d7a5578fb34fdce5d8a07c3bdc285",
+        "spec_sha256": "c22a6a3a5f61584c2b6630a3e2e1248a070c0122808aa89d1e4f955db71c2918",
         "tests_active": 10,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -17066,7 +16973,7 @@
       "provenance": {
         "python_sha256": "3726c45286bfb04bd65fc47a32ece51ad0ae21a32c0db2655fe1abdef97cd7a2",
         "rust_sha256": "d8f8191399609b8bb29cae4978010bb5869d3c86c1f64594134652b0c16ede94",
-        "spec_sha256": "5f5a64d92cb82d44e8a172962ba919cca2149db65650a33152380cae9912be13",
+        "spec_sha256": "0837c8b051c9479747f9ebeb5516f2ed80ad60a2718efcdd995e53ff3e1ac35e",
         "tests_active": 9,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -17956,7 +17863,7 @@
       "provenance": {
         "python_sha256": "da2765520c9b37e8f83a0fde36b54982234b78210d4cb26bf6776384844105e2",
         "rust_sha256": "5201f7901c921d6d9321c9e5830f874d8bfb4e8d751a6c2e0dd33a7a96a4cac6",
-        "spec_sha256": "dc49ecba102956ea9c5d85353d85e794eadcb391d983b77d1e1eb273c3d38b78",
+        "spec_sha256": "8a3426525a8c3362fda89fd4c6a72231c852f9ff6bcccc7ca0a5610628efc6a2",
         "tests_active": 9,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -18400,7 +18307,7 @@
       "provenance": {
         "python_sha256": "92770f1afbb0d5db1cbc27f46abb49370765d90cdd932dad5ef2097d302b1f11",
         "rust_sha256": "92fcf0ba97e901d76b6800bb78419ca82715d245bb13fb33a09943d3096e5b69",
-        "spec_sha256": "a515bb3054b8e3e0c63226f50d01ac0eaa051b7059770c539fd5e168a7709b53",
+        "spec_sha256": "6fd854ab5d67af8bb80dda993cee04e9c5f3fce941bc3e1ceb614bb6f1b8f820",
         "tests_active": 4,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -18871,7 +18778,7 @@
       "provenance": {
         "python_sha256": "edb318b20057505fd2f1c8f1e446c879e3cec2066f12fd4c294fbd96a5476851",
         "rust_sha256": "c69fff09274ff404c70eee2394f22355d8cf2799cb472051614428010f6a362f",
-        "spec_sha256": "8fed6eea8049db0628c0bc34d4d582f28723059f492d33d70e76d73c6ca30425",
+        "spec_sha256": "d6585fdb37a31296b115d57bd6645bf34755549cf50183951686546cf8f75a68",
         "tests_active": 13,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -19253,7 +19160,7 @@
       "provenance": {
         "python_sha256": "a2e8a8b40bbed86297f2655fec0cc274c653e0fa3fa8df0ed97d2d7f161628ef",
         "rust_sha256": "1141d8185daaceffc708485713517421492981cdcb59038377540ac3d00c205c",
-        "spec_sha256": "30c50c5537b980dc26c644188b866c88402fdf8c7e6f41035fd6e5a176e53b0f",
+        "spec_sha256": "a0f69488fc9b7b7892f0256c25b049325047ad7b7b4be28b9b94b53b52e9a4c2",
         "tests_active": 10,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -19574,7 +19481,7 @@
       "provenance": {
         "python_sha256": "318882f36cce8c89393c2685e69f36a52df1b53365529ee049a41a403b5887ca",
         "rust_sha256": "a191e8225ab4f79fb4b043648879e6368c9aa0a9cb7b9c39cc507880109595f5",
-        "spec_sha256": "d70307c3f25578d9aa1fa97cd98e85cd4509fa15250282d36a05658936cf6766",
+        "spec_sha256": "171ff3be3b6b778393abfe2cddb16e2041dfc7c39e5033596aa329cb65535d6b",
         "tests_active": 9,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -20153,7 +20060,7 @@
       "provenance": {
         "python_sha256": "95eeb7129070485ae8716809a496a04e977c983b69d163718307713b744234ce",
         "rust_sha256": "3b6f47e87ac03139cebd3ca4eacdb0e4c9a1823999e78cc162d006a280e79a4b",
-        "spec_sha256": "15c408a3d7e209aad00896d92d8da116fc5954280b6c55a6f6f3c7d9c7b57f90",
+        "spec_sha256": "e031e2c1dae7edb578468952da9a6bf64178acdbec7715e39158013dcb63786a",
         "tests_active": 5,
         "tests_skipped": 0,
         "validation_cases": 0,
@@ -21825,7 +21732,7 @@
         "provenance": {
           "python_sha256": "7c416882656dac01316b3a21583a6dc607bc961537f7d26fdc60da54817bc3cf",
           "rust_sha256": "54cd13dbe14b65e521eb0137a2786d4a7522af1f61c4a063a157160df2b90cde",
-          "spec_sha256": "c86c45c51bffe032a66a1dc2deac854e97c53dcafd12285813a928ce5e8c6465",
+          "spec_sha256": "c08b7fb0977ab7c0ce236e543cbd98683e349609bb01f810c33b6beb28e5222f",
           "tests_active": 4,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -22013,7 +21920,7 @@
         "provenance": {
           "python_sha256": "d8c331baf147067e859f8e7adcd90a54f9b75f9d0d6e91a5858b5b57c38b0d74",
           "rust_sha256": "2f4f9859b25b87806873b5a369cb5d65a277a10b2d9019ad1c38762927c59dab",
-          "spec_sha256": "99e276d08fcacef613e97cec09e56d34be3d25dbd2ae463e2d08b84c69c57d47",
+          "spec_sha256": "fad95995c2dee3e0a81d2e54cb0ebe24cc88ef9265bff0e0563cb966b6aa798b",
           "tests_active": 5,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -22294,7 +22201,7 @@
         "provenance": {
           "python_sha256": "c94cdc62275934f9640fbec4482c5a6ddc7662949ca76b1485184f60bff54c43",
           "rust_sha256": "d2bcde8734cabf3f5e9fedf21ab18126f7dc796d4c6e62e3fa2c50fd1ed84aa5",
-          "spec_sha256": "0a67aeae65c3c6c845b4b86b2f8dad7c32df733261f5a20cbd6c0e93098420d0",
+          "spec_sha256": "00dd93219a8fedcd6d12c89140906bb4a2476bdd9c76e5b7650a402113486986",
           "tests_active": 5,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -22750,7 +22657,7 @@
         "provenance": {
           "python_sha256": "2f6de91182364284a55c5ccd12157f7fd80d9c0e6ca805d3d88af93a387b661e",
           "rust_sha256": "e610634478a8669266055d689a34855b3dc2b76ce9094a2b4c8fa42d407ad711",
-          "spec_sha256": "2443b3ba1a1ab5422411a2d67e22cb6387f5f5fbd901c6e5a02f952d75a31427",
+          "spec_sha256": "ff5267c86046ecd6ca2c023f03852a09f762c421e1ef78d00758254275d49bfe",
           "tests_active": 6,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -23050,7 +22957,7 @@
         "provenance": {
           "python_sha256": "3e7f823e1b41756203e8368230fe256c07ec7346392ba8a4cf0596a529697f64",
           "rust_sha256": "b5aae7793b0c6b58000a73eb148c3b9f4c4a35e21f99b096bb57cfb493264eb1",
-          "spec_sha256": "94c4c8f449cc16859183966409b23c147bf73894e622106789d69f3b07104cea",
+          "spec_sha256": "f461fbbbb2ee6cc433786ef044fb57470b71376e5ad664a69cfc34fe07b5d83a",
           "tests_active": 6,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -23428,7 +23335,7 @@
         "provenance": {
           "python_sha256": "9406f1a8e9a05e9900a8d73b97f8163e6369d925d7e604a4504eb7183abc7d8d",
           "rust_sha256": "929f6e1ef293384eae71abbee777c95370ba1c2f2a7dc2bad701ba3d51af442b",
-          "spec_sha256": "fd762be74fba6df28a9ad2e7c61a5e70d35dfc7c7f52c84d7a360f0e685c7e83",
+          "spec_sha256": "125cdc661edeb3c4193f50688c4d1ece1e51290f8ddc7a409dcc7941ba083328",
           "tests_active": 9,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -23670,7 +23577,7 @@
         "provenance": {
           "python_sha256": "af57ce6772b87cdae396d47939f790b2b8cde651af126d252889c7eaab5fb0f3",
           "rust_sha256": "84428b166cfb3f5fb0f6996db89c0b394f569812fc394c9a796b35a3a9ba7cf8",
-          "spec_sha256": "29968f41b091de33aba4eb1837d71cc2c944c43977b27f6cf3b01c8aa88df12a",
+          "spec_sha256": "3ce841e9cde6ef34a787b037d50ee8130414e97158e4268c24ea8c614ead9f5b",
           "tests_active": 5,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -24003,7 +23910,7 @@
         "provenance": {
           "python_sha256": "b58d1e311415776ea4977c8ed34dccc038ad0a9e04dbf177fc5ff0b62f4fa43d",
           "rust_sha256": "c49e0aeb68981afb8c38f75654e9d3253e8df49eccd333405736edcd8a18031e",
-          "spec_sha256": "833233d8f7dbbf297c4f2e4f74e1c7b987739b69a8ff8439e47076d2ed318316",
+          "spec_sha256": "43f64be7c23097e5ce47771dc3104269245548bcf8e8d147eb06330e6c447e9c",
           "tests_active": 6,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -24262,7 +24169,7 @@
         "provenance": {
           "python_sha256": "729a53bdc60530feb15fa6ff7e573ddc9a9fd254f95ae856873b9256b3dd70b0",
           "rust_sha256": "f8d43d552c18ffcbf8c0a1564823fdc480fa7fa701ee7298ea636938e7152b13",
-          "spec_sha256": "c82d1a2d3ee691f25a4217709202d1696e1894e11b94009147b77f7490d3620e",
+          "spec_sha256": "9f629837587987faa1b75bd0cb1ebd2628f8e18153e58259862bbe63da180a12",
           "tests_active": 9,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -24529,7 +24436,7 @@
         "provenance": {
           "python_sha256": "45641fc81784deca15e397e4efc8dac0848832637b3394e53324325bbb3d563d",
           "rust_sha256": "ce0433085f9f6e5c0fb02340e913c118bcfe0e6422a74a412e3c0c41cb2c44eb",
-          "spec_sha256": "563e5c39fee37f417cfbfa62897e25c56b319bbc831bcd5a627bb8840323a9a3",
+          "spec_sha256": "c8a0caa7a547e599eed1661aa4aed87df3e7cc821fa38d8e4160f783afa65522",
           "tests_active": 6,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -24735,7 +24642,7 @@
         "provenance": {
           "python_sha256": "30f90dce72c542a65150cf948c6617d112dafe13761d391ad08d49a5d8e1451d",
           "rust_sha256": "711d05cd0ac43e1fcd4e5d79fc9fe9c83f4998140b8a8ec374ddead2c8a37bc9",
-          "spec_sha256": "b176c5b3443374a382bbb93c925cd2c465d5e0b0402d7abc7bd87783cdac99b0",
+          "spec_sha256": "7c7c9e4836fa02a77bb62e4d84b567ecdfc4269d8ec7aad133f4b867d6e9bfb3",
           "tests_active": 5,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -24905,7 +24812,7 @@
         "provenance": {
           "python_sha256": "92de9c22e0df8073128adba129be02c1b35592fe603377a55c3a04883054b657",
           "rust_sha256": "4f36f6f32df31e9dbd469e94f1ac74bf970021a0cc6b92ffe19b91533a200919",
-          "spec_sha256": "534ed33564b73067189f2cfb046119331cd7dc202f130f0cd317b623665b3a88",
+          "spec_sha256": "a23b1fc11903b5e266e3906595e76be222607f66f36c5d2be3095519751a67f5",
           "tests_active": 3,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -25124,7 +25031,7 @@
         "provenance": {
           "python_sha256": "9c9bb353c14083e7a2e22bb0bab71d173af1d4870f14b175c0b742c1d13ddf07",
           "rust_sha256": "cc7970ceb7686369d5a7f07e1962b1e457af97f33b9f7ded1aa4764b8240026d",
-          "spec_sha256": "3225735c1e4cd1d251897bdbbcba95cbf2bec4116d28f56f4e1300abc8cd646d",
+          "spec_sha256": "0c4de1463082e238fc752657b110af199ed3a8b3a7e2b0382334cf8db3da43cc",
           "tests_active": 7,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -25306,7 +25213,7 @@
         "provenance": {
           "python_sha256": "3540ca2bbe4a90b32874c88eae1c6c383b539475bfdcae80ef8d71169bc16f3b",
           "rust_sha256": "4f605e97b8996b642bff15f22271d4fb198a9622331f3d6b549ac1335ac2804f",
-          "spec_sha256": "d5cbb7cfca572406a828a07e8caaa0af075f8cb28d8f4c670203767bae6fcccc",
+          "spec_sha256": "3cfb1f260155c31b2ecf34526abfccb035dab848d1161fb5639ae8475dbe5609",
           "tests_active": 8,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -25480,7 +25387,7 @@
         "provenance": {
           "python_sha256": "89799dd45cea456bd29bab85b8dca7a92bd567cdcc2e1857e8a923a1d5778aa0",
           "rust_sha256": "f024f6526109e80718a1d7c2b3c650c07416f5c1a65361a140b6f4afc315bbfd",
-          "spec_sha256": "2a87677e7963c8709fa56f5655efccf9c299591bd0c5b5afc210f466048faedd",
+          "spec_sha256": "a6a1239315b6239aff266ecc6ae295677297c248d8d253347be1598631c92d61",
           "tests_active": 5,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -25669,7 +25576,7 @@
         "provenance": {
           "python_sha256": "d42f1aeedd42438557071d6234fd1b97d4628eb57fb6e2c1babdabe4983d0a38",
           "rust_sha256": "fa3078abdcaec28defcfe8ac48e677c4a7b82c332d3dba3f01b32bf871ab16be",
-          "spec_sha256": "ca89d4e2e6720c2e355599d7ffb4a0a19949007073c10e9446f72fff030cda57",
+          "spec_sha256": "c5b889ffbb228f902aa69a12ae5d8b0c7ef25c79e7aad717afc6f4b039375786",
           "tests_active": 6,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -25986,7 +25893,7 @@
         "provenance": {
           "python_sha256": "a10c107cd5accd75c977403c3f0b8f0556e532f793012501e7b989b114bb7025",
           "rust_sha256": "687cb84fe2924eb0ca62e584fad47ce8d52e1d72f572f75846c90c50171204b8",
-          "spec_sha256": "29dbbeb1ba23acdbb80e8ec882bb141d84543491e22cc353679ae94df05b703c",
+          "spec_sha256": "8dc67d09879da4f9f382fb84d523cf15d99dc326367b717ded3c4709a95ba0e9",
           "tests_active": 9,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -26227,7 +26134,7 @@
         "provenance": {
           "python_sha256": "79e2a62c9656209014e256795f2924d4bb094585931430e7a9d437947df05a71",
           "rust_sha256": "b328a9e667768ba934b3c62a1d95683c0a319bc1a813924f60de33a320b41ad5",
-          "spec_sha256": "b7774dc3ca0fcbed293e43e80119c03faf9f6f7b3a5c56fefd4c1c117dda84fc",
+          "spec_sha256": "6cf78f76b80acecc84310a354b217e23ba68988f99b4bf649a78b09cf25cde47",
           "tests_active": 6,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -26518,7 +26425,7 @@
         "provenance": {
           "python_sha256": "4b96853c6bb69dc880582de1191c7032ec3d7e55928a7ef032dee535ed114efe",
           "rust_sha256": "3b676f5f9fcd6d03330c83bdf638617678d9d23eb40e3756cc7d2e40cfa610f9",
-          "spec_sha256": "4bbd582c0b2bc713bb1c70bcea2852e42803c4a5e4bd0caebdc9066ad0495d70",
+          "spec_sha256": "b02aea7c608badfe0dc8bf35370ae2da81a11ce5e2b71a5a9cd1f18d427d57ca",
           "tests_active": 8,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -26744,7 +26651,7 @@
         "provenance": {
           "python_sha256": "e5b14cc1efff9fd36b018d27dfb36211c9ab93c109d55f66118213a6e5535ec8",
           "rust_sha256": "fff4d53104c876d88a0bddc46ff17bae466365b7bd1a83ffb41d0020c941bfbe",
-          "spec_sha256": "361af6fcc03f6413db702474a964c01bd822ddf39c7e90c531e6168ba8c21b11",
+          "spec_sha256": "ed0629ee8dc0d537202c1e0d74ebd94753656429f06c98df2c1c4849a09b7032",
           "tests_active": 6,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -26956,7 +26863,7 @@
         "provenance": {
           "python_sha256": "3e8b44ac865135ab7fb02b5480e0112f66f38b7e2ac6319a1b02a47fba13e55e",
           "rust_sha256": "22d7c7eeecb935cbe098d5cafd0683e9b41c97c5b19630c83c332b77c38fa4a6",
-          "spec_sha256": "69847c3986f0664581c53c3e26cf4e5cca27baaf3946ccc438aaea11744d874e",
+          "spec_sha256": "8ba3288395c9bd336a741f217563be0a631022c1d506db0da45c40b1a61bffc3",
           "tests_active": 6,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -27106,7 +27013,7 @@
         "provenance": {
           "python_sha256": "eac5939015f6fef3e213c9991674751effebb6e2dc4d3229dd1aa8cfd7b01a03",
           "rust_sha256": "661328842ba6158ad2b2b7d4c107ab6c6b6a5829251542fd2145ec4c84cd537e",
-          "spec_sha256": "ef9545954b53449b3c7e6b948fb331ca96f438aad2d24ba6272d059111a5ffcb",
+          "spec_sha256": "da59dfc2efd592999c2c6494dcfac53ef01dc3cd4a3650615fdbe36084fba3eb",
           "tests_active": 9,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -27584,7 +27491,7 @@
         "provenance": {
           "python_sha256": "41af53ee028a290d5f3661a90d81b3332e4ed9ef11688d5a71330349ba34e4d2",
           "rust_sha256": "4fe8480955e2b89e5099ff5af33aaf2a4e31ec0cd3d4bc114aeb1a5190944a5f",
-          "spec_sha256": "fc6f0b430291cc07255f9fec66818d2d650052c2eea821bbbd74d9e701ac456b",
+          "spec_sha256": "35b8a2de3f1ff86a77a1e6fc1775acb41b7e341dadf104d1f2b0d3a8947c1ceb",
           "tests_active": 3,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -28180,7 +28087,7 @@
         "provenance": {
           "python_sha256": "bd924a00fa3bb747c661a7bdc828d55a1bce97a6d50513b04f953859f38407c3",
           "rust_sha256": "b2414cf1d7caef7dcad205d2c052aad9dfecfea52077dcd43d71fc498a607bb5",
-          "spec_sha256": "70df5cd128ce1cda05315ba98e11b7ebf0cbf13c135cc4fdf6c30d9ee286a12d",
+          "spec_sha256": "ebab6759dabd233201cc7c7fb3b9dde71c28a8f21beb9278a34ff9d0cc5d7c01",
           "tests_active": 14,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -28517,7 +28424,7 @@
         "provenance": {
           "python_sha256": "bcf27899d5dc1e52b07d3da9490256aef0492ae6e758d667804ca131756accef",
           "rust_sha256": "5bf488d2c434a7660d63040405ebe914a568fe88e98a6d50b8e0b10eaf8d5d3d",
-          "spec_sha256": "113cb0e05437223339ce287776f82e6a3c239178271b2f14ec40157c0487a2f8",
+          "spec_sha256": "f9de7d2361934a4c593d4601be4463931fdba58bbe5c1719acfc24baa2648066",
           "tests_active": 6,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -28821,7 +28728,7 @@
         "provenance": {
           "python_sha256": "fd92ca78abaa9be2472ff77dac32774a0c68fb86a1236e930cb1b9886711c4eb",
           "rust_sha256": "4b38b5ee0aac51ce3cb8950c2f7827b9526f3c128c46274917ffc9a9a1761113",
-          "spec_sha256": "ee164b61e33beb07c195ac3e50a3228b3cc86061028bd690214f936d39b02106",
+          "spec_sha256": "0f415589d42c4f64e5ff122fb7bf36314beb1c173b0a54f2491844555ff1aadb",
           "tests_active": 7,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -29136,7 +29043,7 @@
         "provenance": {
           "python_sha256": "201b43ff1e1916dad856a8eb3cba56ca331e142155f835381762be9762e663ca",
           "rust_sha256": "4cd0bd1265038c75e8e6e0c3b56c23f5657656f23729cffaf932b1d9e037d687",
-          "spec_sha256": "09423d5b131f4af9254f50a46b85c68c6db3fec5714f733dacb1501358df383c",
+          "spec_sha256": "369939cc21e96d552cf2f09d03675b903ace7fbfc424056db4aee796b36c46bd",
           "tests_active": 7,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -29448,7 +29355,7 @@
         "provenance": {
           "python_sha256": "553ecec1633708b8fcef6fbe61e97505d46dbd9bf76cb67ed022bb1a73102a65",
           "rust_sha256": "cf016d03c7009cee57d257a564ed60ccaf43c966f145e196af8fd476d5a8eaf2",
-          "spec_sha256": "44cbe4e54cdcd0d734061b318d33dad8418d41904379fae266535e1103528593",
+          "spec_sha256": "015094e9493dfd288c392fd6cb055e54b405133d0374a655b383f073ab65ad11",
           "tests_active": 7,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -29809,7 +29716,7 @@
         "provenance": {
           "python_sha256": "f5fcf0e64dad20641990f61e729a55d4ffcb9d6aef85dc1f6fe1e7124899992f",
           "rust_sha256": "777345bc37cc7d9ff47c71af88bff4dd437c87b5098262bef4e91fc59ae7297c",
-          "spec_sha256": "943c96bc67a83f081cf2cfb7290caa947a2fa387bbe1d8fcf6d8490955ee1296",
+          "spec_sha256": "52abafd6437a361c525a42f5b93c6d988f076f31c41173f88e514151855474bf",
           "tests_active": 5,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -30068,7 +29975,7 @@
         "provenance": {
           "python_sha256": "1ff4aa1fffbda58de92b9259cf921e1f9f33f8ac8c58158f60f6b0a33b8f0bd1",
           "rust_sha256": "09bba3353322df2991cfd87356977cffb95db07a6db59f47e66329a42b593c9d",
-          "spec_sha256": "2706fff36b1585d857fb0de037299439db3f3602997dfdb4c0fd2e791a5ce255",
+          "spec_sha256": "e2a25a06db90a4260327ca2088b3d5814d4b9a2c30dff94a0c8ed05425063d15",
           "tests_active": 15,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -30342,7 +30249,7 @@
         "provenance": {
           "python_sha256": "645ff40f498ec41bd1f270198ffc9f7e937f0c4ce1bde9ac4ac3b1dfc2bc7e74",
           "rust_sha256": "2cdf0b496a6dca095ba650212b111965b5b801295743fe0926470ed07c35a4d6",
-          "spec_sha256": "266a6eedcbfa3b30fe3b699e7b16339fec8ea3d575651286cdb99f03a4d4a5eb",
+          "spec_sha256": "6628c7c0c832bd2ddb8c3cef43c6c8389dfca72b0e2526768f503f5a7062e2ab",
           "tests_active": 13,
           "tests_skipped": 0,
           "validation_cases": 0,

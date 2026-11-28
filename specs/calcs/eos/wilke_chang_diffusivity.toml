@@ -10,6 +10,12 @@ references = ["Wilke, C. R.; Chang, P. (1955). \\\"Correlation of diffusion coef
 standard = "Wilke, C. R.; Chang, P. (1955)"
 edition = "Correlation of diffusion coefficients in dilute solutions. AIChE J. 1(2), 264-270"
 doi = "10.1002/aic.690010222"
+
+[source.neqsim]
+class = "WilkeChangDiffusivity"
+members = ["WilkeChangDiffusivity"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.phi]
 unit = "dimensionless"
@@ -48,6 +54,12 @@ eta = 8.915447896200597e-4
 VA = 4.0203262233375156e-5
 [worked_example.expected]
 d = 1.7212261801805907e-9
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim WilkeChangDiffusivity"
+
 [implementations]
 python = "azoth.eos.wilke_chang_diffusivity"
 rust = "azoth_eos::wilke_chang_diffusivity"

@@ -10,6 +10,12 @@ references = ["Chung, T.-H.; Ajlan, M.; Lee, L. L.; Starling, K. E. (1988). \\\"
 standard = "Chung, T.-H.; Ajlan, M.; Lee, L. L.; Starling, K. E. (1988)"
 edition = "Generalized multiparameter correlation for nonpolar and polar fluid transport properties. Ind. Eng. Chem. Res. 27(4), 671-679"
 doi = "10.1021/ie00076a024"
+
+[source.neqsim]
+class = "ChungViscosityMethod"
+members = ["ChungViscosityMethod"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.omega]
 unit = "dimensionless"
@@ -78,6 +84,12 @@ T = 300.0
 V = 0.0024409707154781444
 [worked_example.expected]
 mu = 1.124009415430133e-05
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ChungViscosityMethod"
+
 [implementations]
 python = "azoth.eos.chung_viscosity"
 rust = "azoth_eos::chung_viscosity"

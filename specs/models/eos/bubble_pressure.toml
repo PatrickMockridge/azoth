@@ -17,6 +17,12 @@ references = [
 standard = "Michelsen, M. L. (1982)"
 edition = "The isothermal flash problem. Part II. Phase-split calculation. Fluid Phase Equilibria 9(1), 21-40."
 doi = "10.1016/0378-3812(82)85002-4"
+
+[source.neqsim]
+class = "BubblePointPressureFlash"
+members = ["BubblePointPressureFlash"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "bubble_pressure_newton"
 initialisation = "wilson_raoult"
@@ -85,6 +91,27 @@ max = 1.0
 max_inclusive = false
 severity = "warning"
 rationale = "Above the nearest component's critical temperature the iteration converges more slowly and the answer is less trustworthy, but a mixture may still have a bubble point there."
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim BubblePointPressureFlash"
+
+[provenance.algorithm.convergence]
+source = "NeqSim BubblePointPressureFlash"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim BubblePointPressureFlash"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim BubblePointPressureFlash"
+
+[provenance.algorithm.scheme]
+source = "NeqSim BubblePointPressureFlash"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim BubblePointPressureFlash"
+
 [implementations]
 python = "azoth.eos.bubble_pressure"
 rust = "azoth_eos::bubble_pressure"

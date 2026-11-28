@@ -26,6 +26,12 @@ references = [
 [source]
 standard = "NeqSim master `PhasePitzer`"
 edition = "`ComponentGePitzer.getGamma`, `getWaterGamma` and `getPitzerOsmoticCoefficient`, ported verbatim; the catalogue is the USGS PHREEQC file NeqSim bundles, at the commit its dataset id carries."
+
+[source.neqsim]
+class = "PhasePitzer"
+members = ["PhasePitzer.getWaterGamma"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -86,6 +92,12 @@ description = "`a_w`, from `phi` and the molality sum the osmotic coefficient wa
 type = "enum"
 values = ["phreeqc", "legacy"]
 description = "which parameter dataset was in force: `phreeqc` for the USGS catalogue, `legacy` for `PitzerParameters.csv`. Reported because the two disagree on pairs they share."
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PhasePitzer.getWaterGamma"
+
 [implementations]
 python = "azoth.eos.pitzer_phase"
 rust = "azoth_eos::pitzer_phase"

@@ -19,6 +19,12 @@ references = [
 [source]
 standard = "NeqSim pvtsimulation/util/DeclineCurveAnalysis.java"
 edition = "Every rate, cumulative, conversion, forecast, fit and summary method; the class has no other surface."
+
+[source.neqsim]
+class = "DeclineCurveAnalysis"
+members = ["DeclineCurveAnalysis"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.calculation]
 type = "enum"
@@ -267,6 +273,12 @@ description = "the summary's time to the economic limit, years.\n"
 unit = "dimensionless"
 optional = true
 description = "the summary's EUR.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim DeclineCurveAnalysis"
+
 [implementations]
 python = "azoth.pvt.decline_curve"
 rust = "azoth_pvt::decline_curve"

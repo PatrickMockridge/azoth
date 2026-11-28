@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim process/safety/selfheating/BasketTestRegression.java"
 edition = "Its `regress`: the least-squares line, the activation energy, the split pre-factor and the three warnings."
+
+[source.neqsim]
+class = "BasketTestRegression"
+members = ["BasketTestRegression.regress"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "basket_least_squares"
 convergence = "absolute"
@@ -80,6 +86,24 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "the class refuses a non-positive conductivity"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim BasketTestRegression.regress"
+
+[provenance.algorithm.convergence]
+source = "NeqSim BasketTestRegression.regress"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim BasketTestRegression.regress"
+
+[provenance.algorithm.scheme]
+source = "NeqSim BasketTestRegression.regress"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim BasketTestRegression.regress"
+
 [implementations]
 python = "azoth.process.basket_test_regression"
 rust = "azoth_process::basket_test_regression"

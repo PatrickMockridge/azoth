@@ -14,6 +14,12 @@ references = [
 [source]
 standard = "Gernert, J.; Span, R. (2016)"
 edition = "The 28-component EOS-CG Helmholtz mixture, evaluated in the reduced variables tau = Tr/T and delta = D/Dr with the reducing parameters composition-averaged over binary interaction parameters and a pairwise departure contribution."
+
+[source.neqsim]
+class = "EOSCGModel"
+members = ["EOSCGModel"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "log_volume_newton"
 initialisation = "ideal_gas"
@@ -70,6 +76,27 @@ min = 0
 min_inclusive = false
 severity = "error"
 rationale = "an absolute pressure; zero and below are not states"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim EOSCGModel"
+
+[provenance.algorithm.convergence]
+source = "NeqSim EOSCGModel"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim EOSCGModel"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim EOSCGModel"
+
+[provenance.algorithm.scheme]
+source = "NeqSim EOSCGModel"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim EOSCGModel"
+
 [implementations]
 python = "azoth.eos.eos_cg_phase"
 rust = "azoth_eos::eos_cg_phase"

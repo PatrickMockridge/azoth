@@ -18,6 +18,12 @@ references = [
 [source]
 standard = "NeqSim master `ProductionChemicalScaleScenario`"
 edition = "`evaluate`, `applyChemical`, `applyBaseDose`, `createEquilibrium`, `carbonateFractions`, `alkalinity`, `baseEquivalentsMolPerL` and `scavengerCapacityMgL`, ported. `ProductionChemical` is a property record here, so its factory defaults and `isStableAt` are the caller's; the Gson report is not."
+
+[source.neqsim]
+class = "ProductionChemicalScaleScenario"
+members = ["ProductionChemicalScaleScenario.evaluate"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.calcium]
 unit = "kg/m**3"
@@ -169,6 +175,12 @@ min_inclusive = true
 max_inclusive = true
 severity = "warning"
 rationale = "A pH outside the aqueous range is a caller's mistake rather than a state; the arithmetic still runs.\n"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim ProductionChemicalScaleScenario.evaluate"
+
 [implementations]
 python = "azoth.eos.production_chemical_scale_scenario"
 rust = "azoth_eos::production_chemical_scale_scenario"

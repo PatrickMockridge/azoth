@@ -14,6 +14,12 @@ references = [
 [source]
 standard = "NeqSim process/mechanicaldesign/heatexchanger/TubeInsertModel.java"
 edition = "`getHeatTransferEnhancementRatio`, `getPressureDropPenaltyRatio`, `getPerformanceEvaluationCriteria` and `applyEnhancement`, with the three per-type private correlation pairs and the four factories' parameter sets."
+
+[source.neqsim]
+class = "TubeInsertModel"
+members = ["TubeInsertModel.getHeatTransferEnhancementRatio"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.insert]
 type = "enum"
@@ -164,6 +170,12 @@ pressure_drop_penalty_ratio = 1.6094693940681604
 performance_evaluation_criteria = 1.2440012030177174
 enhanced_heat_transfer_coefficient = 1457.8573849941363
 enhanced_pressure_drop = 8047.346970340802
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TubeInsertModel.getHeatTransferEnhancementRatio"
+
 [implementations]
 python = "azoth.thermal.tube_insert_model"
 rust = "azoth_thermal::tube_insert_model"

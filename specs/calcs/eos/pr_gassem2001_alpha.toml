@@ -9,6 +9,12 @@ references = ["Gassem, K. A.; Danner, R. P. (2001). \"An alternative alpha funct
 [source]
 standard = "NeqSim master `AttractiveTermPrGassem2001`"
 edition = "`alpha(temperature)`, ported verbatim"
+
+[source.neqsim]
+class = "AttractiveTermPrGassem2001"
+members = ["AttractiveTermPrGassem2001"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.omega]
 unit = "dimensionless"
@@ -35,6 +41,12 @@ omega = 0.152
 Tr = 0.7
 [worked_example.expected]
 alpha = 1.2052404595821262
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim AttractiveTermPrGassem2001"
+
 [implementations]
 python = "azoth.eos.pr_gassem2001_alpha"
 rust = "azoth_eos::pr_gassem2001_alpha"

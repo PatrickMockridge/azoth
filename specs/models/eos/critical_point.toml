@@ -17,6 +17,12 @@ references = [
 [source]
 standard = "Heidemann, R. A.; Khalil, A. M. (1980)"
 edition = "The calculation of critical points. AIChE Journal 26(5), 769-779."
+
+[source.neqsim]
+class = "CriticalPointFlash"
+members = ["CriticalPointFlash"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [algorithm]
 scheme = "heidemann_khalil_critical"
 initialisation = "kay_rule_and_covolume"
@@ -51,9 +57,6 @@ description = "the critical molar volume"
 [outputs.z_c]
 unit = "dimensionless"
 description = "the critical compressibility, `pc vc/(R tc)`"
-[outputs.converged]
-type = "boolean"
-description = "whether the nested Newton met its tolerance. False means the four state fields are NaN and the warning carries the residual; a critical point that was not reached is a refusal, not an exception."
 [outputs.iterations]
 unit = "dimensionless"
 description = "outer iterations the critical-point search took"
@@ -64,20 +67,53 @@ description = "the convergence residual at the returned state, against `algorith
 quantity = "tc"
 min = 0
 min_inclusive = false
-severity = "warning"
-rationale = "a refusal reports NaN here with `converged = false`; the warning, not the value, is the answer. A converged non-positive temperature would still be a defect."
+severity = "error"
+rationale = "the iteration can leave the region where the equation of state has a critical point and converge on a temperature that is not a state."
 [[valid_range]]
 quantity = "pc"
 min = 0
 min_inclusive = false
-severity = "warning"
-rationale = "a refusal reports NaN here with `converged = false`; a converged non-positive pressure would mean the volume is inside the co-volume."
+severity = "error"
+rationale = "a non-positive pressure at the returned volume means the volume is inside the co-volume and the state is not one."
 [[valid_range]]
 quantity = "z_c"
 min = 0
 min_inclusive = false
-severity = "warning"
-rationale = "a refusal reports NaN here with `converged = false`; a sign error in a converged answer would show up here first."
+severity = "error"
+rationale = "a sign error in any of the three quantities above shows up as a negative `z_c` before it shows up anywhere else."
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim CriticalPointFlash"
+
+[provenance.algorithm.convergence]
+source = "NeqSim CriticalPointFlash"
+
+[provenance.algorithm.initialisation]
+source = "NeqSim CriticalPointFlash"
+
+[provenance.algorithm."inner.convergence"]
+source = "NeqSim CriticalPointFlash"
+
+[provenance.algorithm."inner.max_iterations"]
+source = "NeqSim CriticalPointFlash"
+
+[provenance.algorithm."inner.scheme"]
+source = "NeqSim CriticalPointFlash"
+
+[provenance.algorithm."inner.tolerance"]
+source = "NeqSim CriticalPointFlash"
+
+[provenance.algorithm.max_iterations]
+source = "NeqSim CriticalPointFlash"
+
+[provenance.algorithm.scheme]
+source = "NeqSim CriticalPointFlash"
+
+[provenance.algorithm.tolerance]
+source = "NeqSim CriticalPointFlash"
+
 [implementations]
 python = "azoth.eos.critical_point"
 rust = "azoth_eos::critical_point"

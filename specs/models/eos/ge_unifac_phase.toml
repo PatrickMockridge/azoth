@@ -23,6 +23,12 @@ references = [
 standard = "NeqSim master `PhaseGEUnifac`"
 edition = "`ComponentGE.fugcoef`, ported verbatim; the activity coefficient is `eos.unifac_activity_coefficients`'s, ported from `ComponentGEUnifac`."
 doi = "10.1021/ie00058a017"
+
+[source.neqsim]
+class = "PhaseGEUnifac"
+members = ["PhaseGEUnifac"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
 [inputs]
 [inputs.components]
 type = "components"
@@ -70,6 +76,12 @@ type = "vector"
 unit = "dimensionless"
 length = "one per component"
 description = "the infinite-dilution activity coefficient each component's Henry arm divided by, and **one where the arm does not divide by one**"
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim PhaseGEUnifac"
+
 [implementations]
 python = "azoth.eos.ge_unifac_phase"
 rust = "azoth_eos::ge_unifac_phase"

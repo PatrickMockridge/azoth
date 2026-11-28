@@ -28,6 +28,36 @@ and `--model` the id. The
 flags, the tools the model is handed, the bridge's JSON envelopes and the check report —
 and [`agents/deepseek/README.md`](agents/deepseek/README.md) has the setup and caveats.
 
+## The port law
+
+azoth is a port of NeqSim, and that is the admission rule for every change. The
+specification states it (`docs/src/architecture/specification.md`) and
+[`skills/library/port-a-calculation`](skills/library/port-a-calculation/SKILL.md) repeats
+it; this section is the version an agent reads before it writes a plan.
+
+- **Every value names its source.** Every id, equation, input, output, algorithm parameter
+  and constant declares a NeqSim class and member at the pinned commit, a publication
+  NeqSim itself cites, or `caller` for a value the caller supplies. "azoth chose it" is not
+  a source. The spec carries it in `source.neqsim` and `[provenance]`, and
+  `tools/check_port.py` refuses a spec that does not.
+- **No id without a NeqSim class.** A diagnostic variant, an aggregate, a convenience
+  model or a screening label is not a port. If one is wanted it is an explicit extension
+  approved before code is written; the default answer is no.
+- **A study is validation, not specification.** No constant, grid, tolerance or step is
+  changed to make a case study's number pass. A plan that cites a study target as the
+  design input is refused; a test may cite a study as evidence, never as the specification.
+- **Stop before writing the line.** The moment a proposed id, equation or value has no
+  NeqSim source, stop and report it. Finishing the tranche and disclosing the deviation
+  afterwards is the failure this rule exists to prevent.
+- **The plan is a provenance table.** Before code, a plan lists every proposed id,
+  equation, input, output and constant with its NeqSim class, member and commit or its
+  citation; its "not a port" list is empty; and it states that any case study is
+  validation only. A plan without the table is refused.
+
+Where a port composes several NeqSim classes, `source.neqsim.members` names each class and
+method it reads. The databank pin is `databank/manifest.toml`; a capture's pin is the jar
+in its driver header. A result states which pin it was verified against.
+
 ## The NeqSim oracle
 
 azoth is a port of NeqSim, so NeqSim is the differential oracle: a disagreement with
