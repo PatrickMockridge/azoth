@@ -99,15 +99,18 @@ def test_a_docs_change_runs_no_tests_but_the_doc_checks() -> None:
     assert "pytest" not in joined, "a page cannot break a model"
 
 
-def test_checks_only_is_the_flat_jobs_and_the_generators() -> None:
-    """The preflight is what CI runs on every push: the generators' check and no build."""
+def test_checks_only_is_the_narrow_checks_and_the_generators() -> None:
+    """The commit lane's checks: the spec bundle, no repo-wide flat job, no build."""
     module = tool()
-    commands, _ = module.scope(["specs/models/eos/transient_pipe.toml"], module.crate_edges())
-    names = [entry.command for entry in module.checks_only(commands)]
+    paths = ["specs/models/eos/transient_pipe.toml"]
+    commands, _ = module.scope(paths, module.crate_edges())
+    names = [entry.command for entry in module.checks_only(paths, commands)]
     joined = "\n".join(names)
-    assert ".venv/bin/mypy" in names
-    assert "cargo fmt --all --check" in names
+    assert "python tools/spec_lint.py" in names
     assert "python tools/check_port.py" in names
+    assert ".venv/bin/mypy" not in names, "no Python changed"
+    assert "cargo fmt --all --check" not in names
+    assert "python tools/provenance.py --out provenance.json" not in names
     generators = [name for name in names if name.startswith("python tools/gen_")]
     assert generators, "a spec change regenerates its files' checks"
     assert names[-len(generators) :] == generators, "the slow sweep runs last"
@@ -117,14 +120,78 @@ def test_checks_only_is_the_flat_jobs_and_the_generators() -> None:
     assert "check_notebooks" not in joined, "kernels are minutes, not seconds"
 
 
-def test_checks_only_adds_the_flat_jobs_a_docs_diff_does_not_reach() -> None:
-    """A page claims two doc checks; the preflight still pays the five flat jobs CI runs."""
+def test_checks_only_does_not_add_the_repo_wide_jobs() -> None:
+    """A page earns its prose and doc claims; the five flat CI jobs are the push lane's."""
     module = tool()
-    commands, _ = module.scope(["docs/src/safety.md"], module.crate_edges())
-    names = [entry.command for entry in module.checks_only(commands)]
-    assert ".venv/bin/mypy" in names
-    assert "python tools/check_port.py" in names
+    paths = ["docs/src/safety.md"]
+    commands, _ = module.scope(paths, module.crate_edges())
+    names = [entry.command for entry in module.checks_only(paths, commands)]
+    assert "python tools/prose_lint.py" in names
+    assert "python tools/check_doc_claims.py" in names
+    assert ".venv/bin/mypy" not in names
+    assert "python tools/check_port.py" not in names
+    assert "python tools/spec_lint.py" not in names
     assert not any(name.startswith("mdbook") for name in names)
+
+
+def test_a_python_change_is_linted_and_type_checked() -> None:
+    module = tool()
+    path = "python/src/azoth/eos/layers.py"
+    names = [entry.command for entry in module.narrow_checks([path], [])]
+    assert f".venv/bin/ruff check --force-exclude {path}" in names
+    assert f".venv/bin/ruff format --check --force-exclude {path}" in names
+    assert ".venv/bin/mypy" in names
+    assert "cargo fmt --all --check" not in names
+
+
+def test_a_rust_change_is_formatted_by_file_not_by_tree() -> None:
+    module = tool()
+    path = "crates/azoth-eos/src/lib.rs"
+    names = [entry.command for entry in module.narrow_checks([path], [])]
+    assert f"rustfmt --edition 2024 --check {path}" in names
+    assert "cargo fmt --all --check" not in names
+
+
+def test_a_deleted_file_is_not_handed_to_a_formatter() -> None:
+    module = tool()
+    names = [entry.command for entry in module.narrow_checks(["python/tests/gone.py"], [])]
+    assert not any("ruff" in name for name in names)
+
+
+def test_a_tool_change_selects_only_the_generators_that_import_it() -> None:
+    module = tool()
+    assert module.triggered_generators(["tools/port_backlog.py"]) == frozenset(
+        {"gen_port_checklist"}
+    )
+    assert module.triggered_generators(["tools/not_imported_anywhere.py"]) == frozenset()
+
+
+def test_the_commit_lane_runs_a_check_before_a_test() -> None:
+    module = tool()
+    paths = ["python/tests/test_test_scope.py"]
+    commands, _ = module.scope(paths, module.crate_edges())
+    assembled = module.commit_commands(paths, commands)
+    kinds = [entry.kind for entry in assembled]
+    assert module.PYTEST in kinds
+    first_test = kinds.index(module.PYTEST)
+    assert any(
+        entry.kind == module.SCRIPT and "ruff" in entry.command for entry in assembled[:first_test]
+    )
+
+
+def test_the_checks_budget_is_the_commit_lane() -> None:
+    module = tool()
+    assert module.LANE_BUDGET_MINUTES["iterate"] >= module.CHECKS_BUDGET_MINUTES
+
+
+def test_a_run_reports_each_command_time(capsys: Any) -> None:
+    module = tool()
+    assert module.run_with_watchdog([("ok", "true")], None, "iterate") == 0
+    out = capsys.readouterr().out
+    assert re.search(r"ok in \d+\.\d+s", out)
+    assert "passed in" in out
+    assert module.run_with_watchdog([("bad", "false")], None, "iterate") == 1
+    assert "failed after" in capsys.readouterr().out
 
 
 def test_the_nightly_lane_is_the_whole_suite_and_is_not_gated() -> None:
@@ -652,9 +719,10 @@ def test_every_unconditional_ci_step_is_in_the_close_out_table() -> None:
                 continue
             if not ("tools/" in command or ".venv/bin/" in command or command.startswith("cargo ")):
                 continue
-            if re.search(r"tools/gen_\w+\.py --check", command):
+            if re.search(r"tools/gen_\w+\.py --check", command) and command not in declared:
                 # `generator_sweep()` reads these out of the same workflow; a second copy here
-                # would be the list this table exists to avoid.
+                # would be the list this table exists to avoid. A generator the table does
+                # carry (`gen_port_checklist`) is compared in both directions.
                 continue
             expected.add(command)
     # The notebooks run in their own conditionally-reached job, not in an unconditional one,
@@ -677,7 +745,7 @@ def test_the_cheap_checks_run_before_the_expensive_targets() -> None:
             sys.executable,
             str(TOOLS / "test_scope.py"),
             "--paths",
-            "tools/test_scope.py",
+            "specs/models/eos/transient_pipe.toml",
             "--no-gate",
         ],
         capture_output=True,

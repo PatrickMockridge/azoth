@@ -367,8 +367,9 @@ def test_scope_refusal(cmd: str) -> str | None:
         if lane == "push" and "--checks-only" not in tokens and not local_lane:
             return (
                 "The push lane is CI's: every pushed commit runs the same commands on a clean "
-                "runner. Run `python tools/test_scope.py --checks-only --run` before the push "
-                f"and read CI's run; a local copy needs {LOCAL_LANE_TOKEN}."
+                "runner. Commit the slice and run `python tools/test_scope.py --run` (the "
+                "commit lane, 5 min: the diff's checks and tests); then push and read CI's "
+                f"run. A local copy needs {LOCAL_LANE_TOKEN}."
             )
         if gate:
             continue
@@ -376,7 +377,7 @@ def test_scope_refusal(cmd: str) -> str | None:
             return (
                 "`test_scope.py --run` with `--full` or `--lane nightly` is the whole tree. "
                 "It runs nightly in .github/workflows/nightly.yml (budget 60 min). Run the "
-                "edit lane (budget 5 min) or `--lane tranche --run` at close-out; for the "
+                "commit lane (budget 5 min) or `--lane tranche --run` at close-out; for the "
                 f"whole tree, prefix `{FULL_GATE_TOKEN}`."
             )
         if "--run" in tokens:
@@ -674,6 +675,11 @@ SELFTEST: list[tuple[str, bool]] = [
     ("npx -y pytest python/tests", False),
     # **The push lane is CI's.** A local copy needs the visible token, in its own segment.
     ("python tools/test_scope.py --checks-only --run", True),
+    ("python tools/test_scope.py --checks-only --lane push --run", True),
+    # the commit lane's own commands: file-scoped lint and format, whole-package types
+    ("rustfmt --edition 2024 --check crates/azoth-eos/src/lib.rs", True),
+    ("mypy python/src/azoth/eos/layers.py", True),
+    ("python tools/check_guard.py", True),
     ("python tools/test_scope.py --lane push --run", False),
     ("python tools/test_scope.py --lane push --run --max-minutes 15", False),
     ("AZOTH_LOCAL_LANE=1 python tools/test_scope.py --lane push --run", True),
