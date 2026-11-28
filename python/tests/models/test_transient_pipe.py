@@ -108,6 +108,32 @@ def test_the_three_phase_flash_is_refused() -> None:
         )
 
 
+@pytest.mark.parametrize("backend", ["python", "rust"])
+def test_a_cell_that_condenses_into_three_phases_is_refused(backend: str) -> None:
+    # Gas + aqueous at the 5 MPa inlet, and gas + oil + aqueous at the 6 MPa outlet the
+    # constant-pressure boundary holds, so the first periodic flash finds the branch the
+    # model refuses. A swallowed flash would leave the cell's stale two-phase properties.
+    with use_backend(backend), pytest.raises(InvalidInputError, match="oil and an aqueous"):
+        transient_pipe(
+            ["methane", "n-butane", "water"],
+            [0.901, 0.094, 0.005],
+            Q(5.0, "kg/s"),
+            Q(5.0e6, "Pa"),
+            Q(300.0, "K"),
+            Q(100.0, "m"),
+            Q(0.1, "m"),
+            5,
+            Q(1.0e-4, "m"),
+            "constant_flow",
+            "constant_pressure",
+            outlet_pressure=Q(6.0e6, "Pa"),
+            max_simulation_time=Q(1.0, "s"),
+            cfl=0.5,
+            thermodynamic_update_interval=10,
+            eos="srk",
+        )
+
+
 def test_a_low_point_is_refused() -> None:
     case = CASES[0]
     kwargs = h.model_kwargs(SPEC, case["inputs"])

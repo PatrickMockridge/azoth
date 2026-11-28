@@ -78,6 +78,13 @@ BUBBLE_PACKING_VOID_FRACTION = 0.52
 #: `FlowRegimeDetector.DEFAULT_GAS_OIL_IFT`.
 DEFAULT_GAS_OIL_IFT = 0.020
 
+#: The three-phase refusal's reason, matched by `_Pipe._update_thermodynamics` so a
+#: per-cell flash can tell it from a failed flash.
+_THREE_PHASE_REASON = (
+    "the flash leaves both an oil and an aqueous phase, and the class's three-phase "
+    "liquid averaging has no counterpart in this model"
+)
+
 FLOW_REGIMES = (
     "STRATIFIED_SMOOTH",
     "STRATIFIED_WAVY",
@@ -363,11 +370,7 @@ def _fluid_state(
     gas = next((phase for phase in phases if phase.kind == GAS), None)
     liquids = [phase for phase in phases if phase.kind != GAS]
     if len(liquids) > 1:
-        raise InvalidInputError(
-            "components",
-            "the flash leaves both an oil and an aqueous phase, and the class's three-phase "
-            "liquid averaging has no counterpart in this model",
-        )
+        raise InvalidInputError("components", _THREE_PHASE_REASON)
     liquid = liquids[0] if liquids else None
     parachors = [component.parachor for component in mixture.components]
     sigma = DEFAULT_SIGMA
@@ -602,6 +605,36 @@ def _estimate_stratified_level(
     return 0.5 * (low + high)
 
 
+def _drift_stratified_level(
+    u_sl: float,
+    u_sg: float,
+    d: float,
+    theta: float,
+    rho_l: float,
+    rho_g: float,
+) -> float:
+    """`DriftFluxModel.estimateStratifiedLevel`: its own level rule, not the detector's.
+
+    The class carries two stratified-level solvers. `FlowRegimeDetector` bisects a momentum
+    residual; `DriftFluxModel` adjusts a level over twenty steps. The drift-flux closure
+    reads the second, so the two are kept apart here.
+    """
+    h = 0.5 * d
+    for _ in range(20):
+        alpha_l = _holdup_from_level(h, d)
+        alpha_g = 1.0 - alpha_l
+        if alpha_l < 0.01 or alpha_g < 0.01:
+            break
+        area = math.pi * d * d / 4.0
+        u_l = u_sl * area / (alpha_l * area)
+        u_g = u_sg * area / (alpha_g * area)
+        tau_ratio = rho_g * u_g * u_g / (rho_l * u_l * u_l + 1e-10)
+        gravity = (rho_l - rho_g) * GRAVITY * math.sin(theta) * d / (rho_l * u_l * u_l + 1e-10)
+        adjustment = 0.05 * d * (tau_ratio - 1.0 - gravity)
+        h = max(0.01 * d, min(0.99 * d, h - adjustment))
+    return h
+
+
 def _bubble_parameters(
     _u_m: float, _d: float, theta: float, rho_l: float, rho_g: float, sigma: float
 ) -> tuple[float, float]:
@@ -644,7 +677,6 @@ def _drift_flux(section: _Section) -> _Drift:
     rho_l = section.liquid_density
     rho_g = section.gas_density
     sigma = section.surface_tension
-    mu_l = section.liquid_viscosity
     params = _Drift()
     regime = section.flow_regime
     if regime in ("BUBBLE", "DISPERSED_BUBBLE"):
@@ -654,9 +686,7 @@ def _drift_flux(section: _Section) -> _Drift:
     elif regime in ("ANNULAR", "CHURN"):
         params.c0, params.drift_velocity = _annular_parameters(d, theta, rho_l, rho_g)
     elif regime in ("STRATIFIED_SMOOTH", "STRATIFIED_WAVY"):
-        h_l = _estimate_stratified_level(
-            u_sl, u_sg, d, rho_l, rho_g, mu_l, section.gas_viscosity, theta
-        )
+        h_l = _drift_stratified_level(u_sl, u_sg, d, theta, rho_l, rho_g)
         alpha_l = _holdup_from_level(h_l, d)
         params.liquid_holdup = alpha_l
         params.void_fraction = 1.0 - alpha_l
@@ -711,7 +741,11 @@ def _dispersed_bubble(
     u_m = u_sl + u_sg
     sigma_eff = DEFAULT_GAS_OIL_IFT if sigma < 1e-6 else sigma
     we = rho_l * u_m * u_m * d / sigma_eff
-    u_crit = 0.725 + 4.15 * math.sqrt(max(0.0, u_sg))
+    # `Math.sqrt(U_SG)` on a negative gas superficial velocity is NaN, and the whole
+    # criterion is then false; the class does not clamp it to zero.
+    if u_sg < 0.0:
+        return False
+    u_crit = 0.725 + 4.15 * math.sqrt(u_sg)
     ratio = u_sg / u_m if u_m != 0.0 else float("nan")
     return u_m > u_crit and we > 20.0 and ratio < 0.52
 
@@ -801,7 +835,12 @@ def _flow_regime(section: _Section) -> str:
         if _annular_ratio(u_sg, rho_l, rho_g, sigma) > 1.0:
             return "ANNULAR"
         if theta > 0.0:
-            u_bubble = 1.53 * (GRAVITY * sigma * (rho_l - rho_g) / (rho_l * rho_l)) ** 0.25
+            # `calcBubbleRiseVelocity` answers zero when the phases have no density contrast.
+            u_bubble = (
+                0.0
+                if rho_l - rho_g < 1e-6
+                else 1.53 * (GRAVITY * sigma * (rho_l - rho_g) / (rho_l * rho_l)) ** 0.25
+            )
             transport = u_sg + u_sl + u_bubble
             if u_sg >= 0.0 and transport > 0.0 and 1.0 - alpha_l < BUBBLE_PACKING_VOID_FRACTION:
                 void = u_sg / transport
@@ -1176,6 +1215,14 @@ class _Pipe:
                     self.overall_z,
                     self.srk_shift,
                 )
+            except InvalidInputError as error:
+                # The class's per-cell try/catch keeps the previous properties when a flash
+                # fails. A flash that *succeeds* into three phases is not a failure: the
+                # class's three-phase averaging is the branch this model refuses, so it is
+                # reported rather than swallowed as a stale cell.
+                if error.reason == _THREE_PHASE_REASON:
+                    raise
+                continue
             except Exception:
                 continue
             if fluid.gas is not None:

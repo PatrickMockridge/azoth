@@ -51,7 +51,10 @@ members = [
     "PipeSection.getWallisSoundSpeed",
     "DriftFluxModel.calculateDriftFlux",
     "DriftFluxModel.calculatePressureGradient",
+    "DriftFluxModel.estimateStratifiedLevel",
+    "DriftFluxModel.calculateHoldupFromLevel",
     "FlowRegimeDetector.detectFlowRegime",
+    "LiquidAccumulationTracker.identifyAccumulationZones",
     "ThermodynamicOperations.TPflash",
     "ThermodynamicOperations.TPmultiflash",
     "InterfaceProperties.getSurfaceTension",
@@ -446,6 +449,38 @@ source = "NeqSim FlowRegimeDetector.estimateStratifiedLiquidLevel"
 name = "STRATIFIED_LEVEL_STOP"
 value = 1.0e-9
 source = "NeqSim FlowRegimeDetector.estimateStratifiedLiquidLevel"
+[[provenance.constants]]
+name = "STRATIFIED_LEVEL_FLOOR"
+value = 0.01
+source = "NeqSim DriftFluxModel.estimateStratifiedLevel and FlowRegimeDetector.estimateStratifiedLiquidLevel, as a fraction of the diameter"
+[[provenance.constants]]
+name = "STRATIFIED_LEVEL_CEILING"
+value = 0.99
+source = "NeqSim DriftFluxModel.estimateStratifiedLevel and FlowRegimeDetector.estimateStratifiedLiquidLevel, as a fraction of the diameter"
+[[provenance.constants]]
+name = "STRATIFIED_DRIFT_ITERATIONS"
+value = 20
+source = "NeqSim DriftFluxModel.estimateStratifiedLevel"
+[[provenance.constants]]
+name = "STRATIFIED_DRIFT_INITIAL_LEVEL"
+value = 0.5
+source = "NeqSim DriftFluxModel.estimateStratifiedLevel, as a fraction of the diameter"
+[[provenance.constants]]
+name = "STRATIFIED_DRIFT_RELAXATION"
+value = 0.05
+source = "NeqSim DriftFluxModel.estimateStratifiedLevel, as a fraction of the diameter"
+[[provenance.constants]]
+name = "STRATIFIED_DRIFT_BREAK_HOLDUP"
+value = 0.01
+source = "NeqSim DriftFluxModel.estimateStratifiedLevel"
+[[provenance.constants]]
+name = "RISER_BASE_MIN_INCLINATION"
+value = 5.0
+source = "NeqSim LiquidAccumulationTracker.identifyAccumulationZones, degrees"
+[[provenance.constants]]
+name = "RISER_BASE_MAX_INCLINATION"
+value = 30.0
+source = "NeqSim LiquidAccumulationTracker.identifyAccumulationZones, degrees"
 [[provenance.constants]]
 name = "SURFACE_TENSION_FLOOR"
 value = 1.0e-6

@@ -232,6 +232,10 @@ fn phase_kind(kind: PhaseLabel) -> PhaseKind {
     }
 }
 
+/// The three-phase refusal's reason, matched by [`is_three_phase`] so a per-cell flash can
+/// tell it from a failed flash.
+const THREE_PHASE_REASON: &str = "the flash leaves both an oil and an aqueous phase, and the class's three-phase liquid averaging has no counterpart in this model";
+
 fn flash_phases(
     mixture: &Mixture,
     ideal_gas: &IdealGasModel,
@@ -347,11 +351,7 @@ fn fluid_state(
         .filter(|phase| phase.kind != PhaseLabel::Gas)
         .collect();
     if liquids.len() > 1 {
-        return Err(AzothError::invalid_input(
-            "components",
-            "the flash leaves both an oil and an aqueous phase, and the class's three-phase \
-             liquid averaging has no counterpart in this model",
-        ));
+        return Err(AzothError::invalid_input("components", THREE_PHASE_REASON));
     }
     let liquid = liquids.first().map(|phase| (*phase).clone());
     let parachors: Vec<f64> = mixture.components().iter().map(|c| c.parachor).collect();
@@ -633,6 +633,30 @@ fn estimate_stratified_level(
     0.5 * (low + high)
 }
 
+/// `DriftFluxModel.estimateStratifiedLevel`: its own level rule, not the detector's.
+///
+/// The class carries two stratified-level solvers. `FlowRegimeDetector` bisects a momentum
+/// residual; `DriftFluxModel` adjusts a level over twenty steps. The drift-flux closure
+/// reads the second, so the two are kept apart here.
+fn drift_stratified_level(u_sl: f64, u_sg: f64, d: f64, theta: f64, rho_l: f64, rho_g: f64) -> f64 {
+    let mut h = 0.5 * d;
+    for _ in 0..20 {
+        let alpha_l = holdup_from_level(h, d);
+        let alpha_g = 1.0 - alpha_l;
+        if alpha_l < 0.01 || alpha_g < 0.01 {
+            break;
+        }
+        let area = std::f64::consts::PI * d * d / 4.0;
+        let u_l = u_sl * area / (alpha_l * area);
+        let u_g = u_sg * area / (alpha_g * area);
+        let tau_ratio = rho_g * u_g * u_g / (rho_l * u_l * u_l + 1e-10);
+        let gravity = (rho_l - rho_g) * GRAVITY * theta.sin() * d / (rho_l * u_l * u_l + 1e-10);
+        let adjustment = 0.05 * d * (tau_ratio - 1.0 - gravity);
+        h = jmax(0.01 * d, jmin(0.99 * d, h - adjustment));
+    }
+    h
+}
+
 #[allow(clippy::too_many_arguments)]
 fn bubble_parameters(
     _u_m: f64,
@@ -694,7 +718,6 @@ fn drift_flux(section: &Section) -> Drift {
     let rho_l = section.liquid_density;
     let rho_g = section.gas_density;
     let sigma = section.surface_tension;
-    let mu_l = section.liquid_viscosity;
     let mut params = Drift::default();
     match section.flow_regime {
         Regime::Bubble | Regime::DispersedBubble => {
@@ -708,16 +731,7 @@ fn drift_flux(section: &Section) -> Drift {
             (params.c0, params.drift_velocity) = annular_parameters(d, theta, rho_l, rho_g);
         }
         Regime::StratifiedSmooth | Regime::StratifiedWavy => {
-            let h_l = estimate_stratified_level(
-                u_sl,
-                u_sg,
-                d,
-                rho_l,
-                rho_g,
-                mu_l,
-                section.gas_viscosity,
-                theta,
-            );
+            let h_l = drift_stratified_level(u_sl, u_sg, d, theta, rho_l, rho_g);
             let alpha_l = holdup_from_level(h_l, d);
             params.liquid_holdup = alpha_l;
             params.void_fraction = 1.0 - alpha_l;
@@ -785,7 +799,12 @@ fn dispersed_bubble(u_sl: f64, u_sg: f64, d: f64, rho_l: f64, _rho_g: f64, sigma
         sigma
     };
     let we = rho_l * u_m * u_m * d / sigma_eff;
-    let u_crit = 0.725 + 4.15 * jmax(0.0, u_sg).sqrt();
+    // `Math.sqrt(U_SG)` on a negative gas superficial velocity is NaN, and the whole
+    // criterion is then false; the class does not clamp it to zero.
+    if u_sg < 0.0 {
+        return false;
+    }
+    let u_crit = 0.725 + 4.15 * u_sg.sqrt();
     let ratio = if u_m != 0.0 { u_sg / u_m } else { f64::NAN };
     u_m > u_crit && we > 20.0 && ratio < 0.52
 }
@@ -897,7 +916,12 @@ fn flow_regime(section: &Section) -> Regime {
             return Regime::Annular;
         }
         if theta > 0.0 {
-            let u_bubble = 1.53 * (GRAVITY * sigma * (rho_l - rho_g) / (rho_l * rho_l)).powf(0.25);
+            // `calcBubbleRiseVelocity` answers zero when the phases have no density contrast.
+            let u_bubble = if rho_l - rho_g < 1e-6 {
+                0.0
+            } else {
+                1.53 * (GRAVITY * sigma * (rho_l - rho_g) / (rho_l * rho_l)).powf(0.25)
+            };
             let transport = u_sg + u_sl + u_bubble;
             if u_sg >= 0.0 && transport > 0.0 && 1.0 - alpha_l < BUBBLE_PACKING_VOID_FRACTION {
                 let void = u_sg / transport;
@@ -1250,7 +1274,7 @@ impl<'a> Pipe<'a> {
         }
     }
 
-    fn update_thermodynamics(&mut self) {
+    fn update_thermodynamics(&mut self) -> Result<()> {
         for section in &mut self.sections {
             let state = fluid_state(
                 self.mixture,
@@ -1261,8 +1285,14 @@ impl<'a> Pipe<'a> {
                 &self.overall_z,
                 self.srk_shift,
             );
-            let Ok(state) = state else {
-                continue;
+            // The class's per-cell try/catch keeps the previous properties when a flash
+            // fails. A flash that *succeeds* into three phases is not a failure: the
+            // class's three-phase averaging is the branch this model refuses, so it is
+            // reported rather than swallowed as a stale cell.
+            let state = match state {
+                Ok(state) => state,
+                Err(error) if is_three_phase(&error) => return Err(error),
+                Err(_) => continue,
             };
             if let Some(gas) = &state.gas {
                 section.gas_density = gas.density;
@@ -1288,6 +1318,7 @@ impl<'a> Pipe<'a> {
                 DEFAULT_SIGMA
             };
         }
+        Ok(())
     }
 
     fn store_history(&mut self) {
@@ -1307,7 +1338,7 @@ impl<'a> Pipe<'a> {
             .sum();
     }
 
-    fn run(&mut self, z: &[f64]) {
+    fn run(&mut self, z: &[f64]) -> Result<()> {
         self.overall_z = z.to_vec();
         self.store_history();
         while self.simulation_time < self.max_time {
@@ -1320,13 +1351,14 @@ impl<'a> Pipe<'a> {
                 section.flow_regime = flow_regime(section);
             }
             if self.current_step % self.thermo_interval == 0 {
-                self.update_thermodynamics();
+                self.update_thermodynamics()?;
             }
             if self.total_steps as usize % HISTORY_INTERVAL == 0 {
                 self.store_history();
             }
             self.check_convergence();
         }
+        Ok(())
     }
 
     fn advance(&mut self, dt: f64) {
@@ -1483,6 +1515,15 @@ fn update_primitive(
         section.pressure = old.pressure;
     }
     section.update_derived();
+}
+
+/// Whether a flash error is the model's three-phase refusal rather than a failed flash.
+fn is_three_phase(error: &AzothError) -> bool {
+    matches!(
+        error,
+        AzothError::InvalidInput { field, reason }
+            if field == "components" && reason == THREE_PHASE_REASON
+    )
 }
 
 fn refuse_low_points(elevation: &[f64], inclinations: &[f64]) -> Result<()> {
@@ -1768,7 +1809,7 @@ pub fn transient_pipe(
         inlet_boundary,
         outlet_boundary,
     );
-    pipe.run(inlet_z);
+    pipe.run(inlet_z)?;
 
     let pressure_profile = pipe
         .sections

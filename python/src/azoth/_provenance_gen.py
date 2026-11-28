@@ -1943,8 +1943,8 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.transient_pipe': {
         "calc_id": 'eos.transient_pipe',
         "name": 'Transient drift-flux pipeline march',
-        "spec": {'path': 'specs/models/eos/transient_pipe.toml', 'sha256': 'b070a62e1a4eefd37efc5a88957040e7588342569afa8236384e69e0e010bba6'},
-        "code": [{'path': 'python/src/azoth/eos/reference/transient_pipe.py', 'sha256': 'eb66d477ceb3777810e432fc4a7889dca62af1ad285d5fa881ced4b9b1875d25'}, {'path': 'crates/azoth-eos/src/transient_pipe.rs', 'sha256': 'dc52b012ea3d63167aa24472949c93e3fde9e225a269adbf8b84e69f3d8a25f0'}],
+        "spec": {'path': 'specs/models/eos/transient_pipe.toml', 'sha256': 'b87cf225892dde3598f07189346f9ce3d22a6c2852ae54d1d4134659feb4feca'},
+        "code": [{'path': 'python/src/azoth/eos/reference/transient_pipe.py', 'sha256': '6380d668a07c172fbd64890409e14cdb67c3c5ac494d745cea5b9d35af41a893'}, {'path': 'crates/azoth-eos/src/transient_pipe.rs', 'sha256': 'f9dad9c7c059eeb0ae8ff1e8b72fb99c145ddc514d845a39a2143c02f89292be'}],
         "source": 'NeqSim master `TransientPipe`',
         "verification": 'partially_verified',
         "validation_cases": 0,

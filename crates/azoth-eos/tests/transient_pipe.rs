@@ -163,6 +163,42 @@ fn the_three_phase_flash_is_refused() {
 }
 
 #[test]
+fn a_cell_that_condenses_into_three_phases_is_refused() {
+    // Gas + aqueous at the 5 MPa inlet, and gas + oil + aqueous at the 6 MPa outlet the
+    // constant-pressure boundary holds, so the first periodic flash finds the branch the
+    // model refuses. A swallowed flash would leave the cell's stale two-phase properties.
+    let error = transient_pipe(
+        &[
+            "methane".to_owned(),
+            "n-butane".to_owned(),
+            "water".to_owned(),
+        ],
+        &[0.901, 0.094, 0.005],
+        kilograms_per_second(5.0),
+        pascals(5.0e6),
+        kelvins(300.0),
+        meters(100.0),
+        meters(0.1),
+        5,
+        meters(1.0e-4),
+        "constant_flow",
+        "constant_pressure",
+        None,
+        None,
+        Some(pascals(6.0e6)),
+        Some(seconds(1.0)),
+        Some(0.5),
+        Some(10),
+        Some("srk"),
+    )
+    .expect_err("a cell that condenses into three phases has no port");
+    assert!(
+        format!("{error}").contains("oil and an aqueous"),
+        "the refusal should name the three-phase averaging: {error}"
+    );
+}
+
+#[test]
 fn a_low_point_is_refused() {
     let error = transient_pipe(
         &["methane".to_owned(), "n-butane".to_owned()],
