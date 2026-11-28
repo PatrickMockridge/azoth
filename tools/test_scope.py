@@ -1660,7 +1660,7 @@ def narrow_checks(paths: list[str], commands: list[Command]) -> list[Command]:
 
 def commit_commands(paths: list[str], commands: list[Command]) -> list[Command]:
     """The commit lane: its checks first, then the diff's tests and generator checks."""
-    return narrow_checks(paths, commands) + cheap_first(commands)
+    return merge_unique(narrow_checks(paths, commands), cheap_first(commands))
 
 
 def checks_only(paths: list[str], commands: list[Command]) -> list[Command]:
