@@ -218,12 +218,15 @@ One gate, scoped to what the diff reaches, with a wall-clock budget per lane:
 
 | lane | command | budget | what it runs |
 |---|---|---|---|
-| edit | `python tools/test_scope.py --run` | 5 min | the scoped set, the marked sweeps deselected |
+| commit | `python tools/test_scope.py --run` | 5 min | the diff's tests and narrow checks, marked sweeps deselected |
+| commit checks | `python tools/test_scope.py --checks-only --run` | 5 min | the diff's narrow checks only, no tests (seconds in practice) |
 | push | `python tools/test_scope.py --lane push --run` | 15 min | as CI runs it, with the five unconditional jobs |
 | close-out | `python tools/test_scope.py --lane tranche --run` | 20 min | the push set, each reached sweep narrowed to the selected ids |
-| nightly | CI only (`--lane nightly` prints it) | 45 min | the whole tree |
+| nightly | CI only (`--lane nightly` prints it) | 60 min | the whole tree |
 
-`--estimate` prints the minutes before they are spent, and every `--run` prints them first.
+`--checks-only` is the commit lane's checks without the tests; it never runs the five flat CI
+jobs, which are the push lane's. `--estimate` prints the minutes before they are spent, and
+every `--run` prints them first.
 **The budgets are ceilings: `--max-minutes` may only lower one** — a wide diff is the
 tranche lane or CI. A push or tranche lane refuses a dirty tree: commit the slice, run its
 lane, and report the result. No heavy command runs longer than 30 minutes. The Rust

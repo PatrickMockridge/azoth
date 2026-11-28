@@ -72,8 +72,8 @@ discovery loop, which is how a large port becomes rounds of build, test and patc
    then the second kernel; the mirror is arithmetic, not discovery.
 4. **Generators once, one build, one test run.** A red result goes back to the table, not
    into a patch. Regenerating after a later kernel edit is two edits where one was owed.
-5. **`python tools/test_scope.py --checks-only --run`, then push.** CI runs the push lane.
-   What may be written at all is the port law in `AGENTS.md`.
+5. **`python tools/test_scope.py --run` (the commit lane), then push.** CI runs the push
+   lane. What may be written at all is the port law in `AGENTS.md`.
 
 ## Python usage pattern
 

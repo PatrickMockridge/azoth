@@ -1,0 +1,1455 @@
+# Port inventory. A row's `classes` are the only NeqSim classes its work may add.
+# size: S loc<=500 and deps<=10 with a capture; M loc<=2500; L otherwise.
+
+[[package]]
+id = "tier0.not_a_port_target.excluded"
+tier = 0
+title = "Not a port target"
+state = "excluded"
+loc = 16173
+deps = 34
+capture = ""
+new_solver = false
+size = "S"
+blocked_by = "the roadmap names this tree outside the port"
+classes = [
+    "ChungFunction",
+    "EclipseFluidReadWrite",
+    "GERG2004EOS",
+    "JsonFluidReadWrite",
+    "OLGAhydrateCurveGenerator",
+    "OLGApropertyTableGenerator",
+    "OLGApropertyTableGeneratorKeywordFormat",
+    "OLGApropertyTableGeneratorWater",
+    "OLGApropertyTableGeneratorWaterEven",
+    "OLGApropertyTableGeneratorWaterKeywordFormat",
+    "OLGApropertyTableGeneratorWaterStudents",
+    "OLGApropertyTableGeneratorWaterStudentsPH",
+    "OlgaEnvelopeInfo",
+    "OlgaProducedWater",
+    "OlgaTableGrid",
+    "OlgaTableGridFiller",
+    "OlgaTableQualityReport",
+    "OlgaTableReportWriter",
+    "ParachorFunction",
+    "TPflash_benchmark",
+    "TPflash_benchmark_UMR",
+    "TPflash_benchmark_fullcomp",
+    "TablePrinter",
+    "TestChungFit",
+    "TestParachorFit",
+    "TestViscosityFit",
+    "WhitsonPVTReader",
+]
+
+[[package]]
+id = "tier0.reports.excluded"
+tier = 0
+title = "Reports"
+state = "excluded"
+loc = 8848
+deps = 1
+capture = "validation/neqsim/InheritReferenceProbe.java"
+new_solver = false
+size = "S"
+blocked_by = "the roadmap names this tree outside the port"
+classes = [
+    "RefineryCatalyticReformingFeedBalance",
+    "RefineryCatalyticReformingHydrogenRecoveryBalance",
+    "RefineryCatalyticReformingStoichiometricBalance",
+    "RefineryDelayedCokingUtilityBalance",
+    "RefineryDelayedCokingYieldBalance",
+    "RefineryFccCokeRegeneratorBalance",
+    "RefineryFccYieldBalance",
+    "RefineryHydrocrackingHydrogenSupplyBalance",
+    "RefineryHydrocrackingYieldBalance",
+    "RefineryHydrotreatingHydrogenEmissionsBalance",
+    "RefineryHydrotreatingHydrogenRecycleBalance",
+    "RefineryHydrotreatingHydrogenSupplyBalance",
+    "RefineryHydrotreatingHydrogenUtilityBalance",
+    "RefineryHydrotreatingNitrogenBalance",
+    "RefineryHydrotreatingOperatingReceipt",
+    "RefineryHydrotreatingSulfurBalance",
+    "RefineryHydrotreatingSulfurNitrogenBalance",
+    "RefineryHydrotreatingSulfurNitrogenBreakEvenEconomicsReceipt",
+    "RefineryHydrotreatingSulfurNitrogenEconomicsCaseDeltaReceipt",
+    "RefineryHydrotreatingSulfurNitrogenEconomicsScenarioDeltaReceipt",
+    "RefineryHydrotreatingSulfurNitrogenEconomicsTotalDeltaReceipt",
+    "RefineryHydrotreatingSulfurNitrogenFiredHeaterCombustionBalance",
+    "RefineryHydrotreatingSulfurNitrogenFiredHeaterHeatRecoveryBalance",
+    "RefineryHydrotreatingSulfurNitrogenFiredHeaterHeatRecoveryCreditBalance",
+    "RefineryHydrotreatingSulfurNitrogenFiredHeaterStackLossBalance",
+    "RefineryHydrotreatingSulfurNitrogenFiredHeaterUtilityBalance",
+    "RefineryHydrotreatingSulfurNitrogenHydrogenEmissionsBalance",
+    "RefineryHydrotreatingSulfurNitrogenHydrogenRecycleBalance",
+    "RefineryHydrotreatingSulfurNitrogenHydrogenRecycleThroughputBalance",
+    "RefineryHydrotreatingSulfurNitrogenHydrogenSupplyBalance",
+    "RefineryHydrotreatingSulfurNitrogenHydrogenUtilityBalance",
+    "RefineryHydrotreatingSulfurNitrogenNetOperatingReceipt",
+    "RefineryHydrotreatingSulfurNitrogenNetProductIntensityReceipt",
+    "RefineryHydrotreatingSulfurNitrogenOperatingReceipt",
+    "RefineryHydrotreatingSulfurNitrogenProductDistributionReceipt",
+    "RefineryHydrotreatingSulfurNitrogenScreeningEconomicsReceipt",
+    "RefineryHydrotreatingSulfurNitrogenThermalDutyBalance",
+    "RefineryHydrotreatingSulfurNitrogenThroughputBalance",
+    "RefineryHydrotreatingThroughputBalance",
+]
+
+[[package]]
+id = "tier0.cubic_eos_breadth.internal"
+tier = 0
+title = "Cubic EOS breadth"
+state = "internal"
+loc = 660
+deps = 12
+capture = "validation/neqsim/BrineProbe.java"
+new_solver = false
+size = "S"
+classes = [
+    "ComponentIdealGas",
+    "ComponentPR",
+    "PhaseIdealGas",
+    "SystemIdealGas",
+]
+
+[[package]]
+id = "tier0.plumbing.internal"
+tier = 0
+title = "Plumbing"
+state = "internal"
+loc = 32551
+deps = 104
+capture = "validation/neqsim/InheritReferenceProbe.java"
+new_solver = false
+size = "S"
+classes = [
+    "AirPhysicalProperties",
+    "AlDiwiniyaAtmosphericReference",
+    "AminePhysicalProperties",
+    "AsphalteneCharacterization",
+    "BaseOperation",
+    "BasePVTsimulation",
+    "BaseTuningClass",
+    "BioFeedstock",
+    "BiomassCharacterization",
+    "BlackOilTableValidator",
+    "BlackOilUnits",
+    "CCEDataPoint",
+    "CMEFunction",
+    "CO2waterPhysicalProperties",
+    "CVDDataPoint",
+    "CVDFunction",
+    "CalibratedPvtModel",
+    "CharacteriseInterface",
+    "CharacterizationOptions",
+    "CharacterizationValidationReport",
+    "ComponentNameResolver",
+    "CompositionEstimation",
+    "CompositionalReservoirHistory",
+    "ConductivityInterface",
+    "DIISAccelerator",
+    "DLEDataPoint",
+    "DefaultPhysicalProperties",
+    "DensityFunction",
+    "DensityInterface",
+    "DepletionExperiment",
+    "DepletionPvtHistoryGenerator",
+    "DepletionSnapshot",
+    "DifferentiableFlash",
+    "DiffusivityInterface",
+    "DoeBigHillSweetAssay",
+    "Element",
+    "ExperimentType",
+    "FiniteRadialAquiferInfluence",
+    "FlashGradients",
+    "Fluid",
+    "FluidBuilder",
+    "FluidClassifier",
+    "FluidCreator",
+    "FormulaMatrix",
+    "FugacityJacobian",
+    "FunctionJohanSverderup",
+    "FurstElectrolyteConstants",
+    "GasPseudoCriticalProperties",
+    "GasPseudoPressure",
+    "GlycolPhysicalProperties",
+    "InterphasePropertiesInterface",
+    "IonParametersAdvanced",
+    "IonParametersMM",
+    "LiquidPhysicalProperties",
+    "LumpingConfigBuilder",
+    "LumpingModelInterface",
+    "LumpingResult",
+    "MaterialBalancePvtHistory",
+    "ModifiedRANDSolver",
+    "MultiStageSeparatorTest",
+    "NaturalGasPhysicalProperties",
+    "NewtonSolveAB",
+    "NewtonSolveABCD",
+    "NewtonSolveCDplus",
+    "PVTFluidStudy",
+    "PVTRegressionFunction",
+    "PVTReportGenerator",
+    "PedersenAsphalteneCharacterization",
+    "PhaseDefault",
+    "PhysicalPropertyHandler",
+    "PhysicalPropertyMethod",
+    "PhysicalPropertyMethodInterface",
+    "PhysicalPropertyMixingRule",
+    "PhysicalPropertyMixingRuleInterface",
+    "PhysicalPropertyModel",
+    "PhysicalPropertyType",
+    "PlusFractionModelInterface",
+    "ProducedWaterFluidBuilder",
+    "PropertyGradient",
+    "RadialBessel",
+    "RadialInfiniteInfluence",
+    "ReactiveStabilityAnalysis",
+    "Recombine",
+    "RefineryBlendOptimizationPlan",
+    "RegressionParameter",
+    "RegressionParameterConfig",
+    "RegressionResult",
+    "RelPermModelFamily",
+    "RelPermTableType",
+    "RepulsiveTermInterface",
+    "ReservoirFluidType",
+    "ReservoirHistoryEnsemble",
+    "SaltWaterPhysicalProperties",
+    "SarirAtmosphericAssay",
+    "SarirAtmosphericReference",
+    "SaturationPressureCorrelation",
+    "SaturationPressureFunction",
+    "SaturationTemperature",
+    "SeparatorDataPoint",
+    "SeparatorTest",
+    "SimulationInterface",
+    "SlimTubeSim",
+    "SolidPhysicalProperties",
+    "SolutionGasWaterRatio",
+    "SystemPrEos",
+    "SystemProperties",
+    "TBPModelInterface",
+    "TestFitToOilFieldFluid",
+    "TestSaturationPresFunction",
+    "TestWaxTuning",
+    "ThermodynamicConstantsInterface",
+    "ThermodynamicModelSettings",
+    "ThermodynamicModelTest",
+    "TuningInterface",
+    "UNIFACgroup",
+    "UncertaintyAnalysis",
+    "ViscosityDataPoint",
+    "ViscosityFunction",
+    "ViscosityInterface",
+    "ViscositySim",
+    "ViscosityWaxOilSim",
+    "Water",
+    "WaterReferenceConstants",
+    "WaxFractionSim",
+    "WaxFunction",
+]
+
+[[package]]
+id = "tier0.the_gas_diffusivity_method.internal"
+tier = 0
+title = "the gas diffusivity method"
+state = "internal"
+loc = 84
+deps = 11
+capture = "validation/neqsim/PhaseTransportProbe.java"
+new_solver = false
+size = "S"
+classes = [
+    "GasPhysicalProperties",
+]
+
+[[package]]
+id = "tier1.activity_coefficient_ge_models.internal"
+tier = 1
+title = "Activity-coefficient / GE models"
+state = "internal"
+loc = 503
+deps = 12
+capture = "validation/neqsim/BrineProbe.java"
+new_solver = false
+size = "S"
+classes = [
+    "ComponentGEUniquacmodifiedHV",
+    "PhaseGE",
+    "PhaseGEInterface",
+]
+
+[[package]]
+id = "tier1.cubic_eos_breadth_attractive.internal"
+tier = 1
+title = "Cubic EOS breadth (attractive)"
+state = "internal"
+loc = 305
+deps = 1
+capture = "validation/neqsim/AlphaSalinity.java"
+new_solver = false
+size = "S"
+classes = [
+    "AttractiveTermBaseClass",
+    "AttractiveTermInterface",
+]
+
+[[package]]
+id = "tier1.cubic_eos_breadth_component.internal"
+tier = 1
+title = "Cubic EOS breadth (component)"
+state = "internal"
+loc = 2750
+deps = 7
+capture = "validation/neqsim/BrineProbe.java"
+new_solver = false
+size = "S"
+classes = [
+    "ComponentCPAInterface",
+    "ComponentEosInterface",
+    "ComponentGEInterface",
+    "ComponentInterface",
+]
+
+[[package]]
+id = "tier1.cubic_eos_breadth_phase.internal"
+tier = 1
+title = "Cubic EOS breadth (phase)"
+state = "internal"
+loc = 2930
+deps = 19
+capture = "validation/neqsim/BrineProbe.java"
+new_solver = false
+size = "S"
+classes = [
+    "PhaseCPAInterface",
+    "PhaseEosInterface",
+    "PhaseInterface",
+    "PhaseSolid",
+    "PhaseType",
+    "StateOfMatter",
+]
+
+[[package]]
+id = "tier1.cubic_eos_breadth_system.internal"
+tier = 1
+title = "Cubic EOS breadth (system)"
+state = "internal"
+loc = 3315
+deps = 27
+capture = "validation/neqsim/GeHenryProbe.java"
+new_solver = false
+size = "S"
+classes = [
+    "SystemInterface",
+]
+
+[[package]]
+id = "tier1.flow_assurance.internal"
+tier = 1
+title = "Flow assurance"
+state = "internal"
+loc = 749
+deps = 7
+capture = ""
+new_solver = false
+size = "S"
+classes = [
+    "CO2CorrosionAnalyzer",
+]
+
+[[package]]
+id = "tier1.mixing_rules.internal"
+tier = 1
+title = "Mixing rules"
+state = "internal"
+loc = 912
+deps = 3
+capture = "validation/neqsim/KijProbe.java"
+new_solver = false
+size = "S"
+classes = [
+    "BIPEstimationMethod",
+    "CPAMixingRulesInterface",
+    "ElectrolyteMixingRulesInterface",
+    "EosMixingRuleType",
+    "EosMixingRulesInterface",
+    "HVMixingRulesInterface",
+    "MixingRuleHandler",
+    "MixingRuleTypeInterface",
+    "MixingRulesInterface",
+    "SoreideWhitsonParameterization",
+]
+
+[[package]]
+id = "tier1.phase_envelopes.internal"
+tier = 1
+title = "Phase envelopes"
+state = "internal"
+loc = 18
+deps = 1
+capture = ""
+new_solver = true
+size = "S"
+classes = [
+    "ConstantDutyFlashInterface",
+]
+
+[[package]]
+id = "tier1.plumbing.internal"
+tier = 1
+title = "Plumbing"
+state = "internal"
+loc = 5680
+deps = 67
+capture = "validation/neqsim/BrineProbe.java"
+new_solver = false
+size = "S"
+classes = [
+    "ComponentEos",
+    "ComponentGE",
+    "ConstantDutyFlash",
+    "ConstantDutyPressureFlash",
+    "ConstantDutyTemperatureFlash",
+    "DiffusivityModelSelector",
+    "EnvelopeSegment",
+    "EosGeFlashModel",
+    "FreezingPointResult",
+    "FugTestConstP",
+    "GTSurfaceTensionUtils",
+    "HenryWaterReferencePoint",
+    "HenryWaterReferencePointCatalog",
+    "HybridEosGeFlashModel",
+    "MultiSaltPrecipitationResult",
+    "ReferenceWaterTransportProperties",
+    "SaltPrecipitationResult",
+    "SaltSaturationResult",
+    "SolidComplexTemperatureCalc",
+    "SysNewtonRhapsonPHflash",
+    "SysNewtonRhapsonPhaseEnvelope",
+    "SysNewtonRhapsonTPflash",
+    "SysNewtonRhapsonTPflashNew",
+    "SystemEos",
+    "WilsonSaturationEstimate",
+]
+
+[[package]]
+id = "tier1.transport_properties.internal"
+tier = 1
+title = "Transport properties"
+state = "internal"
+loc = 386
+deps = 6
+capture = ""
+new_solver = false
+size = "S"
+classes = [
+    "CommonPhysicalPropertyMethod",
+    "GTSurfaceTension",
+    "GasPhysicalPropertyMethod",
+    "LiquidPhysicalPropertyMethod",
+    "SurfaceTensionInterface",
+]
+
+[[package]]
+id = "tier1.activity_coefficient_ge_models.port"
+tier = 1
+title = "Activity-coefficient / GE models"
+state = "port"
+loc = 3313
+deps = 28
+capture = "validation/neqsim/GeGamma.java"
+new_solver = false
+size = "L"
+classes = [
+    "ComponentGENRTLmodifiedHV",
+    "ComponentGENRTLmodifiedWS",
+    "ComponentGeNRTL",
+    "PhaseGENRTLmodifiedHV",
+    "PhaseGENRTLmodifiedWS",
+    "PhaseGEUnifacPSRK",
+    "PhaseGEUnifacUMRPRU",
+    "PhaseGEUniquacmodifiedHV",
+    "SystemGEWilson",
+    "SystemNRTL",
+    "SystemPsrkEos",
+    "SystemUNIFAC",
+    "SystemUNIFACpsrk",
+    "SystemVanLaarActivitySRK",
+]
+
+[[package]]
+id = "tier1.cubic_eos_breadth.port"
+tier = 1
+title = "Cubic EOS breadth"
+state = "port"
+loc = 4003
+deps = 29
+capture = "validation/neqsim/WaxProbe.java"
+new_solver = false
+size = "L"
+classes = [
+    "ComponentAmmoniaEos",
+    "ComponentBNS",
+    "ComponentCSPsrk",
+    "ComponentRK",
+    "ComponentSrk",
+    "ComponentSrkPeneloux",
+    "ComponentTST",
+    "PhasePrEosvolcor",
+    "PhaseSrkEosvolcor",
+    "SystemAmmoniaEos",
+    "SystemBWRSEos",
+    "SystemBnsEos",
+    "SystemCSPsrkEos",
+    "SystemPrDanesh",
+    "SystemPrEos1978",
+    "SystemPrEosDelft1998",
+    "SystemPrEosvolcor",
+    "SystemPrGassemEos",
+    "SystemPrLeeKeslerEos",
+    "SystemPrMathiasCopeman",
+    "SystemRKEos",
+    "SystemSrkEos",
+    "SystemSrkEosvolcor",
+    "SystemSrkMathiasCopeman",
+    "SystemSrkPenelouxEos",
+    "SystemSrkSchwartzentruberEos",
+    "SystemSrkTwuCoonEos",
+    "SystemTSTEos",
+]
+
+[[package]]
+id = "tier1.cubic_eos_breadth_attractive.port"
+tier = 1
+title = "Cubic EOS breadth (attractive)"
+state = "port"
+loc = 224
+deps = 3
+capture = ""
+new_solver = false
+size = "S"
+classes = [
+    "AttractiveTermCPAWaterCaloric",
+    "AttractiveTermGERG",
+]
+
+[[package]]
+id = "tier1.cubic_eos_breadth_phase.port"
+tier = 1
+title = "Cubic EOS breadth (phase)"
+state = "port"
+loc = 1694
+deps = 17
+capture = "validation/neqsim/GeGamma.java"
+new_solver = false
+size = "M"
+classes = [
+    "PhaseAmmoniaEos",
+    "PhaseBNS",
+    "PhaseBWRSEos",
+    "PhaseCSPsrkEos",
+    "PhaseSrkPenelouxEos",
+    "PhaseTSTEos",
+]
+
+[[package]]
+id = "tier1.cubic_eos_breadth_system.port"
+tier = 1
+title = "Cubic EOS breadth (system)"
+state = "port"
+loc = 115
+deps = 1
+capture = "validation/neqsim/FreezingProbe.java"
+new_solver = false
+size = "S"
+classes = [
+    "SystemSrkTwuCoonParamEos",
+    "SystemSrkTwuCoonStatoilEos",
+]
+
+[[package]]
+id = "tier1.flash_breadth.port"
+tier = 1
+title = "Flash breadth"
+state = "port"
+loc = 3217
+deps = 19
+capture = "validation/neqsim/PhFlashJacobianProbe.java"
+new_solver = true
+size = "L"
+classes = [
+    "EOSCGSinglePhaseVUFlash",
+    "ImprovedVUflashQfunc",
+    "IonicAqueousPhaseEquilibrium",
+    "PHflashSingleComp",
+    "PSflashSingleComp",
+    "PUflash",
+    "QfuncFlash",
+    "SeawaterPHflash",
+    "THflash",
+    "TPgradientFlash",
+    "TSFlash",
+    "TUflash",
+    "TVflash",
+    "VHflash",
+    "VHflashQfunc",
+    "VSflash",
+    "VUflash",
+    "VUflashPureEOSCG",
+    "VUflashQfunc",
+    "dTPflash",
+]
+
+[[package]]
+id = "tier1.mixing_rules.port"
+tier = 1
+title = "Mixing rules"
+state = "port"
+loc = 751
+deps = 3
+capture = ""
+new_solver = false
+size = "M"
+classes = [
+    "BIPEstimator",
+    "SoreideWhitson2026ParameterSet",
+]
+
+[[package]]
+id = "tier1.petroleum_fraction_characterisation.port"
+tier = 1
+title = "Petroleum-fraction characterisation"
+state = "port"
+loc = 1606
+deps = 1
+capture = "validation/neqsim/InheritReferenceProbe.java"
+new_solver = false
+size = "M"
+classes = [
+    "RefineryAssayBlend",
+    "RefineryBinaryBlendEnvelope",
+    "RefineryBlendBatch",
+    "RefineryBlendSourceLedger",
+    "RefineryLinearBlendOptimizer",
+    "RefineryViscosityBlend",
+]
+
+[[package]]
+id = "tier1.phase_envelopes.port"
+tier = 1
+title = "Phase envelopes"
+state = "port"
+loc = 4825
+deps = 22
+capture = "validation/neqsim/Criconden.java"
+new_solver = true
+size = "L"
+classes = [
+    "BubblePointPressureFlashDer",
+    "BubblePointTemperatureNoDer",
+    "CricondenBarFlash",
+    "CricondenBarTemp",
+    "CricondenBarTemp1",
+    "CricondenThermFlash",
+    "CricondenbarFlash",
+    "DewPointTemperatureFlashDer",
+    "ElectrolytePhaseBoundaryFlash",
+    "ElectrolytePhaseBoundaryResult",
+    "HCdewPointPressureFlash",
+    "HPTphaseEnvelope",
+    "PTphaseEnvelope",
+    "PTphaseEnvelopeNew3",
+    "PloadingCurve",
+    "PloadingCurve2",
+]
+
+[[package]]
+id = "tier1.transport_properties.port"
+tier = 1
+title = "Transport properties"
+state = "port"
+loc = 3184
+deps = 21
+capture = "validation/neqsim/FullGtTraceProbe.java"
+new_solver = false
+size = "L"
+classes = [
+    "AmineDiffusivity",
+    "AmineViscosity",
+    "BnsLbcViscosityMethod",
+    "CO2ConductivityMethod",
+    "CO2ViscosityMethod",
+    "ChungDenseConductivityMethod",
+    "CorrespondingStatesDiffusivity",
+    "HighPressureDiffusivity",
+    "HydrogenConductivityMethod",
+    "KTAViscosityMethod",
+    "KTAViscosityMethodMod",
+    "LBCViscosityMethod",
+    "LeeViscosityMethod",
+    "LetsouStielViscosity",
+    "MethaneViscosityMethod",
+    "MuznyModViscosityMethod",
+    "MuznyViscosityMethod",
+    "PFCTViscosityMethod",
+    "PFCTViscosityMethodMod86",
+    "SurfaceTension",
+    "WaterConductivityMethod",
+    "WilkeLeeDiffusivity",
+]
+
+[[package]]
+id = "tier1.transport_properties.unreachable"
+tier = 1
+title = "Transport properties"
+state = "unreachable"
+loc = 372
+deps = 2
+capture = ""
+new_solver = false
+size = "S"
+blocked_by = "unreachable upstream"
+classes = [
+    "GTSurfaceTensionODE",
+]
+
+[[package]]
+id = "tier2.acid_gas.internal"
+tier = 2
+title = "Acid gas"
+state = "internal"
+loc = 162
+deps = 4
+capture = "validation/neqsim/SoreideAlphaDerivatives.java"
+new_solver = false
+size = "S"
+classes = [
+    "ComponentSoreideWhitson",
+    "PhaseSoreideWhitson",
+]
+
+[[package]]
+id = "tier2.electrolytes.internal"
+tier = 2
+title = "Electrolytes"
+state = "internal"
+loc = 10362
+deps = 27
+capture = "validation/neqsim/GeElectrolyteProbe.java"
+new_solver = false
+size = "S"
+classes = [
+    "ComponentDesmukhMather",
+    "ComponentElectrolyteCPAstatoil",
+    "ComponentGePitzer",
+    "ComponentKentEisenberg",
+    "ComponentModifiedFurstElectrolyteEos",
+    "ComponentModifiedFurstElectrolyteEosMod2004",
+    "PhaseModifiedFurstElectrolyteEos",
+    "PhaseModifiedFurstElectrolyteEosMod2004",
+    "PhreeqcPitzerParameterCatalog",
+    "PitzerAttenuation",
+    "PitzerBinaryVolumetricAcousticConversion",
+    "PitzerBinaryVolumetricDatasetProvenance",
+    "PitzerBinaryVolumetricGroupedValidation",
+    "PitzerBinaryVolumetricModel",
+    "PitzerBinaryVolumetricRegression",
+    "PitzerElectrostaticMixing",
+    "PitzerMegParameters",
+    "PitzerNeutralInteraction",
+    "PitzerNeutralParameterCoverage",
+    "PitzerParameterCoverage",
+    "PitzerParameterDatasets",
+    "PitzerParameterQualification",
+    "PitzerTemperatureFunction",
+    "SystemDesmukhMather",
+    "SystemKentEisenberg",
+]
+
+[[package]]
+id = "tier2.freezing.internal"
+tier = 2
+title = "Freezing"
+state = "internal"
+loc = 153
+deps = 5
+capture = "validation/neqsim/FreezingProbe.java"
+new_solver = false
+size = "S"
+classes = [
+    "PhaseSolidHelmholtzEos",
+]
+
+[[package]]
+id = "tier2.plumbing.internal"
+tier = 2
+title = "Plumbing"
+state = "internal"
+loc = 7332
+deps = 61
+capture = "validation/neqsim/GeGamma.java"
+new_solver = false
+size = "S"
+classes = [
+    "DebyeHuckelDerivativeState",
+    "LiquidWaterReference",
+    "SystemThermo",
+]
+
+[[package]]
+id = "tier2.salts_and_scale.internal"
+tier = 2
+title = "Salts and scale"
+state = "internal"
+loc = 755
+deps = 9
+capture = "validation/neqsim/MultiSaltProbe.java"
+new_solver = false
+size = "S"
+classes = [
+    "CalcSaltSatauration",
+]
+
+[[package]]
+id = "tier2.the_water_eos.internal"
+tier = 2
+title = "The water EOS"
+state = "internal"
+loc = 912
+deps = 20
+capture = "validation/neqsim/HydrateFugacityProbe.java"
+new_solver = false
+size = "S"
+classes = [
+    "ComponentWater",
+    "OperationInterface",
+    "PhaseWaterIAPWS",
+    "SystemPitzer",
+    "SystemWaterIF97",
+]
+
+[[package]]
+id = "tier2.salts_and_scale.port"
+tier = 2
+title = "Salts and scale"
+state = "port"
+loc = 718
+deps = 6
+capture = ""
+new_solver = false
+size = "M"
+classes = [
+    "AddIonToScaleSaturation",
+    "CalciumSulfatePhaseBoundaryQualification",
+]
+
+[[package]]
+id = "tier2.the_water_eos.port"
+tier = 2
+title = "The water EOS"
+state = "port"
+loc = 1052
+deps = 11
+capture = "validation/neqsim/FreezingProbe.java"
+new_solver = false
+size = "M"
+classes = [
+    "BrineSalinityCorrection",
+    "CoolingWaterTransport",
+    "CpaWaterPhaseBoundaryCalculator",
+    "SeawaterProperties",
+    "SystemSeawater",
+    "WaterPhaseBoundaryResult",
+]
+
+[[package]]
+id = "tier2.water_content.port"
+tier = 2
+title = "Water content"
+state = "port"
+loc = 89
+deps = 2
+capture = "validation/neqsim/AqueousViscProbe.java"
+new_solver = false
+size = "S"
+classes = [
+    "BukacekWaterInGas",
+]
+
+[[package]]
+id = "tier2.duan_sun_unreachable.unreachable"
+tier = 2
+title = "Duan-Sun, unreachable"
+state = "unreachable"
+loc = 1415
+deps = 17
+capture = "validation/neqsim/GeElectrolyteProbe.java"
+new_solver = false
+size = "S"
+blocked_by = "unreachable upstream"
+classes = [
+    "ComponentGeDuanSun",
+    "DuanSun",
+    "PhaseDuanSun",
+    "SystemDuanSun",
+]
+
+[[package]]
+id = "tier2.electrolyte_cpa.unreachable"
+tier = 2
+title = "Electrolyte-CPA"
+state = "unreachable"
+loc = 6593
+deps = 27
+capture = "validation/neqsim/BrineProbe.java"
+new_solver = true
+size = "S"
+blocked_by = "unreachable upstream"
+classes = [
+    "AttractiveTermCPAstatoil",
+    "ComponentElectrolyteCPA",
+    "ComponentElectrolyteCPAAdvanced",
+    "ComponentElectrolyteCPAOld",
+    "PhaseElectrolyteCPA",
+    "PhaseElectrolyteCPAAdvanced",
+    "PhaseElectrolyteCPAMM",
+    "PhaseElectrolyteCPAstatoil",
+    "SystemElectrolyteCPA",
+    "SystemElectrolyteCPAAdvanced",
+    "SystemElectrolyteCPAMM",
+]
+
+[[package]]
+id = "tier2.freezing.unreachable"
+tier = 2
+title = "Freezing"
+state = "unreachable"
+loc = 576
+deps = 7
+capture = ""
+new_solver = false
+size = "S"
+blocked_by = "unreachable upstream"
+classes = [
+    "FreezeOut",
+    "FreezingPointTemperatureFlashOld",
+    "FreezingPointTemperatureFlashTR",
+]
+
+[[package]]
+id = "tier3.gerg.internal"
+tier = 3
+title = "GERG"
+state = "internal"
+loc = 79
+deps = 0
+capture = ""
+new_solver = true
+size = "S"
+classes = [
+    "GERG2008Type",
+]
+
+[[package]]
+id = "tier3.hydrate.internal"
+tier = 3
+title = "Hydrate"
+state = "internal"
+loc = 1850
+deps = 18
+capture = "validation/neqsim/BrineProbe.java"
+new_solver = false
+size = "S"
+classes = [
+    "ComponentHydrate",
+    "ComponentHydrateGF",
+    "ComponentHydratePVTsim",
+    "ComponentHydratePitzer",
+    "HydrateEquilibriumDiagnostics",
+    "PhaseHydrate",
+]
+
+[[package]]
+id = "tier3.plumbing.internal"
+tier = 3
+title = "Plumbing"
+state = "internal"
+loc = 306
+deps = 6
+capture = "validation/neqsim/InheritReferenceProbe.java"
+new_solver = false
+size = "S"
+classes = [
+    "AsphalteneComponents",
+    "AsphalteneOnsetFlashSupport",
+]
+
+[[package]]
+id = "tier3.wax.internal"
+tier = 3
+title = "Wax"
+state = "internal"
+loc = 205
+deps = 6
+capture = "validation/neqsim/WaxModelProbe.java"
+new_solver = false
+size = "S"
+classes = [
+    "PhaseWax",
+    "WaxModelInterface",
+]
+
+[[package]]
+id = "tier3.asphaltene_and_flow_assurance.port"
+tier = 3
+title = "Asphaltene and flow assurance"
+state = "port"
+loc = 2665
+deps = 7
+capture = ""
+new_solver = false
+size = "L"
+classes = [
+    "AsphalteneSolidModel",
+    "NaphthenateModelFitting",
+    "NaphthenatePrecipitationModel",
+    "SilicaScaleSaturation",
+]
+
+[[package]]
+id = "tier3.asphaltene_carried_on_a_defect_upstream_rather_than_for_want_of_a_port.port"
+tier = 3
+title = "Asphaltene, carried on a defect upstream rather than for want of a port"
+state = "port"
+loc = 6103
+deps = 17
+capture = "validation/neqsim/AsphalteneOnsetProbe.java"
+new_solver = false
+size = "L"
+classes = [
+    "AsphalteneMethodComparison",
+    "AsphalteneMultiMethodBenchmark",
+    "AsphalteneOnsetFitting",
+    "AsphalteneOnsetFunction",
+    "AsphalteneOnsetPressureFlash",
+    "AsphalteneOnsetTemperatureFlash",
+    "AsphalteneStabilityAnalyzer",
+    "DeBoerAsphalteneScreening",
+    "FloryHugginsAsphalteneModel",
+    "RefractiveIndexAsphalteneScreening",
+]
+
+[[package]]
+id = "tier3.gerg.port"
+tier = 3
+title = "GERG"
+state = "port"
+loc = 5946
+deps = 22
+capture = "validation/neqsim/GeGamma.java"
+new_solver = true
+size = "L"
+classes = [
+    "ComponentGERG2004",
+    "ComponentGERG2008Eos",
+    "DETAIL",
+    "EOSCG",
+    "EOSCGCorrelationBackend",
+    "GERG2008H2",
+    "GERG2008NH3",
+    "NeqSimAGA8Detail",
+    "NeqSimEOSCG",
+    "NeqSimGERG2008",
+    "PhaseGERG2004Eos",
+    "PhaseGERG2008Eos",
+    "ReferenceEosLiquidDensitySolver",
+    "SystemGERG2004Eos",
+    "SystemGERGwaterEos",
+]
+
+[[package]]
+id = "tier3.hydrogen_and_cryogenic.port"
+tier = 3
+title = "Hydrogen and cryogenic"
+state = "port"
+loc = 1233
+deps = 9
+capture = ""
+new_solver = false
+size = "M"
+classes = [
+    "HydrideStorageScreening",
+    "PHflashGERG2008",
+    "PHflashLeachman",
+    "PSFlashGERG2008",
+    "PSFlashLeachman",
+    "ParaOrthoH2Correction",
+    "SystemGERG2008Eos",
+]
+
+[[package]]
+id = "tier3.leachman.port"
+tier = 3
+title = "Leachman"
+state = "port"
+loc = 1094
+deps = 21
+capture = "validation/neqsim/GeGamma.java"
+new_solver = true
+size = "M"
+classes = [
+    "ComponentLeachmanEos",
+    "NeqSimLeachman",
+    "PhaseLeachmanEos",
+    "SystemLeachmanEos",
+]
+
+[[package]]
+id = "tier3.wax.port"
+tier = 3
+title = "Wax"
+state = "port"
+loc = 1908
+deps = 10
+capture = "validation/neqsim/WaxModelProbe.java"
+new_solver = false
+size = "M"
+classes = [
+    "ComponentCoutinhoWax",
+    "ComponentWaxWilson",
+    "ComponentWonWax",
+    "WATcalc",
+    "WaxCharacterise",
+    "WaxCurveCalculator",
+    "WaxModelCorrelations",
+]
+
+[[package]]
+id = "tier3.hydrate.unreachable"
+tier = 3
+title = "Hydrate"
+state = "unreachable"
+loc = 749
+deps = 5
+capture = ""
+new_solver = false
+size = "S"
+blocked_by = "unreachable upstream"
+classes = [
+    "ComponentHydrateBallard",
+    "ComponentHydrateKluda",
+    "ComponentHydrateStatoil",
+]
+
+[[package]]
+id = "tier4.adsorption.internal"
+tier = 4
+title = "Adsorption"
+state = "internal"
+loc = 517
+deps = 2
+capture = ""
+new_solver = false
+size = "S"
+classes = [
+    "AbstractAdsorptionModel",
+    "AdsorptionInterface",
+    "IsothermType",
+]
+
+[[package]]
+id = "tier4.cpa.internal"
+tier = 4
+title = "CPA"
+state = "internal"
+loc = 70
+deps = 2
+capture = ""
+new_solver = true
+size = "S"
+classes = [
+    "CPAMixingRuleType",
+]
+
+[[package]]
+id = "tier4.plumbing.internal"
+tier = 4
+title = "Plumbing"
+state = "internal"
+loc = 388
+deps = 2
+capture = "validation/neqsim/GeGamma.java"
+new_solver = false
+size = "S"
+classes = [
+    "CPAContribution",
+    "FluidPropertyEstimator",
+]
+
+[[package]]
+id = "tier4.solids.internal"
+tier = 4
+title = "Solids"
+state = "internal"
+loc = 491
+deps = 9
+capture = "validation/neqsim/AsphalteneOnsetProbe.java"
+new_solver = false
+size = "S"
+classes = [
+    "ComponentSolid",
+    "PhasePureComponentSolid",
+    "SolidHelmholtzEquation",
+    "SolidPhysicalPropertyMethod",
+]
+
+[[package]]
+id = "tier4.adsorption.port"
+tier = 4
+title = "Adsorption"
+state = "port"
+loc = 2329
+deps = 7
+capture = ""
+new_solver = false
+size = "M"
+classes = [
+    "BETAdsorption",
+    "CapillaryCondensationModel",
+    "FreundlichAdsorption",
+    "LangmuirAdsorption",
+    "PotentialTheoryAdsorption",
+    "SipsAdsorption",
+]
+
+[[package]]
+id = "tier4.amines.port"
+tier = 4
+title = "Amines"
+state = "port"
+loc = 1332
+deps = 5
+capture = ""
+new_solver = false
+size = "M"
+classes = [
+    "AmineHeatOfAbsorption",
+    "AmineKentEisenberg",
+    "AmineSystem",
+]
+
+[[package]]
+id = "tier4.cpa.port"
+tier = 4
+title = "CPA"
+state = "port"
+loc = 9489
+deps = 27
+capture = "validation/neqsim/CpaSchemeProbe.java"
+new_solver = true
+size = "L"
+classes = [
+    "CPAMixingRuleHandler",
+    "ComponentPrCPA",
+    "ComponentSrkCPA",
+    "ComponentSrkCPAMM",
+    "ComponentSrkCPAs",
+    "ComponentUMRCPA",
+    "PhaseSrkCPABroydenImplicit",
+    "PhaseSrkCPAandersonMixing",
+    "PhaseSrkCPAandersonReduced",
+    "PhaseSrkCPAfullyImplicit",
+    "PhaseSrkCPAfullyImplicitReduced",
+    "PhaseSrkCPAreduced",
+    "PhaseSrkCPAs",
+    "SystemPrCPA",
+    "SystemSrkCPA",
+    "SystemSrkCPAs",
+    "SystemSrkCPAstatoil",
+    "SystemSrkCPAstatoilAndersonMixing",
+    "SystemSrkCPAstatoilAndersonReduced",
+    "SystemSrkCPAstatoilBroydenImplicit",
+    "SystemSrkCPAstatoilFullyImplicit",
+    "SystemSrkCPAstatoilFullyImplicitReduced",
+    "SystemSrkCPAstatoilReduced",
+]
+
+[[package]]
+id = "tier4.humid_air.port"
+tier = 4
+title = "Humid air"
+state = "port"
+loc = 145
+deps = 1
+capture = ""
+new_solver = false
+size = "S"
+classes = [
+    "HumidAir",
+]
+
+[[package]]
+id = "tier4.mercury.port"
+tier = 4
+title = "Mercury"
+state = "port"
+loc = 762
+deps = 8
+capture = ""
+new_solver = false
+size = "M"
+classes = [
+    "MercuryFluidConverter",
+    "MercuryPhaseEquilibrium",
+]
+
+[[package]]
+id = "tier4.minerals.port"
+tier = 4
+title = "Minerals"
+state = "port"
+loc = 3286
+deps = 8
+capture = ""
+new_solver = false
+size = "L"
+classes = [
+    "MineralH2SBuffers",
+    "MineralMercuryBuffers",
+    "ReservoirH2SEstimator",
+    "ReservoirMercuryEstimator",
+    "SolidGasReactionEquilibrium",
+    "StandardStateSpecies",
+]
+
+[[package]]
+id = "tier4.reference_equations_of_state.port"
+tier = 4
+title = "Reference equations of state"
+state = "port"
+loc = 2467
+deps = 25
+capture = "validation/neqsim/GeGamma.java"
+new_solver = false
+size = "M"
+classes = [
+    "ComponentEOSCGEos",
+    "ComponentSpanWagnerEos",
+    "ComponentVegaEos",
+    "EOSCGSaturationVUFlash",
+    "NeqSimVega",
+    "PHflashVega",
+    "PSFlashVega",
+    "PhaseEOSCGEos",
+    "PhaseSpanWagnerEos",
+    "PhaseVegaEos",
+    "SystemEOSCGEos",
+    "SystemSpanWagnerEos",
+    "SystemVegaEos",
+    "methaneBWR32",
+]
+
+[[package]]
+id = "tier4.saft.port"
+tier = 4
+title = "SAFT"
+state = "port"
+loc = 3457
+deps = 17
+capture = "validation/neqsim/PcsaftCompositionProbe.java"
+new_solver = true
+size = "L"
+classes = [
+    "ComponentPCSAFT",
+    "ComponentPCSAFTa",
+    "ComponentSAFTVRMie",
+    "PhasePCSAFTRahmat",
+    "PhasePCSAFTa",
+    "SystemPCSAFT",
+    "SystemPCSAFTa",
+    "SystemSAFTVRMie",
+]
+
+[[package]]
+id = "tier4.solids.port"
+tier = 4
+title = "Solids"
+state = "port"
+loc = 552
+deps = 15
+capture = ""
+new_solver = false
+size = "M"
+classes = [
+    "ComponentSolidHelmholtzEos",
+    "Density",
+    "PHsolidFlash",
+    "PhaseSolidComplex",
+    "SolidHelmholtzState",
+    "SystemSolidHelmholtzEos",
+]
+
+[[package]]
+id = "tier4.sulfur.port"
+tier = 4
+title = "Sulfur"
+state = "port"
+loc = 327
+deps = 0
+capture = ""
+new_solver = false
+size = "S"
+classes = [
+    "SulfurThermodynamics",
+]
+
+[[package]]
+id = "tier4.umr.port"
+tier = 4
+title = "UMR"
+state = "port"
+loc = 1140
+deps = 10
+capture = "validation/neqsim/GeGamma.java"
+new_solver = true
+size = "M"
+classes = [
+    "ComponentUMRCPAvolcor",
+    "PhaseUMRCPAvolcor",
+    "SystemUMRCPAEoS",
+    "SystemUMRCPAvolcor",
+    "SystemUMRPRUMCEos",
+    "SystemUMRPRUMCEosNew",
+]
+
+[[package]]
+id = "tier4.solids.unreachable"
+tier = 4
+title = "Solids"
+state = "unreachable"
+loc = 448
+deps = 10
+capture = ""
+new_solver = false
+size = "S"
+blocked_by = "unreachable upstream"
+classes = [
+    "SolidFlash12",
+    "SystemArgonSolidHelmholtzEos",
+]
+
+[[package]]
+id = "tier3.wax_pedersen"
+tier = 3
+title = "Wax default-model provenance"
+state = "internal"
+loc = 44
+deps = 3
+capture = ""
+new_solver = false
+size = "S"
+classes = [
+    "ComponentWax",
+]

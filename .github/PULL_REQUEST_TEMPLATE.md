@@ -48,8 +48,9 @@ None, or:
 
 ## Checklist
 
-- [ ] `python tools/test_scope.py --checks-only --run` passed before the last push; it runs
-      the generators' `--check`, `ruff`, `mypy`, `cargo fmt --check` and the spec checks
+- [ ] `python tools/test_scope.py --run` (the commit lane) passed before the last push; it
+      runs the diff's tests, `ruff`/`rustfmt` on the changed files, `mypy`, and the spec
+      checks its trees reach
 - [ ] The push run is green — link:
 - [ ] `mdbook build docs` and `python tools/check_links.py` (docs changes)
 - [ ] Commits are signed

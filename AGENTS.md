@@ -119,9 +119,11 @@ and not sufficient. Before the chain can run, these must exist, in this order:
    matrix, a boolean, a record list), with the model's own test that reads it;
 5. the generator chain, then `gen_ui_fixtures.py`.
 
-Then commit, run `--checks-only`, and push; CI runs the push lane. A close-out tranche runs
-once. Rerunning the same test file while editing is the symptom of a missing behaviour table
-or an unvalidated first kernel; fix the table, not the loop.
+Then commit, run `python tools/test_scope.py --run` (the commit lane: the diff's checks and
+tests), and push; CI runs the push lane. `--checks-only --run` is the same checks without the
+tests. A close-out tranche runs once. Rerunning the same test file while editing is the
+symptom of a missing behaviour table or an unvalidated first kernel; fix the table, not the
+loop.
 
 ### Before blaming the diff: the base red
 

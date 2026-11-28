@@ -5,7 +5,8 @@
     python tools/test_scope.py --staged            # against the index
     python tools/test_scope.py --explain           # and say why each command is there
     python tools/test_scope.py --estimate          # the minutes, before they are spent
-    python tools/test_scope.py --run               # the edit lane, in order (budget 5 min)
+    python tools/test_scope.py --run               # the commit lane, in order (budget 5 min)
+    python tools/test_scope.py --checks-only --run # the commit's checks, no tests
     python tools/test_scope.py --lane tranche --run  # the close-out lane (budget 20 min)
     python tools/test_scope.py --lane nightly      # the whole thing, printed (CI runs it)
     python tools/test_scope.py --audit             # every tracked path, through the table
@@ -23,11 +24,14 @@ it comes back green. Seven namespaces did exactly that until `--audit` walked th
 
 # The lanes
 
-`iterate` is the inner loop, and is what `--run` uses when no lane is named: the scoped set
-with the `slow_sweep`-marked sweeps deselected **by marker**. A marked test is a registry-wide
-sweep, so `-k` cannot reach inside it; the marker lives on the test rather than in a list here
-because a list went stale, and could not see the 462-second layer diff at all until someone
-timed the suite.
+`iterate` is the commit lane, and is what `--run` uses when no lane is named: the scoped set
+with the `slow_sweep`-marked sweeps deselected **by marker**, preceded by the diff's narrow
+checks. A marked test is a registry-wide sweep, so `-k` cannot reach inside it; the marker
+lives on the test rather than in a list here because a list went stale, and could not see the
+462-second layer diff at all until someone timed the suite. The narrow checks are the lint a
+commit needs - ruff and rustfmt on the changed files, whole-package mypy when Python changed,
+and the spec/port bundle when its trees changed - so the flat CI set is not the only way to
+get one. `--checks-only` is that set without the tests.
 
 `push` is what CI runs for a scoped diff. It also deselects the marked sweeps - the nightly is
 where they run - and adds the five unconditional jobs' commands.
@@ -61,6 +65,7 @@ import ast
 import contextlib
 import os
 import re
+import shlex
 import signal
 import subprocess
 import sys
@@ -93,6 +98,11 @@ MARKER = "slow_sweep"
 
 #: A command's kind, which decides how it is wrapped and whether the lane can narrow it.
 CARGO, CLIPPY, PYTEST, SCRIPT = "cargo", "clippy", "pytest", "script"
+
+#: `rustfmt` on named files. The commit lane's Rust format check: `cargo fmt --all` is refused
+#: because it reformats other sessions' files, and a full-tree check is the push lane's.
+RUSTFMT = "rustfmt"
+RUST_KINDS = (CARGO, CLIPPY, RUSTFMT)
 
 #: Where a tool can live: the generators and checkers, and the hooks.
 TOOL_DIRS = (ROOT / "tools", ROOT / ".claude" / "hooks")
@@ -170,6 +180,16 @@ CLOSE_OUT: tuple[Command, ...] = (
         "every spec names its NeqSim source and every value its provenance",
         SCRIPT,
         "python tools/check_port.py",
+    ),
+    Command(
+        "every physics class is owned by the port backlog or a spec",
+        SCRIPT,
+        "python tools/check_port_backlog.py",
+    ),
+    Command(
+        "a new spec class is in the Port-Item scope",
+        SCRIPT,
+        "python tools/check_port_item.py",
     ),
     Command("the skill catalog", SCRIPT, "python tools/validate_skills.py"),
     Command("the guard theorems' ownership", SCRIPT, "python tools/check_guards.py"),
@@ -391,9 +411,10 @@ LANE_BUDGET_MINUTES: dict[str, int] = {
     "nightly": 60,
 }
 
-#: The preflight runs no tests, but a spec or workflow change reaches the whole 23-generator
-#: chain. The edit lane's five minutes is not enough for that, and the preflight is not a lane.
-CHECKS_BUDGET_MINUTES = 15
+#: The commit lane's checks: no tests, no `CLOSE_OUT`, and the same five-minute ceiling as the
+#: lane that carries them. The 15-minute figure this replaces was the whole flat CI set run
+#: repo-wide, which is the preflight loop the split exists to end.
+CHECKS_BUDGET_MINUTES = 5
 
 #: **Which generators a diff can make stale.** Conservative by design: a miss here is caught
 #: by CI's unconditional `spec-validate` and the drift job, so the cost is one stale file
@@ -417,6 +438,7 @@ SPEC_GENERATORS = frozenset(
         "gen_python_result",
         "gen_python_transport",
         "gen_python_wrappers",
+        "gen_port_checklist",
         "gen_reaction_data",
         "gen_registry",
         "gen_safety",
@@ -430,13 +452,14 @@ RUST_GENERATORS = SPEC_GENERATORS
 #: A hand-written Python reference module is hashed into the provenance block `gen_registry`
 #: emits; nothing else generated reads it.
 PYTHON_GENERATORS = frozenset({"gen_registry"})
-DATA_GENERATORS = frozenset({"gen_databank", "gen_keycard"})
+DATA_GENERATORS = frozenset({"gen_databank", "gen_keycard", "gen_port_checklist"})
 CAPTURE_GENERATORS = frozenset({"gen_neqsim_cases"})
 
 #: A tree that cannot make any generated file stale.
 QUIET_TREES = (
     "docs/",
     f"{TESTS}/",
+    "AGENTS.md",
     "CLAUDE.md",
     "README.md",
     "ROADMAP.md",
@@ -1077,7 +1100,7 @@ def claims(path: str) -> Claim:
         # The NeqSim captures: read by `python/tests/validation`, which its own job runs.
         return Claim(data=True, jobs=("validation",))
 
-    if parts[0] == "docs" or path in ("README.md", "ROADMAP.md"):
+    if parts[0] == "docs" or path in ("README.md", "ROADMAP.md", "PORT.md"):
         return Claim(docs=True)
 
     if path in ("Cargo.lock", "rust-toolchain.toml"):
@@ -1170,6 +1193,26 @@ def generator_of(path: str) -> str | None:
     return found.group(1) if found else None
 
 
+@cache
+def generators_importing_tool(stem: str) -> frozenset[str]:
+    """The `gen_*` tools that import `stem`, so a changed helper narrows to its consumers.
+
+    A non-`gen_*` tool that is imported by a generator can make that generator's output stale.
+    Returning `None` for it - the old fallback - ran all 27 generators for a one-line helper
+    change, which is the largest single cost the commit lane has to avoid.
+    """
+    pattern = re.compile(
+        rf"^\s*(?:from\s+{re.escape(stem)}\s+import|import\s+{re.escape(stem)}(?:\s|$))",
+        re.MULTILINE,
+    )
+    found = {
+        tool.stem
+        for tool in sorted(TOOLS.glob("gen_*.py"))
+        if pattern.search(tool.read_text(encoding="utf-8", errors="replace"))
+    }
+    return frozenset(found)
+
+
 def triggered_generators(paths: list[str]) -> frozenset[str] | None:
     """The generators this diff can make stale, or None for "ask all of them".
 
@@ -1185,8 +1228,14 @@ def triggered_generators(paths: list[str]) -> frozenset[str] | None:
                 return None
             names.add(generator)
             continue
-        if path.startswith("tools/gen_") and path.endswith(".py"):
-            names.add(Path(path).stem)
+        if path.startswith("tools/") and path.endswith(".py"):
+            stem = Path(path).stem
+            # A generator's own change is its own check; a helper narrows to the generators
+            # that import it, and a tool no generator imports names none.
+            if stem.startswith("gen_"):
+                names.add(stem)
+            else:
+                names |= generators_importing_tool(stem)
             continue
         matched = False
         for prefix, generators in (
@@ -1473,21 +1522,161 @@ def cheap_first(commands: list[Command]) -> list[Command]:
     return [e for e in commands if is_cheap(e)] + [e for e in commands if not is_cheap(e)]
 
 
-def checks_only(commands: list[Command]) -> list[Command]:
-    """The cheap half alone: the diff's generator checks and every unconditional CI step.
+#: The checks every commit earns. `check_port_item` is deliberately absent: it reads
+#: `origin/main..HEAD` and cannot see an uncommitted spec, so it is the push lane's.
+NARROW_ALWAYS: tuple[Command, ...] = (
+    Command("the guard in the working tree", SCRIPT, "python tools/check_guard.py"),
+    Command("every tracked path claims something", SCRIPT, "python tools/test_scope.py --audit"),
+)
 
-    `CLOSE_OUT` is added whatever the lane, because those are the five jobs CI runs on every
-    push - the preflight is the same set on a developer's machine. `is_cheap` excludes the
-    notebook run, which starts kernels and is minutes rather than seconds.
+#: The checks a spec change earns: the artifacts read each other, so they run together.
+NARROW_SPEC: tuple[Command, ...] = (
+    Command("the schemas and the semantic rules", SCRIPT, "python tools/spec_lint.py"),
+    Command("the porting refusals, in all three places", SCRIPT, "python tools/check_unported.py"),
+    Command(
+        "every spec names its NeqSim source and every value its provenance",
+        SCRIPT,
+        "python tools/check_port.py",
+    ),
+    Command(
+        "every physics class is owned by the port backlog or a spec",
+        SCRIPT,
+        "python tools/check_port_backlog.py",
+    ),
+    Command("the port checklist is current", SCRIPT, "python tools/gen_port_checklist.py --check"),
+)
+
+#: The two checks the port inventory's own inputs earn.
+NARROW_PORT_DATA: tuple[Command, ...] = (
+    Command(
+        "every physics class is owned by the port backlog or a spec",
+        SCRIPT,
+        "python tools/check_port_backlog.py",
+    ),
+    Command("the port checklist is current", SCRIPT, "python tools/gen_port_checklist.py --check"),
+)
+
+
+def merge_unique(first: list[Command], second: list[Command]) -> list[Command]:
+    """Both lists in order, one entry per (command, jobs) - the same key `scope` dedupes on."""
+    seen: set[tuple[str, tuple[str, ...]]] = set()
+    out: list[Command] = []
+    for entry in first + second:
+        key = (entry.command, entry.jobs)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(entry)
+    return out
+
+
+def narrow_checks(paths: list[str], commands: list[Command]) -> list[Command]:
+    """The checks a commit earns: the diff's own, and no repo-wide flat job.
+
+    **The file-scoped checks are file-scoped because they are file-local.** `ruff` and
+    `rustfmt` are; `mypy` is not - a changed signature breaks a dependent the diff does not
+    touch, and mypy follows imports outward, not inward - so the type check is whole-package
+    and incremental. The spec bundle runs when the trees it reads change. Deleted paths are
+    dropped before they reach a formatter.
     """
-    seen = {entry.command for entry in commands}
-    union = list(commands) + [entry for entry in CLOSE_OUT if entry.command not in seen]
-    cheap = [entry for entry in union if is_cheap(entry)]
-    # **The sweep is the slow half of the cheap half.** A lint or spec failure should stop the
-    # preflight before fifteen minutes of generators, not after.
-    return [entry for entry in cheap if not is_generator_check(entry)] + [
-        entry for entry in cheap if is_generator_check(entry)
+    existing = [
+        entry
+        for entry in commands
+        if entry.kind == SCRIPT and not is_generator_check(entry) and entry.command != "true"
     ]
+    checks = list(NARROW_ALWAYS)
+    python = [
+        path
+        for path in paths
+        if path.startswith("python/") and path.endswith(".py") and (ROOT / path).is_file()
+    ]
+    if python:
+        files = " ".join(shlex.quote(path) for path in python)
+        checks += [
+            Command(
+                "changed Python, linted",
+                SCRIPT,
+                f".venv/bin/ruff check --force-exclude {files}",
+                jobs=("python-lint",),
+            ),
+            Command(
+                "changed Python, formatted",
+                SCRIPT,
+                f".venv/bin/ruff format --check --force-exclude {files}",
+                jobs=("python-lint",),
+            ),
+            # Whole-package: a subset misses the dependents a signature change breaks.
+            Command("the strict type check", SCRIPT, ".venv/bin/mypy", jobs=("python-lint",)),
+        ]
+    # The tools are Python too. CI's ruff reads `python/src` and `python/tests` only, so a
+    # changed tool is linted here and not formatted against a convention its tree never had.
+    tools = [
+        path
+        for path in paths
+        if path.startswith(("tools/", ".claude/hooks/"))
+        and path.endswith(".py")
+        and (ROOT / path).is_file()
+    ]
+    if tools:
+        files = " ".join(shlex.quote(path) for path in tools)
+        checks.append(
+            Command(
+                "changed tooling, linted",
+                SCRIPT,
+                f".venv/bin/ruff check --force-exclude {files}",
+                jobs=("python-lint",),
+            )
+        )
+    rust = [path for path in paths if path.endswith(".rs") and (ROOT / path).is_file()]
+    if rust:
+        files = " ".join(shlex.quote(path) for path in rust)
+        checks.append(
+            Command(
+                "changed Rust, formatted",
+                RUSTFMT,
+                f"rustfmt --edition 2024 --check {files}",
+                jobs=("rust-lint",),
+            )
+        )
+    if any(path.startswith("specs/") for path in paths):
+        checks += list(NARROW_SPEC)
+    elif any(path.startswith(("crates/", "python/src/azoth/")) for path in paths):
+        checks.append(
+            Command(
+                "the porting refusals, in all three places",
+                SCRIPT,
+                "python tools/check_unported.py",
+            )
+        )
+    if any(path.startswith(("databank/", "data/neqsim/")) for path in paths):
+        checks += list(NARROW_PORT_DATA)
+    if any(
+        path.startswith(("docs/", "specs/", "skills/", "agents/")) or path.endswith(".md")
+        for path in paths
+    ):
+        checks.append(Command("the prose standard", SCRIPT, "python tools/prose_lint.py"))
+    return merge_unique(checks, existing)
+
+
+def commit_commands(paths: list[str], commands: list[Command]) -> list[Command]:
+    """The commit lane: its checks first, then the diff's tests and generator checks."""
+    return merge_unique(narrow_checks(paths, commands), cheap_first(commands))
+
+
+def checks_only(paths: list[str], commands: list[Command]) -> list[Command]:
+    """The commit lane's checks alone: no `CLOSE_OUT`, no tests, no build.
+
+    This is the command an agent reaches for while editing. It is the diff's narrow set plus
+    the generator checks the diff triggered - seconds to a minute, not the 26 flat jobs CI
+    runs on every push. Those are the `push` lane's.
+    """
+    narrow = narrow_checks(paths, commands)
+    checks = [entry for entry in narrow if not is_generator_check(entry)]
+    sweeps = merge_unique(
+        [entry for entry in narrow if is_generator_check(entry)],
+        [entry for entry in commands if is_generator_check(entry)],
+    )
+    return checks + sweeps
 
 
 def rust_scope(crates: set[str], edges: dict[str, set[str]]) -> list[Command]:
@@ -1722,7 +1911,7 @@ def scope(paths: list[str], edges: dict[str, set[str]]) -> tuple[list[Command], 
             # anything else - a hook, a helper - is covered by its own test and by nothing
             # here. Asking a tool for a flag it does not take is an argparse failure dressed as
             # a test, and a rule that cannot be satisfied teaches a reader to ignore the tool.
-            if tool.startswith("gen_"):
+            if tool.startswith("gen_") and tool not in UNCHECKABLE:
                 commands.append(
                     Command(
                         f"the generator that changed: {tool}",
@@ -2136,13 +2325,24 @@ def estimate_seconds(entry: Command) -> int:
         return ESTIMATE_GENERATORS.get(stem, 2)
     if entry.kind in (CARGO, CLIPPY) or entry.command.endswith("/maturin develop"):
         return ESTIMATE_CARGO
+    if entry.kind == RUSTFMT:
+        return 2
+    if "/mypy" in entry.command:
+        return 45
+    if "/ruff" in entry.command:
+        return 2
     return 3
 
 
 def run_with_watchdog(
     labelled: list[tuple[str, str]], budget_seconds: int | None, lane: str
 ) -> int:
-    """Run the lines, killing the whole process group when the lane's budget is spent."""
+    """Run the lines, killing the whole process group when the lane's budget is spent.
+
+    **Every command reports its wall clock.** A run whose cost is invisible is how a
+    55-command preflight was spent four times in one session; the timings are the evidence a
+    reader needs to stop and ask before the next repeat.
+    """
     start = time.monotonic()
     for reason, line in labelled:
         remaining = None if not budget_seconds else budget_seconds - (time.monotonic() - start)
@@ -2150,16 +2350,21 @@ def run_with_watchdog(
             print(f"\ntest_scope: the {lane} budget of {budget_seconds // 60} min is spent")
             return 1
         print(f"\n== {reason}\n== {line}", flush=True)
+        started = time.monotonic()
         process = subprocess.Popen(line, shell=True, cwd=ROOT, start_new_session=True)
         try:
             code = process.wait(timeout=remaining)
         except subprocess.TimeoutExpired:
+            elapsed = time.monotonic() - started
             _terminate(process)
-            print(f"\ntest_scope: the {lane} budget is spent at: {line}")
+            print(f"\ntest_scope: the {lane} budget is spent after {elapsed:.1f}s at: {line}")
             return 1
+        elapsed = time.monotonic() - started
         if code != 0:
-            print(f"\ntest_scope: failed: {line}")
+            print(f"\ntest_scope: failed after {elapsed:.1f}s: {line}")
             return 1
+        print(f"== ok in {elapsed:.1f}s", flush=True)
+    print(f"\ntest_scope: the {lane} set passed in {time.monotonic() - start:.1f}s")
     return 0
 
 
@@ -2466,7 +2671,7 @@ def main() -> int:
     parser.add_argument(
         "--checks-only",
         action="store_true",
-        help="the generators' --check and the five flat CI jobs' commands; no build or tests",
+        help="the diff's narrow checks and generators; no repo-wide flat jobs, build or tests",
     )
     parser.add_argument(
         "--audit",
@@ -2504,7 +2709,17 @@ def main() -> int:
     if args.audit:
         return audit()
 
-    # **`--run` is the edit lane unless told otherwise.** A local run that silently reaches the
+    if args.full and args.checks_only:
+        # Two meanings collide: `--checks-only` is the diff's narrow set, `--full` is the whole
+        # surface. Running the narrow set with no diff would check nothing and call it green.
+        print(
+            "test_scope: --checks-only is the diff's narrow checks and --full is the whole "
+            "surface. Run one or the other.",
+            file=sys.stderr,
+        )
+        return 2
+
+    # **`--run` is the commit lane unless told otherwise.** A local run that silently reaches the
     # whole suite is the hour this tool exists to prevent; the close-out is explicit.
     lane = args.lane or ("iterate" if args.run else "push")
     if args.full:
@@ -2552,16 +2767,25 @@ def main() -> int:
         # the diff's corner of it.
         paths: list[str] = []
         commands, unclaimed = full_surface(), []
+        commands = cheap_first(commands)
     else:
         paths = changed_paths(args)
         commands, unclaimed = scope(paths, crate_edges())
-        if lane in ("push", "tranche"):
+        if args.checks_only:
+            # **The commit lane's checks, not the five flat jobs.** The flat jobs are the push
+            # lane's; running them per commit is the 15-minute loop this split ends.
+            commands = checks_only(paths, commands)
+        elif lane in ("push", "tranche"):
             # **The push and the close-out also run what the diff does not reach**, because CI
             # does: the five `ALWAYS_JOBS` are flat-cost and unconditional. Deduplicated by
             # command, since a docs change already claims `check_doc_claims` itself.
             seen = {entry.command for entry in commands}
             commands += [entry for entry in CLOSE_OUT if entry.command not in seen]
-    commands = cheap_first(commands)
+            commands = cheap_first(commands)
+        else:
+            # **The commit lane: its checks first, then what the diff reaches.** The default
+            # `--run` now carries the lint, so the preflight is not the only way to get one.
+            commands = commit_commands(paths, commands)
     if args.explain:
         if args.full:
             print("# the full surface, not the diff")
@@ -2601,15 +2825,13 @@ def main() -> int:
         return 0
 
     if args.only == "rust":
-        commands = [entry for entry in commands if entry.kind in (CARGO, CLIPPY)]
+        commands = [entry for entry in commands if entry.kind in RUST_KINDS]
     elif args.only == "python":
-        # Everything that is not a cargo invocation: the pytest targets, the generator
+        # Everything that is not a Rust invocation: the pytest targets, the generator
         # checks, the doc checkers and the extension rebuild.
-        commands = [entry for entry in commands if entry.kind not in (CARGO, CLIPPY)]
+        commands = [entry for entry in commands if entry.kind not in RUST_KINDS]
     if args.job:
         commands = [entry for entry in commands if args.job in jobs_of(entry)]
-    if args.checks_only:
-        commands = checks_only(commands)
     if args.verify_selection:
         return verify_selection(commands)
     if not commands:
@@ -2657,7 +2879,7 @@ def main() -> int:
         # **A run always shows its estimate first**, so the transcript carries the minutes
         # before the budget is spent.
         minutes = sum(estimate_seconds(entry) for entry in commands) / 60
-        where = "checks-only preflight" if args.checks_only else f"{lane} lane"
+        where = "narrow-checks run" if args.checks_only else f"{lane} lane"
         print(f"# estimated: {minutes:.1f} min against a {budget}-minute {where}")
         if budget and minutes > budget:
             print(f"# WARNING: over the {lane} budget; the tranche lane is the close-out")

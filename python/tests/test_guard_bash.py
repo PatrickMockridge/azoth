@@ -54,7 +54,7 @@ def test_the_whole_tree_needs_the_visible_token() -> None:
 
 
 def test_the_scoped_runner_refuses_its_own_whole_tree_modes() -> None:
-    """A local `--run` is the edit lane; the whole tree is nightly and needs the token."""
+    """A local `--run` is the commit lane; the whole tree is nightly and needs the token."""
     assert _allowed("python tools/test_scope.py --run")
     assert _allowed("python tools/test_scope.py --lane tranche --run")
     assert _allowed("python tools/test_scope.py --lane nightly --no-gate")
@@ -97,6 +97,14 @@ def test_the_push_lane_is_ci_and_needs_the_visible_token() -> None:
     assert not _allowed("python tools/test_scope.py --lane push --run")
     assert _allowed("AZOTH_LOCAL_LANE=1 python tools/test_scope.py --lane push --run")
     assert not _allowed("echo AZOTH_LOCAL_LANE=1; python tools/test_scope.py --lane push --run")
+
+
+def test_the_push_refusal_points_at_the_commit_lane() -> None:
+    """The old message sent every local push attempt into the 15-minute preflight."""
+    allow, reason = _guard().decide("python tools/test_scope.py --lane push --run")
+    assert not allow
+    assert "commit lane" in (reason or "")
+    assert "--checks-only --run" not in (reason or "")
 
 
 def test_an_hour_long_heavy_command_is_refused() -> None:

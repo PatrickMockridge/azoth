@@ -36,41 +36,48 @@ of this file.
   Rerunning a test file while editing is the symptom of a missing table.
 - **One order for the edits** — kernel and spec, generators, build, test — so no file is
   regenerated twice. Format and lint are checks, not editors.
-- **`--checks-only` before every push; CI runs the push lane.** A local push lane is
-  refused unless `AZOTH_LOCAL_LANE=1`; a tranche runs once at close-out.
+- **The commit lane before each commit; CI runs the PR gate.** `python tools/test_scope.py
+  --run` is the commit lane: the diff's tests and its narrow checks, 5 minutes, dirty tree
+  allowed. `--checks-only --run` is the same checks without the tests, seconds. The push
+  lane is CI's and runs once per PR; a local copy needs `AZOTH_LOCAL_LANE=1`, and a tranche
+  runs once at close-out.
 
 ## Running tests and builds
 
 This box has 47 GiB RAM and 2 GiB swap, with no OOM guard (`systemd-oomd` inactive,
 `earlyoom` absent), so a runaway thrashes the desktop instead of failing one process.
 
-- **`python tools/test_scope.py --run` is the gate, and it is the edit lane by default.** It
-  reads the diff and runs what it reaches: the crates whose sources changed *and every crate
-  that depends on them*, and the Python mirror of each of those crates — a kernel change runs
-  `test_cross_impl.py`, because that agreement test is the whole reason every calculation is
-  written twice. A path it cannot place is an error rather than a shrug, and so is a path a
-  rule *claims and then places nowhere*. `--explain` says why each command is there; the
-  generator subset is the diff's (a test or docs change asks none, a generated file asks its
-  own), and the checks run first, because a stale generated file is minutes to find and an
-  hour to be told about by a test.
-- **Four lanes, each with a wall-clock budget.** `iterate` is the default for `--run`: the
-  scoped set, no close-out, the `slow_sweep`-marked sweeps deselected, 5 minutes. `push` is
-  CI's scoped lane and also deselects them, 15 minutes. `tranche` is the close-out: the push
-  set with each reached sweep narrowed to the ids the scope selected, 20 minutes. `nightly`
-  is the whole tree, 60 minutes, and it is CI's — `--lane nightly --run` is refused and
-  `--full` forces that render. `--estimate` prints the minutes before they are spent, and
-  every `--run` prints the estimate first. **The budgets are ceilings: `--max-minutes` may
-  only lower one** — a diff too wide for the push lane is `--lane tranche` (20 minutes) or
-  CI, never a longer push. A local run that spends its budget kills the whole process
-  group. **Never run `pytest python/tests`; it is nightly-only and the guard refuses it.**
+- **`python tools/test_scope.py --run` is the gate, and it is the commit lane by default.**
+  It reads the diff and runs what it reaches: the crates whose sources changed *and every
+  crate that depends on them*, and the Python mirror of each of those crates — a kernel
+  change runs `test_cross_impl.py`, because that agreement test is the whole reason every
+  calculation is written twice. A path it cannot place is an error rather than a shrug, and
+  so is a path a rule *claims and then places nowhere*. `--explain` says why each command is
+  there; the generator subset is the diff's (a test or docs change asks none, a generated
+  file asks its own), and the checks run first, because a stale generated file is minutes to
+  find and an hour to be told about by a test. The checks are the diff's narrow set —
+  `ruff` and `rustfmt` on the changed files, whole-package `mypy` when Python changed, and
+  the spec/port checks when their trees changed — not the five flat jobs CI runs on every
+  push.
+- **Four lanes, each with a wall-clock budget.** `iterate` is the commit lane and the default
+  for `--run`: the diff's narrow checks and tests, no close-out, the `slow_sweep`-marked
+  sweeps deselected, 5 minutes. `push` is the PR lane CI runs: the scoped tests plus all the
+  unconditional CI checks, 15 minutes. `tranche` is the close-out: the push set with each
+  reached sweep narrowed to the ids the scope selected, 20 minutes. `nightly` is the whole
+  tree, 60 minutes, and it is CI's — `--lane nightly --run` is refused and `--full` forces
+  that render. `--estimate` prints the minutes before they are spent, and every `--run`
+  prints the estimate first. **The budgets are ceilings: `--max-minutes` may only lower
+  one** — a diff too wide for the push lane is `--lane tranche` (20 minutes) or CI, never a
+  longer push. A local run that spends its budget kills the whole process group. **Never
+  run `pytest python/tests`; it is nightly-only and the guard refuses it.**
   `AZOTH_PYTEST_WORKERS` (`0` disables) sets the xdist worker count.
 - **A push or tranche lane runs against a commit.** `--lane push|tranche --run` refuses a
   dirty tree; `--lane iterate` (5 minutes) is the dirty-tree lane. Commit the slice, run
-  `python tools/test_scope.py --checks-only --run`, push, and report CI's run in the next
-  message; the push lane is CI's, and a local copy is refused unless `AZOTH_LOCAL_LANE=1`.
-  A tranche runs once at close-out. **No single heavy command runs longer than 30
-  minutes** — `tools/gated.sh` enforces that ceiling and the lane budgets are tighter. An
-  hour-long test is not something an agent starts on its own.
+  `python tools/test_scope.py --run` (the commit lane), push, and report CI's run in the
+  next message; the push lane is CI's, and a local copy is refused unless
+  `AZOTH_LOCAL_LANE=1`. A tranche runs once at close-out. **No single heavy command runs
+  longer than 30 minutes** — `tools/gated.sh` enforces that ceiling and the lane budgets are
+  tighter. An hour-long test is not something an agent starts on its own.
 - **Three checks say whether the scoped set is worth trusting.** `--audit` walks every
   tracked path through the table, so the day a directory is added and no rule knows it the
   gate says so; `--verify-selection` collects every emitted target and refuses one that
