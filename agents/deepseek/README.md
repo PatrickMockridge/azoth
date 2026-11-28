@@ -64,7 +64,7 @@ with a pump sizing, the demo separator, and relief and fire questions.
 - **`azoth_help`, `azoth_catalogue`, `azoth_spec`, `azoth_intake`, `azoth_calc`** — the
   plugin in [`plugin/`](plugin/). `azoth_help` defines FEED, model, catalogue, keycard,
   dossier, hard gap and soft gap; `azoth_intake` checks a dossier before a calculation; the
-  others call `python -m azoth.harness`, which runs any of the 97 calculations and 305
+  others call `python -m azoth.harness`, which runs any of the 101 calculations and 305
   models by id. Inputs are numbers in the unit `azoth_spec` declares, or `{value, unit}`;
   a dossier replaces `inputs` and adds a sibling `intake` block. The result is the
   library's `to_dict()` with warnings and the provenance block, rendered with what its

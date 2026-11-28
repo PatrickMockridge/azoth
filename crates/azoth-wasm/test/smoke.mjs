@@ -39,9 +39,9 @@ check("30 with a model", withModel === 30, `${withModel}`);
 check("30 runnable", runnable === 30, `${runnable}`);
 const withTools = JSON.parse(azoth.palette_json(true));
 check("20 tools", withTools.tools.length === 20, `${withTools.tools.length}`);
-check("97 calculations", catalogue.calcs.length === 97, `${catalogue.calcs.length}`);
+check("101 calculations", catalogue.calcs.length === 101, `${catalogue.calcs.length}`);
 const available = catalogue.calcs.filter((entry) => entry.available).length;
-check("93 a sheet can draw", available === 93, `${available}`);
+check("97 a sheet can draw", available === 97, `${available}`);
 check("96 safety calculations", catalogue.safety.length === 96, `${catalogue.safety.length}`);
 const nativeSafety = catalogue.safety.filter((entry) => entry.native).length;
 check("32 native safety ids", nativeSafety === 32, `${nativeSafety}`);
@@ -162,5 +162,5 @@ if (failures.length > 0) {
   process.exit(1);
 }
 console.log(
-  "wasm smoke: OK (31 palette entries, 16 tools, 97 calculations, 96 safety ids, 32 native, 6 nodes, 43 values)",
+  "wasm smoke: OK (31 palette entries, 16 tools, 101 calculations, 96 safety ids, 32 native, 6 nodes, 43 values)",
 );
