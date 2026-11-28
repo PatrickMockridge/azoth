@@ -57,6 +57,24 @@ The spec declares; the generators name. A field the spec does not name cannot be
 emitted, and a declared output with no field is a promise the code cannot keep —
 `python/tests/test_registry_contract.py` holds both directions.
 
+## The order
+
+A port over roughly 500 lines follows this order. Skipping it turns the test suite into the
+discovery loop, which is how a large port becomes rounds of build, test and patch.
+
+1. **The behaviour table, before code.** The plan carries one row per state variable, phase
+   getter and its volume convention, unit conversion, phase label, flash dispatch, output
+   getter and post-store mutation, default, cap and fallback, each naming its NeqSim member.
+   A second reader checks the table against the class source; a row that cannot be filled is
+   a stop-and-report, not a guess.
+2. **One probe that prints all the state**, at full precision, before the first kernel.
+3. **The first kernel**: one state and one step against the probe, then its full case. Only
+   then the second kernel; the mirror is arithmetic, not discovery.
+4. **Generators once, one build, one test run.** A red result goes back to the table, not
+   into a patch. Regenerating after a later kernel edit is two edits where one was owed.
+5. **`python tools/test_scope.py --checks-only --run`, then push.** CI runs the push lane.
+   What may be written at all is the port law in `AGENTS.md`.
+
 ## Python usage pattern
 
 ```python

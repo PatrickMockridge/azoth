@@ -79,11 +79,24 @@ def test_a_package_runner_resolves_to_the_program_it_runs() -> None:
 
 def test_the_lane_budget_can_only_be_lowered() -> None:
     """The 2026-10-22 bypass: `--max-minutes 35` against a 15-minute push lane."""
-    assert not _allowed("python tools/test_scope.py --lane push --run --max-minutes 35")
+    assert not _allowed(
+        "AZOTH_LOCAL_LANE=1 python tools/test_scope.py --lane push --run --max-minutes 35"
+    )
     assert not _allowed("python tools/test_scope.py --lane tranche --run --max-minutes 21")
-    assert not _allowed("python tools/test_scope.py --lane push --run --max-minutes 0")
-    assert _allowed("python tools/test_scope.py --lane push --run --max-minutes 15")
+    assert not _allowed(
+        "AZOTH_LOCAL_LANE=1 python tools/test_scope.py --lane push --run --max-minutes 0"
+    )
+    assert _allowed(
+        "AZOTH_LOCAL_LANE=1 python tools/test_scope.py --lane push --run --max-minutes 15"
+    )
     assert _allowed("python tools/test_scope.py --lane tranche --run --max-minutes 20")
+
+
+def test_the_push_lane_is_ci_and_needs_the_visible_token() -> None:
+    """A local push-lane copy is refused unless `AZOTH_LOCAL_LANE=1` is in its own segment."""
+    assert not _allowed("python tools/test_scope.py --lane push --run")
+    assert _allowed("AZOTH_LOCAL_LANE=1 python tools/test_scope.py --lane push --run")
+    assert not _allowed("echo AZOTH_LOCAL_LANE=1; python tools/test_scope.py --lane push --run")
 
 
 def test_an_hour_long_heavy_command_is_refused() -> None:
