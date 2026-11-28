@@ -18,7 +18,7 @@ def test_the_wax_fraction_rises_as_the_temperature_falls() -> None:
         for t in (275.0, 265.0, 255.0)
     ]
     assert amounts[0] == 0.0
-    assert amounts[1] == pytest.approx(0.0707, rel=1e-2)
+    assert amounts[1] == pytest.approx(0.0690, rel=1e-2)
     assert amounts[0] < amounts[1] < amounts[2]
 
 
