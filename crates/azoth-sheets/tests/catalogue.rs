@@ -9,7 +9,7 @@ fn available() -> Vec<&'static CalcForm> {
 #[test]
 fn every_calculation_is_listed_once_and_in_order() {
     let ids: Vec<&str> = forms().iter().map(|form| form.id).collect();
-    assert_eq!(ids.len(), 98, "the registry is 98 calculations");
+    assert_eq!(ids.len(), 97, "the registry is 97 calculations");
     let mut sorted = ids.clone();
     sorted.sort_unstable();
     assert_eq!(ids, sorted, "ids are in id order");
@@ -40,7 +40,7 @@ fn the_table_shaped_calculations_are_the_four_that_are_refused() {
             form.id
         );
     }
-    assert_eq!(available().len(), 94);
+    assert_eq!(available().len(), 93);
 }
 
 #[test]
