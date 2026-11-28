@@ -23,7 +23,7 @@ edition = "Its `run`: the mole alignment, the discharge selection, the mass and 
 
 [source.neqsim]
 class = "DepressurizationSimulator"
-members = ["DepressurizationSimulator"]
+members = ["DepressurizationSimulator.evaluate"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [algorithm]
@@ -256,22 +256,22 @@ rationale = "the class refuses a non-positive stop pressure"
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim DepressurizationSimulator"
+default = "NeqSim DepressurizationSimulator.evaluate"
 
 [provenance.algorithm.convergence]
-source = "NeqSim DepressurizationSimulator"
+source = "NeqSim DepressurizationSimulator.evaluate"
 
 [provenance.algorithm.initialisation]
-source = "NeqSim DepressurizationSimulator"
+source = "NeqSim DepressurizationSimulator.evaluate"
 
 [provenance.algorithm.max_iterations]
-source = "NeqSim DepressurizationSimulator"
+source = "NeqSim DepressurizationSimulator.evaluate"
 
 [provenance.algorithm.scheme]
-source = "NeqSim DepressurizationSimulator"
+source = "NeqSim DepressurizationSimulator.evaluate"
 
 [provenance.algorithm.tolerance]
-source = "NeqSim DepressurizationSimulator"
+source = "NeqSim DepressurizationSimulator.evaluate"
 
 [implementations]
 python = "azoth.process.depressurization"

@@ -18,8 +18,8 @@ standard = "Standard thermodynamics, as in Michelsen & Mollerup"
 edition = "NeqSim master `thermodynamicoperations/flashops/OptimizedVUflash`, ported line for line: its `calcdQdP`, `calcdQdT`, `calcdQdPP`, `calcdQdTT` and its damped clamped step are these lines."
 
 [source.neqsim]
-class = "Standard"
-members = ["Standard.calcdQdP"]
+class = "OptimizedVUflash"
+members = ["OptimizedVUflash.calcdQdP"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [algorithm]
@@ -106,49 +106,49 @@ rationale = "a molar volume; zero and below are not states"
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Standard.calcdQdP"
+default = "NeqSim OptimizedVUflash.calcdQdP"
 
 [provenance.algorithm.convergence]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim OptimizedVUflash.calcdQdP"
 
 [provenance.algorithm.initialisation]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim OptimizedVUflash.calcdQdP"
 
 [provenance.algorithm."inner.convergence"]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim OptimizedVUflash.calcdQdP"
 
 [provenance.algorithm."inner.initialisation"]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim OptimizedVUflash.calcdQdP"
 
 [provenance.algorithm."inner.inner.convergence"]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim OptimizedVUflash.calcdQdP"
 
 [provenance.algorithm."inner.inner.max_iterations"]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim OptimizedVUflash.calcdQdP"
 
 [provenance.algorithm."inner.inner.scheme"]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim OptimizedVUflash.calcdQdP"
 
 [provenance.algorithm."inner.inner.tolerance"]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim OptimizedVUflash.calcdQdP"
 
 [provenance.algorithm."inner.max_iterations"]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim OptimizedVUflash.calcdQdP"
 
 [provenance.algorithm."inner.scheme"]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim OptimizedVUflash.calcdQdP"
 
 [provenance.algorithm."inner.tolerance"]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim OptimizedVUflash.calcdQdP"
 
 [provenance.algorithm.max_iterations]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim OptimizedVUflash.calcdQdP"
 
 [provenance.algorithm.scheme]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim OptimizedVUflash.calcdQdP"
 
 [provenance.algorithm.tolerance]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim OptimizedVUflash.calcdQdP"
 
 [implementations]
 python = "azoth.eos.vu_flash"

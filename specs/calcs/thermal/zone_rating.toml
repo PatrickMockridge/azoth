@@ -15,7 +15,7 @@ edition = "`calculateZones(ZoneDefinition[])` over the permissive `calculate()`;
 
 [source.neqsim]
 class = "ThermalDesignCalculator"
-members = ["ThermalDesignCalculator"]
+members = ["ThermalDesignCalculator.calculateZones"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -313,7 +313,7 @@ zones = [{ zone_name = "desuperheating", duty_fraction = 0.15, tube_side_heat_tr
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim ThermalDesignCalculator"
+default = "NeqSim ThermalDesignCalculator.calculateZones"
 
 [implementations]
 python = "azoth.thermal.zone_rating"

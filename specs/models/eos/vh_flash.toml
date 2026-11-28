@@ -17,8 +17,8 @@ standard = "Standard thermodynamics, as in Michelsen & Mollerup"
 edition = "NeqSim master `thermodynamicoperations/flashops/VHflashQfunc`, whose Q-function quartet is `OptimizedVUflash`'s with `Hspec` in place of `Uspec + P Vspec`."
 
 [source.neqsim]
-class = "Standard"
-members = ["Standard"]
+class = "OptimizedVUflash"
+members = ["OptimizedVUflash"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [algorithm]
@@ -106,49 +106,49 @@ rationale = "a molar volume; zero and below are not states"
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Standard"
+default = "NeqSim OptimizedVUflash"
 
 [provenance.algorithm.convergence]
-source = "NeqSim Standard"
+source = "NeqSim OptimizedVUflash"
 
 [provenance.algorithm.initial_temperature]
-source = "NeqSim Standard"
+source = "NeqSim OptimizedVUflash"
 
 [provenance.algorithm."inner.convergence"]
-source = "NeqSim Standard"
+source = "NeqSim OptimizedVUflash"
 
 [provenance.algorithm."inner.initialisation"]
-source = "NeqSim Standard"
+source = "NeqSim OptimizedVUflash"
 
 [provenance.algorithm."inner.inner.convergence"]
-source = "NeqSim Standard"
+source = "NeqSim OptimizedVUflash"
 
 [provenance.algorithm."inner.inner.max_iterations"]
-source = "NeqSim Standard"
+source = "NeqSim OptimizedVUflash"
 
 [provenance.algorithm."inner.inner.scheme"]
-source = "NeqSim Standard"
+source = "NeqSim OptimizedVUflash"
 
 [provenance.algorithm."inner.inner.tolerance"]
-source = "NeqSim Standard"
+source = "NeqSim OptimizedVUflash"
 
 [provenance.algorithm."inner.max_iterations"]
-source = "NeqSim Standard"
+source = "NeqSim OptimizedVUflash"
 
 [provenance.algorithm."inner.scheme"]
-source = "NeqSim Standard"
+source = "NeqSim OptimizedVUflash"
 
 [provenance.algorithm."inner.tolerance"]
-source = "NeqSim Standard"
+source = "NeqSim OptimizedVUflash"
 
 [provenance.algorithm.max_iterations]
-source = "NeqSim Standard"
+source = "NeqSim OptimizedVUflash"
 
 [provenance.algorithm.scheme]
-source = "NeqSim Standard"
+source = "NeqSim OptimizedVUflash"
 
 [provenance.algorithm.tolerance]
-source = "NeqSim Standard"
+source = "NeqSim OptimizedVUflash"
 
 [implementations]
 python = "azoth.eos.vh_flash"

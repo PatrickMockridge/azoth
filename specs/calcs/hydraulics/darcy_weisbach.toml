@@ -10,8 +10,8 @@ standard = "Crane TP-410"
 edition = "2013"
 
 [source.neqsim]
-class = "Fittings"
-members = ["Fittings"]
+class = "FrictionFactorCalculator"
+members = ["FrictionFactorCalculator.calcPressureDropPerLength"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -103,7 +103,7 @@ dp = 22455.0
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Fittings"
+default = "NeqSim FrictionFactorCalculator.calcPressureDropPerLength"
 
 [implementations]
 python = "azoth.hydraulics.darcy_weisbach"

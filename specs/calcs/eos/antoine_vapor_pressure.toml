@@ -18,7 +18,7 @@ edition = "the four correlations NeqSim master evaluates in `thermo/component/Co
 
 [source.neqsim]
 class = "Component"
-members = ["Component"]
+members = ["Component.getAntoineVaporPressure"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -92,7 +92,7 @@ p_sat = 929295.9523003073
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Component"
+default = "NeqSim Component.getAntoineVaporPressure"
 
 [implementations]
 python = "azoth.eos.antoine_vapor_pressure"

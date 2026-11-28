@@ -21,8 +21,8 @@ edition = """\
 doi = "10.1021/i160057a011"
 
 [source.neqsim]
-class = "ComponentPR"
-members = ["ComponentPR"]
+class = "AttractiveTermPr"
+members = ["AttractiveTermPr.alpha", "AttractiveTermPr.aT"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -73,7 +73,7 @@ b_reduced = 0.0243135415625
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim ComponentPR"
+default = "NeqSim AttractiveTermPr"
 
 [implementations]
 python = "azoth.eos.pr_alpha_ab"

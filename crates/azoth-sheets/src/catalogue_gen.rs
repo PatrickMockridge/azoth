@@ -13576,7 +13576,6 @@ pub static CALCS: &[CalcForm] = &[
         ],
         references: &[
             "Standard gravity: the 1901 CGPM resolution fixed it at exactly 9.80665 m/s**2.",
-            "No specific source is claimed: the relation is general pump engineering.",
         ],
         inputs: &[
             CalcInput {

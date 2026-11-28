@@ -195,7 +195,8 @@ def test_the_block_exists_for_every_registered_id() -> None:
     # 394: the plus-molar-mass saturation tuning; 395: the Van Everdingen-Hurst aquifer;
     # 396: the Fetkovich aquifer; 397: the generalized material balance; 398: the relative
     # permeability table; 399: the CVD material balance; 400: the gas-density consistency;
-    # 401: the separator path; 402 was the UMR-PRU flash; 401 remains after the PRSV calc.
+    # 401: the separator path; 402 was the UMR-PRU flash; 401 remains after the PRSV calc
+    # was removed.
     assert len(registered) == 401
 
 

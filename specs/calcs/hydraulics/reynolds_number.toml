@@ -10,8 +10,8 @@ standard = "Crane TP-410"
 edition = "2013"
 
 [source.neqsim]
-class = "Fittings"
-members = ["Fittings"]
+class = "AdiabaticPipe"
+members = ["AdiabaticPipe.getReynoldsNumber"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -83,7 +83,7 @@ re = 149401.19760479042
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Fittings"
+default = "NeqSim AdiabaticPipe.getReynoldsNumber"
 
 [implementations]
 python = "azoth.hydraulics.reynolds_number"

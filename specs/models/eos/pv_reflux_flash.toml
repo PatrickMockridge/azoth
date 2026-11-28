@@ -15,8 +15,8 @@ standard = "Standard thermodynamics, as in Michelsen & Mollerup"
 edition = "NeqSim master `thermodynamicoperations/flashops/PVrefluxflash`: its residual, its secant, its ramped damping, its two-kelvin step cap and its first-iteration probe are this model's loop."
 
 [source.neqsim]
-class = "Standard"
-members = ["Standard"]
+class = "PVrefluxflash"
+members = ["PVrefluxflash"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [algorithm]
@@ -114,49 +114,49 @@ rationale = "an absolute temperature; zero and below are not states"
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Standard"
+default = "NeqSim PVrefluxflash"
 
 [provenance.algorithm.convergence]
-source = "NeqSim Standard"
+source = "NeqSim PVrefluxflash"
 
 [provenance.algorithm.initialisation]
-source = "NeqSim Standard"
+source = "NeqSim PVrefluxflash"
 
 [provenance.algorithm."inner.convergence"]
-source = "NeqSim Standard"
+source = "NeqSim PVrefluxflash"
 
 [provenance.algorithm."inner.initialisation"]
-source = "NeqSim Standard"
+source = "NeqSim PVrefluxflash"
 
 [provenance.algorithm."inner.inner.convergence"]
-source = "NeqSim Standard"
+source = "NeqSim PVrefluxflash"
 
 [provenance.algorithm."inner.inner.max_iterations"]
-source = "NeqSim Standard"
+source = "NeqSim PVrefluxflash"
 
 [provenance.algorithm."inner.inner.scheme"]
-source = "NeqSim Standard"
+source = "NeqSim PVrefluxflash"
 
 [provenance.algorithm."inner.inner.tolerance"]
-source = "NeqSim Standard"
+source = "NeqSim PVrefluxflash"
 
 [provenance.algorithm."inner.max_iterations"]
-source = "NeqSim Standard"
+source = "NeqSim PVrefluxflash"
 
 [provenance.algorithm."inner.scheme"]
-source = "NeqSim Standard"
+source = "NeqSim PVrefluxflash"
 
 [provenance.algorithm."inner.tolerance"]
-source = "NeqSim Standard"
+source = "NeqSim PVrefluxflash"
 
 [provenance.algorithm.max_iterations]
-source = "NeqSim Standard"
+source = "NeqSim PVrefluxflash"
 
 [provenance.algorithm.scheme]
-source = "NeqSim Standard"
+source = "NeqSim PVrefluxflash"
 
 [provenance.algorithm.tolerance]
-source = "NeqSim Standard"
+source = "NeqSim PVrefluxflash"
 
 [implementations]
 python = "azoth.eos.pv_reflux_flash"

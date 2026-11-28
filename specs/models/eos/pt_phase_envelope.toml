@@ -120,34 +120,34 @@ rationale = "a grid answer reports NaN because RobustPhaseEnvelope has no critic
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim RobustPhaseEnvelope"
+default = "NeqSim PTPhaseEnvelopeMichelsen"
 
 [provenance.algorithm.convergence]
-source = "NeqSim RobustPhaseEnvelope"
+source = "NeqSim PTPhaseEnvelopeMichelsen"
 
 [provenance.algorithm.initialisation]
-source = "NeqSim RobustPhaseEnvelope"
+source = "NeqSim PTPhaseEnvelopeMichelsen"
 
 [provenance.algorithm."inner.convergence"]
-source = "NeqSim RobustPhaseEnvelope"
+source = "NeqSim PTPhaseEnvelopeMichelsen"
 
 [provenance.algorithm."inner.max_iterations"]
-source = "NeqSim RobustPhaseEnvelope"
+source = "NeqSim PTPhaseEnvelopeMichelsen"
 
 [provenance.algorithm."inner.scheme"]
-source = "NeqSim RobustPhaseEnvelope"
+source = "NeqSim PTPhaseEnvelopeMichelsen"
 
 [provenance.algorithm."inner.tolerance"]
-source = "NeqSim RobustPhaseEnvelope"
+source = "NeqSim PTPhaseEnvelopeMichelsen"
 
 [provenance.algorithm.max_iterations]
-source = "NeqSim RobustPhaseEnvelope"
+source = "NeqSim PTPhaseEnvelopeMichelsen"
 
 [provenance.algorithm.scheme]
-source = "NeqSim RobustPhaseEnvelope"
+source = "NeqSim PTPhaseEnvelopeMichelsen"
 
 [provenance.algorithm.tolerance]
-source = "NeqSim RobustPhaseEnvelope"
+source = "NeqSim PTPhaseEnvelopeMichelsen"
 
 [implementations]
 python = "azoth.eos.pt_phase_envelope"

@@ -37,8 +37,8 @@ standard = "NeqSim master `PlusFractionModel.PedersenPlusModel` with `PedersenPl
 edition = "`characterizePlusFraction` and the solver's `solve`. `PedersenHeavyOilPlusModel` is the same class with `lastPlusFractionNumber = 200`. `Characterise.characterisePlusFraction` is the caller, and it swaps to the heavy model when `M_plus > 0.605` kg/mol."
 
 [source.neqsim]
-class = "PlusFractionModel"
-members = ["PlusFractionModel.characterizePlusFraction"]
+class = "PedersenPlusModelSolver"
+members = ["PedersenPlusModelSolver.characterizePlusFraction"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [algorithm]
@@ -131,22 +131,22 @@ rationale = "the molar-mass table ends at C200, and the range is half-open so th
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim PlusFractionModel.characterizePlusFraction"
+default = "NeqSim PedersenPlusModelSolver.characterizePlusFraction"
 
 [provenance.algorithm.convergence]
-source = "NeqSim PlusFractionModel.characterizePlusFraction"
+source = "NeqSim PedersenPlusModelSolver.characterizePlusFraction"
 
 [provenance.algorithm.initialisation]
-source = "NeqSim PlusFractionModel.characterizePlusFraction"
+source = "NeqSim PedersenPlusModelSolver.characterizePlusFraction"
 
 [provenance.algorithm.max_iterations]
-source = "NeqSim PlusFractionModel.characterizePlusFraction"
+source = "NeqSim PedersenPlusModelSolver.characterizePlusFraction"
 
 [provenance.algorithm.scheme]
-source = "NeqSim PlusFractionModel.characterizePlusFraction"
+source = "NeqSim PedersenPlusModelSolver.characterizePlusFraction"
 
 [provenance.algorithm.tolerance]
-source = "NeqSim PlusFractionModel.characterizePlusFraction"
+source = "NeqSim PedersenPlusModelSolver.characterizePlusFraction"
 
 [implementations]
 python = "azoth.characterization.pedersen_plus_split"

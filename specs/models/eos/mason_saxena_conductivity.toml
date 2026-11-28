@@ -19,7 +19,7 @@ doi = "10.1063/1.1724352"
 
 [source.neqsim]
 class = "ChungConductivityMethod"
-members = ["ChungConductivityMethod"]
+members = ["ChungConductivityMethod.calcConductivity"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -80,7 +80,7 @@ rationale = "an absolute temperature; zero and below are not states\n"
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim ChungConductivityMethod"
+default = "NeqSim ChungConductivityMethod.calcConductivity"
 
 [implementations]
 python = "azoth.eos.mason_saxena_conductivity"

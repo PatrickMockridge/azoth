@@ -12,9 +12,9 @@ edition = "Diffusion coefficients in dilute binary liquid mixtures. J. Chem. Eng
 doi = "10.1021/je60064a006"
 
 [source.neqsim]
-class = "Data"
-members = ["Data"]
-commit = "f0c7436c6923766b1e22957b7075f650600457a7"
+class = "TynCalusDiffusivity"
+members = ["TynCalusDiffusivity.calcBinaryDiffusionCoefficient"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
 [inputs.VA]
@@ -54,7 +54,7 @@ d = 1.4502274002446276e-9
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Data"
+default = "NeqSim TynCalusDiffusivity.calcBinaryDiffusionCoefficient"
 
 [implementations]
 python = "azoth.eos.tyn_calus_diffusivity"

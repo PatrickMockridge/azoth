@@ -19,7 +19,7 @@ edition = "The flood, the dissolved-water correction and the residual-phase remo
 
 [source.neqsim]
 class = "SaturateWithWater"
-members = ["SaturateWithWater"]
+members = ["SaturateWithWater.indexOfAqueousPhase"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [algorithm]
@@ -92,22 +92,22 @@ rationale = "a non-positive pressure is not a state the cubic can be evaluated a
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim SaturateWithWater"
+default = "NeqSim SaturateWithWater.indexOfAqueousPhase"
 
 [provenance.algorithm.convergence]
-source = "NeqSim SaturateWithWater"
+source = "NeqSim SaturateWithWater.indexOfAqueousPhase"
 
 [provenance.algorithm.initialisation]
-source = "NeqSim SaturateWithWater"
+source = "NeqSim SaturateWithWater.indexOfAqueousPhase"
 
 [provenance.algorithm.max_iterations]
-source = "NeqSim SaturateWithWater"
+source = "NeqSim SaturateWithWater.indexOfAqueousPhase"
 
 [provenance.algorithm.scheme]
-source = "NeqSim SaturateWithWater"
+source = "NeqSim SaturateWithWater.indexOfAqueousPhase"
 
 [provenance.algorithm.tolerance]
-source = "NeqSim SaturateWithWater"
+source = "NeqSim SaturateWithWater.indexOfAqueousPhase"
 
 [implementations]
 python = "azoth.eos.saturate_with_water"

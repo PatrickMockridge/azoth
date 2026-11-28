@@ -106,7 +106,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'characterization.pedersen_plus_split': {
         "calc_id": 'characterization.pedersen_plus_split',
         "name": "A plus fraction split into carbon-number cuts, by Pedersen's two Newton solves",
-        "spec": {'path': 'specs/models/characterization/pedersen_plus_split.toml', 'sha256': '14bc437c55d00ad3f6d1c3f2cecc15795336bdbb506886cc1d1e13ac5dce6c25'},
+        "spec": {'path': 'specs/models/characterization/pedersen_plus_split.toml', 'sha256': 'cd069b699c0e67269dd437a029137326bbc97968b896a25c4c3f99b03f6ea225'},
         "code": [{'path': 'python/src/azoth/characterization/reference/pedersen_plus_split.py', 'sha256': '23eda9729758766a11437daf70d7490b3bb83b00047bbcbf370cdf82d91afd66'}, {'path': 'crates/azoth-characterization/src/pedersen_plus_split.rs', 'sha256': '7d7ee26bfcc4e60e4b5b857b61bd22f3759f072161236e6b08c3408bf7ee6790'}],
         "source": 'NeqSim master `PlusFractionModel.PedersenPlusModel` with `PedersenPlusModelSolver`',
         "verification": 'partially_verified',
@@ -139,7 +139,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'characterization.tbp_cut_boundaries': {
         "calc_id": 'characterization.tbp_cut_boundaries',
         "name": 'A cumulative TBP curve cut into an assay, one row per interval',
-        "spec": {'path': 'specs/models/characterization/tbp_cut_boundaries.toml', 'sha256': '9a2709e6afb2f6e6fe45b75a90135475f94cb89b23c43e8ae35433975fb9b593'},
+        "spec": {'path': 'specs/models/characterization/tbp_cut_boundaries.toml', 'sha256': '4078441b2a5b4e907fff8686364d7a48c5c923f4898df48020d284622d7d8a35'},
         "code": [{'path': 'python/src/azoth/characterization/reference/tbp_cut_boundaries.py', 'sha256': 'cc9b4d0e5757bf3d5bcb21f685669513f4410462fd44bb42d04cb2338f8acd55'}, {'path': 'crates/azoth-characterization/src/tbp_cut_boundaries.rs', 'sha256': 'e9fbbbbf641a4c64ee241c06a820badcb76c8a655fe66eb0c1d28805c874d5e9'}],
         "source": 'NeqSim master `OilAssayCharacterisation.addTBPCutBoundariesKelvin`',
         "verification": 'partially_verified',
@@ -161,7 +161,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'characterization.tbp_density': {
         "calc_id": 'characterization.tbp_density',
         "name": 'TBP cut specific gravity from its boiling point and molar mass',
-        "spec": {'path': 'specs/models/characterization/tbp_density.toml', 'sha256': '97be43688c167c89aef32bf40803a1bb68f9f0d82242268aa8aece53c81ec053'},
+        "spec": {'path': 'specs/models/characterization/tbp_density.toml', 'sha256': '998c51fed781036d3888a72ef2457e4fc825d9315764caa0b852b5e743217e4e'},
         "code": [{'path': 'python/src/azoth/characterization/reference/tbp_density.py', 'sha256': 'a90c5b8675efec6d8975f142ba8a589be9e33c2f287a85b4dcd67cc219023d3b'}, {'path': 'crates/azoth-characterization/src/tbp_density.rs', 'sha256': 'eccc0027cc97b01bd30f8c8cd33ecafe34190a8df06cd0b05d2c1e60917ebb9a'}],
         "source": 'NeqSim master `TbpClosure.RIAZI_DAUBERT_1980.calcDensity`',
         "verification": 'partially_verified',
@@ -183,7 +183,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'characterization.tbp_grouping': {
         "calc_id": 'characterization.tbp_grouping',
         "name": "A fluid's components grouped into boiling-point bins",
-        "spec": {'path': 'specs/models/characterization/tbp_grouping.toml', 'sha256': '6e880299a6710ca5583e950919401d954e66eeb066dd603258f120fea26845c8'},
+        "spec": {'path': 'specs/models/characterization/tbp_grouping.toml', 'sha256': '74a600eda6342cf3c4ad43f2d0180e3cc8528781808c381057a0dc83de077720'},
         "code": [{'path': 'python/src/azoth/characterization/reference/tbp_grouping.py', 'sha256': '02405bcc55ae1ace208f93efc09242062f907ec9a2309482730052173b876f69'}, {'path': 'crates/azoth-characterization/src/tbp_grouping.rs', 'sha256': '7be5d16f18f7bc87652fb1dc24ba9ceed3c4e65fbf1d2068569cd04a9d0b23bc'}],
         "source": 'NeqSim master `Phase.groupTBPfractions`',
         "verification": 'partially_verified',
@@ -194,7 +194,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'characterization.transfer_binary_interaction_parameters': {
         "calc_id": 'characterization.transfer_binary_interaction_parameters',
         "name": "A fluid's interaction table written onto another fluid's slate",
-        "spec": {'path': 'specs/models/characterization/transfer_binary_interaction_parameters.toml', 'sha256': '82d18ee677d42af57d63a68c9be29ded7c6a1145176a3a1307161ed8870a6f7e'},
+        "spec": {'path': 'specs/models/characterization/transfer_binary_interaction_parameters.toml', 'sha256': 'e7e175644005d005f4355a448280249b2f80c1b52227ddd61cffebefdd5db360'},
         "code": [{'path': 'python/src/azoth/characterization/reference/transfer_binary_interaction_parameters.py', 'sha256': '034a51eeefbb44f3d1e258a13c02ca2b0a364766f2ba6a90eb71e4c37998de2d'}, {'path': 'crates/azoth-characterization/src/transfer_binary_interaction_parameters.rs', 'sha256': '7e0390643f35dc93f68ef1f7167a663c7504d2621e6c6c22d3af4b696120fba7'}],
         "source": 'NeqSim master `PseudoComponentCombiner.transferBinaryInteractionParameters`',
         "verification": 'partially_verified',
@@ -227,7 +227,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.antoine_vapor_pressure': {
         "calc_id": 'eos.antoine_vapor_pressure',
         "name": "Antoine vapour pressure from NeqSim's correlation",
-        "spec": {'path': 'specs/calcs/eos/antoine_vapor_pressure.toml', 'sha256': '2ba07ad6b51caad9744fe4f0607338d1db65ecfad110c2dcd37b0dcbef8ba5f4'},
+        "spec": {'path': 'specs/calcs/eos/antoine_vapor_pressure.toml', 'sha256': 'cfa680effc43a7fc409ee59c723765bd69cbce6a52abe2d148b41ce36f768514'},
         "code": [{'path': 'python/src/azoth/eos/reference/antoine_vapor_pressure.py', 'sha256': '191c4adf63171ce844a85801e420a7f89c45ff7547737cc6d647cebbdd1b1103'}, {'path': 'crates/azoth-eos/src/antoine_vapor_pressure.rs', 'sha256': 'd1eb7f4acb1e4dcd4cbb9ef578c75ee67485ab741343a957df9f1ff3c21612b3'}],
         "source": "NeqSim's `getAntoineVaporPressure`",
         "verification": 'verified',
@@ -238,7 +238,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.aqueous_viscosity': {
         "calc_id": 'eos.aqueous_viscosity',
         "name": 'Liquid viscosity of an aqueous phase',
-        "spec": {'path': 'specs/models/eos/aqueous_viscosity.toml', 'sha256': 'df562a14dcdc5b9a3269e8c5a9aa2c2c48292750b2f90a4eaf89c49a843c36f1'},
+        "spec": {'path': 'specs/models/eos/aqueous_viscosity.toml', 'sha256': '26a24d493ab2e07f5695db248348effa65c1a10c73e2d00ab22b94e32163cf33'},
         "code": [{'path': 'python/src/azoth/eos/reference/aqueous_viscosity.py', 'sha256': '53504e1b8cf6eaeb41ac35d604673685af8d73202030e4da6535c5afaec30835'}, {'path': 'crates/azoth-eos/src/aqueous_viscosity.rs', 'sha256': '044ee1f6039c6ab7870118c607a0f0477e2e06fefb61a60d59b37ee5096b1298'}],
         "source": 'NeqSim physicalproperties/methods/liquidphysicalproperties/viscosity/Viscosity.java',
         "verification": 'partially_verified',
@@ -326,7 +326,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.calc_ionic_composition': {
         "calc_id": 'eos.calc_ionic_composition',
         "name": 'Molalities and activity coefficients of a phase',
-        "spec": {'path': 'specs/models/eos/calc_ionic_composition.toml', 'sha256': '67efdfa93f55be3cada933e4816d920825f80878e8d625fb0a736e8650ceffe4'},
+        "spec": {'path': 'specs/models/eos/calc_ionic_composition.toml', 'sha256': 'bb2f74f3b11943197623981813df91f3acccbef20665e1788812e0fae4a5cf7c'},
         "code": [{'path': 'python/src/azoth/eos/reference/calc_ionic_composition.py', 'sha256': '00a834a26dc83af240ee305f1ad2a2df81b02cc66137294821c1c572e084d31e'}, {'path': 'crates/azoth-eos/src/calc_ionic_composition.rs', 'sha256': '55cb5814b84918984e75c3aabe811e68a5747593a4c7884615660184da98a780'}],
         "source": 'NeqSim master `CalcIonicComposition`',
         "verification": 'partially_verified',
@@ -359,7 +359,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.chapman_enskog_diffusivity': {
         "calc_id": 'eos.chapman_enskog_diffusivity',
         "name": 'Gas binary diffusivity from the Chapman-Enskog theory',
-        "spec": {'path': 'specs/calcs/eos/chapman_enskog_diffusivity.toml', 'sha256': 'd7483d32f32b741ad7e2dc621d98b423a5a37d61d5491b534d1f70e4930bf083'},
+        "spec": {'path': 'specs/calcs/eos/chapman_enskog_diffusivity.toml', 'sha256': '49c8fe6fa488b57d339b04b914fb77c98cbafcf155d89c2169768ce176059738'},
         "code": [{'path': 'python/src/azoth/eos/reference/chapman_enskog_diffusivity.py', 'sha256': '12aa2951865a0e6696c66978dad4b627ca38b6b7701da6d635726e7ff384d218'}, {'path': 'crates/azoth-eos/src/chapman_enskog_diffusivity.rs', 'sha256': '846f78dc977e4a8e19201141a4b66921d31b3e116c44ea44f5de5f6726e772dd'}],
         "source": 'Chapman, S.; Enskog, D. (1917)',
         "verification": 'partially_verified',
@@ -645,7 +645,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.fuller_schettler_giddings_diffusivity': {
         "calc_id": 'eos.fuller_schettler_giddings_diffusivity',
         "name": 'Gas binary diffusivity from the Fuller-Schettler-Giddings correlation',
-        "spec": {'path': 'specs/calcs/eos/fuller_schettler_giddings_diffusivity.toml', 'sha256': '163a25891928dbecf381e2509e574bdaad5ebf34eb80a1fce1ea79aec9e3fd88'},
+        "spec": {'path': 'specs/calcs/eos/fuller_schettler_giddings_diffusivity.toml', 'sha256': '8c5d7b9dde563959d4eac7930a00b3ae81fe3d2475c62bc501f3fcfa4c79123a'},
         "code": [{'path': 'python/src/azoth/eos/reference/fuller_schettler_giddings_diffusivity.py', 'sha256': 'c1873e34dc34feb18b2f6ec82e993bbd21bab0bacdcf45d3927fd66a03d891be'}, {'path': 'crates/azoth-eos/src/fuller_schettler_giddings_diffusivity.rs', 'sha256': 'f719bc7febc0ec100a6d96656ec1269d23753a0698272f5a8b4839058d530a5b'}],
         "source": 'Fuller, E. N.; Schettler, P. D.; Giddings, J. C. (1966)',
         "verification": 'partially_verified',
@@ -678,7 +678,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.ge_flash': {
         "calc_id": 'eos.ge_flash',
         "name": 'Gamma-phi flash with a named activity-coefficient liquid',
-        "spec": {'path': 'specs/models/eos/ge_flash.toml', 'sha256': '383934ce7b77ccd7349004591657b3ef927834000b2e906f34ff151b1e36031d'},
+        "spec": {'path': 'specs/models/eos/ge_flash.toml', 'sha256': 'a755ec85e2d40a975875f453c04339b98f01959803913e507f613fda39352ebe'},
         "code": [{'path': 'python/src/azoth/eos/reference/ge_flash.py', 'sha256': '459fa621e125ecfbb3a735ad762a5a11a86e0e50dd190cfb295d8085f27c61e3'}, {'path': 'crates/azoth-eos/src/ge_flash.rs', 'sha256': '3bd0ec14cbab9f64f0ee04eac2a7e445162a919526fcd6bf58a641a89e96cf16'}],
         "source": 'NeqSim master `SystemEosGE`',
         "verification": 'partially_verified',
@@ -722,7 +722,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.ge_uniquac_phase': {
         "calc_id": 'eos.ge_uniquac_phase',
         "name": 'Fugacity coefficients of a UNIQUAC activity-coefficient liquid',
-        "spec": {'path': 'specs/models/eos/ge_uniquac_phase.toml', 'sha256': '634a22110b5f588f232bb636b993b931cf31b292255f4de121202947324b32d2'},
+        "spec": {'path': 'specs/models/eos/ge_uniquac_phase.toml', 'sha256': '20cdfd6f2ecab71e5cc83be1dfa1391a285479dbb3b045d08e1b98f567f0820b'},
         "code": [{'path': 'python/src/azoth/eos/reference/ge_uniquac_phase.py', 'sha256': '5cffcd6e0633e2d51014a40e3c1a4a32f59158eb946da00712d28e5a178ebfcd'}, {'path': 'crates/azoth-eos/src/ge_uniquac_phase.rs', 'sha256': '11b3bc01fe0af814aaa1e24a118f5c8fa6b824c8920c478d3682a83819b41b48'}],
         "source": 'NeqSim master `PhaseGEUniquac`',
         "verification": 'partially_verified',
@@ -799,7 +799,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.heat_of_vaporization': {
         "calc_id": 'eos.heat_of_vaporization',
         "name": "Heat of vaporisation from NeqSim's correlation",
-        "spec": {'path': 'specs/calcs/eos/heat_of_vaporization.toml', 'sha256': '6aa67bc6abacb7c6ff6110d65d2c6f540aedef19bfc4f3522d445ebc684417a1'},
+        "spec": {'path': 'specs/calcs/eos/heat_of_vaporization.toml', 'sha256': 'b270c87df00633c3e12d9bde554b026f54def17b713b4681a8fdf2c9b3b663f2'},
         "code": [{'path': 'python/src/azoth/eos/reference/heat_of_vaporization.py', 'sha256': '905d48e1a218bd35b93ed0738fb801a351b29fbb076a57a4662384665a4612d2'}, {'path': 'crates/azoth-eos/src/heat_of_vaporization.rs', 'sha256': '14b296df206e56e7bd620fd574e110791b0b872638ff9fd56e9c6d526b947c6f'}],
         "source": "NeqSim's `getPureComponentHeatOfVaporization`",
         "verification": 'verified',
@@ -942,7 +942,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.ideal_gas_cp': {
         "calc_id": 'eos.ideal_gas_cp',
         "name": 'Ideal-gas heat capacity from a polynomial',
-        "spec": {'path': 'specs/calcs/eos/ideal_gas_cp.toml', 'sha256': '8ceaa6ae557e8f1ce857c9126326c0a90f49275fc8e97e30c21cdce813746983'},
+        "spec": {'path': 'specs/calcs/eos/ideal_gas_cp.toml', 'sha256': '017de216fc85fe17c2a9de9cf94857acd82d1651ce1574d6f80a4ede2fd8ec82'},
         "code": [{'path': 'python/src/azoth/eos/reference/ideal_gas_cp.py', 'sha256': '6981d5361d9ba67e861de78ccaa3cee53175f438800606c25de2ca8a4c982b87'}, {'path': 'crates/azoth-eos/src/ideal_gas_cp.rs', 'sha256': 'b4831ac1b984f9164cd4864acdae6120ad7b996be2afcf8c21ad7ccf425128aa'}],
         "source": 'NeqSim, developed at NTNU and maintained by Equinor - Apache-2.0',
         "verification": 'partially_verified',
@@ -997,7 +997,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.liquid_heat_capacity': {
         "calc_id": 'eos.liquid_heat_capacity',
         "name": "Liquid heat capacity from NeqSim's polynomial",
-        "spec": {'path': 'specs/calcs/eos/liquid_heat_capacity.toml', 'sha256': 'c2860963fd4102116c5594c903e6775a08369b844fadf4c481fb9658bb5f75f1'},
+        "spec": {'path': 'specs/calcs/eos/liquid_heat_capacity.toml', 'sha256': 'fb77d0f3d4363a768c6b2a32a19d28be2ca3e86891b2c7dff8f93edd6ff3ba3f'},
         "code": [{'path': 'python/src/azoth/eos/reference/liquid_heat_capacity.py', 'sha256': 'a91ae4a5d72544eb65d2c99434160553dc97a4abe5f3444f96729b8796665d24'}, {'path': 'crates/azoth-eos/src/liquid_heat_capacity.rs', 'sha256': 'ca7f047ffadcb530aa352616addb15baf99bfe45c442c32bcbfee2f0615dea63'}],
         "source": "NeqSim's `getPureComponentCpLiquid`",
         "verification": 'verified',
@@ -1008,7 +1008,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.liquid_viscosity_pure': {
         "calc_id": 'eos.liquid_viscosity_pure',
         "name": "One component's pure-liquid viscosity from the LIQVISC correlation",
-        "spec": {'path': 'specs/calcs/eos/liquid_viscosity_pure.toml', 'sha256': 'f446a67a92913adaac0ee740ccacf3c63047936bab0e47fdf0ae4f5fd16c709f'},
+        "spec": {'path': 'specs/calcs/eos/liquid_viscosity_pure.toml', 'sha256': '33af905dcc006db94f570d2c27bfe3074be118942a8417c28c8098234174a3d5'},
         "code": [{'path': 'python/src/azoth/eos/reference/liquid_viscosity_pure.py', 'sha256': 'fcac1523f084335107f459940294016c59b6df2aea36c29a1aebe861ed47cef2'}, {'path': 'crates/azoth-eos/src/liquid_viscosity_pure.rs', 'sha256': 'e4fc41f7e9a468fbd789b760e5817827bbadec1e4a2181c2ed1b1399cb61a265'}],
         "source": 'NeqSim master `commonphasephysicalproperties/viscosity/Viscosity` and `liquidphysicalproperties/viscosity/Viscosity`',
         "verification": 'partially_verified',
@@ -1019,7 +1019,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.mason_saxena_conductivity': {
         "calc_id": 'eos.mason_saxena_conductivity',
         "name": 'Gas mixture conductivity by Mason-Saxena mixing over Chung pure-component conductivities',
-        "spec": {'path': 'specs/models/eos/mason_saxena_conductivity.toml', 'sha256': '7555245c85a438d4e38fc2030c9157ebb941f8c54e53eb3e79d46ea6fe983959'},
+        "spec": {'path': 'specs/models/eos/mason_saxena_conductivity.toml', 'sha256': '88d5ead2c44dce8861e26a7759d11b541cee746dc28cf073500019863794dca2'},
         "code": [{'path': 'python/src/azoth/eos/reference/mason_saxena_conductivity.py', 'sha256': '2a5e6f6da7b5da3d0415faa8aacf68603bce9e73337c20ca6d2b999bb39351cf'}, {'path': 'crates/azoth-eos/src/mason_saxena_conductivity.rs', 'sha256': 'a2316bc5d60735270618259a53bb81806863fb1099661043b7282d526874ec67'}],
         "source": 'Mason, E. A.; Saxena, S. C. (1958); Chung et al. (1988)',
         "verification": 'verified',
@@ -1118,7 +1118,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.multiflash_stability_test': {
         "calc_id": 'eos.multiflash_stability_test',
         "name": 'Multiflash seeding stability test',
-        "spec": {'path': 'specs/models/eos/multiflash_stability_test.toml', 'sha256': '0b81d0d489d6b80b5ac7faf2afd0d05987d2a5dc0571541d302a2fecc967cca2'},
+        "spec": {'path': 'specs/models/eos/multiflash_stability_test.toml', 'sha256': '5da4ff6829d2192e9bebbaa9d466fc73120b7d9d539d051c99c9df63b6a9bef0'},
         "code": [{'path': 'python/src/azoth/eos/reference/multiflash_stability_test.py', 'sha256': 'cca4a59a18634db84e93d8532f2686360571c56e1bffb5b843c44eae321b0e57'}, {'path': 'crates/azoth-eos/src/multiflash_stability_test.rs', 'sha256': '887db30be02eef8156978a6f85913aadd90894d18a3d7fb7457660d68125095e'}],
         "source": 'NeqSim master `TPmultiflash.stabilityAnalysis`',
         "verification": 'partially_verified',
@@ -1195,7 +1195,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.ph_flash': {
         "calc_id": 'eos.ph_flash',
         "name": 'Pressure-enthalpy flash',
-        "spec": {'path': 'specs/models/eos/ph_flash.toml', 'sha256': '1460eae9f48b600142f05580b0bc6f0f012030e7e4e02b274718c6e43a9f7781'},
+        "spec": {'path': 'specs/models/eos/ph_flash.toml', 'sha256': 'fe50e7ae83dc1ff950adc74c476722a1852be219deb2adb3c3d5823921a4d85d'},
         "code": [{'path': 'python/src/azoth/eos/reference/ph_flash.py', 'sha256': 'c6ccab9d63b45ea1f20a034ea62a30731b417361cd44aef52ac0fec6c3ca45f6'}, {'path': 'crates/azoth-eos/src/ph_flash.rs', 'sha256': 'e542ca473de36c41f5cf4090820a545dbf2fd4930649b7b1660129365c4fadd7'}],
         "source": 'Standard thermodynamics, as in Smith, Van Ness & Abbott; Michelsen & Mollerup',
         "verification": 'partially_verified',
@@ -1283,7 +1283,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.pr78_kappa': {
         "calc_id": 'eos.pr78_kappa',
         "name": 'Peng-Robinson (1978) attraction-parameter coefficient',
-        "spec": {'path': 'specs/calcs/eos/pr78_kappa.toml', 'sha256': '1fdb75f72df8069eaeff7cd810d79f4c64d6c2f1cd26333beb814cf0d40902bd'},
+        "spec": {'path': 'specs/calcs/eos/pr78_kappa.toml', 'sha256': 'ae05f7b9e78621c633bcdf71190e0e02003f7e9b1658e0c46209518bd752c2d5'},
         "code": [{'path': 'python/src/azoth/eos/reference/pr78_kappa.py', 'sha256': '914abebf9302e0ae5adc7ec7f814a3297660dc1b9e61e07bab346880400c37ee'}, {'path': 'crates/azoth-eos/src/pr78_kappa.rs', 'sha256': 'f615df5267a99f80d568d4f78310bd137b3949c645d59ba6ea9fdd0f2b03057f'}],
         "source": 'Peng, D. Y.; Robinson, D. B. (1978)',
         "verification": 'partially_verified',
@@ -1294,7 +1294,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.pr_alpha_ab': {
         "calc_id": 'eos.pr_alpha_ab',
         "name": 'Peng-Robinson alpha function and reduced attraction parameters',
-        "spec": {'path': 'specs/calcs/eos/pr_alpha_ab.toml', 'sha256': '786df3f63c2f6517495c67e9800e48019bd22bb425826038e986f137b0e1350a'},
+        "spec": {'path': 'specs/calcs/eos/pr_alpha_ab.toml', 'sha256': '93316c6a9f7874dd5e0ed48f9e397a5abc2ec5f91e9d0b76ce86e1759426a65b'},
         "code": [{'path': 'python/src/azoth/eos/reference/pr_alpha_ab.py', 'sha256': 'a2fae6664620765dd401f99573ba586f73abdc09715d9f36f3b831b54321ed76'}, {'path': 'crates/azoth-eos/src/pr_alpha_ab.rs', 'sha256': '39ecfc817a7f0ed937947e860a6dadf38e2107d6a864ed27748b7678b5cf69b4'}],
         "source": 'Peng, D. Y.; Robinson, D. B. (1976)',
         "verification": 'partially_verified',
@@ -1338,8 +1338,8 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.pr_departure': {
         "calc_id": 'eos.pr_departure',
         "name": 'Peng-Robinson fugacity coefficient and departure functions',
-        "spec": {'path': 'specs/calcs/eos/pr_departure.toml', 'sha256': '948a38ab3a00a6f68eb46af2fbd1a69510079af61689db61b5e498de33085b48'},
-        "code": [{'path': 'python/src/azoth/eos/reference/pr_departure.py', 'sha256': '9e50d0df5b1ad39ea87ea4c3880f8b17ad00213c2baecceb45035003f2c27a44'}, {'path': 'crates/azoth-eos/src/pr_departure.rs', 'sha256': '264c55abb6731864609b3a3df27bd6215fbb84ff9e65d90d460f0d90ff32e8d3'}],
+        "spec": {'path': 'specs/calcs/eos/pr_departure.toml', 'sha256': '71ea730c6722c6f29499b018ce8861ca02e84447dbba995e76219d04b9f2e360'},
+        "code": [{'path': 'python/src/azoth/eos/reference/pr_departure.py', 'sha256': '9e50d0df5b1ad39ea87ea4c3880f8b17ad00213c2baecceb45035003f2c27a44'}, {'path': 'crates/azoth-eos/src/pr_departure.rs', 'sha256': '2e77e59c6628bc06c00cb3c85791fe9cdc9bd706bedbddcaffa59b616c2dffa3'}],
         "source": 'Peng, D. Y.; Robinson, D. B. (1976)',
         "verification": 'partially_verified',
         "validation_cases": 0,
@@ -1360,7 +1360,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.pr_kappa': {
         "calc_id": 'eos.pr_kappa',
         "name": 'Peng-Robinson attraction-parameter coefficient',
-        "spec": {'path': 'specs/calcs/eos/pr_kappa.toml', 'sha256': '788c8c09c847880d99ef5b5f7e686f18c58c8c9e284304ec3167d366166c96d8'},
+        "spec": {'path': 'specs/calcs/eos/pr_kappa.toml', 'sha256': '6fb66f95dc65433870d1023b3d538981ae3f76fcab8043dfdae131bf2d667bac'},
         "code": [{'path': 'python/src/azoth/eos/reference/pr_kappa.py', 'sha256': '34466077239d56814a9d56ecc6cfa7b3af4de6c0b59effa5a070402b970dc715'}, {'path': 'crates/azoth-eos/src/pr_kappa.rs', 'sha256': '386a7eb2f853952e8d4d1934e6f76715b1dc80f0d06539ebf73fff6b5b7d1839'}],
         "source": 'Peng, D. Y.; Robinson, D. B. (1976)',
         "verification": 'partially_verified',
@@ -1382,9 +1382,9 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.pr_mass_density': {
         "calc_id": 'eos.pr_mass_density',
         "name": 'Mass density from a molar volume',
-        "spec": {'path': 'specs/calcs/eos/pr_mass_density.toml', 'sha256': '0676a50f4cba26534eeb0af5d7eaa1a5ed9b74cd9c1d28af9c4db8976a5dc1f5'},
+        "spec": {'path': 'specs/calcs/eos/pr_mass_density.toml', 'sha256': '348592db19e62b8c4bad87ef92dcaf5958c1118145f32ad8b2c7832d0c556ba8'},
         "code": [{'path': 'python/src/azoth/eos/reference/pr_mass_density.py', 'sha256': 'fd6877f4be631a9246c3fbf49e81ad4d75b16a0f63e48650c3685f71e692c2f1'}, {'path': 'crates/azoth-eos/src/pr_mass_density.rs', 'sha256': '3aa2c2ac0aed081300bf51d6e8bebd0630cc333a3ff1b8dda754d16c19618b0a'}],
-        "source": 'The definition of molar mass',
+        "source": 'NeqSim `Phase.getDensity`, which divides the molar mass by the molar volume',
         "verification": 'partially_verified',
         "validation_cases": 0,
         "tests_active": 4,
@@ -1393,7 +1393,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.pr_molar_volume': {
         "calc_id": 'eos.pr_molar_volume',
         "name": 'Molar volume from a compressibility factor',
-        "spec": {'path': 'specs/calcs/eos/pr_molar_volume.toml', 'sha256': '2db052bff3f05971e95a7a0fb248b0781914a1150cb46af6aefcfdf7fad1b1ef'},
+        "spec": {'path': 'specs/calcs/eos/pr_molar_volume.toml', 'sha256': '9170d37394c968c9cccb201a1ee6c637168ac13d02c2a5059ba08c4f41ee9884'},
         "code": [{'path': 'python/src/azoth/eos/reference/pr_molar_volume.py', 'sha256': 'f7606d9986f82a6b9422a85f956985de50829eaf3bdc13b0cb4665668fd7cd09'}, {'path': 'crates/azoth-eos/src/pr_molar_volume.rs', 'sha256': 'be2cc84a951b6389dcd4359c74cbea406a22da5edab75a24870b5d4fa9dfa032'}],
         "source": 'The ideal-gas law with the compressibility factor as the departure from it',
         "verification": 'partially_verified',
@@ -1404,7 +1404,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.pr_peneloux_shift': {
         "calc_id": 'eos.pr_peneloux_shift',
         "name": 'Peng-Robinson Peneloux volume-translation parameter',
-        "spec": {'path': 'specs/calcs/eos/pr_peneloux_shift.toml', 'sha256': 'a763b6588feeacc50c0e36df66c855d6c825dec2ecb80c93b90c8b82f58ceff5'},
+        "spec": {'path': 'specs/calcs/eos/pr_peneloux_shift.toml', 'sha256': 'f071c4c30ab0b7c29ca135196684e5d1d8926169c4c58eece78b8c317683fb1b'},
         "code": [{'path': 'python/src/azoth/eos/reference/pr_peneloux_shift.py', 'sha256': 'aa9364c60f514ee60259c2fbf443a173d53658987248ac68bffc81b65e5d6646'}, {'path': 'crates/azoth-eos/src/pr_peneloux_shift.rs', 'sha256': '8a130b4461ce2abc9b5806655acd6563d0184f30ccfe7ca665700fa5ce835c54'}],
         "source": 'Péneloux, A.; Rauzy, E.; Fréze, R. (1982)',
         "verification": 'verified',
@@ -1415,7 +1415,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.pr_z_factor': {
         "calc_id": 'eos.pr_z_factor',
         "name": 'Peng-Robinson compressibility factor',
-        "spec": {'path': 'specs/calcs/eos/pr_z_factor.toml', 'sha256': '12d9aa8ff82ecf72265ae30643c947d57f2ba047508a118832773df12cc3c8f0'},
+        "spec": {'path': 'specs/calcs/eos/pr_z_factor.toml', 'sha256': 'a118a692165744b15646a31267f5b2a9f68cf6b648c13f118810aa9bde63e787'},
         "code": [{'path': 'python/src/azoth/eos/reference/pr_z_factor.py', 'sha256': '451cdd4b22495bce7cf55d85bf38eca6cb085559fe970661fd62b9f53452effc'}, {'path': 'crates/azoth-eos/src/pr_z_factor.rs', 'sha256': '861b7e0f10aa40ff6a1900d7186a126d490704d3040ab3588575c10865293190'}],
         "source": 'Peng, D. Y.; Robinson, D. B. (1976)',
         "verification": 'partially_verified',
@@ -1437,7 +1437,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.ps_flash': {
         "calc_id": 'eos.ps_flash',
         "name": 'Pressure-entropy flash',
-        "spec": {'path': 'specs/models/eos/ps_flash.toml', 'sha256': '9e13da74021eff2868b9efaf73b5d40331f4ad56d9335b233219c3473c7c50ac'},
+        "spec": {'path': 'specs/models/eos/ps_flash.toml', 'sha256': 'b69711cc7a3421ef238cdb0978b81df1e4cff2157ff080100c961d0c67c7bc56'},
         "code": [{'path': 'python/src/azoth/eos/reference/ps_flash.py', 'sha256': '46aee54c38504c868e7a8eb7e175d205c7600a88c9cd720fecab40d7400d6ce3'}, {'path': 'crates/azoth-eos/src/ps_flash.rs', 'sha256': 'd6bb98ffb059ab245a96fe7674b8b1c698c2c7c68e52d2fe7afad2b93415082d'}],
         "source": 'Standard thermodynamics, as in Smith, Van Ness & Abbott; Michelsen & Mollerup',
         "verification": 'partially_verified',
@@ -1459,8 +1459,8 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.pt_phase_envelope': {
         "calc_id": 'eos.pt_phase_envelope',
         "name": 'PT phase envelope',
-        "spec": {'path': 'specs/models/eos/pt_phase_envelope.toml', 'sha256': '17796193aff41843cc35b0d38e3990d6f6971a07c53e6b4db8e6e45f0d10378a'},
-        "code": [{'path': 'python/src/azoth/eos/reference/pt_phase_envelope.py', 'sha256': '3d185a8c0cfa925f1b6fc5e9d5c6f6598ba6cbddec07ed7c379cb1a35876ef97'}, {'path': 'crates/azoth-eos/src/pt_phase_envelope.rs', 'sha256': '926b7bd870485f95680f05aa4ccea60e7dc8ac7656a3d16c261419b07ea587d8'}],
+        "spec": {'path': 'specs/models/eos/pt_phase_envelope.toml', 'sha256': 'e8b4e5660b734dfe80b6873963f7cc097ba34446b3ea6c8ad89cc9f48b8af1e1'},
+        "code": [{'path': 'python/src/azoth/eos/reference/pt_phase_envelope.py', 'sha256': '3d185a8c0cfa925f1b6fc5e9d5c6f6598ba6cbddec07ed7c379cb1a35876ef97'}, {'path': 'crates/azoth-eos/src/pt_phase_envelope.rs', 'sha256': 'ba9b50a7db0a6cabc0c4c156c58db7c40114141e8162e9cea36d5b398dd3db25'}],
         "source": 'Michelsen, M. L. (1980), with NeqSim `RobustPhaseEnvelope` for the fallback and `eos.critical_point` for the critical point',
         "verification": 'partially_verified',
         "validation_cases": 0,
@@ -1492,7 +1492,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.pv_flash': {
         "calc_id": 'eos.pv_flash',
         "name": 'Pressure-volume flash',
-        "spec": {'path': 'specs/models/eos/pv_flash.toml', 'sha256': '702397a7e5f0b7547e97f88774bf22eac5277e2cd031f6b56ac2808b35df3c0c'},
+        "spec": {'path': 'specs/models/eos/pv_flash.toml', 'sha256': 'a8d35702ac3a4233aa8c139fda83ddd4d347637f3ea086d592c65c45888aa0a9'},
         "code": [{'path': 'python/src/azoth/eos/reference/pv_flash.py', 'sha256': '4febddedb126aad7fabf304e2bb6129285f6962cad56612d71f399d03c6d1f3c'}, {'path': 'crates/azoth-eos/src/pv_flash.rs', 'sha256': '4a04ee3a7831429011a431253fc38525c1007d3c8610ed3d90f5adb759e24a75'}],
         "source": 'Standard thermodynamics, as in Michelsen & Mollerup',
         "verification": 'partially_verified',
@@ -1503,7 +1503,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.pv_reflux_flash': {
         "calc_id": 'eos.pv_reflux_flash',
         "name": 'Pressure and reflux-ratio flash',
-        "spec": {'path': 'specs/models/eos/pv_reflux_flash.toml', 'sha256': 'be4297756ffe3af5a9e0d18a0988d921f4d8698c8fe2e2e92faeed2cad5e3e44'},
+        "spec": {'path': 'specs/models/eos/pv_reflux_flash.toml', 'sha256': '6f10266f816c8b892da54fad5060eab6cde2d06012d6a081015b0a53bc1f9149'},
         "code": [{'path': 'python/src/azoth/eos/reference/pv_reflux_flash.py', 'sha256': '66a5abd9d091e9904a06b0158fcd34af05f6462138e9ca92f8c4014e01e5bbee'}, {'path': 'crates/azoth-eos/src/pv_reflux_flash.rs', 'sha256': 'f9759bc879467c7bc5af1d691a1293c4737fa90cf5b30614938abc04d624d637'}],
         "source": 'Standard thermodynamics, as in Michelsen & Mollerup',
         "verification": 'partially_verified',
@@ -1514,7 +1514,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.pvf_flash': {
         "calc_id": 'eos.pvf_flash',
         "name": 'Pressure and vapour-fraction flash',
-        "spec": {'path': 'specs/models/eos/pvf_flash.toml', 'sha256': '2a4c5f908719d34e2f17b96e10cb46877da4a275b2deac2de96a17645324c6e8'},
+        "spec": {'path': 'specs/models/eos/pvf_flash.toml', 'sha256': '210d7e405a456b1bf38f6a5152b2310859816f5516d3bf834291ee0d14390135'},
         "code": [{'path': 'python/src/azoth/eos/reference/pvf_flash.py', 'sha256': 'cde14382b3f629a51ae2ce82b2b7fa9c5098d513f02d27fed0482218b5e57d0d'}, {'path': 'crates/azoth-eos/src/pvf_flash.rs', 'sha256': '97ce2830a8875da10b27353714013459a0337c9277e4723a95da8e1e76c970bb'}],
         "source": 'Standard thermodynamics, as in Michelsen & Mollerup',
         "verification": 'partially_verified',
@@ -1536,7 +1536,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.rachford_rice_binary': {
         "calc_id": 'eos.rachford_rice_binary',
         "name": 'Rachford-Rice vapour fraction, for a binary',
-        "spec": {'path': 'specs/calcs/eos/rachford_rice_binary.toml', 'sha256': '51d71346726517aa360cfd1c4168e7802a9d4a358a84c35f11d7e9ba9eb6a0e5'},
+        "spec": {'path': 'specs/calcs/eos/rachford_rice_binary.toml', 'sha256': '78d7419bce981fa9cd2dd434a9bce7dcad6aba7cd511dbabda8faf0ec700d3fc'},
         "code": [{'path': 'python/src/azoth/eos/reference/rachford_rice_binary.py', 'sha256': 'f649eb5733497253d0315db5a4edc01f2e3a77e02ce2afd5f9003a51670d44a6'}, {'path': 'crates/azoth-eos/src/rachford_rice_binary.rs', 'sha256': '23fb94da32f0011255fe169918c65252150a4c6d280aa451052b5a823b44628c'}],
         "source": 'Rachford, H. H.; Rice, J. D. (1952)',
         "verification": 'partially_verified',
@@ -1547,7 +1547,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.rackett_molar_volume': {
         "calc_id": 'eos.rackett_molar_volume',
         "name": 'Saturated liquid molar volume from the Rackett equation',
-        "spec": {'path': 'specs/calcs/eos/rackett_molar_volume.toml', 'sha256': '2e84619cb36fbc982e757febbc4d49c45f2f05395391c054f6afec55f1d79510'},
+        "spec": {'path': 'specs/calcs/eos/rackett_molar_volume.toml', 'sha256': '676ff28523c112f33e95ee7da5ebd53ecc387d463c9e918356846667a640d35a'},
         "code": [{'path': 'python/src/azoth/eos/reference/rackett_molar_volume.py', 'sha256': 'fc0c75670fb12a642d4fe543bb2233881e509fa37333d71a28acf6891b9d9a27'}, {'path': 'crates/azoth-eos/src/rackett_molar_volume.rs', 'sha256': '0acf6c5eab311ed2f00112966e1bdd0a0350c08373abfadfbcade1777f478f38'}],
         "source": 'Spencer, C. F.; Danner, R. P. (1972)',
         "verification": 'partially_verified',
@@ -1558,7 +1558,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.rk_alpha_ab': {
         "calc_id": 'eos.rk_alpha_ab',
         "name": 'Redlich-Kwong alpha function and reduced attraction parameters',
-        "spec": {'path': 'specs/calcs/eos/rk_alpha_ab.toml', 'sha256': '3e288d78adfbaa8ff490cf629558979ff2616993b538d4ec283b6030d82edde0'},
+        "spec": {'path': 'specs/calcs/eos/rk_alpha_ab.toml', 'sha256': '14640bf4ea2af96b860db4471684fc7d107b075ebff6dcd6ec3259dbc3dec05f'},
         "code": [{'path': 'python/src/azoth/eos/reference/rk_alpha_ab.py', 'sha256': '1f6a8d58a8b0a5c4fabaf0373f3afb61b3fc9a7a89ab85636f2dc792cdfd08c6'}, {'path': 'crates/azoth-eos/src/rk_alpha_ab.rs', 'sha256': 'ac264135b0d9e05cd7eb337ce1dc5a3c1b829844f187c52b27f44e8dbf0b8435'}],
         "source": 'Redlich, O.; Kwong, J. N. S. (1949)',
         "verification": 'partially_verified',
@@ -1602,7 +1602,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.saturate_with_water': {
         "calc_id": 'eos.saturate_with_water',
         "name": 'Water saturation of a fluid',
-        "spec": {'path': 'specs/models/eos/saturate_with_water.toml', 'sha256': '2ff65075da3033775ffc416f1f3dc55fa13350e363771325391a5f4875f9f199'},
+        "spec": {'path': 'specs/models/eos/saturate_with_water.toml', 'sha256': '671ae233640eaf8936e4a8994a0b175b4286b457466c87f655f1cd48412dba85'},
         "code": [{'path': 'python/src/azoth/eos/reference/saturate_with_water.py', 'sha256': '76cf5627672c2a5dbd87a2f2c8803b65da13c26d0a1ff691f50f9426899145f9'}, {'path': 'crates/azoth-eos/src/saturate_with_water.rs', 'sha256': 'a84ec5e8645bf2d3d296fe31021e5fa1b88d112724977f5fbb9bf9e7da70074d'}],
         "source": 'NeqSim master `SaturateWithWater`',
         "verification": 'partially_verified',
@@ -1723,7 +1723,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.solid_fugacity': {
         "calc_id": 'eos.solid_fugacity',
         "name": 'Pure solid fugacity coefficient',
-        "spec": {'path': 'specs/calcs/eos/solid_fugacity.toml', 'sha256': 'd956e1d99026a184ef8f96dea45a1538fadcfa9f32eaa2deab72385a2b62c316'},
+        "spec": {'path': 'specs/calcs/eos/solid_fugacity.toml', 'sha256': 'b799e61c83a1f886554fe646309f6e4f75dbb02e1459f4dd9ccfbc6caf8f132d'},
         "code": [{'path': 'python/src/azoth/eos/reference/solid_fugacity.py', 'sha256': '04d1d0485234275bf05e66d2e018418d4ef145b3a60e721b36197024e2ed050d'}, {'path': 'crates/azoth-eos/src/solid_fugacity.rs', 'sha256': 'ce04e7769a459d39463f4b0dfc91b1d9fef87f8f14d6dcdcf822ed211dee9854'}],
         "source": 'NeqSim master `ComponentSolid.fugcoef2`',
         "verification": 'partially_verified',
@@ -1767,7 +1767,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.srk_alpha_ab': {
         "calc_id": 'eos.srk_alpha_ab',
         "name": 'Soave-Redlich-Kwong alpha function and reduced attraction parameters',
-        "spec": {'path': 'specs/calcs/eos/srk_alpha_ab.toml', 'sha256': '635288ea8c698ea5e2db2d84c4528e7eb4201cfcf3ebe293302935b80ce1aa44'},
+        "spec": {'path': 'specs/calcs/eos/srk_alpha_ab.toml', 'sha256': 'c450e32255af591d79571b7f92b3324858d0fda3f8ffb5ae45e65fd08e953114'},
         "code": [{'path': 'python/src/azoth/eos/reference/srk_alpha_ab.py', 'sha256': '45c9a95d7928fca499b5cf68a4a50a4276f06e6841d7064aca759ec52b3a1276'}, {'path': 'crates/azoth-eos/src/srk_alpha_ab.rs', 'sha256': 'f9d9451cbd1202c5bc8a46b0014d49d0feba154ac5af58886c54ff5ee63f3579'}],
         "source": 'Soave, G. (1972)',
         "verification": 'partially_verified',
@@ -1800,7 +1800,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.srk_kappa': {
         "calc_id": 'eos.srk_kappa',
         "name": 'Soave-Redlich-Kwong attraction-parameter coefficient',
-        "spec": {'path': 'specs/calcs/eos/srk_kappa.toml', 'sha256': '5c7b9003a1fc0243c366c72079548e05afb8574fb24943e3c593f299c30440e3'},
+        "spec": {'path': 'specs/calcs/eos/srk_kappa.toml', 'sha256': '52ec2b82b6424e336226ac1b8c14ec5f9e3449b38583f7b9ac960807372e0227'},
         "code": [{'path': 'python/src/azoth/eos/reference/srk_kappa.py', 'sha256': '33e790da3b3b0e150bdd903d6dfbbb3169d701c2b62f3ed7865a7418c669d94b'}, {'path': 'crates/azoth-eos/src/srk_kappa.rs', 'sha256': '4778ba612cfa4b75c0620ae4efc6aa5de0e9da6420006be72069edda9176a5b4'}],
         "source": 'Soave, G. (1972)',
         "verification": 'partially_verified',
@@ -1811,7 +1811,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.srk_peneloux_shift': {
         "calc_id": 'eos.srk_peneloux_shift',
         "name": 'Soave-Redlich-Kwong Peneloux volume-translation parameter',
-        "spec": {'path': 'specs/calcs/eos/srk_peneloux_shift.toml', 'sha256': 'ccbbe2f37e52f387fda506455480a4a3c8a1656e3f7226034e34e41dc344f641'},
+        "spec": {'path': 'specs/calcs/eos/srk_peneloux_shift.toml', 'sha256': '949106616f5cb08a2e6df5c6d252080d5dc8abc5333509c93ea03c16f1cbbcba'},
         "code": [{'path': 'python/src/azoth/eos/reference/srk_peneloux_shift.py', 'sha256': 'f6a57825d2df6ca6fd7b1b7cdb327aad1216b573e29621438953097b3331ebf0'}, {'path': 'crates/azoth-eos/src/srk_peneloux_shift.rs', 'sha256': 'ec2a7e25e907f9334e9de0a1ef3757680d25f771c7c24441ddaff74a96963126'}],
         "source": 'Péneloux, A.; Rauzy, E.; Fréze, R. (1982)',
         "verification": 'verified',
@@ -1833,7 +1833,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.stability_test': {
         "calc_id": 'eos.stability_test',
         "name": 'Tangent-plane stability test',
-        "spec": {'path': 'specs/models/eos/stability_test.toml', 'sha256': 'e3d54a68c3db8205ccbbe21fcf36adcd2c1a1601b4c0f8ef7ecb438679d62c30'},
+        "spec": {'path': 'specs/models/eos/stability_test.toml', 'sha256': '8e3b1d44da2c4961f92668a96c335245d305c91f535e527b07ee32e453a7666d'},
         "code": [{'path': 'python/src/azoth/eos/reference/stability_test.py', 'sha256': '94b0fe0bcb635613dec1b2f54460557df0f157a1344c05c6f9319c6d828e01cf'}, {'path': 'crates/azoth-eos/src/stability_test.rs', 'sha256': '1fc5ee7fddfd84dd762e20a115171e375ac9348df63fe5fed33ab77e62aad182'}],
         "source": 'Michelsen, M. L. (1982), "The isothermal flash problem. Part I. Stability"',
         "verification": 'partially_verified',
@@ -1866,7 +1866,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.tbp_fraction_properties': {
         "calc_id": 'eos.tbp_fraction_properties',
         "name": 'TBP pseudo-component properties',
-        "spec": {'path': 'specs/calcs/eos/tbp_fraction_properties.toml', 'sha256': 'a8d2bb37a8ca433760940825ccb4f8ad7043b2b40a0d03eae05597f772913e46'},
+        "spec": {'path': 'specs/calcs/eos/tbp_fraction_properties.toml', 'sha256': 'e9951b3571522cae936ef22bb250825fad6f426908c6742b17518332881c6454'},
         "code": [{'path': 'python/src/azoth/eos/reference/tbp_fraction_properties.py', 'sha256': '0a400886e6751be64d30206e4b118523cd700bc87f728b228b9b9fbcfa26026c'}, {'path': 'crates/azoth-eos/src/tbp_fraction_properties.rs', 'sha256': '6123d83d373a1ec8eb90385371ab116c153123ddbae910fd962f76c4ccab8d7d'}],
         "source": 'NeqSim master `TBPfractionModel.PedersenTBPModelSRK`',
         "verification": 'partially_verified',
@@ -1976,7 +1976,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.tv_fraction_flash': {
         "calc_id": 'eos.tv_fraction_flash',
         "name": 'Temperature and vapour-volume-fraction flash',
-        "spec": {'path': 'specs/models/eos/tv_fraction_flash.toml', 'sha256': '97f7f437cff370e1995482b569103557464737ab0e258fae4c05223fdee40635'},
+        "spec": {'path': 'specs/models/eos/tv_fraction_flash.toml', 'sha256': '8f8c325f3acb3e913c04e8eedaff049f6ed8f9c27e1c7d692129e4ca6c371f51'},
         "code": [{'path': 'python/src/azoth/eos/reference/tv_fraction_flash.py', 'sha256': '046fd5ab5370f12ad98362ad3a084eb6d0b42438fbba894547bde11adf12f3aa'}, {'path': 'crates/azoth-eos/src/tv_fraction_flash.rs', 'sha256': '0a33c22ef76231dd07b280d495fb1978ecf6f858302d72c3cd0c07676d4c3d8f'}],
         "source": 'ASTM D6377-20',
         "verification": 'partially_verified',
@@ -1987,7 +1987,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.twu_kappa': {
         "calc_id": 'eos.twu_kappa',
         "name": 'Twu attraction-parameter coefficient',
-        "spec": {'path': 'specs/calcs/eos/twu_kappa.toml', 'sha256': '974b75192baedccdde4a4dd810d540f556af274b1c27bb6f1d808c49134fd89f'},
+        "spec": {'path': 'specs/calcs/eos/twu_kappa.toml', 'sha256': '1fb6eb6b034ec427402a6e46d2517322d3357a4b2cde50259c6b52eb1aba6818'},
         "code": [{'path': 'python/src/azoth/eos/reference/twu_kappa.py', 'sha256': '0b321fbcf5857893262a2057cec3fa533b91a65f634d3ffb395b381df5dd460d'}, {'path': 'crates/azoth-eos/src/twu_kappa.rs', 'sha256': 'b2906d72fc8f1ce7f291d1de5a08f3c5449e1448f02068e6ee47e0ff2283d190'}],
         "source": 'Twu, C. H.; Bluck, D.; Cunningham, J. R.; Coon, J. E. (1991)',
         "verification": 'partially_verified',
@@ -2031,7 +2031,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.tyn_calus_diffusivity': {
         "calc_id": 'eos.tyn_calus_diffusivity',
         "name": 'Liquid binary diffusivity from the Tyn-Calus correlation',
-        "spec": {'path': 'specs/calcs/eos/tyn_calus_diffusivity.toml', 'sha256': '032cb11a4aef6ac403033be80afcdde80b082b03a5037f2168ed239661d24f95'},
+        "spec": {'path': 'specs/calcs/eos/tyn_calus_diffusivity.toml', 'sha256': '9c55e8b185d8645002e004f7e7e9efdf55c45432ec08c88a4051582dda09c59b'},
         "code": [{'path': 'python/src/azoth/eos/reference/tyn_calus_diffusivity.py', 'sha256': '6d7da916d9c73dc02d011bfcaeafbd96c4dfbbb2d3530063d889b6941e253362'}, {'path': 'crates/azoth-eos/src/tyn_calus_diffusivity.rs', 'sha256': 'cdc02fc4d4a21692e4b536b8d53eb66eacfc423616b158b8685eccdf94d534b8'}],
         "source": 'Tyn, M. T.; Calus, W. F. (1975)',
         "verification": 'partially_verified',
@@ -2053,7 +2053,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.umr_pru_flash': {
         "calc_id": 'eos.umr_pru_flash',
         "name": 'UMR-PRU pressure-temperature flash',
-        "spec": {'path': 'specs/models/eos/umr_pru_flash.toml', 'sha256': 'c0f6e726bf11e20d6a41356277c79914302dd231cf5752e190e25a5a9e0e99c4'},
+        "spec": {'path': 'specs/models/eos/umr_pru_flash.toml', 'sha256': '9773ecef788f0f51a59c14a6afd1834352e8d3662e2eaf53bfe7d5b448c61213'},
         "code": [{'path': 'python/src/azoth/eos/reference/umr_pru_flash.py', 'sha256': '58034324cd23446ded0fa33eaaf094427281adcc476202ceda7236faf704f257'}, {'path': 'crates/azoth-eos/src/umr_pru_flash.rs', 'sha256': '9513b58d5de82d8ed6d36697244f2d908d8216b5ebcfa3648d0c7d03ff14abcc'}],
         "source": 'NeqSim `SystemUMRPRUEos`; Michelsen (1982) for the flash',
         "verification": 'partially_verified',
@@ -2075,7 +2075,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.unifac_activity_coefficients': {
         "calc_id": 'eos.unifac_activity_coefficients',
         "name": 'Activity coefficients from the UNIFAC group-contribution model',
-        "spec": {'path': 'specs/models/eos/unifac_activity_coefficients.toml', 'sha256': '26f34a44658d18098f21583866663b804bdf3e40c41fb4d495c72e4252f67c31'},
+        "spec": {'path': 'specs/models/eos/unifac_activity_coefficients.toml', 'sha256': '7a3d9e02fe94628912592674d35860af69debcbd52f3e670401cb6442003cc83'},
         "code": [{'path': 'python/src/azoth/eos/reference/unifac_activity_coefficients.py', 'sha256': '1975c97ce30604f9e6169d0613af168f9f66d6022e479c5047ea02b21e1f1ad6'}, {'path': 'crates/azoth-eos/src/unifac_activity_coefficients.rs', 'sha256': '4d0f8edbc7f006ee6d01a6b2b0147824c9b0a9aa07a4ae2779e932a04b29a7e9'}],
         "source": 'Fredenslund et al. (1975); Hansen et al. (1991)',
         "verification": 'verified',
@@ -2086,7 +2086,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.unifac_psrk_activity_coefficients': {
         "calc_id": 'eos.unifac_psrk_activity_coefficients',
         "name": 'Activity coefficients from UNIFAC with PSRK temperature-dependent interaction parameters',
-        "spec": {'path': 'specs/models/eos/unifac_psrk_activity_coefficients.toml', 'sha256': '75216920897f8938e82ccacba06b5693b97b36e17142d4047979cc2ecbbca9f5'},
+        "spec": {'path': 'specs/models/eos/unifac_psrk_activity_coefficients.toml', 'sha256': '27bb5c99f02c61a1749cfcd7a299b40e2c7c98cf6800fa033fbd67b98d62b9a7'},
         "code": [{'path': 'python/src/azoth/eos/reference/unifac_psrk_activity_coefficients.py', 'sha256': '2825a63593dace2ffe6337119be426ce42f5cb0e4e058ba42a5327314639e0f0'}, {'path': 'crates/azoth-eos/src/unifac_psrk_activity_coefficients.rs', 'sha256': 'ecfbc7e4d2aa2e710d2c9ddf2c519b38cea8ff0baabe9e1401f4d94589739074'}],
         "source": 'Holderbaum, T.; Gmehling, J. (1991)',
         "verification": 'partially_verified',
@@ -2152,7 +2152,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.vh_flash': {
         "calc_id": 'eos.vh_flash',
         "name": 'Volume-enthalpy flash',
-        "spec": {'path': 'specs/models/eos/vh_flash.toml', 'sha256': 'c1735bef3984b8687ce962a02c8a74ae0c09115edfd4ef97fe78668b7f5f9684'},
+        "spec": {'path': 'specs/models/eos/vh_flash.toml', 'sha256': '645ee2229d2c2c7e1512598821bc695d8b6a758a72353c7f3f153e0f368aab14'},
         "code": [{'path': 'python/src/azoth/eos/reference/vh_flash.py', 'sha256': 'd86c5783b17c88c0c554bef0dadfb373c3878626b06960061027e21c365b7423'}, {'path': 'crates/azoth-eos/src/vh_flash.rs', 'sha256': '48fdbe4b25e6e724cb131603a0069a3a552c747bed2bbc759ac6800b93af924f'}],
         "source": 'Standard thermodynamics, as in Michelsen & Mollerup',
         "verification": 'partially_verified',
@@ -2174,7 +2174,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.vs_flash': {
         "calc_id": 'eos.vs_flash',
         "name": 'Volume-entropy flash',
-        "spec": {'path': 'specs/models/eos/vs_flash.toml', 'sha256': 'bcc9fa35cb8db27cfcc09fd0c2c1ab698e062586f88d17f6afa6bc888050eb2f'},
+        "spec": {'path': 'specs/models/eos/vs_flash.toml', 'sha256': 'c22ab33f5b0d7911699351781934e92da1e03bb594629180e95ab471f74271b3'},
         "code": [{'path': 'python/src/azoth/eos/reference/vs_flash.py', 'sha256': 'f800ccf7ad9128f85be40107e60e652f56e9229b7133c4825473d8e0ef079454'}, {'path': 'crates/azoth-eos/src/vs_flash.rs', 'sha256': 'b94c152addd33a44425f7f241c50d9be1b53c82bf5fe81a60ebee4c09fab2490'}],
         "source": 'Standard thermodynamics, as in Michelsen & Mollerup',
         "verification": 'partially_verified',
@@ -2185,7 +2185,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.vu_flash': {
         "calc_id": 'eos.vu_flash',
         "name": 'Volume-internal-energy flash',
-        "spec": {'path': 'specs/models/eos/vu_flash.toml', 'sha256': '7977560046d6c3689987cb387b7aa416f38010b78e161164f2f5897b0a52af00'},
+        "spec": {'path': 'specs/models/eos/vu_flash.toml', 'sha256': 'fd7b3968d2912670c707c7917d1cb1ec257c6ff54cdbb0e925108a5a7e978b27'},
         "code": [{'path': 'python/src/azoth/eos/reference/vu_flash.py', 'sha256': '65dce6e9e2a5d97910e7eb9372aa50f1f61a8ea48526657ba0f07217ac117990'}, {'path': 'crates/azoth-eos/src/vu_flash.rs', 'sha256': 'd3bb158d9b13e57b26c4802b4ec6f59de9aa80a233c1b496c84e933cb0a46edb'}],
         "source": 'Standard thermodynamics, as in Michelsen & Mollerup',
         "verification": 'partially_verified',
@@ -2196,7 +2196,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.vu_flash_single_comp': {
         "calc_id": 'eos.vu_flash_single_comp',
         "name": 'Volume-internal-energy flash of a pure component',
-        "spec": {'path': 'specs/models/eos/vu_flash_single_comp.toml', 'sha256': 'c4606ecc4ec7940a3617299944c2c7c652afdd8d6f4c75b7612084e5bc09c83c'},
+        "spec": {'path': 'specs/models/eos/vu_flash_single_comp.toml', 'sha256': '4edd0b1d90375658033ac6afc0a41f5713dc476eeda02b479bb77462ed5980dd'},
         "code": [{'path': 'python/src/azoth/eos/reference/vu_flash_single_comp.py', 'sha256': '0e9133b99e4d16ac64c9ab2447b23684ded888173e993832401324063cb964bb'}, {'path': 'crates/azoth-eos/src/vu_flash_single_comp.rs', 'sha256': '37ae5198078845b2505823b81b17b214de35baf018780b8e00913076ca10e815'}],
         "source": 'Standard thermodynamics, as in Michelsen & Mollerup',
         "verification": 'partially_verified',
@@ -2262,7 +2262,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.wax_solid_fugacity': {
         "calc_id": 'eos.wax_solid_fugacity',
         "name": 'Wax solid fugacity coefficient',
-        "spec": {'path': 'specs/calcs/eos/wax_solid_fugacity.toml', 'sha256': '95178049b42846597288fc26ba61af86a2296a0d856ca756b615136c3b529be7'},
+        "spec": {'path': 'specs/calcs/eos/wax_solid_fugacity.toml', 'sha256': 'ce710e6558bf75a52bbe45eb1a4ca23413af7b2adc4eda500e6459755916caf4'},
         "code": [{'path': 'python/src/azoth/eos/reference/wax_solid_fugacity.py', 'sha256': '8d68db580d544eb7dba01eabab06b91d27d42d417125d96e5b718b46e6a16481'}, {'path': 'crates/azoth-eos/src/wax_solid_fugacity.rs', 'sha256': '7d9aee091f647af821f7fec42cabd750773b67c088d7a0c6970856455770522c'}],
         "source": 'NeqSim master `ComponentWax.fugcoef2`',
         "verification": 'partially_verified',
@@ -2295,7 +2295,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'eos.wilson_activity_coefficients': {
         "calc_id": 'eos.wilson_activity_coefficients',
         "name": 'Activity coefficients from the paraffin-wax Wilson model',
-        "spec": {'path': 'specs/models/eos/wilson_activity_coefficients.toml', 'sha256': 'f13a796a4e505bf8d53ce3b9790af7a74ff93f791bb39c5ea944a359706056af'},
+        "spec": {'path': 'specs/models/eos/wilson_activity_coefficients.toml', 'sha256': '8c5ab11a79eec4f954672b07f90f859a52be9f79dae88d97eeba79f475a26552'},
         "code": [{'path': 'python/src/azoth/eos/reference/wilson_activity_coefficients.py', 'sha256': 'b4c79259f2a2b2b525f7ad1484d57c3c9c0e8279cc25b99693fe86739a6b2aa4'}, {'path': 'crates/azoth-eos/src/wilson_activity_coefficients.rs', 'sha256': '58a5e1cb4a6cc285f7c2ea2993c87b345df01f9baa334532f18eb1c63c688af9'}],
         "source": 'Coutinho et al. (1995)',
         "verification": 'verified',
@@ -2328,7 +2328,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'hydraulics.crane_k_factors': {
         "calc_id": 'hydraulics.crane_k_factors',
         "name": 'Fitting resistance coefficients by the equivalent-length method',
-        "spec": {'path': 'specs/calcs/hydraulics/crane_k_factors.toml', 'sha256': '3712ce3d300f618abbebc0c782e3a2c6bbf6f5eea6e7ab8dfe193650e03ad5d3'},
+        "spec": {'path': 'specs/calcs/hydraulics/crane_k_factors.toml', 'sha256': 'ddcb8d55a03f43585916bb91345a9cd4feb740554df14c0612cb94c57b6a4f89'},
         "code": [{'path': 'python/src/azoth/hydraulics/reference/crane_k_factors.py', 'sha256': 'da3c2817aac4a8a31485f7e9e18375a74067d3663b649782da08e61f93da1ab7'}, {'path': 'crates/azoth-hydraulics/src/crane_k_factors.rs', 'sha256': '67500619b58a96c6098b0cbed9e1312c0a2a917b6de56008ebe5b6a8016a7613'}],
         "source": 'Crane TP-410',
         "verification": 'partially_verified',
@@ -2339,7 +2339,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'hydraulics.darcy_weisbach': {
         "calc_id": 'hydraulics.darcy_weisbach',
         "name": 'Darcy-Weisbach pressure drop',
-        "spec": {'path': 'specs/calcs/hydraulics/darcy_weisbach.toml', 'sha256': '9390bcbe6448f3c0571c5e5ae224854638144319532cbcce3d1e4a6f0029678d'},
+        "spec": {'path': 'specs/calcs/hydraulics/darcy_weisbach.toml', 'sha256': '4fe3feb009f703300e9b4016948937badb28cf59d7fb9b491c52aab53bd1856e'},
         "code": [{'path': 'python/src/azoth/hydraulics/reference/darcy_weisbach.py', 'sha256': 'bc58e0c3099a8a3d2d455051e79f7f740048e760ccc66ea50e5a4943416601ec'}, {'path': 'crates/azoth-hydraulics/src/darcy_weisbach.rs', 'sha256': '545fbab9e66481f673f2c8fba273fabdcaed2d20cf2b9ab33aa063996739915c'}],
         "source": 'Crane TP-410',
         "verification": 'source_needed',
@@ -2416,9 +2416,9 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'hydraulics.pump_power': {
         "calc_id": 'hydraulics.pump_power',
         "name": 'Pump shaft power from flow, head and efficiency',
-        "spec": {'path': 'specs/calcs/hydraulics/pump_power.toml', 'sha256': '7667bdfec5e316baa651b299d3b91f4b581e91c34fe376ae9227d7f5d82e4e77'},
+        "spec": {'path': 'specs/calcs/hydraulics/pump_power.toml', 'sha256': 'cb9476f8e8c4bcce77a3af585a5071c77947352d1239f7094d0d1ddce0d6c4b2'},
         "code": [{'path': 'python/src/azoth/hydraulics/reference/pump_power.py', 'sha256': '1bfe9e3e720c07ea24b35fd8fefddf8a2eac2316875aabfc9ec5683be40cb9a8'}, {'path': 'crates/azoth-hydraulics/src/pump_power.rs', 'sha256': 'fbd0ee2cda141c1578fcfa8ebdcfa0b4130e645e54170fa9d288fb5f04ec5963'}],
-        "source": 'standard pump hydraulics; the hydraulic-power relation in any fluids text',
+        "source": 'NeqSim `Pump.run`, the pump-curve head-to-shaft-power branch',
         "verification": 'partially_verified',
         "validation_cases": 0,
         "tests_active": 5,
@@ -2427,7 +2427,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'hydraulics.reynolds_number': {
         "calc_id": 'hydraulics.reynolds_number',
         "name": 'Reynolds number for pipe flow',
-        "spec": {'path': 'specs/calcs/hydraulics/reynolds_number.toml', 'sha256': '6b299151d581cc13994aeaaac6b9b35558a54d58d6d542660d424ca3a45070c9'},
+        "spec": {'path': 'specs/calcs/hydraulics/reynolds_number.toml', 'sha256': '8ce05995f31497450d3ab3af18c6220f7532d06d3bbdbbfc4550a96df70d27f2'},
         "code": [{'path': 'python/src/azoth/hydraulics/reference/reynolds_number.py', 'sha256': '5be9c9707bc530763db47bf842635165ef5149bf05a5adecb65f37c293a9a830'}, {'path': 'crates/azoth-hydraulics/src/reynolds_number.rs', 'sha256': '4e7fb5bae8f374eaf9195a0c6267a1c6225b37ba801896ff1ae98e54fc86ff74'}],
         "source": 'Crane TP-410',
         "verification": 'partially_verified',
@@ -2713,7 +2713,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'process.depressurization': {
         "calc_id": 'process.depressurization',
         "name": 'Vessel depressurization',
-        "spec": {'path': 'specs/models/process/depressurization.toml', 'sha256': '5df67eba7d7230e9226bd74013965b7814756f961dd64a0eb8b25ed075055cda'},
+        "spec": {'path': 'specs/models/process/depressurization.toml', 'sha256': 'b519d80f1b3b96663edcc8719c208e3510029722a9f2bb08cc93bebe07b42ace'},
         "code": [{'path': 'python/src/azoth/process/reference/depressurization.py', 'sha256': '31a0745ebfa94d1383e9432561039104bd3927370c070b3b8544d7e45115ce2e'}, {'path': 'crates/azoth-process/src/models/depressurization.rs', 'sha256': 'd9e577d81565cb5ea4faf1d7646bef19ec3a70e53a61bca99d00c1b90aa17379'}],
         "source": 'NeqSim process/safety/depressurization/DepressurizationSimulator.java',
         "verification": 'partially_verified',
@@ -2823,7 +2823,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'process.expander': {
         "calc_id": 'process.expander',
         "name": 'Expander',
-        "spec": {'path': 'specs/models/process/expander.toml', 'sha256': 'afe3cbe384ce2a46bf62c1a8034a49927d91540a74465233953a3dafb07565f4'},
+        "spec": {'path': 'specs/models/process/expander.toml', 'sha256': '4625ff2366a52d1dfebd0016ae94ea1e23c561e117dfe27c5ee67b7398cabda6'},
         "code": [{'path': 'python/src/azoth/process/reference/expander.py', 'sha256': 'fb609696806ae1602defbf483d47c2fa8e758ecb922415cc67cd2cce8fb4aee6'}, {'path': 'crates/azoth-process/src/models/expander.rs', 'sha256': '68572af89c9b50b02766ebbd78cac409162bec0c32ffe9698edf36909c095c4a'}],
         "source": 'NeqSim process/equipment/compressor/Compressor.java',
         "verification": 'partially_verified',
@@ -2988,7 +2988,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'process.gibbs_reactor': {
         "calc_id": 'process.gibbs_reactor',
         "name": 'Gibbs reactor',
-        "spec": {'path': 'specs/models/process/gibbs_reactor.toml', 'sha256': 'c50d636d6aaf1d62ece70ed63fd71f0ade831dfbf48938d911ca317e392002c5'},
+        "spec": {'path': 'specs/models/process/gibbs_reactor.toml', 'sha256': 'df81ea3db8e33a69ef2c59dda6628bae0750a8ad36fb23927f8edffac04bf7c2'},
         "code": [{'path': 'python/src/azoth/process/reference/gibbs_reactor.py', 'sha256': '778d1deab7a7447287031c596105de8da4ba067dc7aa07f4518855dfce75cf00'}, {'path': 'crates/azoth-process/src/models/gibbs_reactor.rs', 'sha256': 'dd4ebc822aee627477d67042040c9b2b1f44c41d7b22dc264730a1ff7219c75b'}],
         "source": 'NeqSim process/equipment/reactor/GibbsReactor.java',
         "verification": 'partially_verified',
@@ -3725,7 +3725,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'process.stirred_tank_reactor': {
         "calc_id": 'process.stirred_tank_reactor',
         "name": 'Stirred-tank reactor',
-        "spec": {'path': 'specs/models/process/stirred_tank_reactor.toml', 'sha256': 'a3cd9926cfcfc6889962fe5f8df77cb449577dd40dcbf92379871857384be615'},
+        "spec": {'path': 'specs/models/process/stirred_tank_reactor.toml', 'sha256': '7cd6fb404a66b45b40ff83c2993849e751e31ff77ab1179717650d1b51642838'},
         "code": [{'path': 'python/src/azoth/process/reference/stirred_tank_reactor.py', 'sha256': 'cad67f5e57cfc2ee9604fb7ecf976fb2836642cfde51c244037c0c668865c8a4'}, {'path': 'crates/azoth-process/src/models/stirred_tank_reactor.rs', 'sha256': '1a54e56dfa4497b5ea7c831520bfa454fdd4b032ecc12f94d51c6fa37467b016'}],
         "source": 'NeqSim process/equipment/reactor/StirredTankReactor.java',
         "verification": 'partially_verified',
@@ -3758,7 +3758,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'process.tank': {
         "calc_id": 'process.tank',
         "name": 'Tank',
-        "spec": {'path': 'specs/models/process/tank.toml', 'sha256': '206e7414b4befa3405f0fd61a75b88ceb46231c6690556b945dea55413b3733e'},
+        "spec": {'path': 'specs/models/process/tank.toml', 'sha256': 'b618c878129b1321ec6761739e263c4e5b8bf48208006b5a00ce15dd17a02b14'},
         "code": [{'path': 'python/src/azoth/process/reference/tank.py', 'sha256': 'bf406d71ebbc39ce9428087ead3cbc01cab68904e1249c8eaa0c2351c7c64d9d'}, {'path': 'crates/azoth-process/src/models/tank.rs', 'sha256': 'af47b4809776c7e24dd040a28a4f1e0a28dad51b304314f7e5de6e921d062698'}],
         "source": 'NeqSim process/equipment/tank/Tank.java',
         "verification": 'partially_verified',
@@ -4209,7 +4209,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'reactions.reactive_co2_brine_phase_equilibrium': {
         "calc_id": 'reactions.reactive_co2_brine_phase_equilibrium',
         "name": 'Reactive CO2/brine phase equilibrium',
-        "spec": {'path': 'specs/models/reactions/reactive_co2_brine_phase_equilibrium.toml', 'sha256': 'a7453353a0d041c16913ea0aaefdf35c8375fc71414dbc43cba928d8724c0db0'},
+        "spec": {'path': 'specs/models/reactions/reactive_co2_brine_phase_equilibrium.toml', 'sha256': '458b60951ece3c4e121a0c46e6c2f763026107c8f7e775656d31d69661b3bc06'},
         "code": [{'path': 'python/src/azoth/reactions/reference/reactive_co2_brine_phase_equilibrium.py', 'sha256': '66ec16493c0403cba27f50cc52d45c386266cee1d0573c51b292daee72b08867'}, {'path': 'crates/azoth-reactions/src/reactive_co2_brine_phase_equilibrium.rs', 'sha256': 'cf86f160f75b06a2f5093cc79e133783588cab8219ae8610d48fe28229277060'}],
         "source": 'NeqSim master `ReactiveCO2BrinePhaseEquilibrium`',
         "verification": 'partially_verified',
@@ -4242,7 +4242,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'reactions.reactive_phase_equilibrium': {
         "calc_id": 'reactions.reactive_phase_equilibrium',
         "name": 'Reactive equilibrium as an operation on one phase',
-        "spec": {'path': 'specs/models/reactions/reactive_phase_equilibrium.toml', 'sha256': '7c56377057ea1bb363d171d0ddacb7dc005d394e88a1e0c80a3eb706bdbcbb12'},
+        "spec": {'path': 'specs/models/reactions/reactive_phase_equilibrium.toml', 'sha256': '4af52c1a3841a8e958341f6392536edd186ccc1a12eadbeca5b514d24dabd172'},
         "code": [{'path': 'python/src/azoth/reactions/reference/reactive_phase_equilibrium.py', 'sha256': '82570568f1238358385d5191d3017093b7518552e510be3b9ef25868c86a4350'}, {'path': 'crates/azoth-reactions/src/reactive_phase_equilibrium.rs', 'sha256': '353ed585ee7d2dad9a9e8e3910301abbdc6d171acf7d8d4e18b3209ef189b5e4'}],
         "source": 'NeqSim master `ChemicalReactionOperations`',
         "verification": 'partially_verified',
@@ -4418,7 +4418,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'thermal.zone_rating': {
         "calc_id": 'thermal.zone_rating',
         "name": 'A shell-and-tube exchanger rated zone by zone',
-        "spec": {'path': 'specs/calcs/thermal/zone_rating.toml', 'sha256': '8958ea887cd3e1848b485d52aad3c87eedff635353c14149af99b0a671cfb7f2'},
+        "spec": {'path': 'specs/calcs/thermal/zone_rating.toml', 'sha256': 'e031e2c1dae7edb578468952da9a6bf64178acdbec7715e39158013dcb63786a'},
         "code": [{'path': 'python/src/azoth/thermal/reference/zone_rating.py', 'sha256': '95eeb7129070485ae8716809a496a04e977c983b69d163718307713b744234ce'}, {'path': 'crates/azoth-thermal/src/zone_rating.rs', 'sha256': '3b6f47e87ac03139cebd3ca4eacdb0e4c9a1823999e78cc162d006a280e79a4b'}],
         "source": 'NeqSim process/mechanicaldesign/heatexchanger/ThermalDesignCalculator.java',
         "verification": 'partially_verified',

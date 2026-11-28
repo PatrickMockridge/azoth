@@ -18,8 +18,8 @@ edition = "Fluid Phase Equilibria 9(1), 1-19"
 doi = "10.1016/0378-3812(82)85001-2"
 
 [source.neqsim]
-class = "Fluid"
-members = ["Fluid"]
+class = "Flash"
+members = ["Flash.stabilityAnalysis"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [algorithm]
@@ -92,22 +92,22 @@ rationale = "Above `T / Tc = 0.9` for every component the cubic's roots are clos
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Fluid"
+default = "NeqSim Flash.stabilityAnalysis"
 
 [provenance.algorithm.convergence]
-source = "NeqSim Fluid"
+source = "NeqSim Flash.stabilityAnalysis"
 
 [provenance.algorithm.initialisation]
-source = "NeqSim Fluid"
+source = "NeqSim Flash.stabilityAnalysis"
 
 [provenance.algorithm.max_iterations]
-source = "NeqSim Fluid"
+source = "NeqSim Flash.stabilityAnalysis"
 
 [provenance.algorithm.scheme]
-source = "NeqSim Fluid"
+source = "NeqSim Flash.stabilityAnalysis"
 
 [provenance.algorithm.tolerance]
-source = "NeqSim Fluid"
+source = "NeqSim Flash.stabilityAnalysis"
 
 [implementations]
 python = "azoth.eos.stability_test"

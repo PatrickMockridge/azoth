@@ -27,9 +27,8 @@ use crate::spec_gen;
 /// the multiplication by `R` and `T` happens where those live - the model layer -
 /// rather than here.
 ///
-/// `kappa` may come from [`crate::pr_kappa`] or [`crate::prsv_kappa`]: this calc uses
-/// it only through `psi`, the logarithmic derivative of the alpha function, and both
-/// correlations supply a coefficient for the same alpha function.
+/// `kappa` comes from [`crate::pr_kappa`]; this calc uses it only through `psi`, the
+/// logarithmic derivative of the alpha function.
 ///
 /// # Errors
 /// * [`azoth_core::AzothError::OutOfRange`] if `b_reduced <= 0` (it is a divisor) or

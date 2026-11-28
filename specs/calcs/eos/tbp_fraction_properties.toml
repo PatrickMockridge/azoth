@@ -16,7 +16,7 @@ edition = "`calcTC`, `calcPC`, `calcTB`, `calcm` and the base class's `calcAcent
 
 [source.neqsim]
 class = "TBPfractionModel"
-members = ["TBPfractionModel.calcTC"]
+members = ["TBPfractionModel.PedersenTBPModelSRK"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -79,7 +79,7 @@ attraction_exponent = 2.228110216
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim TBPfractionModel.calcTC"
+default = "NeqSim TBPfractionModel.PedersenTBPModelSRK"
 
 [implementations]
 python = "azoth.eos.tbp_fraction_properties"

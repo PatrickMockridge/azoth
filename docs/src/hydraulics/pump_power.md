@@ -20,7 +20,7 @@ power = rho * g * q * H / eta
 
 ## Source
 
-**standard pump hydraulics; the hydraulic-power relation in any fluids text**
+**NeqSim `Pump.run`, the pump-curve head-to-shaft-power branch**
 
 ## Inputs
 
@@ -118,7 +118,7 @@ declared checks *that call* could not evaluate.
 ## References
 
 - Standard gravity: the 1901 CGPM resolution fixed it at exactly 9.80665 m/s**2.
-- No specific source is claimed: the relation is general pump engineering.
+- NeqSim `Pump.run`, the pump-curve branch: `deltaP = pumpHead * densityInlet * gravity`, `hydraulicPower = (massFlow / densityInlet) * deltaP`, `shaftPower = hydraulicPower / efficiency`. With `q = massFlow / densityInlet` this is `rho * g * q * H / eta`.
 
 
 ---

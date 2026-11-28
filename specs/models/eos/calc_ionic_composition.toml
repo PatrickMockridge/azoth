@@ -20,7 +20,7 @@ edition = "Its `run` - three columns per component, the molalities over the wate
 
 [source.neqsim]
 class = "CalcIonicComposition"
-members = ["CalcIonicComposition"]
+members = ["CalcIonicComposition.getLogPureComponentFugacity"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -71,7 +71,7 @@ rationale = "an absolute pressure; zero and below are not states"
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim CalcIonicComposition"
+default = "NeqSim CalcIonicComposition.getLogPureComponentFugacity"
 
 [implementations]
 python = "azoth.eos.calc_ionic_composition"

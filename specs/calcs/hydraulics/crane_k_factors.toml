@@ -11,7 +11,7 @@ edition = "2013 method; the coefficient set is NeqSim's equivalent-length defaul
 
 [source.neqsim]
 class = "Fittings"
-members = ["Fittings"]
+members = ["Fittings.plug_valve_straightway"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -72,7 +72,7 @@ k_total = 0.684
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Fittings"
+default = "NeqSim Fittings.plug_valve_straightway"
 
 [implementations]
 python = "azoth.hydraulics.crane_k_factors"

@@ -20,8 +20,8 @@ standard = "Standard thermodynamics, as in Smith, Van Ness & Abbott; Michelsen &
 edition = "The procedure is the ordinary one: the enthalpy of a mixture at fixed pressure is a strictly increasing function of temperature."
 
 [source.neqsim]
-class = "Standard"
-members = ["Standard"]
+class = "PHflash"
+members = ["PHflash.run"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [algorithm]
@@ -111,49 +111,49 @@ rationale = """\
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Standard"
+default = "NeqSim PHflash.run"
 
 [provenance.algorithm.convergence]
-source = "NeqSim Standard"
+source = "NeqSim PHflash.run"
 
 [provenance.algorithm.initial_temperature]
-source = "NeqSim Standard"
+source = "NeqSim PHflash.run"
 
 [provenance.algorithm."inner.convergence"]
-source = "NeqSim Standard"
+source = "NeqSim PHflash.run"
 
 [provenance.algorithm."inner.initialisation"]
-source = "NeqSim Standard"
+source = "NeqSim PHflash.run"
 
 [provenance.algorithm."inner.inner.convergence"]
-source = "NeqSim Standard"
+source = "NeqSim PHflash.run"
 
 [provenance.algorithm."inner.inner.max_iterations"]
-source = "NeqSim Standard"
+source = "NeqSim PHflash.run"
 
 [provenance.algorithm."inner.inner.scheme"]
-source = "NeqSim Standard"
+source = "NeqSim PHflash.run"
 
 [provenance.algorithm."inner.inner.tolerance"]
-source = "NeqSim Standard"
+source = "NeqSim PHflash.run"
 
 [provenance.algorithm."inner.max_iterations"]
-source = "NeqSim Standard"
+source = "NeqSim PHflash.run"
 
 [provenance.algorithm."inner.scheme"]
-source = "NeqSim Standard"
+source = "NeqSim PHflash.run"
 
 [provenance.algorithm."inner.tolerance"]
-source = "NeqSim Standard"
+source = "NeqSim PHflash.run"
 
 [provenance.algorithm.max_iterations]
-source = "NeqSim Standard"
+source = "NeqSim PHflash.run"
 
 [provenance.algorithm.scheme]
-source = "NeqSim Standard"
+source = "NeqSim PHflash.run"
 
 [provenance.algorithm.tolerance]
-source = "NeqSim Standard"
+source = "NeqSim PHflash.run"
 
 [implementations]
 python = "azoth.eos.ph_flash"

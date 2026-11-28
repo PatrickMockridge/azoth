@@ -21,7 +21,7 @@ doi = "10.1002/aic.690210607"
 
 [source.neqsim]
 class = "ComponentGEUnifac"
-members = ["ComponentGEUnifac"]
+members = ["ComponentGEUnifac.getGamma"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -58,7 +58,7 @@ rationale = "an absolute temperature; zero and below are not states\n"
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim ComponentGEUnifac"
+default = "NeqSim ComponentGEUnifac.getGamma"
 
 [implementations]
 python = "azoth.eos.unifac_activity_coefficients"

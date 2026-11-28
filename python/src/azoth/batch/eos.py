@@ -61,7 +61,6 @@ __all__ = [
     "PrMolarVolumeBatch",
     "PrPenelouxShiftBatch",
     "PrZFactorBatch",
-    "PrsvKappaBatch",
     "RachfordRiceBinaryBatch",
     "RackettMolarVolumeBatch",
     "RkAlphaAbBatch",

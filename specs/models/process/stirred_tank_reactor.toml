@@ -22,7 +22,7 @@ edition = "Its steady-state `run`: every reaction applied, the pressure set, the
 
 [source.neqsim]
 class = "StirredTankReactor"
-members = ["StirredTankReactor"]
+members = ["StirredTankReactor.reaction"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -121,7 +121,7 @@ rationale = "a vessel passes pressure down, not up\n"
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim StirredTankReactor"
+default = "NeqSim StirredTankReactor.reaction"
 
 [implementations]
 python = "azoth.process.stirred_tank_reactor"

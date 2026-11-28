@@ -12,7 +12,7 @@ edition = "the correlation NeqSim master evaluates in `thermo/component/Componen
 
 [source.neqsim]
 class = "Component"
-members = ["Component"]
+members = ["Component.getPureComponentCpLiquid"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -61,7 +61,7 @@ cp = 75.355
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Component"
+default = "NeqSim Component.getPureComponentCpLiquid"
 
 [implementations]
 python = "azoth.eos.liquid_heat_capacity"

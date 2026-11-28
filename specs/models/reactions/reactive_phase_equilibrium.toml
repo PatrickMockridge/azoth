@@ -31,7 +31,7 @@ edition = "The facade as an operation on one phase: the phase search and its ski
 
 [source.neqsim]
 class = "ChemicalReactionOperations"
-members = ["ChemicalReactionOperations"]
+members = ["ChemicalReactionOperations.getReactivePhaseIndex"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [algorithm]
@@ -171,22 +171,22 @@ rationale = "the phase's total moles; a phase holding material cannot have zero 
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim ChemicalReactionOperations"
+default = "NeqSim ChemicalReactionOperations.getReactivePhaseIndex"
 
 [provenance.algorithm.convergence]
-source = "NeqSim ChemicalReactionOperations"
+source = "NeqSim ChemicalReactionOperations.getReactivePhaseIndex"
 
 [provenance.algorithm.initialisation]
-source = "NeqSim ChemicalReactionOperations"
+source = "NeqSim ChemicalReactionOperations.getReactivePhaseIndex"
 
 [provenance.algorithm.max_iterations]
-source = "NeqSim ChemicalReactionOperations"
+source = "NeqSim ChemicalReactionOperations.getReactivePhaseIndex"
 
 [provenance.algorithm.scheme]
-source = "NeqSim ChemicalReactionOperations"
+source = "NeqSim ChemicalReactionOperations.getReactivePhaseIndex"
 
 [provenance.algorithm.tolerance]
-source = "NeqSim ChemicalReactionOperations"
+source = "NeqSim ChemicalReactionOperations.getReactivePhaseIndex"
 
 [implementations]
 python = "azoth.reactions.reactive_phase_equilibrium"

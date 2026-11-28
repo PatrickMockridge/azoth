@@ -22,7 +22,7 @@ edition = "Its steady-state `run`: a `VUflash` at the fluid's own volume and int
 
 [source.neqsim]
 class = "Tank"
-members = ["Tank"]
+members = ["Tank.setVolume"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -94,7 +94,7 @@ rationale = "an absolute temperature, and the first feed's is the one the check 
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Tank"
+default = "NeqSim Tank.setVolume"
 
 [implementations]
 python = "azoth.process.tank"

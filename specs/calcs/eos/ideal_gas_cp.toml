@@ -11,7 +11,7 @@ edition = "`thermo/component/Component.java`, `getCp0(double)` at line 1547. The
 
 [source.neqsim]
 class = "Component"
-members = ["Component"]
+members = ["Component.getCp0"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -63,7 +63,7 @@ rationale = "a heat capacity of zero or below, which is how a fitted polynomial 
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Component"
+default = "NeqSim Component.getCp0"
 
 [implementations]
 python = "azoth.eos.ideal_gas_cp"

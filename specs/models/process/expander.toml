@@ -38,8 +38,8 @@ standard = "NeqSim process/equipment/compressor/Compressor.java"
 edition = "Its `run`: the isentropic branch, the stepped polytropic branch, the `recoveredPower` constraint, the stated power's back-computed efficiency and the outlet-temperature secant; and `ExpanderMechanicalDesign.calcDesign` behind `mechanical_design`."
 
 [source.neqsim]
-class = "Compressor"
-members = ["Compressor.recoveredPower"]
+class = "Expander"
+members = ["Expander.run"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -286,7 +286,7 @@ rationale = "an absolute temperature"
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Compressor.recoveredPower"
+default = "NeqSim Expander.run"
 
 [implementations]
 python = "azoth.process.expander"

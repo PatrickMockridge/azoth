@@ -20,7 +20,7 @@ edition = "Its interval arithmetic, its cut naming and the range each cut keeps.
 
 [source.neqsim]
 class = "OilAssayCharacterisation"
-members = ["OilAssayCharacterisation"]
+members = ["OilAssayCharacterisation.addTBPCutBoundariesKelvin"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -76,7 +76,7 @@ description = "Each cut's average normal boiling point, the midpoint of its two 
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim OilAssayCharacterisation"
+default = "NeqSim OilAssayCharacterisation.addTBPCutBoundariesKelvin"
 
 [implementations]
 python = "azoth.characterization.tbp_cut_boundaries"

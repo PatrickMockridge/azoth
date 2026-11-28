@@ -27,7 +27,7 @@ doi = "10.1002/aic.690210115"
 
 [source.neqsim]
 class = "PhaseGEUniquac"
-members = ["PhaseGEUniquac.c5ec5fb"]
+members = ["PhaseGEUniquac.gamma"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -86,7 +86,7 @@ description = "the infinite-dilution activity coefficient each component's Henry
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim PhaseGEUniquac.c5ec5fb"
+default = "NeqSim PhaseGEUniquac.gamma"
 
 [implementations]
 python = "azoth.eos.ge_uniquac_phase"

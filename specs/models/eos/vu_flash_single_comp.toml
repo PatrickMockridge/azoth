@@ -17,8 +17,8 @@ edition = "NeqSim master `thermodynamicoperations/flashops/VUflashSingleComp`: t
 doi = "10.1016/S0378-3812(01)00701-1"
 
 [source.neqsim]
-class = "Standard"
-members = ["Standard"]
+class = "VUflashSingleComp"
+members = ["VUflashSingleComp"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [algorithm]
@@ -69,31 +69,31 @@ rationale = "an absolute pressure; zero and below are not states"
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Standard"
+default = "NeqSim VUflashSingleComp"
 
 [provenance.algorithm."bracket.lower"]
-source = "NeqSim Standard"
+source = "NeqSim VUflashSingleComp"
 
 [provenance.algorithm."bracket.scheme"]
-source = "NeqSim Standard"
+source = "NeqSim VUflashSingleComp"
 
 [provenance.algorithm."bracket.steps"]
-source = "NeqSim Standard"
+source = "NeqSim VUflashSingleComp"
 
 [provenance.algorithm."bracket.upper"]
-source = "NeqSim Standard"
+source = "NeqSim VUflashSingleComp"
 
 [provenance.algorithm.convergence]
-source = "NeqSim Standard"
+source = "NeqSim VUflashSingleComp"
 
 [provenance.algorithm.max_iterations]
-source = "NeqSim Standard"
+source = "NeqSim VUflashSingleComp"
 
 [provenance.algorithm.scheme]
-source = "NeqSim Standard"
+source = "NeqSim VUflashSingleComp"
 
 [provenance.algorithm.tolerance]
-source = "NeqSim Standard"
+source = "NeqSim VUflashSingleComp"
 
 [implementations]
 python = "azoth.eos.vu_flash_single_comp"

@@ -129,4 +129,3 @@ fn the_co_volume_is_the_quadratic_rule() {
         x[0] * x[0] * bij(0, 0) + 2.0 * x[0] * x[1] * bij(0, 1) + x[1] * x[1] * bij(1, 1);
     common::assert_close(b_mix, expected, 1.0e-14, "quadratic co-volume");
 }
-

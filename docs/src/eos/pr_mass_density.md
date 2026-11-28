@@ -20,7 +20,7 @@ rho = M/v
 
 ## Source
 
-**The definition of molar mass**
+**NeqSim `Phase.getDensity`, which divides the molar mass by the molar volume**
 
 Molar mass is the mass per amount of substance, so a mass density is a molar mass divided by a molar volume. There is no paper to cite for that.
 

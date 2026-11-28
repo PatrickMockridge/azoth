@@ -22,7 +22,7 @@ edition = "Its base-name and pseudo-position loops, and the two refusals `System
 
 [source.neqsim]
 class = "PseudoComponentCombiner"
-members = ["PseudoComponentCombiner"]
+members = ["PseudoComponentCombiner.transferBinaryInteractionParameters"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -66,7 +66,7 @@ description = "The target's matrix after the transfer: its own values, with the 
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim PseudoComponentCombiner"
+default = "NeqSim PseudoComponentCombiner.transferBinaryInteractionParameters"
 
 [implementations]
 python = "azoth.characterization.transfer_binary_interaction_parameters"

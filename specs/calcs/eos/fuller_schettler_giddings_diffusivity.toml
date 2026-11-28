@@ -12,9 +12,9 @@ edition = "A new method for prediction of binary gas-phase diffusion coefficient
 doi = "10.1021/ie50677a007"
 
 [source.neqsim]
-class = "Table"
-members = ["Table"]
-commit = "f0c7436c6923766b1e22957b7075f650600457a7"
+class = "FullerSchettlerGiddingsDiffusivity"
+members = ["FullerSchettlerGiddingsDiffusivity.calcBinaryDiffusionCoefficient"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
 [inputs.MA]
@@ -70,7 +70,7 @@ d = 2.155058583907974e-5
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Table"
+default = "NeqSim FullerSchettlerGiddingsDiffusivity.calcBinaryDiffusionCoefficient"
 
 [implementations]
 python = "azoth.eos.fuller_schettler_giddings_diffusivity"

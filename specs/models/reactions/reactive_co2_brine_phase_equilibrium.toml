@@ -21,7 +21,7 @@ edition = "Its `run`: the phase selection, the reaction residual read on the fla
 
 [source.neqsim]
 class = "ReactiveCO2BrinePhaseEquilibrium"
-members = ["ReactiveCO2BrinePhaseEquilibrium"]
+members = ["ReactiveCO2BrinePhaseEquilibrium.chemicalReactionInit"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [algorithm]
@@ -103,34 +103,34 @@ rationale = "an absolute pressure; zero and below are not states"
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+default = "NeqSim ReactiveCO2BrinePhaseEquilibrium.chemicalReactionInit"
 
 [provenance.algorithm.convergence]
-source = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+source = "NeqSim ReactiveCO2BrinePhaseEquilibrium.chemicalReactionInit"
 
 [provenance.algorithm.initialisation]
-source = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+source = "NeqSim ReactiveCO2BrinePhaseEquilibrium.chemicalReactionInit"
 
 [provenance.algorithm."inner.convergence"]
-source = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+source = "NeqSim ReactiveCO2BrinePhaseEquilibrium.chemicalReactionInit"
 
 [provenance.algorithm."inner.max_iterations"]
-source = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+source = "NeqSim ReactiveCO2BrinePhaseEquilibrium.chemicalReactionInit"
 
 [provenance.algorithm."inner.scheme"]
-source = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+source = "NeqSim ReactiveCO2BrinePhaseEquilibrium.chemicalReactionInit"
 
 [provenance.algorithm."inner.tolerance"]
-source = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+source = "NeqSim ReactiveCO2BrinePhaseEquilibrium.chemicalReactionInit"
 
 [provenance.algorithm.max_iterations]
-source = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+source = "NeqSim ReactiveCO2BrinePhaseEquilibrium.chemicalReactionInit"
 
 [provenance.algorithm.scheme]
-source = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+source = "NeqSim ReactiveCO2BrinePhaseEquilibrium.chemicalReactionInit"
 
 [provenance.algorithm.tolerance]
-source = "NeqSim ReactiveCO2BrinePhaseEquilibrium"
+source = "NeqSim ReactiveCO2BrinePhaseEquilibrium.chemicalReactionInit"
 
 [implementations]
 python = "azoth.reactions.reactive_co2_brine_phase_equilibrium"

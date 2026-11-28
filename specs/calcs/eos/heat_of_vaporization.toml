@@ -12,7 +12,7 @@ edition = "the correlation NeqSim master evaluates in `thermo/component/Componen
 
 [source.neqsim]
 class = "Component"
-members = ["Component"]
+members = ["Component.getPureComponentHeatOfVaporization"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -67,7 +67,7 @@ hov = 36147.57779141032
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Component"
+default = "NeqSim Component.getPureComponentHeatOfVaporization"
 
 [implementations]
 python = "azoth.eos.heat_of_vaporization"

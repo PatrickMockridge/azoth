@@ -24,8 +24,8 @@ standard = "NeqSim master `SystemEosGE`"
 edition = "the direct gamma-phi branch of `TPflash`, `sucsSubsGammaPhi`, generalised over the liquid phase: `phi_i^L` is whichever `PhaseGE` subclass is named, `phi_i^V` is the cubic's."
 
 [source.neqsim]
-class = "TPflash"
-members = ["TPflash.sucsSubsGammaPhi"]
+class = "SystemEosGE"
+members = ["SystemEosGE.sucsSubsGammaPhi"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [algorithm]
@@ -125,34 +125,34 @@ rationale = "an absolute pressure; zero and below are not states\n"
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim TPflash.sucsSubsGammaPhi"
+default = "NeqSim SystemEosGE.sucsSubsGammaPhi"
 
 [provenance.algorithm.convergence]
-source = "NeqSim TPflash.sucsSubsGammaPhi"
+source = "NeqSim SystemEosGE.sucsSubsGammaPhi"
 
 [provenance.algorithm.initialisation]
-source = "NeqSim TPflash.sucsSubsGammaPhi"
+source = "NeqSim SystemEosGE.sucsSubsGammaPhi"
 
 [provenance.algorithm."inner.convergence"]
-source = "NeqSim TPflash.sucsSubsGammaPhi"
+source = "NeqSim SystemEosGE.sucsSubsGammaPhi"
 
 [provenance.algorithm."inner.max_iterations"]
-source = "NeqSim TPflash.sucsSubsGammaPhi"
+source = "NeqSim SystemEosGE.sucsSubsGammaPhi"
 
 [provenance.algorithm."inner.scheme"]
-source = "NeqSim TPflash.sucsSubsGammaPhi"
+source = "NeqSim SystemEosGE.sucsSubsGammaPhi"
 
 [provenance.algorithm."inner.tolerance"]
-source = "NeqSim TPflash.sucsSubsGammaPhi"
+source = "NeqSim SystemEosGE.sucsSubsGammaPhi"
 
 [provenance.algorithm.max_iterations]
-source = "NeqSim TPflash.sucsSubsGammaPhi"
+source = "NeqSim SystemEosGE.sucsSubsGammaPhi"
 
 [provenance.algorithm.scheme]
-source = "NeqSim TPflash.sucsSubsGammaPhi"
+source = "NeqSim SystemEosGE.sucsSubsGammaPhi"
 
 [provenance.algorithm.tolerance]
-source = "NeqSim TPflash.sucsSubsGammaPhi"
+source = "NeqSim SystemEosGE.sucsSubsGammaPhi"
 
 [implementations]
 python = "azoth.eos.ge_flash"

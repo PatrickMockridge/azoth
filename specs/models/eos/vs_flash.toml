@@ -16,8 +16,8 @@ standard = "Standard thermodynamics, as in Michelsen & Mollerup"
 edition = "NeqSim master `thermodynamicoperations/flashops/VSflash`: its `calcdQdP`, `calcdQdT`, `calcdQdPP` and its damped clamped step are this model's loop, reached from `VesselDepressurization`'s isentropic branch."
 
 [source.neqsim]
-class = "Standard"
-members = ["Standard.calcdQdP"]
+class = "VesselDepressurization"
+members = ["VesselDepressurization.calcdQdP"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [algorithm]
@@ -105,49 +105,49 @@ rationale = "a molar volume; zero and below are not states"
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Standard.calcdQdP"
+default = "NeqSim VesselDepressurization.calcdQdP"
 
 [provenance.algorithm.convergence]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim VesselDepressurization.calcdQdP"
 
 [provenance.algorithm.initial_temperature]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim VesselDepressurization.calcdQdP"
 
 [provenance.algorithm."inner.convergence"]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim VesselDepressurization.calcdQdP"
 
 [provenance.algorithm."inner.initialisation"]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim VesselDepressurization.calcdQdP"
 
 [provenance.algorithm."inner.inner.convergence"]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim VesselDepressurization.calcdQdP"
 
 [provenance.algorithm."inner.inner.max_iterations"]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim VesselDepressurization.calcdQdP"
 
 [provenance.algorithm."inner.inner.scheme"]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim VesselDepressurization.calcdQdP"
 
 [provenance.algorithm."inner.inner.tolerance"]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim VesselDepressurization.calcdQdP"
 
 [provenance.algorithm."inner.max_iterations"]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim VesselDepressurization.calcdQdP"
 
 [provenance.algorithm."inner.scheme"]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim VesselDepressurization.calcdQdP"
 
 [provenance.algorithm."inner.tolerance"]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim VesselDepressurization.calcdQdP"
 
 [provenance.algorithm.max_iterations]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim VesselDepressurization.calcdQdP"
 
 [provenance.algorithm.scheme]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim VesselDepressurization.calcdQdP"
 
 [provenance.algorithm.tolerance]
-source = "NeqSim Standard.calcdQdP"
+source = "NeqSim VesselDepressurization.calcdQdP"
 
 [implementations]
 python = "azoth.eos.vs_flash"

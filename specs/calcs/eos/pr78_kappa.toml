@@ -16,8 +16,8 @@ standard = "Peng, D. Y.; Robinson, D. B. (1978)"
 edition = "The Characterization of the Heptanes and Heavier Fractions for the GPA Peng-Robinson Programs. GPA Research Report RR-28"
 
 [source.neqsim]
-class = "Report"
-members = ["Report"]
+class = "AttractiveTermPr1978"
+members = ["AttractiveTermPr1978.setm"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -46,7 +46,7 @@ kappa = 1.2150662799999998
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Report"
+default = "NeqSim AttractiveTermPr1978.setm"
 
 [implementations]
 python = "azoth.eos.pr78_kappa"

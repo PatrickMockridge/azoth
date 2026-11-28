@@ -719,12 +719,7 @@ fn bisect_boundary(mixture: &Mixture, z: &[f64], t: f64, inside: f64, outside: f
     0.5 * (inside + outside)
 }
 
-fn boundaries_at(
-    mixture: &Mixture,
-    z: &[f64],
-    t: f64,
-    pressures: &[f64],
-) -> Option<(f64, f64)> {
+fn boundaries_at(mixture: &Mixture, z: &[f64], t: f64, pressures: &[f64]) -> Option<(f64, f64)> {
     let flags: Vec<bool> = pressures
         .iter()
         .map(|&pressure| two_phase_at(mixture, z, t, pressure))
@@ -754,9 +749,7 @@ fn boundaries_at(
 /// `RobustPhaseEnvelope`'s direct-flash envelope, at the class's own parameters.
 fn robust_grid(mixture: &Mixture, z: &[f64]) -> Result<(BranchTrace, BranchTrace, u32)> {
     let pressures: Vec<f64> = (0..GRID_P_STEPS)
-        .map(|i| {
-            GRID_P_MIN + (GRID_P_MAX - GRID_P_MIN) * i as f64 / (GRID_P_STEPS - 1) as f64
-        })
+        .map(|i| GRID_P_MIN + (GRID_P_MAX - GRID_P_MIN) * i as f64 / (GRID_P_STEPS - 1) as f64)
         .collect();
     let step = (GRID_T_MAX - GRID_T_MIN) / (GRID_T_STEPS - 1) as f64;
     let mut lower_t = Vec::new();

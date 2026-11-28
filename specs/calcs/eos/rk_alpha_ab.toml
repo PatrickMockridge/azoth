@@ -19,8 +19,8 @@ edition = "On the Thermodynamics of Solutions. V. Chemical Reviews, 44(1), 233-2
 doi = "10.1021/cr60137a013"
 
 [source.neqsim]
-class = "ComponentRK"
-members = ["ComponentRK"]
+class = "AttractiveTermRk"
+members = ["AttractiveTermRk.alpha", "AttractiveTermRk.aT"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -67,7 +67,7 @@ b_reduced = 0.02707510936404929
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim ComponentRK"
+default = "NeqSim AttractiveTermRk"
 
 [implementations]
 python = "azoth.eos.rk_alpha_ab"

@@ -16,8 +16,8 @@ edition = """\
     correction"""
 
 [source.neqsim]
-class = "Units"
-members = ["Units"]
+class = "Phase"
+members = ["Phase.getMolarVolume"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -75,7 +75,7 @@ v = 0.0018317107825229842
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Units"
+default = "NeqSim Phase.getMolarVolume"
 
 [implementations]
 python = "azoth.eos.pr_molar_volume"

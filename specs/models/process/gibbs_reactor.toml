@@ -38,7 +38,7 @@ edition = "Its steady-state `run`: clone the inlet, take the element balance, fr
 
 [source.neqsim]
 class = "GibbsReactor"
-members = ["GibbsReactor"]
+members = ["GibbsReactor.solveGibbsEquilibrium"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -317,7 +317,7 @@ rationale = "the class tests this against zero before reading it, and a non-posi
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim GibbsReactor"
+default = "NeqSim GibbsReactor.solveGibbsEquilibrium"
 
 [implementations]
 python = "azoth.process.gibbs_reactor"

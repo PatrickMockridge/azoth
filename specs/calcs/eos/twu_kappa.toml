@@ -11,8 +11,8 @@ edition = "A Cubic Equation of State with a New Alpha Function and a New Mixing 
 doi = "10.1016/0378-3812(91)90024-2"
 
 [source.neqsim]
-class = "Fluid"
-members = ["Fluid"]
+class = "AttractiveTermTwu"
+members = ["AttractiveTermTwu.init"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -41,7 +41,7 @@ kappa = 0.7152048
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Fluid"
+default = "NeqSim AttractiveTermTwu.init"
 
 [implementations]
 python = "azoth.eos.twu_kappa"

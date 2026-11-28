@@ -28,7 +28,7 @@ edition = "The override, which `TPmultiflash.run()` calls where a caller reaches
 
 [source.neqsim]
 class = "TPmultiflash"
-members = ["TPmultiflash"]
+members = ["TPmultiflash.stabilityAnalysis"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [algorithm]
@@ -96,22 +96,22 @@ rationale = "an absolute pressure; zero and below are not states"
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim TPmultiflash"
+default = "NeqSim TPmultiflash.stabilityAnalysis"
 
 [provenance.algorithm.convergence]
-source = "NeqSim TPmultiflash"
+source = "NeqSim TPmultiflash.stabilityAnalysis"
 
 [provenance.algorithm.initialisation]
-source = "NeqSim TPmultiflash"
+source = "NeqSim TPmultiflash.stabilityAnalysis"
 
 [provenance.algorithm.max_iterations]
-source = "NeqSim TPmultiflash"
+source = "NeqSim TPmultiflash.stabilityAnalysis"
 
 [provenance.algorithm.scheme]
-source = "NeqSim TPmultiflash"
+source = "NeqSim TPmultiflash.stabilityAnalysis"
 
 [provenance.algorithm.tolerance]
-source = "NeqSim TPmultiflash"
+source = "NeqSim TPmultiflash.stabilityAnalysis"
 
 [implementations]
 python = "azoth.eos.multiflash_stability_test"

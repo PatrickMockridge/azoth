@@ -19,8 +19,8 @@ edition = "PR with the standard alpha and `bmixType = 1` on the `_umr` tables, f
 
 [source.neqsim]
 class = "SystemUMRPRUEos"
-members = ["SystemUMRPRUEos"]
-commit = "f0c7436c6923766b1e22957b7075f650600457a7"
+members = ["SystemUMRPRUEos.calcBFull"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [algorithm]
 scheme = "successive_substitution_flash"
@@ -130,34 +130,34 @@ rationale = "Above `T / Tc = 0.9` for the nearest component the cubic's roots ar
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim SystemUMRPRUEos"
+default = "NeqSim SystemUMRPRUEos.calcBFull"
 
 [provenance.algorithm.convergence]
-source = "NeqSim SystemUMRPRUEos"
+source = "NeqSim SystemUMRPRUEos.calcBFull"
 
 [provenance.algorithm.initialisation]
-source = "NeqSim SystemUMRPRUEos"
+source = "NeqSim SystemUMRPRUEos.calcBFull"
 
 [provenance.algorithm."inner.convergence"]
-source = "NeqSim SystemUMRPRUEos"
+source = "NeqSim SystemUMRPRUEos.calcBFull"
 
 [provenance.algorithm."inner.max_iterations"]
-source = "NeqSim SystemUMRPRUEos"
+source = "NeqSim SystemUMRPRUEos.calcBFull"
 
 [provenance.algorithm."inner.scheme"]
-source = "NeqSim SystemUMRPRUEos"
+source = "NeqSim SystemUMRPRUEos.calcBFull"
 
 [provenance.algorithm."inner.tolerance"]
-source = "NeqSim SystemUMRPRUEos"
+source = "NeqSim SystemUMRPRUEos.calcBFull"
 
 [provenance.algorithm.max_iterations]
-source = "NeqSim SystemUMRPRUEos"
+source = "NeqSim SystemUMRPRUEos.calcBFull"
 
 [provenance.algorithm.scheme]
-source = "NeqSim SystemUMRPRUEos"
+source = "NeqSim SystemUMRPRUEos.calcBFull"
 
 [provenance.algorithm.tolerance]
-source = "NeqSim SystemUMRPRUEos"
+source = "NeqSim SystemUMRPRUEos.calcBFull"
 
 [implementations]
 python = "azoth.eos.umr_pru_flash"

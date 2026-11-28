@@ -18,7 +18,7 @@ edition = "NeqSim master `thermodynamicoperations/flashops/TVfractionFlash`: its
 
 [source.neqsim]
 class = "TVfractionFlash"
-members = ["TVfractionFlash"]
+members = ["TVfractionFlash.run"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [algorithm]
@@ -118,49 +118,49 @@ rationale = "an absolute pressure; zero and below are not states"
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim TVfractionFlash"
+default = "NeqSim TVfractionFlash.run"
 
 [provenance.algorithm.convergence]
-source = "NeqSim TVfractionFlash"
+source = "NeqSim TVfractionFlash.run"
 
 [provenance.algorithm.initialisation]
-source = "NeqSim TVfractionFlash"
+source = "NeqSim TVfractionFlash.run"
 
 [provenance.algorithm."inner.convergence"]
-source = "NeqSim TVfractionFlash"
+source = "NeqSim TVfractionFlash.run"
 
 [provenance.algorithm."inner.initialisation"]
-source = "NeqSim TVfractionFlash"
+source = "NeqSim TVfractionFlash.run"
 
 [provenance.algorithm."inner.inner.convergence"]
-source = "NeqSim TVfractionFlash"
+source = "NeqSim TVfractionFlash.run"
 
 [provenance.algorithm."inner.inner.max_iterations"]
-source = "NeqSim TVfractionFlash"
+source = "NeqSim TVfractionFlash.run"
 
 [provenance.algorithm."inner.inner.scheme"]
-source = "NeqSim TVfractionFlash"
+source = "NeqSim TVfractionFlash.run"
 
 [provenance.algorithm."inner.inner.tolerance"]
-source = "NeqSim TVfractionFlash"
+source = "NeqSim TVfractionFlash.run"
 
 [provenance.algorithm."inner.max_iterations"]
-source = "NeqSim TVfractionFlash"
+source = "NeqSim TVfractionFlash.run"
 
 [provenance.algorithm."inner.scheme"]
-source = "NeqSim TVfractionFlash"
+source = "NeqSim TVfractionFlash.run"
 
 [provenance.algorithm."inner.tolerance"]
-source = "NeqSim TVfractionFlash"
+source = "NeqSim TVfractionFlash.run"
 
 [provenance.algorithm.max_iterations]
-source = "NeqSim TVfractionFlash"
+source = "NeqSim TVfractionFlash.run"
 
 [provenance.algorithm.scheme]
-source = "NeqSim TVfractionFlash"
+source = "NeqSim TVfractionFlash.run"
 
 [provenance.algorithm.tolerance]
-source = "NeqSim TVfractionFlash"
+source = "NeqSim TVfractionFlash.run"
 
 [implementations]
 python = "azoth.eos.tv_fraction_flash"

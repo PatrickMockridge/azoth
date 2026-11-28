@@ -20,8 +20,8 @@ standard = "NeqSim physicalproperties/methods/liquidphysicalproperties/viscosity
 edition = "`calcViscosity` and `calcPureComponentViscosity`, ported verbatim; the `Gij` matrix is read as the zero the class leaves it at."
 
 [source.neqsim]
-class = "Viscosity"
-members = ["Viscosity.calcViscosity"]
+class = "WaterPhysicalProperties"
+members = ["WaterPhysicalProperties.calcViscosity"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -60,7 +60,7 @@ rationale = "an absolute pressure; zero and below are not states"
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Viscosity.calcViscosity"
+default = "NeqSim WaterPhysicalProperties.calcViscosity"
 
 [implementations]
 python = "azoth.eos.aqueous_viscosity"

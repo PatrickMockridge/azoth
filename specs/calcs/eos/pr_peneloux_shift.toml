@@ -12,8 +12,8 @@ edition = "A consistent correction for Redlich-Kwong-Soave volumes. Fluid Phase 
 doi = "10.1016/0378-3812(82)80002-2"
 
 [source.neqsim]
-class = "Fluid"
-members = ["Fluid"]
+class = "ComponentPRvolcor"
+members = ["ComponentPRvolcor.getVolumeCorrection"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -60,7 +60,7 @@ c = -6.349504285100194e-06
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Fluid"
+default = "NeqSim ComponentPRvolcor.getVolumeCorrection"
 
 [implementations]
 python = "azoth.eos.pr_peneloux_shift"

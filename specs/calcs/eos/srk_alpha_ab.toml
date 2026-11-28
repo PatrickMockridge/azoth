@@ -19,8 +19,8 @@ edition = "Equilibrium constants from a modified Redlich-Kwong equation of state
 doi = "10.1016/0009-2509(72)80096-4"
 
 [source.neqsim]
-class = "ComponentSrk"
-members = ["ComponentSrk"]
+class = "AttractiveTermSrk"
+members = ["AttractiveTermSrk.alpha", "AttractiveTermSrk.aT"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -71,7 +71,7 @@ b_reduced = 0.02707510936404929
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim ComponentSrk"
+default = "NeqSim AttractiveTermSrk"
 
 [implementations]
 python = "azoth.eos.srk_alpha_ab"

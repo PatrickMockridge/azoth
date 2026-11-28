@@ -13,7 +13,7 @@ doi = "10.1002/cite.330530107"
 
 [source.neqsim]
 class = "Viscosity"
-members = ["Viscosity.calcPureComponentViscosity"]
+members = ["calcPureComponentViscosity", "getViscosityPressureCorrection"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [inputs]
@@ -95,7 +95,7 @@ mu = 6.528922494381046e-4
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim Viscosity.calcPureComponentViscosity"
+default = "NeqSim Viscosity"
 
 [implementations]
 python = "azoth.eos.liquid_viscosity_pure"

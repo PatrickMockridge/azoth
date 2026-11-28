@@ -1276,6 +1276,7 @@ def specs_claim(path: str, parts: list[str]) -> Claim:
         return Claim(
             ids=tuple(found),
             namespaces=(parts[2],),
+            shared=not found,
             files=(f"{TESTS}/test_manifest_citations.py",),
         )
     if len(parts) >= 3 and parts[1] == "cases":
@@ -1283,6 +1284,7 @@ def specs_claim(path: str, parts: list[str]) -> Claim:
         return Claim(
             ids=tuple(found),
             namespaces=tuple(sorted({i.split(".")[0] for i in found})),
+            shared=not found,
             files=(f"{TESTS}/test_manifest_citations.py",),
             jobs=("validation",),
         )
@@ -1385,6 +1387,9 @@ def declared_id(path: Path) -> list[str]:
     `model` (`eos.emulsion_viscosity`'s is), and a line-based test read one of those as the
     spec's id.
     """
+    if not path.exists():
+        # A path the diff deletes is still walked; it names no id any more.
+        return []
     text = path.read_text(encoding="utf-8")
     if path.is_relative_to(SPECS / "cases"):
         match = re.search(r'^model = "([^"]+)"', text, re.M)

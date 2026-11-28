@@ -19,7 +19,7 @@ edition = "The one member of four that can be inverted for specific gravity. The
 
 [source.neqsim]
 class = "TbpClosure"
-members = ["TbpClosure.supportsDensityFromMolarMass"]
+members = ["TbpClosure.RIAZI_DAUBERT_1980.calcDensity"]
 commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
 
 [[unported]]
@@ -69,7 +69,7 @@ rationale = "the correlation divides by it, so zero has no answer and below it t
 default = "caller"
 
 [provenance.outputs]
-default = "NeqSim TbpClosure.supportsDensityFromMolarMass"
+default = "NeqSim TbpClosure.RIAZI_DAUBERT_1980.calcDensity"
 
 [implementations]
 python = "azoth.characterization.tbp_density"
