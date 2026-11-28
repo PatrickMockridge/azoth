@@ -87,11 +87,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      # `check_port_item.py` reads the base revision; two commits give a push its parent,
-      # and the base branch is fetched below for a pull request.
+      # `check_port_item.py` reads every commit message in the range. A pull request checks
+      # out the merge commit, so two commits reach only the tip and an earlier commit's
+      # trailer is invisible; the base branch is fetched below for the diff.
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
       - if: github.event_name == 'pull_request'
         run: git fetch --no-tags origin "${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}"
       - uses: actions/setup-python@v5
