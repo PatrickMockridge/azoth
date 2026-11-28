@@ -38,6 +38,7 @@ from pathlib import Path
 
 WRAPPER = "tools/gated.sh"
 FULL_GATE_TOKEN = "AZOTH_FULL_GATE=1"
+LOCAL_LANE_TOKEN = "AZOTH_LOCAL_LANE=1"
 
 # Directory roots that mean "the whole suite" when handed to pytest.
 WIDE_PYTEST_ROOTS = {
@@ -264,52 +265,58 @@ def script_runs_heavy(arguments: list[str]) -> bool:
 
 
 def expand(
-    tokens: list[str], wrapped_so_far: bool, gate: bool
-) -> list[tuple[list[str], bool, bool]]:
-    """One resolved command and everything it passes on, with its wrap and gate flags."""
+    tokens: list[str], wrapped_so_far: bool, gate: bool, local_lane: bool
+) -> list[tuple[list[str], bool, bool, bool]]:
+    """One resolved command and everything it passes on, with its wrap and token flags."""
     is_wrapped = wrapped_so_far or wrapped(tokens)
-    out: list[tuple[list[str], bool, bool]] = [(tokens, is_wrapped, gate)]
+    out: list[tuple[list[str], bool, bool, bool]] = [(tokens, is_wrapped, gate, local_lane)]
     name = Path(tokens[0]).name
     rest = tokens[1:]
     if name in FORWARDERS:
         if name in ("bash", "sh", "zsh", "dash", "ksh") and "-c" in rest:
-            out.extend(candidates(" ".join(rest[rest.index("-c") + 1 :]), is_wrapped, gate))
+            out.extend(
+                candidates(" ".join(rest[rest.index("-c") + 1 :]), is_wrapped, gate, local_lane)
+            )
         elif name in ("bash", "sh", "zsh", "dash", "ksh"):
             # **A script file is a command the guard cannot otherwise read.** If it names a
             # heavy program, the segment is refused; a script with nothing heavy in it passes.
             if script_runs_heavy(rest):
-                out.append(([HEAVY_SCRIPT], is_wrapped, gate))
+                out.append(([HEAVY_SCRIPT], is_wrapped, gate, local_lane))
         elif name == "xargs":
-            out.extend(candidates(" ".join(rest), is_wrapped, gate))
+            out.extend(candidates(" ".join(rest), is_wrapped, gate, local_lane))
     elif name in BUILD_TOOLS:
         # **A recipe this guard cannot read is the sweep until proven otherwise.** There is
         # no Makefile in this tree, so an unreadable target is a command nobody can check.
-        out.append(([name, "the sweep"], is_wrapped, gate))
+        out.append(([name, "the sweep"], is_wrapped, gate, local_lane))
     if name == "find" and "-exec" in tokens and HEAVY_WORDS.search(" ".join(tokens)):
-        out.append(([HEAVY_SCRIPT], is_wrapped, gate))
+        out.append(([HEAVY_SCRIPT], is_wrapped, gate, local_lane))
     inner = wrapper_inner(tokens)
     if inner:
-        out.extend(expand(inner, wrapped(tokens), gate))
+        out.extend(expand(inner, wrapped(tokens), gate, local_lane))
     return out
 
 
 def candidates(
-    cmd: str, inherited_wrapped: bool = False, inherited_gate: bool = False
-) -> list[tuple[list[str], bool, bool]]:
+    cmd: str,
+    inherited_wrapped: bool = False,
+    inherited_gate: bool = False,
+    inherited_local: bool = False,
+) -> list[tuple[list[str], bool, bool, bool]]:
     """Every token list worth checking: each segment, resolved, and what its shell passes on.
 
-    Each entry is `(tokens, wrapped, gate)`: whether a memory-capped wrapper encloses it, and
-    whether the full-gate token was in its own segment. The gate is read **before** the
-    leading assignments are stripped, or `AZOTH_FULL_GATE=1 tools/gated.sh ...` would be
-    checked without the token it carries.
+    Each entry is `(tokens, wrapped, gate, local_lane)`: whether a memory-capped wrapper
+    encloses it, and whether the full-gate or local-lane token was in its own segment. Tokens
+    are read **before** the leading assignments are stripped, or
+    `AZOTH_FULL_GATE=1 tools/gated.sh ...` would be checked without the token it carries.
     """
-    out: list[tuple[list[str], bool, bool]] = []
+    out: list[tuple[list[str], bool, bool, bool]] = []
     for raw in segments(cmd):
         gate = inherited_gate or FULL_GATE_TOKEN in raw
+        local_lane = inherited_local or LOCAL_LANE_TOKEN in raw
         tokens = strip_launchers(raw)
         if not tokens:
             continue
-        out.extend(expand(tokens, inherited_wrapped, gate))
+        out.extend(expand(tokens, inherited_wrapped, gate, local_lane))
     return out
 
 
@@ -346,10 +353,10 @@ def timeout_refusal(cmd: str) -> str | None:
 
 def test_scope_refusal(cmd: str) -> str | None:
     """Refuse a local run of the whole tree through the scoped runner."""
-    for tokens, _, gate in candidates(cmd):
+    for tokens, _, gate, local_lane in candidates(cmd):
         if not any(t.endswith("test_scope.py") for t in tokens):
             continue
-        if gate or "--run" not in tokens:
+        if "--run" not in tokens:
             continue
         lane = ""
         if "--lane" in tokens:
@@ -357,10 +364,18 @@ def test_scope_refusal(cmd: str) -> str | None:
             if i + 1 < len(tokens):
                 lane = tokens[i + 1]
         lane = lane or next((t.split("=", 1)[1] for t in tokens if t.startswith("--lane=")), "")
+        if lane == "push" and "--checks-only" not in tokens and not local_lane:
+            return (
+                "The push lane is CI's: every pushed commit runs the same commands on a clean "
+                "runner. Run `python tools/test_scope.py --checks-only --run` before the push "
+                f"and read CI's run; a local copy needs {LOCAL_LANE_TOKEN}."
+            )
+        if gate:
+            continue
         if "--full" in tokens or lane == "nightly":
             return (
                 "`test_scope.py --run` with `--full` or `--lane nightly` is the whole tree. "
-                "It runs nightly in .github/workflows/nightly.yml (budget 45 min). Run the "
+                "It runs nightly in .github/workflows/nightly.yml (budget 60 min). Run the "
                 "edit lane (budget 5 min) or `--lane tranche --run` at close-out; for the "
                 f"whole tree, prefix `{FULL_GATE_TOKEN}`."
             )
@@ -378,7 +393,7 @@ def test_scope_refusal(cmd: str) -> str | None:
                     except ValueError:
                         budget = None
             if budget is not None:
-                lane_budget = {"iterate": 5, "push": 15, "tranche": 20, "nightly": 45}.get(
+                lane_budget = {"iterate": 5, "push": 15, "tranche": 20, "nightly": 60}.get(
                     lane or "iterate", 5
                 )
                 if budget <= 0:
@@ -517,7 +532,7 @@ def decide(cmd: str) -> tuple[bool, str]:
     refusal = test_scope_refusal(cmd) or timeout_refusal(cmd)
     if refusal:
         return False, refusal
-    for tokens, is_wrapped, full_gate in candidates(cmd):
+    for tokens, is_wrapped, full_gate, _ in candidates(cmd):
         # **The token has to be in the same segment as the command it attests to.** Read off
         # the whole line, `echo AZOTH_FULL_GATE=1; cargo test --workspace` attested for a
         # command it had nothing to do with, and so did `echo tools/gated.sh && cargo test`.
@@ -657,10 +672,17 @@ SELFTEST: list[tuple[str, bool]] = [
     # package runners resolve to the program they run
     ("npx cargo test", False),
     ("npx -y pytest python/tests", False),
+    # **The push lane is CI's.** A local copy needs the visible token, in its own segment.
+    ("python tools/test_scope.py --checks-only --run", True),
+    ("python tools/test_scope.py --lane push --run", False),
+    ("python tools/test_scope.py --lane push --run --max-minutes 15", False),
+    ("AZOTH_LOCAL_LANE=1 python tools/test_scope.py --lane push --run", True),
+    ("echo AZOTH_LOCAL_LANE=1; python tools/test_scope.py --lane push --run", False),
+    ("tools/gated.sh python tools/test_scope.py --lane push --run", False),
+    ("AZOTH_LOCAL_LANE=1 tools/gated.sh python tools/test_scope.py --lane push --run", True),
     # the lane budget may only be lowered, and zero is not a budget
     ("python tools/test_scope.py --lane push --run --max-minutes 35", False),
     ("python tools/test_scope.py --lane push --run --max-minutes 0", False),
-    ("python tools/test_scope.py --lane push --run --max-minutes 15", True),
     ("python tools/test_scope.py --lane tranche --run --max-minutes 21", False),
     ("python tools/test_scope.py --lane tranche --run --max-minutes 20", True),
     # `timeout` is resolved past its duration, wrapped or not

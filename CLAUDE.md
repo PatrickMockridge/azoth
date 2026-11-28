@@ -17,6 +17,28 @@ heat transfer) with an agentic layer on top.
   `pip install '.[agent]'` supplies the SDK's bundled runtime when `dsh` is not on PATH;
   the skills themselves need no runtime.
 
+## Writing code
+
+The gate verifies what was written; it is not how the code is discovered. A kernel typed
+from a skim and patched until a test turns green is the failure this section prevents.
+`AGENTS.md` carries the port law — every value names its NeqSim source — and binds a reader
+of this file.
+
+- **A port over roughly 500 lines starts in plan mode.** The plan carries the behaviour
+  table: every state variable, phase getter and its volume convention, unit conversion,
+  phase label, flash dispatch, output getter and post-store mutation, default, cap and
+  fallback, each naming its NeqSim member. A second reader checks the table against the
+  class source before the first kernel; a row that cannot be filled is a stop-and-report,
+  not a guess. No kernel is written before the plan is approved.
+- **One probe, all the state**, before the first kernel; its full case before the second
+  kernel exists. The mirror is arithmetic, not discovery.
+- **One build, one test run.** A red result goes back to the table, not into a patch.
+  Rerunning a test file while editing is the symptom of a missing table.
+- **One order for the edits** — kernel and spec, generators, build, test — so no file is
+  regenerated twice. Format and lint are checks, not editors.
+- **`--checks-only` before every push; CI runs the push lane.** A local push lane is
+  refused unless `AZOTH_LOCAL_LANE=1`; a tranche runs once at close-out.
+
 ## Running tests and builds
 
 This box has 47 GiB RAM and 2 GiB swap, with no OOM guard (`systemd-oomd` inactive,
@@ -43,10 +65,12 @@ This box has 47 GiB RAM and 2 GiB swap, with no OOM guard (`systemd-oomd` inacti
   group. **Never run `pytest python/tests`; it is nightly-only and the guard refuses it.**
   `AZOTH_PYTEST_WORKERS` (`0` disables) sets the xdist worker count.
 - **A push or tranche lane runs against a commit.** `--lane push|tranche --run` refuses a
-  dirty tree; `--lane iterate` (5 minutes) is the dirty-tree lane. Commit the slice, run its
-  one lane, and report the elapsed time and result in the next message. **No single heavy
-  command runs longer than 30 minutes** — `tools/gated.sh` enforces that ceiling and the
-  lane budgets are tighter. An hour-long test is not something an agent starts on its own.
+  dirty tree; `--lane iterate` (5 minutes) is the dirty-tree lane. Commit the slice, run
+  `python tools/test_scope.py --checks-only --run`, push, and report CI's run in the next
+  message; the push lane is CI's, and a local copy is refused unless `AZOTH_LOCAL_LANE=1`.
+  A tranche runs once at close-out. **No single heavy command runs longer than 30
+  minutes** — `tools/gated.sh` enforces that ceiling and the lane budgets are tighter. An
+  hour-long test is not something an agent starts on its own.
 - **Three checks say whether the scoped set is worth trusting.** `--audit` walks every
   tracked path through the table, so the day a directory is added and no rule knows it the
   gate says so; `--verify-selection` collects every emitted target and refuses one that

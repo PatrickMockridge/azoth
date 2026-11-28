@@ -15,6 +15,13 @@ on:
         type: string
         default: scoped
 
+# **A superseded run buys nothing.** A new commit on the same branch cancels the run it
+# replaced; the nightly and a main push carry different calling workflows, so they do not
+# cancel each other.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   CARGO_TERM_COLOR: always
   # Fail fast on a Rust warning rather than letting it accumulate.

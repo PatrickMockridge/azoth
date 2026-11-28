@@ -99,6 +99,34 @@ def test_a_docs_change_runs_no_tests_but_the_doc_checks() -> None:
     assert "pytest" not in joined, "a page cannot break a model"
 
 
+def test_checks_only_is_the_flat_jobs_and_the_generators() -> None:
+    """The preflight is what CI runs on every push: the generators' check and no build."""
+    module = tool()
+    commands, _ = module.scope(["specs/models/eos/transient_pipe.toml"], module.crate_edges())
+    names = [entry.command for entry in module.checks_only(commands)]
+    joined = "\n".join(names)
+    assert ".venv/bin/mypy" in names
+    assert "cargo fmt --all --check" in names
+    assert "python tools/check_port.py" in names
+    generators = [name for name in names if name.startswith("python tools/gen_")]
+    assert generators, "a spec change regenerates its files' checks"
+    assert names[-len(generators) :] == generators, "the slow sweep runs last"
+    assert "pytest" not in joined
+    assert "cargo test" not in joined
+    assert "maturin" not in joined
+    assert "check_notebooks" not in joined, "kernels are minutes, not seconds"
+
+
+def test_checks_only_adds_the_flat_jobs_a_docs_diff_does_not_reach() -> None:
+    """A page claims two doc checks; the preflight still pays the five flat jobs CI runs."""
+    module = tool()
+    commands, _ = module.scope(["docs/src/safety.md"], module.crate_edges())
+    names = [entry.command for entry in module.checks_only(commands)]
+    assert ".venv/bin/mypy" in names
+    assert "python tools/check_port.py" in names
+    assert not any(name.startswith("mdbook") for name in names)
+
+
 def test_the_nightly_lane_is_the_whole_suite_and_is_not_gated() -> None:
     """`tools/gated.sh` does not exist on a runner, so the lane that CI runs must not name it."""
     lines = tool().nightly(gate=False)

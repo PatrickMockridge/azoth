@@ -48,11 +48,10 @@ None, or:
 
 ## Checklist
 
-- [ ] `python tools/test_scope.py --lane push --run` (the extension is built by the gate;
-      `AZOTH_REQUIRE_RUST=1` makes a missing one an error)
-- [ ] `ruff check && ruff format --check && mypy`
-- [ ] `python tools/spec_lint.py`
-- [ ] `mdbook build docs` and `python tools/check_links.py`
+- [ ] `python tools/test_scope.py --checks-only --run` passed before the last push; it runs
+      the generators' `--check`, `ruff`, `mypy`, `cargo fmt --check` and the spec checks
+- [ ] The push run is green — link:
+- [ ] `mdbook build docs` and `python tools/check_links.py` (docs changes)
 - [ ] Commits are signed
 
 ## Anything a reviewer should look at first

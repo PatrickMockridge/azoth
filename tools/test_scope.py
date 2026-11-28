@@ -391,6 +391,10 @@ LANE_BUDGET_MINUTES: dict[str, int] = {
     "nightly": 60,
 }
 
+#: The preflight runs no tests, but a spec or workflow change reaches the whole 23-generator
+#: chain. The edit lane's five minutes is not enough for that, and the preflight is not a lane.
+CHECKS_BUDGET_MINUTES = 15
+
 #: **Which generators a diff can make stale.** Conservative by design: a miss here is caught
 #: by CI's unconditional `spec-validate` and the drift job, so the cost is one stale file
 #: found on the push rather than one merged. The alternative - the full 23-generator sweep on
@@ -1469,6 +1473,23 @@ def cheap_first(commands: list[Command]) -> list[Command]:
     return [e for e in commands if is_cheap(e)] + [e for e in commands if not is_cheap(e)]
 
 
+def checks_only(commands: list[Command]) -> list[Command]:
+    """The cheap half alone: the diff's generator checks and every unconditional CI step.
+
+    `CLOSE_OUT` is added whatever the lane, because those are the five jobs CI runs on every
+    push - the preflight is the same set on a developer's machine. `is_cheap` excludes the
+    notebook run, which starts kernels and is minutes rather than seconds.
+    """
+    seen = {entry.command for entry in commands}
+    union = list(commands) + [entry for entry in CLOSE_OUT if entry.command not in seen]
+    cheap = [entry for entry in union if is_cheap(entry)]
+    # **The sweep is the slow half of the cheap half.** A lint or spec failure should stop the
+    # preflight before fifteen minutes of generators, not after.
+    return [entry for entry in cheap if not is_generator_check(entry)] + [
+        entry for entry in cheap if is_generator_check(entry)
+    ]
+
+
 def rust_scope(crates: set[str], edges: dict[str, set[str]]) -> list[Command]:
     """The cargo commands for a set of changed crates, plus the extension rebuild."""
     touched = sorted({crate for crate in crates} | {n for c in crates for n in reaches(c, edges)})
@@ -2443,6 +2464,11 @@ def main() -> int:
     parser.add_argument("--explain", action="store_true")
     parser.add_argument("--run", action="store_true")
     parser.add_argument(
+        "--checks-only",
+        action="store_true",
+        help="the generators' --check and the five flat CI jobs' commands; no build or tests",
+    )
+    parser.add_argument(
         "--audit",
         action="store_true",
         help="walk every tracked path through the table, rather than the diff",
@@ -2582,13 +2608,16 @@ def main() -> int:
         commands = [entry for entry in commands if entry.kind not in (CARGO, CLIPPY)]
     if args.job:
         commands = [entry for entry in commands if args.job in jobs_of(entry)]
+    if args.checks_only:
+        commands = checks_only(commands)
     if args.verify_selection:
         return verify_selection(commands)
     if not commands:
         print(f"# nothing in {len(paths)} changed path(s) reaches a test")
         return 0
 
-    budget = args.max_minutes if args.max_minutes is not None else LANE_BUDGET_MINUTES[lane]
+    default_budget = CHECKS_BUDGET_MINUTES if args.checks_only else LANE_BUDGET_MINUTES[lane]
+    budget = args.max_minutes if args.max_minutes is not None else default_budget
     budget_seconds = budget * 60 if budget else None
     if args.no_gate:
         # **On a runner the job's `timeout-minutes` is the watchdog, not this lane's budget.**
@@ -2628,7 +2657,8 @@ def main() -> int:
         # **A run always shows its estimate first**, so the transcript carries the minutes
         # before the budget is spent.
         minutes = sum(estimate_seconds(entry) for entry in commands) / 60
-        print(f"# estimated: {minutes:.1f} min against a {budget}-minute {lane} lane")
+        where = "checks-only preflight" if args.checks_only else f"{lane} lane"
+        print(f"# estimated: {minutes:.1f} min against a {budget}-minute {where}")
         if budget and minutes > budget:
             print(f"# WARNING: over the {lane} budget; the tranche lane is the close-out")
 
@@ -2636,7 +2666,9 @@ def main() -> int:
         print(f"# {reason}\n{line}" if args.explain else line)
 
     if args.run:
-        return run_with_watchdog(labelled, budget_seconds, lane)
+        return run_with_watchdog(
+            labelled, budget_seconds, "checks-only" if args.checks_only else lane
+        )
     return 0
 
 
