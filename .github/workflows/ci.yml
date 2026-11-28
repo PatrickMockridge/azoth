@@ -377,9 +377,16 @@ jobs:
         env:
           PYTHONPATH: ""
         run: |
-          .venv/bin/python -m coverage json -o coverage.json
-          python tools/check_coverage.py \
-            --base "${{ needs.scope.outputs.base }}" --json coverage.json
+          # A diff that selects only the extension build (a Rust test file, say) runs no
+          # pytest target, so there is no coverage document and nothing to decide. The
+          # check says that rather than failing on `coverage json`'s "No data to report".
+          if [ -f .coverage ]; then
+            .venv/bin/python -m coverage json -o coverage.json
+            python tools/check_coverage.py \
+              --base "${{ needs.scope.outputs.base }}" --json coverage.json
+          else
+            echo "no Python test was selected, so there are no changed lines to cover"
+          fi
   notebooks:
     name: notebooks
     runs-on: ubuntu-latest
