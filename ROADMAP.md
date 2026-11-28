@@ -1394,7 +1394,7 @@ three bindings of it — `azoth-wasm` for a browser, `azoth.process.Session` for
 there** rather than counted here. The editor it feeds is `ui/`.
 
 **The editor hosts two documents and a drawing viewer beside the flowsheet.** `azoth-sheets`
-owns a calculation book of the 98 standalone calculations, and `azoth-safety` owns a safety
+owns a calculation book of the 97 standalone calculations, and `azoth-safety` owns a safety
 study: safety scenarios, one registered model each, and bow-ties whose frequency and RRF are
 `process.bow_tie`'s. Each has its own command model, envelope and route — `/sheets` and
 `/safety` — and its own bindings (`SheetEditor`/`SafetyEditor` in wasm, `azoth sheets`/`azoth
