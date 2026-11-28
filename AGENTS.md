@@ -58,6 +58,79 @@ Where a port composes several NeqSim classes, `source.neqsim.members` names each
 method it reads. The databank pin is `databank/manifest.toml`; a capture's pin is the jar
 in its driver header. A result states which pin it was verified against.
 
+## Executing a port
+
+The law says what may enter a port. This section says the order that keeps a large one from
+being discovered one failing comparison at a time. It is not advice; a port over roughly 500
+lines that skips it is refused.
+
+### Before code: the behaviour table
+
+The provenance table answers *where each value comes from*. A port also needs a table of
+*what the class actually does*, because the units, volumes, phase labels and post-run
+mutations are where a faithful transcription diverges. The plan carries one row per item:
+
+- every state variable and its primitive/conservative form;
+- every phase property the algorithm reads, and the getter it reads it from;
+- the **volume convention** for each use: shifted or unshifted, molar or mass, and which
+  getter applies which (NeqSim's `getDensity()` and `getVolume()` do not agree);
+- every unit conversion inside the class, including the factors in its own expressions;
+- every phase label, mole/mass/volume fraction, and which of the three the class uses;
+- the flash dispatch and the flag that selects it;
+- every getter an output reads, **and every mutation the class makes after it stores the
+  output** (a section rewritten by `updateOutletStream()` after `storeResults()` is invisible
+  in the stored profile and visible in `getSections()`; the port must know which one it
+  exposes);
+- every default, cap, floor and fallback, with its member.
+
+If a row cannot be filled from the class source, that is the stop-and-report rule, not a
+guess. The 2026-11 `TransientPipe` port needed six corrections that this table would have
+carried from the start.
+
+### One probe, all the state
+
+Write the probe before the first kernel and make it print everything the comparison could
+need, at full precision: the input echo, the initial and final value of every output, every
+getter value, every phase property the algorithm reads, every internal field the class
+mutates after storing results, the step and time counters, and the whole output matrix
+including the rows the class never wrote. A probe that prints only the final profiles is
+not finished. Recompiling a probe to find a convention is a cycle the first probe should
+have removed.
+
+### First kernel, then the second
+
+Validate the first kernel's **single state and single step** against the probe before
+writing the march, and get its **full case** to match before writing the second kernel. The
+mirror is arithmetic, not discovery: a correction made in one language and then copied is
+one edit; a correction found after both exist is two edits and two test runs. The
+cross-implementation comparison is the last check, not the first.
+
+### A new id, in dependency order
+
+The generator chain's order is in `docs/src/architecture/specification.md`; it is necessary
+and not sufficient. Before the chain can run, these must exist, in this order:
+
+1. the spec and its case, with expected values from the capture (never from either kernel);
+2. the Rust result struct, its `impl CalcResult`, and the `lib.rs` re-export — the Python
+   result generator reads `FIELDS` from the Rust source;
+3. the public Python wrapper in the namespace's `__init__.py`, its import and its `__all__`
+   entry — the stub generator imports the namespace and looks the function up;
+4. a `SELF_ASSERTED_EXPECTATIONS` entry for any expectation a `TestCase` cannot carry (a
+   matrix, a boolean, a record list), with the model's own test that reads it;
+5. the generator chain, then `gen_ui_fixtures.py`.
+
+Then commit and run **one** lane. Rerunning the same test file while editing is the symptom
+of a missing behaviour table or an unvalidated first kernel; fix the table, not the loop.
+
+### Before blaming the diff: the base red
+
+A scoped lane exposes whatever the diff reaches, including reds already on `main`. Before
+chasing a failure, run the same scoped command at the base commit in a throwaway worktree
+(`git worktree add /tmp/azoth-base origin/main`). A failure there is not this diff's: state
+it in the PR body as pre-existing and leave it out of the change. The 2026-11 `Fürst`
+Huron-Vidal refusal and two `clippy::question_mark` lints were on `main` and cost cycles
+because they were diagnosed one at a time.
+
 ## The NeqSim oracle
 
 azoth is a port of NeqSim, so NeqSim is the differential oracle: a disagreement with

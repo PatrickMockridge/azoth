@@ -2253,6 +2253,51 @@ impl CalcResult for PipeBeggsAndBrillsResult {
     }
 }
 
+/// Result of `eos.transient_pipe`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct TransientPipeResult {
+    /// Each cell's final pressure.
+    pub pressure_profile: Vec<f64>,
+    /// Each cell's final temperature; the held inlet temperature.
+    pub temperature_profile: Vec<f64>,
+    /// Each cell's final liquid holdup.
+    pub liquid_holdup_profile: Vec<f64>,
+    /// Each cell's final gas velocity.
+    pub gas_velocity_profile: Vec<f64>,
+    /// Each cell's final liquid velocity.
+    pub liquid_velocity_profile: Vec<f64>,
+    /// The class's allocated pressure-history matrix, unwritten rows zero.
+    pub pressure_history: Vec<Vec<f64>>,
+    /// The last step's accumulated time.
+    pub simulation_time: Time,
+    /// The adaptive steps the march took.
+    pub total_time_steps: u32,
+    /// The class's summed mixture mass, which it calls a residual.
+    pub mass_inventory: Mass,
+    /// Caveats.
+    pub warnings: Vec<Warning>,
+}
+
+impl CalcResult for TransientPipeResult {
+    const CALC_ID: &'static str = "eos.transient_pipe";
+    const FIELDS: &'static [&'static str] = &[
+        "pressure_profile",
+        "temperature_profile",
+        "liquid_holdup_profile",
+        "gas_velocity_profile",
+        "liquid_velocity_profile",
+        "pressure_history",
+        "simulation_time",
+        "total_time_steps",
+        "mass_inventory",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 /// Result of `eos.closed_loop_deposition_solver`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ClosedLoopDepositionSolverResult {

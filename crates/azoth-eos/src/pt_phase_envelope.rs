@@ -727,12 +727,8 @@ fn boundaries_at(mixture: &Mixture, z: &[f64], t: f64, pressures: &[f64]) -> Opt
     if !flags.iter().any(|flag| *flag) {
         return None;
     }
-    let Some(first) = flags.iter().position(|flag| *flag) else {
-        return None;
-    };
-    let Some(last) = flags.iter().rposition(|flag| *flag) else {
-        return None;
-    };
+    let first = flags.iter().position(|flag| *flag)?;
+    let last = flags.iter().rposition(|flag| *flag)?;
     let lower = if first == 0 {
         pressures[0]
     } else {

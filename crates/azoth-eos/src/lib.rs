@@ -232,6 +232,7 @@ pub mod srk_alpha_ab;
 pub mod srk_cpa_phase;
 pub mod srk_departure;
 pub mod tbp_fraction_properties;
+pub mod transient_pipe;
 // The CPA phase state's shared arithmetic, private: the two models that use it are
 // `srk_cpa_phase` and `pr_cpa_phase`, which name the family and the result type.
 mod cpa_phase;
@@ -437,8 +438,8 @@ pub use results::{
     SoreideWhitsonPhaseResult, SoundSpeedResult, SrkAlphaAbResult, SrkDepartureResult,
     SrkKappaResult, SrkPenelouxShiftResult, SrkZFactorResult, StabilityTestResult,
     StabilityVerdict, StreamScaleAnalyzerResult, StreamScaleMineralRow, SurfCooldownResult,
-    ThFlashResult, ThermalConductivityResult, TsFlashResult, TuFlashResult, TwuKappaResult,
-    TwucoonAlphaResult, TwucoonParamAlphaResult, TwucoonStatoilAlphaResult,
+    ThFlashResult, ThermalConductivityResult, TransientPipeResult, TsFlashResult, TuFlashResult,
+    TwuKappaResult, TwucoonAlphaResult, TwucoonParamAlphaResult, TwucoonStatoilAlphaResult,
     TynCalusDiffusivityResult, UmrCpaPhaseResult, UmrPruFlashResult, UmrprAlphaResult,
     UnifacActivityCoefficientsResult, UnifacPsrkActivityCoefficientsResult,
     UnifacUmrpruActivityCoefficientsResult, UniquacActivityCoefficientsResult,
@@ -472,6 +473,7 @@ pub use thermal_conductivity::thermal_conductivity;
 pub use tp_multiflash::tp_multiflash;
 pub use tp_multiflash_wax::tp_multiflash_wax;
 pub use tp_solid_flash::tp_solid_flash;
+pub use transient_pipe::transient_pipe;
 pub use ts_flash::ts_flash;
 pub use tu_flash::tu_flash;
 pub use tv_flash::tv_flash;

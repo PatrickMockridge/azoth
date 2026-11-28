@@ -131,7 +131,7 @@ pub fn sound_speed(
 }
 
 /// One phase's isentropic speed, m/s.
-fn phase_speed_of(
+pub(crate) fn phase_speed_of(
     mixture: &Mixture,
     ideal_gas: &crate::molar_enthalpy_entropy::IdealGasModel,
     reduced: &ReducedParameters,
@@ -149,7 +149,7 @@ fn phase_speed_of(
 }
 
 /// The composition's molar mass, kg/mol.
-fn molar_mass_of(mixture: &Mixture, composition: &[f64]) -> Result<f64> {
+pub(crate) fn molar_mass_of(mixture: &Mixture, composition: &[f64]) -> Result<f64> {
     let mut total = 0.0;
     for (component, fraction) in mixture.components().iter().zip(composition) {
         let mass = component.molar_mass.ok_or_else(|| {

@@ -538,6 +538,23 @@ which a one-step id keeps outside. `cooler_invalid_design` is the class's own re
   > captures/process_cooler_transient.tsv
 ```
 
+## The transient drift-flux pipe
+
+`transient_pipe.tsv` is `TransientPipe.run`'s isothermal march on a 100 m, 100 mm, five-cell
+SRK methane/n-butane line at 50 bar and 300 K. The two cases are the same line with a
+constant-flow inlet and with the inlet closed, both against 40 bar at the outlet for 1 s.
+The rows print the inlet stream's flashed phase state and overall density, the five result
+profiles, the allocated pressure-history matrix (the initial row and the ten-step row), the
+step and time counters, the class's mass inventory, and the final per-section primitive
+state. The section rows are after `updateOutletStream`, whose constant-flow branch rewrites
+the outlet section's phase velocities; the `profile` rows are the getters' stored values and
+are the case's expected values.
+
+```bash
+../../tools/gated.sh javac -proc:none -cp neqsim-b40bb11.jar TransientPipeProbe.java
+../../tools/gated.sh java -cp .:neqsim-b40bb11.jar TransientPipeProbe > captures/transient_pipe.tsv
+```
+
 ## The compressor's no-chart modes
 
 Three captures on `CompressorDepositTest`'s machine: the polytropic branch, the

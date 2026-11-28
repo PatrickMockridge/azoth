@@ -1,0 +1,65 @@
+model = "eos.transient_pipe"
+
+# The capture's two cases: the same 100 m, 100 mm, five-cell SRK methane/n-butane line,
+# first with a constant-flow inlet and then with the inlet closed. Every number below is
+# from validation/neqsim/captures/transient_pipe.tsv, not from the azoth kernels.
+
+[[cases]]
+id = "flowing_inlet"
+tolerance = 1.0e-6
+source = "The capture's `flowing_inlet` row: 5 kg/s at 50 bar and 300 K, 40 bar at the outlet, 1 s. The largest relative divergence of the two kernels from the capture is 6.7e-8, so the tolerance is a decade above it.\n"
+[cases.inputs]
+components = ['methane', 'n-butane']
+inlet_z = [0.9, 0.1]
+inlet_mass_flow = 5.0
+inlet_p = 5.0e6
+inlet_t = 300.0
+length = 100.0
+diameter = 0.1
+number_of_sections = 5
+roughness = 1.0e-4
+inlet_boundary = "constant_flow"
+outlet_boundary = "constant_pressure"
+outlet_pressure = 4.0e6
+max_simulation_time = 1.0
+cfl = 0.5
+thermodynamic_update_interval = 10
+eos = "srk"
+[cases.expected]
+pressure_profile = [5075413.602400322, 5075413.602400322, 4568336.765724651, 4600391.868996797, 4000000.0]
+temperature_profile = [300.0, 300.0, 300.0, 300.0, 300.0]
+liquid_holdup_profile = [7.360144201059221e-4, 6.115559261819923e-4, 3.991590114760574e-4, 3.808008615411572e-4, 3.829987792437967e-4]
+gas_velocity_profile = [13.984876454601896, 16.167308855722958, 22.592131475002677, 19.353311734320194, 21.63595185843785]
+liquid_velocity_profile = [13.984876454601896, 0.0, 0.0, 0.0, 0.0]
+pressure_history = [[5000000.0, 4750000.0, 4500000.0, 4250000.0, 4000000.0], [4148595.0563689233, 4148595.0563689233, 4179421.184677736, 4192432.7261649515, 4000000.0]]
+mass_inventory = 32.83280608066242
+
+[[cases]]
+id = "closed_inlet"
+tolerance = 1.0e-6
+source = "The capture's `closed_inlet` row: the same state with the inlet closed, the blowdown against 40 bar. The largest relative divergence of the two kernels from the capture is 6.7e-8, so the tolerance is a decade above it.\n"
+[cases.inputs]
+components = ['methane', 'n-butane']
+inlet_z = [0.9, 0.1]
+inlet_mass_flow = 5.0
+inlet_p = 5.0e6
+inlet_t = 300.0
+length = 100.0
+diameter = 0.1
+number_of_sections = 5
+roughness = 1.0e-4
+inlet_boundary = "closed"
+outlet_boundary = "constant_pressure"
+outlet_pressure = 4.0e6
+max_simulation_time = 1.0
+cfl = 0.5
+thermodynamic_update_interval = 10
+eos = "srk"
+[cases.expected]
+pressure_profile = [5000000.0, 2453959.852015648, 4776110.694642241, 3613421.4910400053, 4000000.0]
+temperature_profile = [300.0, 300.0, 300.0, 300.0, 300.0]
+liquid_holdup_profile = [0.006821786530105705, 5.867508569657765e-4, 4.2520419153841386e-4, 4.2265853314394497e-4, 3.2639120177181745e-4]
+gas_velocity_profile = [0.0, 199.58846082245657, 72.15202716110366, 107.16346709062235, 80.13382871264388]
+liquid_velocity_profile = [0.0, 0.0, 0.0, 0.0, 0.0]
+pressure_history = [[5000000.0, 4750000.0, 4500000.0, 4250000.0, 4000000.0], [5000000.0, 3535118.248342026, 4713287.972547586, 4159227.8891934236, 4000000.0]]
+mass_inventory = 29.152599136716624

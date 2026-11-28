@@ -194,6 +194,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyTpMultiflashResult>()?;
     m.add_class::<crate::transport_gen::PyTpMultiflashWaxResult>()?;
     m.add_class::<crate::transport_gen::PyTpSolidFlashResult>()?;
+    m.add_class::<crate::transport_gen::PyTransientPipeResult>()?;
     m.add_class::<crate::transport_gen::PyTsFlashResult>()?;
     m.add_class::<crate::transport_gen::PyTuFlashResult>()?;
     m.add_class::<crate::transport_gen::PyTvFlashResult>()?;
@@ -983,6 +984,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::tp_multiflash, m)?)?;
     m.add_function(wrap_pyfunction!(crate::eos::tp_multiflash_wax, m)?)?;
     m.add_function(wrap_pyfunction!(crate::eos::tp_solid_flash, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::transient_pipe, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::ts_flash, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::tu_flash, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::tv_flash, m)?)?;

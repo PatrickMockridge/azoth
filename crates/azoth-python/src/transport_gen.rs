@@ -10990,6 +10990,127 @@ impl From<&azoth_eos::results::TpSolidFlashResult> for PyTpSolidFlashResult {
         }
     }
 }
+/// Result of `eos.transient_pipe`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "TransientPipeResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTransientPipeResult {
+    /// each cell's final pressure, `getPressureProfile`.
+    #[pyo3(get)]
+    pub pressure_profile: Vec<PyQty>,
+    /// each cell's final temperature, `getTemperatureProfile`; the held inlet temperature.
+    #[pyo3(get)]
+    pub temperature_profile: Vec<PyQty>,
+    /// each cell's final liquid holdup, `getLiquidHoldupProfile`.
+    #[pyo3(get)]
+    pub liquid_holdup_profile: Vec<f64>,
+    /// each cell's final gas velocity, `getGasVelocityProfile`.
+    #[pyo3(get)]
+    pub gas_velocity_profile: Vec<PyQty>,
+    /// each cell's final liquid velocity, `getLiquidVelocityProfile`.
+    #[pyo3(get)]
+    pub liquid_velocity_profile: Vec<PyQty>,
+    /// `getPressureHistory`: the allocated matrix, the initial row first, a row every ten steps while the allocation lasts, and zero in the rows never written.
+    #[pyo3(get)]
+    pub pressure_history: Vec<Vec<PyQty>>,
+    /// `getSimulationTime`: the last step's accumulated time, which may pass `max_simulation_time` by one step.
+    #[pyo3(get)]
+    pub simulation_time: PyQty,
+    /// `getTotalTimeSteps`: the adaptive steps the march took.
+    #[pyo3(get)]
+    pub total_time_steps: u32,
+    /// `getMassResidual`: the class's name for the summed mixture mass, not a residual.
+    #[pyo3(get)]
+    pub mass_inventory: PyQty,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyTransientPipeResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "TransientPipeResult(pressure_profile={:?}, temperature_profile={:?}, liquid_holdup_profile={:?}, gas_velocity_profile={:?}, liquid_velocity_profile={:?}, pressure_history={:?}, simulation_time={:?}, total_time_steps={:?}, mass_inventory={:?}, {} warning(s))",
+            self.pressure_profile,
+            self.temperature_profile,
+            self.liquid_holdup_profile,
+            self.gas_velocity_profile,
+            self.liquid_velocity_profile,
+            self.pressure_history,
+            self.simulation_time,
+            self.total_time_steps,
+            self.mass_inventory,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_eos::results::TransientPipeResult> for PyTransientPipeResult {
+    fn from(r: &azoth_eos::results::TransientPipeResult) -> Self {
+        Self {
+            pressure_profile: r
+                .pressure_profile
+                .iter()
+                .map(|v| PyQty {
+                    magnitude_si: *v,
+                    unit: "Pa".to_string(),
+                })
+                .collect(),
+            temperature_profile: r
+                .temperature_profile
+                .iter()
+                .map(|v| PyQty {
+                    magnitude_si: *v,
+                    unit: "K".to_string(),
+                })
+                .collect(),
+            liquid_holdup_profile: r.liquid_holdup_profile.clone(),
+            gas_velocity_profile: r
+                .gas_velocity_profile
+                .iter()
+                .map(|v| PyQty {
+                    magnitude_si: *v,
+                    unit: "m/s".to_string(),
+                })
+                .collect(),
+            liquid_velocity_profile: r
+                .liquid_velocity_profile
+                .iter()
+                .map(|v| PyQty {
+                    magnitude_si: *v,
+                    unit: "m/s".to_string(),
+                })
+                .collect(),
+            pressure_history: r
+                .pressure_history
+                .iter()
+                .map(|row| {
+                    row.iter()
+                        .map(|v| PyQty {
+                            magnitude_si: *v,
+                            unit: "Pa".to_string(),
+                        })
+                        .collect()
+                })
+                .collect(),
+            simulation_time: PyQty {
+                magnitude_si: r.simulation_time.value,
+                unit: "s".to_string(),
+            },
+            total_time_steps: r.total_time_steps,
+            mass_inventory: PyQty {
+                magnitude_si: r.mass_inventory.value,
+                unit: "kg".to_string(),
+            },
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `eos.ts_flash`, transported.
 #[pyclass(
     frozen,

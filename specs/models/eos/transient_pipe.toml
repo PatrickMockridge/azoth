@@ -1,0 +1,466 @@
+id = "eos.transient_pipe"
+name = "Transient drift-flux pipeline march"
+kind = "direct"
+assumptions = [
+    "**the march is `TransientPipe.run`'s isothermal path**: `includeHeatTransfer` is false, so temperature is held and the energy flux is never read back.\n",
+    "**`gasBeta` is the gas phase's mole fraction** and splits the inlet mass flow; the initial holdup is `U_SL/(U_SL+U_SG)`, as the class computes it.\n",
+    "**each cell is flashed every `thermodynamic_update_interval` steps** at its pressure and the inlet temperature; `TPflash` dispatches to `TPmultiflash` under `setMultiPhaseCheck(true)`.\n",
+    "**phase density is `M/V` with Peneloux; surface tension is the mixture Parachor with gas first.** The label is `V/b > 1.75`, and no second mN/m conversion is applied.\n",
+    "**the pressure update is the class's acoustic relation**, `p_new = p_old + c^2 (rho_new - rho_old)`, with the 5 % density and pressure caps and the `[1e5, 5e7]` Pa bounds.\n",
+    "**the class's specific enthalpy is `getEnthalpy(\"J/mol\") / getMolarMass() * 1000`**, 1000 times the J/kg value; in the isothermal path it reaches only the unread energy variable.\n",
+    "**gas plus at most one liquid.** A three-phase flash, the slug and accumulation trackers, heat transfer and the transient boundaries are refused.\n",
+    "**the supported boundaries are `CONSTANT_FLOW`, `CONSTANT_PRESSURE` and `CLOSED`**; the model is one `run()` to `max_simulation_time`, not an incremental `runTransient`.\n",
+    "**the history is the class's preallocated matrix**, `int(maxSimulationTime/(dt*historyInterval))+1` rows at 0.1 s and 10, written every ten steps; unwritten rows stay zero.\n",
+    "**the class's split is its own code**: `splitMachPlus` and `splitMachMinus` omit the `beta (M^2 - 1)^2` term their comment names.\n",
+]
+references = [
+    "NeqSim master, `process/equipment/pipeline/twophasepipe/TransientPipe.java`, `DriftFluxModel.java`, `FlowRegimeDetector.java` and `PipeSection.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.",
+    "Taitel, Y. and Dukler, A. E. (1976), AIChE Journal 22(1); Barnea, D. (1987), Int. J. Multiphase Flow 13(1); Bendiksen, K. H. (1984), Int. J. Multiphase Flow 10(4); Zuber, N. and Findlay, J. A. (1965), J. Heat Transfer 87(4) - the regime map and drift-flux closures the class cites.",
+    "Liou, M.-S. (1996), J. Comput. Phys. 129 - the AUSM+ split the class names, whose `beta` term its code omits.",
+    "`validation/neqsim/captures/transient_pipe.tsv` - the class on a 100 m, 100 mm, five-cell methane/n-butane line, a flowing inlet and a closed inlet, at the pinned jar.",
+]
+[source]
+standard = "NeqSim master `TransientPipe`"
+edition = "`run`'s isothermal drift-flux march: the CFL step, finite-volume update, class face split, drift-flux split, acoustic pressure update, three boundaries, periodic TP flash, profiles and history. Heat transfer, slug/accumulation, three-phase and transient boundaries are outside this model."
+
+[source.neqsim]
+class = "TransientPipe"
+members = [
+    "TransientPipe.initializePipe",
+    "TransientPipe.initializeFromStream",
+    "TransientPipe.run",
+    "TransientPipe.calculateTimeStep",
+    "TransientPipe.advanceTimeStep",
+    "TransientPipe.calculateFluxes",
+    "TransientPipe.calculateAUSMFlux",
+    "TransientPipe.splitMachPlus",
+    "TransientPipe.splitMachMinus",
+    "TransientPipe.splitPressurePlus",
+    "TransientPipe.splitPressureMinus",
+    "TransientPipe.addSourceTerms",
+    "TransientPipe.updatePrimitiveVariables",
+    "TransientPipe.applyBoundaryConditions",
+    "TransientPipe.updateBoundaryPressures",
+    "TransientPipe.updateFlowRegimes",
+    "TransientPipe.updateThermodynamicProperties",
+    "TransientPipe.storeResults",
+    "TransientPipe.storeHistory",
+    "TransientPipe.checkConvergence",
+    "PipeSection.getConservativeVariables",
+    "PipeSection.updateDerivedQuantities",
+    "PipeSection.getWallisSoundSpeed",
+    "DriftFluxModel.calculateDriftFlux",
+    "DriftFluxModel.calculatePressureGradient",
+    "FlowRegimeDetector.detectFlowRegime",
+    "ThermodynamicOperations.TPflash",
+    "ThermodynamicOperations.TPmultiflash",
+    "InterfaceProperties.getSurfaceTension",
+    "PhaseEos.getSoundSpeed",
+    "Phase.getEnthalpy",
+]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
+[inputs]
+[inputs.components]
+type = "components"
+description = "the fluid's substances, by name, resolved against the component databank.\n"
+[inputs.inlet_z]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the feed's overall mole fractions, which every cell flash holds.\n"
+[inputs.inlet_mass_flow]
+unit = "kg/s"
+description = "the inlet stream's mass flow, which initialises the superficial velocities; a closed inlet still reads it for the initial state.\n"
+[inputs.inlet_p]
+unit = "Pa"
+description = "the inlet stream's pressure, which is the initial inlet cell's pressure.\n"
+[inputs.inlet_t]
+unit = "K"
+description = "the inlet stream's temperature, held by every cell for the isothermal march.\n"
+[inputs.length]
+unit = "m"
+description = "the line's total length.\n"
+[inputs.diameter]
+unit = "m"
+description = "the internal diameter.\n"
+[inputs.number_of_sections]
+unit = "dimensionless"
+description = "the number of computational cells; `dx` is the length over this.\n"
+[inputs.roughness]
+unit = "m"
+description = "the wall's absolute roughness.\n"
+[inputs.inlet_boundary]
+type = "enum"
+values = ["constant_flow", "constant_pressure", "closed"]
+description = "the inlet boundary arm.\n"
+[inputs.outlet_boundary]
+type = "enum"
+values = ["constant_pressure", "constant_flow", "closed"]
+description = "the outlet boundary arm.\n"
+[inputs.elevation_profile]
+type = "vector"
+unit = "m"
+length = "one per section"
+optional = true
+description = "each cell's elevation. Absent is a flat line. A local minimum is an accumulation zone and is refused.\n"
+[inputs.inclination_profile]
+type = "vector"
+unit = "dimensionless"
+length = "one per section, in radians"
+optional = true
+description = "each cell's inclination, used only when no elevation profile is given. Absent is a flat line. A riser-base transition is refused.\n"
+[inputs.outlet_pressure]
+unit = "Pa"
+optional = true
+description = "the constant outlet pressure. Absent is the class's hydrostatic and friction estimate from the inlet state, floored at 1 bar.\n"
+[inputs.max_simulation_time]
+unit = "s"
+optional = true
+description = "the march's end. **Absent is the class's 3600 s.**\n"
+[inputs.cfl]
+unit = "dimensionless"
+optional = true
+description = "the CFL number. **Absent is the class's 0.5.**\n"
+[inputs.thermodynamic_update_interval]
+unit = "dimensionless"
+optional = true
+description = "the number of steps between cell flashes. **Absent is the class's 10.**\n"
+[inputs.eos]
+type = "enum"
+values = ["srk", "pr"]
+optional = true
+description = "the cubic. **Absent is `srk`.**\n"
+[outputs]
+[outputs.pressure_profile]
+type = "vector"
+unit = "Pa"
+length = "one per section"
+description = "each cell's final pressure, `getPressureProfile`.\n"
+[outputs.temperature_profile]
+type = "vector"
+unit = "K"
+length = "one per section"
+description = "each cell's final temperature, `getTemperatureProfile`; the held inlet temperature.\n"
+[outputs.liquid_holdup_profile]
+type = "vector"
+unit = "dimensionless"
+length = "one per section"
+description = "each cell's final liquid holdup, `getLiquidHoldupProfile`.\n"
+[outputs.gas_velocity_profile]
+type = "vector"
+unit = "m/s"
+length = "one per section"
+description = "each cell's final gas velocity, `getGasVelocityProfile`.\n"
+[outputs.liquid_velocity_profile]
+type = "vector"
+unit = "m/s"
+length = "one per section"
+description = "each cell's final liquid velocity, `getLiquidVelocityProfile`.\n"
+[outputs.pressure_history]
+type = "matrix"
+unit = "Pa"
+shape = "one row per allocated sample, one column per section"
+description = "`getPressureHistory`: the allocated matrix, the initial row first, a row every ten steps while the allocation lasts, and zero in the rows never written.\n"
+[outputs.simulation_time]
+unit = "s"
+description = "`getSimulationTime`: the last step's accumulated time, which may pass `max_simulation_time` by one step.\n"
+[outputs.total_time_steps]
+unit = "dimensionless"
+description = "`getTotalTimeSteps`: the adaptive steps the march took.\n"
+[outputs.mass_inventory]
+unit = "kg"
+description = "`getMassResidual`: the class's name for the summed mixture mass, not a residual.\n"
+[[valid_range]]
+quantity = "inlet_mass_flow"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a closed inlet has no flow, and the class initialises a stagnant state from a zero stream.\n"
+[[valid_range]]
+quantity = "inlet_p"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure.\n"
+[[valid_range]]
+quantity = "inlet_t"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature.\n"
+[[valid_range]]
+quantity = "length"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the line has a length.\n"
+[[valid_range]]
+quantity = "diameter"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the cells have an area.\n"
+[[valid_range]]
+quantity = "number_of_sections"
+min = 1
+min_inclusive = true
+severity = "error"
+rationale = "at least one cell.\n"
+[[valid_range]]
+quantity = "roughness"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "an absolute roughness cannot be negative.\n"
+[[valid_range]]
+quantity = "max_simulation_time"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a march has a positive duration.\n"
+[[valid_range]]
+quantity = "cfl"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a positive CFL number.\n"
+[[valid_range]]
+quantity = "thermodynamic_update_interval"
+min = 1
+min_inclusive = true
+severity = "error"
+rationale = "a flash every positive number of steps.\n"
+[[valid_range]]
+quantity = "outlet_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure.\n"
+
+[[provenance.constants]]
+name = "GRAVITY"
+value = 9.81
+source = "NeqSim TransientPipe.GRAVITY, DriftFluxModel.GRAVITY and FlowRegimeDetector.GRAVITY"
+[[provenance.constants]]
+name = "DEFAULT_ROUGHNESS"
+value = 1.0e-4
+source = "NeqSim TransientPipe.roughness"
+[[provenance.constants]]
+name = "DEFAULT_SECTIONS"
+value = 50
+source = "NeqSim TransientPipe.numberOfSections"
+[[provenance.constants]]
+name = "DEFAULT_MAX_TIME"
+value = 3600.0
+source = "NeqSim TransientPipe.maxSimulationTime"
+[[provenance.constants]]
+name = "DEFAULT_DT"
+value = 0.1
+source = "NeqSim TransientPipe.dt, the history allocation's step"
+[[provenance.constants]]
+name = "DEFAULT_CFL"
+value = 0.5
+source = "NeqSim TransientPipe.cflNumber"
+[[provenance.constants]]
+name = "MIN_TIME_STEP"
+value = 1.0e-4
+source = "NeqSim TransientPipe.minTimeStep"
+[[provenance.constants]]
+name = "MAX_TIME_STEP"
+value = 10.0
+source = "NeqSim TransientPipe.maxTimeStep"
+[[provenance.constants]]
+name = "DEFAULT_THERMO_INTERVAL"
+value = 10
+source = "NeqSim TransientPipe.thermodynamicUpdateInterval"
+[[provenance.constants]]
+name = "HISTORY_INTERVAL"
+value = 10
+source = "NeqSim TransientPipe.historyInterval"
+[[provenance.constants]]
+name = "GAS_DENSITY_FALLBACK"
+value = 1.0
+source = "NeqSim TransientPipe.initializeFromStream"
+[[provenance.constants]]
+name = "GAS_VISCOSITY_FALLBACK"
+value = 1.0e-5
+source = "NeqSim TransientPipe.initializeFromStream"
+[[provenance.constants]]
+name = "GAS_SOUND_SPEED_FALLBACK"
+value = 340.0
+source = "NeqSim TransientPipe.initializeFromStream"
+[[provenance.constants]]
+name = "LIQUID_DENSITY_FALLBACK"
+value = 800.0
+source = "NeqSim TransientPipe.initializeFromStream"
+[[provenance.constants]]
+name = "LIQUID_VISCOSITY_FALLBACK"
+value = 1.0e-3
+source = "NeqSim TransientPipe.initializeFromStream"
+[[provenance.constants]]
+name = "LIQUID_SOUND_SPEED_FALLBACK"
+value = 1500.0
+source = "NeqSim TransientPipe.initializeFromStream"
+[[provenance.constants]]
+name = "DEFAULT_GAS_OIL_SIGMA"
+value = 0.020
+source = "NeqSim TransientPipe.initializeFromStream; FlowRegimeDetector.DEFAULT_GAS_OIL_IFT"
+[[provenance.constants]]
+name = "DEFAULT_GAS_WATER_SIGMA"
+value = 0.072
+source = "NeqSim TransientPipe.initializeFromStream; FlowRegimeDetector.DEFAULT_GAS_WATER_IFT"
+[[provenance.constants]]
+name = "OUTLET_PRESSURE_FLOOR"
+value = 1.0e5
+source = "NeqSim TransientPipe.initializeFromStream"
+[[provenance.constants]]
+name = "INITIAL_TURBULENT_FRICTION"
+value = 0.316
+source = "NeqSim TransientPipe.initializeFromStream"
+[[provenance.constants]]
+name = "GAS_VELOCITY_CAP"
+value = 500.0
+source = "NeqSim TransientPipe.calculateTimeStep"
+[[provenance.constants]]
+name = "LIQUID_VELOCITY_CAP"
+value = 100.0
+source = "NeqSim TransientPipe.calculateTimeStep"
+[[provenance.constants]]
+name = "SOUND_SPEED_FLOOR"
+value = 10.0
+source = "NeqSim TransientPipe.calculateTimeStep"
+[[provenance.constants]]
+name = "SOUND_SPEED_CEILING"
+value = 1000.0
+source = "NeqSim TransientPipe.calculateTimeStep"
+[[provenance.constants]]
+name = "CFL_SOUND_SPEED_FALLBACK"
+value = 100.0
+source = "NeqSim TransientPipe.calculateTimeStep"
+[[provenance.constants]]
+name = "HOLDUP_FLOOR"
+value = 1.0e-4
+source = "NeqSim TransientPipe.updatePrimitiveVariables"
+[[provenance.constants]]
+name = "HOLDUP_CEILING"
+value = 0.9999
+source = "NeqSim TransientPipe.updatePrimitiveVariables"
+[[provenance.constants]]
+name = "SINGLE_PHASE_THRESHOLD"
+value = 0.001
+source = "NeqSim TransientPipe.updatePrimitiveVariables"
+[[provenance.constants]]
+name = "C0_FLOOR"
+value = 0.9
+source = "NeqSim TransientPipe.updatePrimitiveVariables"
+[[provenance.constants]]
+name = "C0_CEILING"
+value = 1.5
+source = "NeqSim TransientPipe.updatePrimitiveVariables"
+[[provenance.constants]]
+name = "DRIFT_VELOCITY_CAP"
+value = 10.0
+source = "NeqSim TransientPipe.updatePrimitiveVariables"
+[[provenance.constants]]
+name = "PHASE_VELOCITY_CAP"
+value = 300.0
+source = "NeqSim TransientPipe.updatePrimitiveVariables"
+[[provenance.constants]]
+name = "MIXTURE_VELOCITY_CAP"
+value = 200.0
+source = "NeqSim TransientPipe.updatePrimitiveVariables"
+[[provenance.constants]]
+name = "MIXTURE_DENSITY_FALLBACK"
+value = 100.0
+source = "NeqSim TransientPipe.addSourceTerms"
+[[provenance.constants]]
+name = "FRICTION_GRADIENT_CAP"
+value = 1000.0
+source = "NeqSim TransientPipe.addSourceTerms"
+[[provenance.constants]]
+name = "PRESSURE_SOUND_SPEED_FALLBACK"
+value = 200.0
+source = "NeqSim TransientPipe.updatePrimitiveVariables"
+[[provenance.constants]]
+name = "DENSITY_CHANGE_CAP"
+value = 0.05
+source = "NeqSim TransientPipe.updatePrimitiveVariables"
+[[provenance.constants]]
+name = "PRESSURE_CHANGE_CAP"
+value = 0.05
+source = "NeqSim TransientPipe.updatePrimitiveVariables"
+[[provenance.constants]]
+name = "PRESSURE_FLOOR"
+value = 1.0e5
+source = "NeqSim TransientPipe.updatePrimitiveVariables"
+[[provenance.constants]]
+name = "PRESSURE_CEILING"
+value = 5.0e7
+source = "NeqSim TransientPipe.updatePrimitiveVariables"
+[[provenance.constants]]
+name = "ANNULAR_BRIDGING_HOLDUP"
+value = 0.24
+source = "NeqSim FlowRegimeDetector.ANNULAR_BRIDGING_HOLDUP"
+[[provenance.constants]]
+name = "BUBBLE_PACKING_VOID_FRACTION"
+value = 0.52
+source = "NeqSim FlowRegimeDetector.BUBBLE_PACKING_VOID_FRACTION"
+[[provenance.constants]]
+name = "SHELTERING_COEFFICIENT"
+value = 0.01
+source = "NeqSim FlowRegimeDetector.SHELTERING_COEFFICIENT"
+[[provenance.constants]]
+name = "DEGENERATE_GAS_VISCOSITY_FRACTION"
+value = 0.01
+source = "NeqSim FlowRegimeDetector.DEGENERATE_GAS_VISCOSITY_FRACTION"
+[[provenance.constants]]
+name = "BUBBLE_CRITICAL_VOID_FRACTION"
+value = 0.25
+source = "NeqSim FlowRegimeDetector.detectInclinedFlowRegime"
+[[provenance.constants]]
+name = "BUBBLE_RISE_COEFFICIENT"
+value = 1.53
+source = "NeqSim FlowRegimeDetector.calcBubbleRiseVelocity"
+[[provenance.constants]]
+name = "ANNULAR_GAS_LIFT_COEFFICIENT"
+value = 3.1
+source = "NeqSim FlowRegimeDetector.annularGasLiftRatio"
+[[provenance.constants]]
+name = "DISPERSED_BUBBLE_COEFFICIENT"
+value = 0.725
+source = "NeqSim FlowRegimeDetector.isDispersedBubble"
+[[provenance.constants]]
+name = "DISPERSED_BUBBLE_SLOPE"
+value = 4.15
+source = "NeqSim FlowRegimeDetector.isDispersedBubble"
+[[provenance.constants]]
+name = "DISPERSED_BUBBLE_WEBER"
+value = 20.0
+source = "NeqSim FlowRegimeDetector.isDispersedBubble"
+[[provenance.constants]]
+name = "STRATIFIED_LEVEL_ITERATIONS"
+value = 60
+source = "NeqSim FlowRegimeDetector.estimateStratifiedLiquidLevel"
+[[provenance.constants]]
+name = "STRATIFIED_LEVEL_STOP"
+value = 1.0e-9
+source = "NeqSim FlowRegimeDetector.estimateStratifiedLiquidLevel"
+[[provenance.constants]]
+name = "SURFACE_TENSION_FLOOR"
+value = 1.0e-6
+source = "NeqSim TransientPipe.initializeFromStream and updateThermodynamicProperties"
+[[provenance.constants]]
+name = "HISTORY_ROW_CAP"
+value = 0.1
+source = "NeqSim TransientPipe.dt and historyInterval, the allocation `int(maxT/(dt*historyInterval))+1`"
+
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim TransientPipe"
+
+[implementations]
+python = "azoth.eos.transient_pipe"
+rust = "azoth_eos::transient_pipe"

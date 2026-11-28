@@ -507,6 +507,7 @@ from azoth.core.result import (
     Tr3001ComplianceResult,
     Tr3001Finding,
     TransferBinaryInteractionParametersResult,
+    TransientPipeResult,
     TrappedInventoryResult,
     TrappedInventorySegmentResult,
     TrayHydraulicsResult,
@@ -951,6 +952,7 @@ __all__ = [
     "tp_solid_flash",
     "tr3001_compliance",
     "transfer_binary_interaction_parameters",
+    "transient_pipe",
     "trapped_inventory",
     "tray_hydraulics",
     "ts_flash",
@@ -4804,6 +4806,43 @@ def tp_solid_flash(components: list[str], solid: str, T: Q, P: Q, z: list[float]
         iterations=result.iterations,
         residual=result.residual,
         converged=result.converged,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def transient_pipe(components: list[str], inlet_z: list[float], inlet_mass_flow: Q, inlet_p: Q, inlet_t: Q, length: Q, diameter: Q, number_of_sections: int, roughness: Q, inlet_boundary: str, outlet_boundary: str, elevation_profile: list[float] | None=None, inclination_profile: list[float] | None=None, outlet_pressure: Q | None=None, max_simulation_time: Q | None=None, cfl: float | None=None, thermodynamic_update_interval: int | None=None, eos: str | None=None) -> TransientPipeResult:
+    """``eos.transient_pipe``, computed in Rust."""
+    spec = _models_gen.model("eos.transient_pipe")
+    result = _core.transient_pipe(
+        list(components),
+        list(inlet_z),
+        input_to_si(spec, "inlet_mass_flow", inlet_mass_flow),
+        input_to_si(spec, "inlet_p", inlet_p),
+        input_to_si(spec, "inlet_t", inlet_t),
+        input_to_si(spec, "length", length),
+        input_to_si(spec, "diameter", diameter),
+        _count("number_of_sections", number_of_sections),
+        input_to_si(spec, "roughness", roughness),
+        inlet_boundary,
+        outlet_boundary,
+        None if elevation_profile is None else [_si(spec, "elevation_profile", v) for v in elevation_profile],
+        None if inclination_profile is None else list(inclination_profile),
+        None if outlet_pressure is None else input_to_si(spec, "outlet_pressure", outlet_pressure),
+        None if max_simulation_time is None else input_to_si(spec, "max_simulation_time", max_simulation_time),
+        None if cfl is None else cfl,
+        None if thermodynamic_update_interval is None else _count("thermodynamic_update_interval", thermodynamic_update_interval),
+        eos,
+    )
+    return TransientPipeResult(
+        pressure_profile=tuple(from_si(q.magnitude_si, q.unit) for q in result.pressure_profile),
+        temperature_profile=tuple(from_si(q.magnitude_si, q.unit) for q in result.temperature_profile),
+        liquid_holdup_profile=tuple(result.liquid_holdup_profile),
+        gas_velocity_profile=tuple(from_si(q.magnitude_si, q.unit) for q in result.gas_velocity_profile),
+        liquid_velocity_profile=tuple(from_si(q.magnitude_si, q.unit) for q in result.liquid_velocity_profile),
+        pressure_history=tuple(tuple(from_si(v.magnitude_si, v.unit) for v in row) for row in result.pressure_history),
+        simulation_time=from_si(result.simulation_time.magnitude_si, result.simulation_time.unit),
+        total_time_steps=result.total_time_steps,
+        mass_inventory=from_si(result.mass_inventory.magnitude_si, result.mass_inventory.unit),
         warnings=_warnings(result.warnings),
     )
 
