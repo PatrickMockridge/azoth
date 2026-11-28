@@ -736,6 +736,38 @@ pub fn bubble_temperature(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// Bukacek water dew point.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (water_mole_fraction, pressure))]
+#[pyo3(text_signature = "(water_mole_fraction, pressure)")]
+pub fn bukacek_water_dew_point(
+    py: Python<'_>,
+    water_mole_fraction: f64,
+    pressure: f64,
+) -> PyResult<crate::transport_gen::PyBukacekWaterDewPointResult> {
+    azoth_eos::bukacek_water_dew_point::bukacek_water_dew_point(water_mole_fraction, pressure)
+        .map(|r| crate::transport_gen::PyBukacekWaterDewPointResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
+/// Bukacek water content of a gas.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (temperature, pressure))]
+#[pyo3(text_signature = "(temperature, pressure)")]
+pub fn bukacek_water_in_gas(
+    py: Python<'_>,
+    temperature: f64,
+    pressure: f64,
+) -> PyResult<crate::transport_gen::PyBukacekWaterInGasResult> {
+    azoth_eos::bukacek_water_in_gas::bukacek_water_in_gas(temperature, pressure)
+        .map(|r| crate::transport_gen::PyBukacekWaterInGasResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// Molalities and activity coefficients of a phase.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -1054,6 +1086,22 @@ pub fn costald_molar_volume(
     )
     .map(|r| crate::transport_gen::PyCostaldMolarVolumeResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
+}
+
+/// Caloric-fitted SRK-CPA water alpha function.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (temperature, critical_temperature))]
+#[pyo3(text_signature = "(temperature, critical_temperature)")]
+pub fn cpa_water_caloric_alpha(
+    py: Python<'_>,
+    temperature: f64,
+    critical_temperature: f64,
+) -> PyResult<crate::transport_gen::PyCpaWaterCaloricAlphaResult> {
+    azoth_eos::cpa_water_caloric_alpha::cpa_water_caloric_alpha(temperature, critical_temperature)
+        .map(|r| crate::transport_gen::PyCpaWaterCaloricAlphaResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
 }
 
 /// Mixture critical point.
@@ -1808,6 +1856,22 @@ pub fn gerg2008_phase(
 ) -> PyResult<crate::transport_gen::PyGerg2008PhaseResult> {
     azoth_eos::gerg2008_phase::gerg2008_phase(&components, kelvins(T), pascals(P), &z)
         .map(|r| crate::transport_gen::PyGerg2008PhaseResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
+/// GERG water alpha function.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (temperature, critical_temperature))]
+#[pyo3(text_signature = "(temperature, critical_temperature)")]
+pub fn gerg_water_alpha(
+    py: Python<'_>,
+    temperature: f64,
+    critical_temperature: f64,
+) -> PyResult<crate::transport_gen::PyGergWaterAlphaResult> {
+    azoth_eos::gerg_water_alpha::gerg_water_alpha(temperature, critical_temperature)
+        .map(|r| crate::transport_gen::PyGergWaterAlphaResult::from(&r))
         .map_err(|e| to_pyerr(py, e))
 }
 

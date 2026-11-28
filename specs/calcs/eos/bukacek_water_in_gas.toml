@@ -1,0 +1,169 @@
+id = "eos.bukacek_water_in_gas"
+name = "Bukacek water content of a gas"
+summary = "The water content of a gas at its water dew point, as a mole fraction. Use it for a gas-water content screen."
+equation = "tau = (TC_WATER - temperature)/TC_WATER; exponent = (A1*tau + A2*tau**1.5 + A3*tau**3 + A4*tau**3.5 + A5*tau**4 + A6*tau**7.5)/(1 - tau); psw_bar = PC_WATER_BAR*exp(exponent); mg_per_sm3 = MG_PER_SM3_FACTOR*psw_bar/(pressure/PA_PER_BAR) + MG_PER_SM3_OFFSET*10**(EXPONENTIAL_NUMERATOR/temperature + EXPONENTIAL_OFFSET); water_mole_fraction = (mg_per_sm3/MOLAR_MASS_GAS_MG_PER_MOL)/(ATMOSPHERE_PA/(GAS_CONSTANT*STANDARD_VOLUME_TEMPERATURE))"
+latex = '''\tau = \frac{T_c - T}{T_c}, \qquad e = \frac{a_1\tau + a_2\tau^{1.5} + a_3\tau^3 + a_4\tau^{3.5} + a_5\tau^4 + a_6\tau^{7.5}}{1-\tau}'''
+assumptions = ["**the class is written in bar.** `PC_WATER_BAR` is 220.64 and the pressure divides it directly; this spec takes Pa and converts with `PA_PER_BAR`.\n", "**the gas molar mass is a fixed constant, not the mixture's.** The class uses `0.6*28.0 g/mol` = 16.8 g/mol for every gas.\n", "**the standard cubic metre is the class's 288.15 K and 1 atm**, the `molgasSm3` it divides by.\n", "**the value is the water content at the water dew point**, as the class's own comment states; it is not a humidity at an arbitrary relative humidity.\n"]
+notes = ["**the returned quantity is a mole fraction.** `getWaterInGas` returns `ans/molgasSm3`, moles of water per standard cubic metre over moles of gas per standard cubic metre; despite the class's name it is not a ppm value, and the class's own `main` prints it as the raw fraction.\n"]
+references = ["NeqSim master `thermo/util/empiric/BukacekWaterInGas.java`, Apache-2.0, commit b40bb1134508faa24b07aed9a23c4d52865e5c2a.", "`validation/neqsim/captures/bukacek_probe.tsv` - `getWaterInGas` at four states and the class's inverse at three.\n"]
+[source]
+standard = "NeqSim master `BukacekWaterInGas`"
+edition = "`getWaterInGas(temperature, pressure)`, ported verbatim; pressure in bar as the class reads it"
+
+[source.neqsim]
+class = "BukacekWaterInGas"
+members = ["BukacekWaterInGas.getWaterInGas"]
+commit = "b40bb1134508faa24b07aed9a23c4d52865e5c2a"
+
+[inputs]
+[inputs.temperature]
+unit = "K"
+description = "the gas temperature.\n"
+[inputs.pressure]
+unit = "Pa"
+description = "the total pressure; the kernel converts it to the bar the class reads.\n"
+[outputs]
+[outputs.water_mole_fraction]
+unit = "dimensionless"
+description = "the water mole fraction of the gas at its water dew point.\n"
+[[valid_range]]
+quantity = "temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature; the exponential's `-1716.26/T` divides by it.\n"
+[[valid_range]]
+quantity = "pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the first term divides by it.\n"
+[worked_example]
+source = "the capture's `water_in_gas_T_288.15_P_1` row at NeqSim b40bb113."
+derivation = "T = 288.15 K, P = 1 bar = 100000 Pa:\n\n  tau = (667.14 - 288.15)/667.14 = 0.5680816620199658\n  exponent = -10.043864144698594\n  psw_bar = 220.64*exp(-10.043864144698594) = 0.009587148927854984\n  10**(-1716.26/288.15 + 6.69449) = 0.999... ; the offset term is 16.0 mg/Sm3\n  mg_per_sm3 = 761900.42*0.009587148927854984/1 + 16.016*10**(-1716.26/288.15 + 6.69449) = 7392.134725030488\n  water_mole_fraction = (7392.134725030488/16800)/(101325/(8.3144621*288.15)) = 0.4400080193506/42.29254601480821 = 0.01040391418367174\n"
+tolerance = 1e-12
+[worked_example.inputs]
+temperature = 288.15
+pressure = 100000.0
+[worked_example.expected]
+water_mole_fraction = 0.01040391418367174
+[provenance.inputs]
+default = "caller"
+
+[provenance.outputs]
+default = "NeqSim BukacekWaterInGas.getWaterInGas"
+
+[[provenance.constants]]
+name = "TC_WATER"
+value = 667.14
+source = "NeqSim BukacekWaterInGas.getWaterInGas, `TCwater = 393.99 + 273.15`"
+[[provenance.constants]]
+name = "PC_WATER_BAR"
+value = 220.64
+source = "NeqSim BukacekWaterInGas.getWaterInGas, `PCwater`"
+[[provenance.constants]]
+name = "A1"
+value = -7.85823
+source = "NeqSim BukacekWaterInGas.getWaterInGas, the tau coefficient"
+[[provenance.constants]]
+name = "A2"
+value = 1.83991
+source = "NeqSim BukacekWaterInGas.getWaterInGas, the tau**1.5 coefficient"
+[[provenance.constants]]
+name = "A3"
+value = -11.7811
+source = "NeqSim BukacekWaterInGas.getWaterInGas, the tau**3 coefficient"
+[[provenance.constants]]
+name = "A4"
+value = 22.67
+source = "NeqSim BukacekWaterInGas.getWaterInGas, the tau**3.5 coefficient"
+[[provenance.constants]]
+name = "A5"
+value = -15.9393
+source = "NeqSim BukacekWaterInGas.getWaterInGas, the tau**4 coefficient"
+[[provenance.constants]]
+name = "A6"
+value = 1.77516
+source = "NeqSim BukacekWaterInGas.getWaterInGas, the tau**7.5 coefficient"
+[[provenance.constants]]
+name = "MG_PER_SM3_FACTOR"
+value = 761900.42
+source = "NeqSim BukacekWaterInGas.getWaterInGas, `mgwaterSm3`"
+[[provenance.constants]]
+name = "MG_PER_SM3_OFFSET"
+value = 16.016
+source = "NeqSim BukacekWaterInGas.getWaterInGas, the second `mgwaterSm3` term"
+[[provenance.constants]]
+name = "EXPONENTIAL_NUMERATOR"
+value = -1716.26
+source = "NeqSim BukacekWaterInGas.getWaterInGas, `-1716.26/temperature`"
+[[provenance.constants]]
+name = "EXPONENTIAL_OFFSET"
+value = 6.69449
+source = "NeqSim BukacekWaterInGas.getWaterInGas, `+ 6.69449`"
+[[provenance.constants]]
+name = "MOLAR_MASS_GAS_MG_PER_MOL"
+value = 16800.0
+source = "NeqSim BukacekWaterInGas.getWaterInGas, `molarMassGas = 0.6*28.0*1000`"
+[[provenance.constants]]
+name = "ATMOSPHERE_PA"
+value = 101325.0
+source = "NeqSim ThermodynamicConstantsInterface.atm"
+[[provenance.constants]]
+name = "GAS_CONSTANT"
+value = 8.3144621
+source = "NeqSim ThermodynamicConstantsInterface.R"
+[[provenance.constants]]
+name = "STANDARD_VOLUME_TEMPERATURE"
+value = 288.15
+source = "NeqSim BukacekWaterInGas.getWaterInGas, `molgasSm3`'s 288.15 K"
+[[provenance.constants]]
+name = "PA_PER_BAR"
+value = 100000.0
+source = "caller, the Pa-to-bar conversion the class omits because it assumes bar"
+
+[implementations]
+python = "azoth.eos.bukacek_water_in_gas"
+rust = "azoth_eos::bukacek_water_in_gas"
+[[tests]]
+id = "worked_example"
+type = "worked_example"
+status = "active"
+[[tests]]
+id = "cold_gas_at_70_bar"
+type = "reference"
+status = "active"
+source = "The capture's `water_in_gas_T_255.15_P_70` row; the probe passes 70 bar, the case 70e5 Pa.\n"
+tolerance = 1e-12
+[tests.inputs]
+temperature = 255.15
+pressure = 7000000.0
+[tests.expected]
+water_mole_fraction = 3.26289109072766e-05
+[[tests]]
+id = "at_273_15_k_and_5_bar"
+type = "reference"
+status = "active"
+source = "The capture's `water_in_gas_T_273.15_P_5` row.\n"
+tolerance = 1e-12
+[tests.inputs]
+temperature = 273.15
+pressure = 500000.0
+[tests.expected]
+water_mole_fraction = 0.0007663284688898948
+[[tests]]
+id = "at_300_k_and_100_bar"
+type = "reference"
+status = "active"
+source = "The capture's `water_in_gas_T_300_P_100` row.\n"
+tolerance = 1e-12
+[tests.inputs]
+temperature = 300.0
+pressure = 10000000.0
+[tests.expected]
+water_mole_fraction = 0.00043144164901043244
+[[tests]]
+id = "round_trip_units"
+type = "property"
+property = "unit_round_trip"
+status = "active"

@@ -2993,6 +2993,16 @@ class BubbleTemperatureResult:
     warnings: list[Warning]
 
 @final
+class BukacekWaterDewPointResult:
+    temperature: Qty
+    warnings: list[Warning]
+
+@final
+class BukacekWaterInGasResult:
+    water_mole_fraction: float
+    warnings: list[Warning]
+
+@final
 class BwrsPhaseResult:
     z_factor: float
     ln_phi: list[float]
@@ -3083,6 +3093,11 @@ class Co2WaterDiffusivityResult:
 @final
 class CostaldMolarVolumeResult:
     v: Qty
+    warnings: list[Warning]
+
+@final
+class CpaWaterCaloricAlphaResult:
+    alpha: float
     warnings: list[Warning]
 
 @final
@@ -3372,6 +3387,11 @@ class Gerg2008PhaseResult:
     cv: Qty
     cp: Qty
     g: Qty
+    warnings: list[Warning]
+
+@final
+class GergWaterAlphaResult:
+    alpha: float
     warnings: list[Warning]
 
 @final
@@ -7798,6 +7818,11 @@ def bubble_temperature(
     alpha: str = "pr",
     alpha_params: list[list[float]] | None = None,
 ) -> BubbleTemperatureResult: ...
+def bukacek_water_dew_point(
+    water_mole_fraction: float,
+    pressure: float,
+) -> BukacekWaterDewPointResult: ...
+def bukacek_water_in_gas(temperature: float, pressure: float) -> BukacekWaterInGasResult: ...
 def bwrs_phase(
     a: list[float],
     rhoc: list[float],
@@ -7906,6 +7931,10 @@ def costald_molar_volume(
     rho_normal: float,
     T: float,
 ) -> CostaldMolarVolumeResult: ...
+def cpa_water_caloric_alpha(
+    temperature: float,
+    critical_temperature: float,
+) -> CpaWaterCaloricAlphaResult: ...
 def critical_point(
     Tc: list[float],
     Pc: list[float],
@@ -8243,6 +8272,7 @@ def gerg2008_phase(
     P: float,
     z: list[float],
 ) -> Gerg2008PhaseResult: ...
+def gerg_water_alpha(temperature: float, critical_temperature: float) -> GergWaterAlphaResult: ...
 def gt_surface_tension(
     components: list[str],
     eos: str,

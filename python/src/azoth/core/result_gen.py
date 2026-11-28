@@ -866,6 +866,32 @@ class BubbleTemperatureResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class BukacekWaterDewPointResult(_HasWarnings):
+    """Result of ``eos.bukacek_water_dew_point``."""
+
+    CALC_ID: ClassVar[str] = "eos.bukacek_water_dew_point"
+
+    #: the water dew-point temperature.
+    temperature: Q
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class BukacekWaterInGasResult(_HasWarnings):
+    """Result of ``eos.bukacek_water_in_gas``."""
+
+    CALC_ID: ClassVar[str] = "eos.bukacek_water_in_gas"
+
+    #: the water mole fraction of the gas at its water dew point.
+    water_mole_fraction: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class BwrsPhaseResult(_HasWarnings):
     """Result of ``eos.bwrs_phase``."""
 
@@ -1115,6 +1141,19 @@ class CostaldMolarVolumeResult(_HasWarnings):
 
     #: The saturated liquid molar volume at `T`.
     v: Q
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class CpaWaterCaloricAlphaResult(_HasWarnings):
+    """Result of ``eos.cpa_water_caloric_alpha``."""
+
+    CALC_ID: ClassVar[str] = "eos.cpa_water_caloric_alpha"
+
+    #: the temperature-dependent alpha function.
+    alpha: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -1924,6 +1963,19 @@ class Gerg2008PhaseResult(_HasWarnings):
 
     #: the Gibbs energy, `h - T s`
     g: Q
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class GergWaterAlphaResult(_HasWarnings):
+    """Result of ``eos.gerg_water_alpha``."""
+
+    CALC_ID: ClassVar[str] = "eos.gerg_water_alpha"
+
+    #: the temperature-dependent alpha function.
+    alpha: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]

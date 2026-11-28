@@ -804,6 +804,181 @@
     },
     {
       "assumptions": [
+        "**the loop is the class's own fixed step, with no bracket and no convergence flag.** It tests the pre-update `x_k`, updates `T`, and returns the post-update iterate; a converged state therefore returns the temperature after one more (tiny) step.\n",
+        "**the step is dimensionally large.** `1e5` is K per unit mole fraction, so the map is coarse and is not contractive at every state.\n",
+        "**the forward calculation is `eos.bukacek_water_in_gas`.** Its constants and its bar convention are that id's, not repeated here.\n"
+      ],
+      "available": true,
+      "equation": "T0 = 273.15 K; at each iteration x_k = bukacek(T_{k-1}, pressure), T_k = T_{k-1} - (x_k - water_mole_fraction)*1e5, and the loop stops when |(x_k - water_mole_fraction)/water_mole_fraction| <= 1e-8 or after 1000 iterations, returning T_k",
+      "id": "eos.bukacek_water_dew_point",
+      "inputs": [
+        {
+          "default": null,
+          "description": "the water mole fraction whose dew point is wanted.\n",
+          "dimension": "dimensionless",
+          "kind": "quantity",
+          "name": "water_mole_fraction",
+          "range": [
+            {
+              "band": "outside",
+              "code": "OUT_OF_VALID_RANGE",
+              "equals": null,
+              "max": null,
+              "max_inclusive": true,
+              "min": 0.0,
+              "min_inclusive": false,
+              "rationale": "the convergence test divides by it.\n",
+              "severity": "error"
+            }
+          ],
+          "required": true,
+          "unit": "dimensionless",
+          "values": []
+        },
+        {
+          "default": null,
+          "description": "the total pressure; the forward calculation it calls converts to bar.\n",
+          "dimension": "pressure",
+          "kind": "quantity",
+          "name": "pressure",
+          "range": [
+            {
+              "band": "outside",
+              "code": "OUT_OF_VALID_RANGE",
+              "equals": null,
+              "max": null,
+              "max_inclusive": true,
+              "min": 0.0,
+              "min_inclusive": false,
+              "rationale": "the forward calculation divides by it.\n",
+              "severity": "error"
+            }
+          ],
+          "required": true,
+          "unit": "Pa",
+          "values": []
+        }
+      ],
+      "name": "Bukacek water dew point",
+      "namespace": "eos",
+      "outputs": [
+        {
+          "description": "the water dew-point temperature.\n",
+          "dimension": "thermodynamic_temperature",
+          "kind": "quantity",
+          "name": "temperature",
+          "optional": false,
+          "unit": "K",
+          "values": []
+        }
+      ],
+      "provenance": {
+        "python_sha256": "a9183dbf021c141be8681f64c2ec68f2eff653af1410c8be32d907c6fc57840d",
+        "rust_sha256": "c062c45a8c5fe997dc29b4b0e300f1ea373466252be9b2cb1450ccdbf4421374",
+        "spec_sha256": "ae3df3aba128c5f22380c65c2060839c55c67092b1ad407d5ec93ba7a3234f2b",
+        "tests_active": 3,
+        "tests_skipped": 0,
+        "validation_cases": 0,
+        "verification": "partially_verified"
+      },
+      "references": [],
+      "refusal": null,
+      "summary": "The water dew-point temperature of a gas from its water mole fraction and pressure. Use it for a gas dehydration screen.",
+      "worked_example": {
+        "pressure": 7000000.0,
+        "water_mole_fraction": 0.00002
+      }
+    },
+    {
+      "assumptions": [
+        "**the class is written in bar.** `PC_WATER_BAR` is 220.64 and the pressure divides it directly; this spec takes Pa and converts with `PA_PER_BAR`.\n",
+        "**the gas molar mass is a fixed constant, not the mixture's.** The class uses `0.6*28.0 g/mol` = 16.8 g/mol for every gas.\n",
+        "**the standard cubic metre is the class's 288.15 K and 1 atm**, the `molgasSm3` it divides by.\n",
+        "**the value is the water content at the water dew point**, as the class's own comment states; it is not a humidity at an arbitrary relative humidity.\n"
+      ],
+      "available": true,
+      "equation": "tau = (TC_WATER - temperature)/TC_WATER; exponent = (A1*tau + A2*tau**1.5 + A3*tau**3 + A4*tau**3.5 + A5*tau**4 + A6*tau**7.5)/(1 - tau); psw_bar = PC_WATER_BAR*exp(exponent); mg_per_sm3 = MG_PER_SM3_FACTOR*psw_bar/(pressure/PA_PER_BAR) + MG_PER_SM3_OFFSET*10**(EXPONENTIAL_NUMERATOR/temperature + EXPONENTIAL_OFFSET); water_mole_fraction = (mg_per_sm3/MOLAR_MASS_GAS_MG_PER_MOL)/(ATMOSPHERE_PA/(GAS_CONSTANT*STANDARD_VOLUME_TEMPERATURE))",
+      "id": "eos.bukacek_water_in_gas",
+      "inputs": [
+        {
+          "default": null,
+          "description": "the gas temperature.\n",
+          "dimension": "thermodynamic_temperature",
+          "kind": "quantity",
+          "name": "temperature",
+          "range": [
+            {
+              "band": "outside",
+              "code": "OUT_OF_VALID_RANGE",
+              "equals": null,
+              "max": null,
+              "max_inclusive": true,
+              "min": 0.0,
+              "min_inclusive": false,
+              "rationale": "an absolute temperature; the exponential's `-1716.26/T` divides by it.\n",
+              "severity": "error"
+            }
+          ],
+          "required": true,
+          "unit": "K",
+          "values": []
+        },
+        {
+          "default": null,
+          "description": "the total pressure; the kernel converts it to the bar the class reads.\n",
+          "dimension": "pressure",
+          "kind": "quantity",
+          "name": "pressure",
+          "range": [
+            {
+              "band": "outside",
+              "code": "OUT_OF_VALID_RANGE",
+              "equals": null,
+              "max": null,
+              "max_inclusive": true,
+              "min": 0.0,
+              "min_inclusive": false,
+              "rationale": "the first term divides by it.\n",
+              "severity": "error"
+            }
+          ],
+          "required": true,
+          "unit": "Pa",
+          "values": []
+        }
+      ],
+      "name": "Bukacek water content of a gas",
+      "namespace": "eos",
+      "outputs": [
+        {
+          "description": "the water mole fraction of the gas at its water dew point.\n",
+          "dimension": "dimensionless",
+          "kind": "quantity",
+          "name": "water_mole_fraction",
+          "optional": false,
+          "unit": "dimensionless",
+          "values": []
+        }
+      ],
+      "provenance": {
+        "python_sha256": "21449fdc006e78aa975ac84335ec2144424111d0da2cead2b42980b706ebdaad",
+        "rust_sha256": "d9c3f6d96c962f5396cfe638e6aa77cb26a016f3cd229902d0c4dc5567876d53",
+        "spec_sha256": "4c8e3ac2151a6cb11ad798401c1a16854c3ac358985d76a32840a40abc5bd114",
+        "tests_active": 5,
+        "tests_skipped": 0,
+        "validation_cases": 0,
+        "verification": "partially_verified"
+      },
+      "references": [],
+      "refusal": null,
+      "summary": "The water content of a gas at its water dew point, as a mole fraction. Use it for a gas-water content screen.",
+      "worked_example": {
+        "pressure": 100000.0,
+        "temperature": 288.15
+      }
+    },
+    {
+      "assumptions": [
         "outside the validated temperature band the calculation warns rather than refuses.\n"
       ],
       "available": true,
@@ -1529,6 +1704,94 @@
         "Vc": 0.00037,
         "omega": 0.3013,
         "rho_normal": 664.0
+      }
+    },
+    {
+      "assumptions": [
+        "**water only.** The constructor refuses any other component (`IllegalArgumentException`); the id carries the water calculation and no component selector.\n",
+        "**only the temperature dependence changes.** The water `a0`, `b`, association energy and association volume are the standard SRK-CPA ones; this alpha scales the attraction.\n"
+      ],
+      "available": true,
+      "equation": "u = 1 - sqrt(temperature/critical_temperature); alpha = (1 + c1*u + c2*u**2 + c3*u**3 + c4*u**4 + c5*u**5)**2",
+      "id": "eos.cpa_water_caloric_alpha",
+      "inputs": [
+        {
+          "default": null,
+          "description": "the absolute temperature at which the alpha is evaluated.\n",
+          "dimension": "thermodynamic_temperature",
+          "kind": "quantity",
+          "name": "temperature",
+          "range": [
+            {
+              "band": "outside",
+              "code": "OUT_OF_VALID_RANGE",
+              "equals": null,
+              "max": null,
+              "max_inclusive": true,
+              "min": 0.0,
+              "min_inclusive": false,
+              "rationale": "an absolute temperature; zero and below are not states.\n",
+              "severity": "error"
+            }
+          ],
+          "required": true,
+          "unit": "K",
+          "values": []
+        },
+        {
+          "default": null,
+          "description": "the water component's critical temperature, from `getComponent().getTC()`.\n",
+          "dimension": "thermodynamic_temperature",
+          "kind": "quantity",
+          "name": "critical_temperature",
+          "range": [
+            {
+              "band": "outside",
+              "code": "OUT_OF_VALID_RANGE",
+              "equals": null,
+              "max": null,
+              "max_inclusive": true,
+              "min": 0.0,
+              "min_inclusive": false,
+              "rationale": "the reduced temperature divides by it.\n",
+              "severity": "error"
+            }
+          ],
+          "required": true,
+          "unit": "K",
+          "values": []
+        }
+      ],
+      "name": "Caloric-fitted SRK-CPA water alpha function",
+      "namespace": "eos",
+      "outputs": [
+        {
+          "description": "the temperature-dependent alpha function.\n",
+          "dimension": "dimensionless",
+          "kind": "quantity",
+          "name": "alpha",
+          "optional": false,
+          "unit": "dimensionless",
+          "values": []
+        }
+      ],
+      "provenance": {
+        "python_sha256": "b5215bfc0c5d14258a6d25e6571c49728bebda65b024614f9986c5c11bd10c61",
+        "rust_sha256": "e827aa3f51116403e163f289989959d61731e207f3d4c389ad3dfab117bf79b2",
+        "spec_sha256": "e83dde5dda3dcab9fbe0ead2bc7e66165e06866f4affc207a0a7b0826b8a1808",
+        "tests_active": 6,
+        "tests_skipped": 0,
+        "validation_cases": 0,
+        "verification": "partially_verified"
+      },
+      "references": [
+        "Palma, A. M.; Queimada, A. J.; Coutinho, J. A. P. (2017). \"Modelling the thermodynamic properties of aqueous solutions with a cubic-plus-association equation of state.\" Ind. Eng. Chem. Res. DOI 10.1021/acs.iecr.7b03522. The flexible-alpha form the class follows."
+      ],
+      "refusal": null,
+      "summary": "The caloric-data-fitted five-parameter alpha function for SRK-CPA water. Use it when an SRK-CPA water phase carries the calibration.",
+      "worked_example": {
+        "critical_temperature": 647.3,
+        "temperature": 298.15
       }
     },
     {
@@ -3337,6 +3600,94 @@
         "T": 298.15,
         "VA": 0.00002514,
         "VB": 0.0000185
+      }
+    },
+    {
+      "assumptions": [
+        "**the water branch only.** For any other component `AttractiveTermGERG.alpha` delegates to `AttractiveTermPr.alpha`, which is `eos.pr_alpha_ab`; this id is the water override.\n",
+        "**the component's critical temperature is the caller's.** The class reads `getComponent().getTC()`; the probe's water carries the databank's 647.3 K.\n"
+      ],
+      "available": true,
+      "equation": "u = 1 - sqrt(temperature/critical_temperature); alpha = (1 + c1*u + c2*u**2 + c3*u**4)**2, with c the liquid set at 273.16 K and above and the solid set below it",
+      "id": "eos.gerg_water_alpha",
+      "inputs": [
+        {
+          "default": null,
+          "description": "the absolute temperature at which the alpha is evaluated.\n",
+          "dimension": "thermodynamic_temperature",
+          "kind": "quantity",
+          "name": "temperature",
+          "range": [
+            {
+              "band": "outside",
+              "code": "OUT_OF_VALID_RANGE",
+              "equals": null,
+              "max": null,
+              "max_inclusive": true,
+              "min": 0.0,
+              "min_inclusive": false,
+              "rationale": "an absolute temperature; zero and below are not states.\n",
+              "severity": "error"
+            }
+          ],
+          "required": true,
+          "unit": "K",
+          "values": []
+        },
+        {
+          "default": null,
+          "description": "the component's critical temperature, from `getComponent().getTC()`.\n",
+          "dimension": "thermodynamic_temperature",
+          "kind": "quantity",
+          "name": "critical_temperature",
+          "range": [
+            {
+              "band": "outside",
+              "code": "OUT_OF_VALID_RANGE",
+              "equals": null,
+              "max": null,
+              "max_inclusive": true,
+              "min": 0.0,
+              "min_inclusive": false,
+              "rationale": "the reduced temperature divides by it.\n",
+              "severity": "error"
+            }
+          ],
+          "required": true,
+          "unit": "K",
+          "values": []
+        }
+      ],
+      "name": "GERG water alpha function",
+      "namespace": "eos",
+      "outputs": [
+        {
+          "description": "the temperature-dependent alpha function.\n",
+          "dimension": "dimensionless",
+          "kind": "quantity",
+          "name": "alpha",
+          "optional": false,
+          "unit": "dimensionless",
+          "values": []
+        }
+      ],
+      "provenance": {
+        "python_sha256": "32984a5340c74cbd6e620385bb92835e0468c1b3dbfcc3bbc0ef9802e1c82a67",
+        "rust_sha256": "1aed2a1335d095abc734c718ce6964e7b34944fc7fcc105590402f54c1054a4e",
+        "spec_sha256": "a3356286ab5e94334d4f33720b9bc9af365013d3bb42488e13a40835d826b781",
+        "tests_active": 8,
+        "tests_skipped": 0,
+        "validation_cases": 0,
+        "verification": "partially_verified"
+      },
+      "references": [
+        "Mathias, P. M.; Copeman, T. W. (1983). \"Extension of the Peng-Robinson equation of state to complex mixtures: evaluation of the various forms of the local composition concept.\" Fluid Phase Equilib. 13, 91-108. DOI 10.1016/0378-3812(83)80084-3. The three-parameter alpha form."
+      ],
+      "refusal": null,
+      "summary": "The GERG water attraction-temperature function, with its solid and liquid coefficient sets. Use it when a cubic EOS carries the GERG water alpha.",
+      "worked_example": {
+        "critical_temperature": 647.3,
+        "temperature": 300.0
       }
     },
     {
@@ -10626,7 +10977,7 @@
       "provenance": {
         "python_sha256": "8d68db580d544eb7dba01eabab06b91d27d42d417125d96e5b718b46e6a16481",
         "rust_sha256": "7d9aee091f647af821f7fec42cabd750773b67c088d7a0c6970856455770522c",
-        "spec_sha256": "ce710e6558bf75a52bbe45eb1a4ca23413af7b2adc4eda500e6459755916caf4",
+        "spec_sha256": "ec3023be9612754e493812d0dd480a41cfe2f0a55c233f8951e713c3244a9b4c",
         "tests_active": 3,
         "tests_skipped": 0,
         "validation_cases": 0,

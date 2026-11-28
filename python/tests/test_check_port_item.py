@@ -108,3 +108,40 @@ def test_a_change_with_no_new_class_passes(tmp_path: Path) -> None:
     path.write_text(BASE_SPEC + "\n# a correction\n", encoding="utf-8")
     commit(root, "comment only")
     assert check.check(root, "HEAD^..HEAD") == []
+
+
+def test_a_row_removed_by_the_same_change_still_scopes_the_trailer(tmp_path: Path) -> None:
+    """A completed row is deleted; the trailer must still resolve against the base."""
+    root = repository(tmp_path, "Beta")
+    path = root / "specs" / "calcs" / "eos" / "example.toml"
+    path.write_text(NEXT_SPEC, encoding="utf-8")
+    (root / "databank" / "port_backlog.toml").write_text("", encoding="utf-8")
+    commit(root, "add beta and remove the row\n\nPort-Item: tier1.beta")
+    assert check.check(root, "HEAD^..HEAD") == []
+
+
+def test_one_class_may_be_named_by_two_new_specs(tmp_path: Path) -> None:
+    """A class with two calculations is one owner and several ids, both new here."""
+    root = repository(tmp_path, "Beta")
+    path = root / "specs" / "calcs" / "eos" / "example.toml"
+    path.write_text(NEXT_SPEC, encoding="utf-8")
+    second = root / "specs" / "calcs" / "eos" / "second.toml"
+    second.write_text(
+        NEXT_SPEC.replace('id = "eos.example"', 'id = "eos.second"'), encoding="utf-8"
+    )
+    commit(root, "add beta in two specs\n\nPort-Item: tier1.beta")
+    assert check.check(root, "HEAD^..HEAD") == []
+
+
+def test_a_class_named_by_a_spec_outside_the_change_is_refused(tmp_path: Path) -> None:
+    root = repository(tmp_path, "Beta")
+    path = root / "specs" / "calcs" / "eos" / "example.toml"
+    path.write_text(NEXT_SPEC, encoding="utf-8")
+    commit(root, "add beta\n\nPort-Item: tier1.beta")
+    second = root / "specs" / "calcs" / "eos" / "second.toml"
+    second.write_text(
+        NEXT_SPEC.replace('id = "eos.example"', 'id = "eos.second"'), encoding="utf-8"
+    )
+    commit(root, "add the second spec\n\nPort-Item: tier1.beta")
+    problems = check.check(root, "HEAD^..HEAD")
+    assert any("is already named by" in problem for problem in problems)

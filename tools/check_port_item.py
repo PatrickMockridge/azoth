@@ -9,6 +9,11 @@ The class must be in that row's `classes`; a spec that adds a class outside the 
 adds one with no trailer, is refused. A change that introduces no new class needs no
 trailer, so corrections and maintenance are not blocked.
 
+The row may be deleted by the same change: its id is resolved against the base backlog
+as well as the head, because a completed row is removed rather than left stale. A class
+that carries more than one calculation may be named by more than one new spec; a class
+a spec outside this change already names is refused.
+
     python tools/check_port_item.py --range origin/main..HEAD
 """
 
@@ -71,11 +76,20 @@ def check(root: Path = ROOT, revision_range: str = "origin/main..HEAD") -> list[
 
     trailers = TRAILER.findall(_git(root, "log", "--format=%B", revision_range).stdout)
     ids = [item.strip() for value in trailers for item in value.split(",") if item.strip()]
-    backlog_data = backlog.read(root / backlog.BACKLOG_REL)
-    rows = {
-        str(row.get("id")): row
-        for row in list(backlog_data.get("package", [])) + list(backlog_data.get("process", []))
-    }
+    rows: dict[str, dict] = {}
+    for source in (None, base):
+        if source is None:
+            data = backlog.read(root / backlog.BACKLOG_REL)
+        else:
+            shown = _git(root, "show", f"{source}:{backlog.BACKLOG_REL}")
+            if shown.returncode != 0:
+                continue
+            try:
+                data = tomllib.loads(shown.stdout)
+            except tomllib.TOMLDecodeError:
+                continue
+        for row in list(data.get("package", [])) + list(data.get("process", [])):
+            rows.setdefault(str(row.get("id")), row)
     scope: set[str] = set()
     for item in ids:
         row = rows.get(item)
@@ -85,11 +99,18 @@ def check(root: Path = ROOT, revision_range: str = "origin/main..HEAD") -> list[
         scope.update(str(name) for name in row.get("classes", []))
 
     specs = per_spec(root)
+    added: dict[str, set[str]] = {}
     for path in changed:
-        current = specs.get(path, set())
         previous = _git(root, "show", f"{base}:{path}")
         before = spec_classes(previous.stdout) if previous.returncode == 0 else set()
-        new = current - before
+        added[path] = specs.get(path, set()) - before
+    owners: dict[str, set[str]] = {}
+    for path, names in specs.items():
+        for name in names:
+            owners.setdefault(name, set()).add(path)
+
+    for path in changed:
+        new = added[path]
         if not new:
             continue
         if not ids:
@@ -98,8 +119,8 @@ def check(root: Path = ROOT, revision_range: str = "origin/main..HEAD") -> list[
         for name in sorted(new):
             if name not in scope:
                 problems.append(f"{path}: {name} is outside the Port-Item scope")
-            for other, names in specs.items():
-                if other != path and name in names:
+            for other in sorted(owners.get(name, set()) - {path}):
+                if other not in added or name not in added[other]:
                     problems.append(f"{path}: {name} is already named by {other}")
     return problems
 

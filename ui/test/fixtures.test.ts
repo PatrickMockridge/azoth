@@ -76,12 +76,12 @@ describe("the catalogue", () => {
   });
 
   it("carries the standalone calculations, with the table-shaped four refused", () => {
-    // **The registry's 97, and the 93 a sheet can draw.** The four with table-shaped inputs or
+    // **The registry's 101, and the 97 a sheet can draw.** The four with table-shaped inputs or
     // outputs are listed and refused rather than omitted, so a picker can say why they are not
     // available instead of pretending they do not exist.
     const calcs = catalogue.calcs ?? [];
-    expect(calcs).toHaveLength(97);
-    expect(calcs.filter((entry) => entry.available)).toHaveLength(93);
+    expect(calcs).toHaveLength(101);
+    expect(calcs.filter((entry) => entry.available)).toHaveLength(97);
     expect(
       calcs.filter((entry) => !entry.available).map((entry) => entry.id),
     ).toEqual([

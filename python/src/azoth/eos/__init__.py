@@ -78,6 +78,8 @@ from azoth.core.result import (
     BrineMixingScaleEvaluatorResult,
     BubblePressureResult,
     BubbleTemperatureResult,
+    BukacekWaterDewPointResult,
+    BukacekWaterInGasResult,
     BwrsPhaseResult,
     CalcIonicCompositionResult,
     CapillaryDewPointResult,
@@ -90,6 +92,7 @@ from azoth.core.result import (
     Co2PhaseResult,
     Co2WaterDiffusivityResult,
     CostaldMolarVolumeResult,
+    CpaWaterCaloricAlphaResult,
     CriticalPointResult,
     DesmukhMatherPhaseResult,
     DeWaardMilliamsCorrosionResult,
@@ -115,6 +118,7 @@ from azoth.core.result import (
     GeNrtlFlashResult,
     GeNrtlPhaseResult,
     Gerg2008PhaseResult,
+    GergWaterAlphaResult,
     GeUnifacPhaseResult,
     GeUniquacPhaseResult,
     GeVanLaarAcidPhaseResult,
@@ -295,6 +299,8 @@ __all__ = [
     "available_components",
     "bubble_pressure",
     "bubble_temperature",
+    "bukacek_water_dew_point",
+    "bukacek_water_in_gas",
     "bwrs_coefficients",
     "bwrs_phase",
     "calc_ionic_composition",
@@ -306,6 +312,7 @@ __all__ = [
     "co2_phase",
     "component",
     "costald_molar_volume",
+    "cpa_water_caloric_alpha",
     "critical_point",
     "desmukh_mather_phase",
     "dew_pressure",
@@ -327,6 +334,7 @@ __all__ = [
     "ge_van_laar_acid_phase",
     "ge_wilson_phase",
     "gerg2008_phase",
+    "gerg_water_alpha",
     "hayduk_minhas_diffusivity",
     "heat_of_vaporization",
     "helium_phase",
@@ -583,6 +591,10 @@ _SRK_Z_FACTOR = "eos.srk_z_factor"
 _SRK_DEPARTURE = "eos.srk_departure"
 _RK_ALPHA_AB = "eos.rk_alpha_ab"
 _RK_DEPARTURE = "eos.rk_departure"
+_BUKACEK_WATER_DEW_POINT = "eos.bukacek_water_dew_point"
+_BUKACEK_WATER_IN_GAS = "eos.bukacek_water_in_gas"
+_CPA_WATER_CALORIC_ALPHA = "eos.cpa_water_caloric_alpha"
+_GERG_WATER_ALPHA = "eos.gerg_water_alpha"
 
 
 def closed_loop_deposition_solver(
@@ -5753,3 +5765,47 @@ def water_dew_point_multiphase(
     See :func:`azoth.eos.reference.water_dew_point_multiphase`.
     """
     return resolve(_WATER_DEW_POINT_MULTIPHASE)(components=components, z=z, P=P, eos=eos)  # type: ignore[no-any-return]
+
+
+def gerg_water_alpha(temperature: float, critical_temperature: float) -> GergWaterAlphaResult:
+    """The GERG water alpha function.
+
+    See :func:`azoth.eos.reference.gerg_water_alpha`.
+    """
+    return resolve(_GERG_WATER_ALPHA)(  # type: ignore[no-any-return]
+        temperature=temperature, critical_temperature=critical_temperature
+    )
+
+
+def cpa_water_caloric_alpha(
+    temperature: float, critical_temperature: float
+) -> CpaWaterCaloricAlphaResult:
+    """The caloric-fitted SRK-CPA water alpha function.
+
+    See :func:`azoth.eos.reference.cpa_water_caloric_alpha`.
+    """
+    return resolve(_CPA_WATER_CALORIC_ALPHA)(  # type: ignore[no-any-return]
+        temperature=temperature, critical_temperature=critical_temperature
+    )
+
+
+def bukacek_water_in_gas(temperature: float, pressure: float) -> BukacekWaterInGasResult:
+    """The Bukacek water content of a gas, as a mole fraction.
+
+    See :func:`azoth.eos.reference.bukacek_water_in_gas`.
+    """
+    return resolve(_BUKACEK_WATER_IN_GAS)(  # type: ignore[no-any-return]
+        temperature=temperature, pressure=pressure
+    )
+
+
+def bukacek_water_dew_point(
+    water_mole_fraction: float, pressure: float
+) -> BukacekWaterDewPointResult:
+    """The Bukacek water dew-point temperature.
+
+    See :func:`azoth.eos.reference.bukacek_water_dew_point`.
+    """
+    return resolve(_BUKACEK_WATER_DEW_POINT)(  # type: ignore[no-any-return]
+        water_mole_fraction=water_mole_fraction, pressure=pressure
+    )

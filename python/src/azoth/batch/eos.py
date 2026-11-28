@@ -29,14 +29,18 @@ from azoth.core.warnings import Warning
 
 __all__ = [
     "BeggsBrillSegmentBatch",
+    "BukacekWaterDewPointBatch",
+    "BukacekWaterInGasBatch",
     "ChapmanEnskogDiffusivityBatch",
     "ChungConductivityBatch",
     "ChungViscosityBatch",
     "Co2WaterDiffusivityBatch",
     "CostaldMolarVolumeBatch",
+    "CpaWaterCaloricAlphaBatch",
     "DeWaardMilliamsCorrosionBatch",
     "ElectrolyteScaleCalculatorBatch",
     "FullerSchettlerGiddingsDiffusivityBatch",
+    "GergWaterAlphaBatch",
     "HeatOfVaporizationBatch",
     "IapwsSaturationPressureBatch",
     "IdealGasCpBatch",
@@ -82,13 +86,17 @@ __all__ = [
     "UmrprAlphaBatch",
     "Vdw1fMixBinaryBatch",
     "WilkeChangDiffusivityBatch",
+    "bukacek_water_dew_point",
+    "bukacek_water_in_gas",
     "chapman_enskog_diffusivity",
     "chung_conductivity",
     "chung_viscosity",
     "co2_water_diffusivity",
     "costald_molar_volume",
+    "cpa_water_caloric_alpha",
     "de_waard_milliams_corrosion",
     "fuller_schettler_giddings_diffusivity",
+    "gerg_water_alpha",
     "heat_of_vaporization",
     "iapws_saturation_pressure",
     "ideal_gas_cp",
@@ -173,6 +181,10 @@ _SOREIDE_WHITSON_ALPHA = "eos.soreide_whitson_alpha"
 _SRK_ALPHA_AB = "eos.srk_alpha_ab"
 _SRK_Z_FACTOR = "eos.srk_z_factor"
 _SRK_DEPARTURE = "eos.srk_departure"
+_BUKACEK_WATER_DEW_POINT = "eos.bukacek_water_dew_point"
+_BUKACEK_WATER_IN_GAS = "eos.bukacek_water_in_gas"
+_CPA_WATER_CALORIC_ALPHA = "eos.cpa_water_caloric_alpha"
+_GERG_WATER_ALPHA = "eos.gerg_water_alpha"
 _RK_ALPHA_AB = "eos.rk_alpha_ab"
 _RK_DEPARTURE = "eos.rk_departure"
 _PR78_KAPPA = "eos.pr78_kappa"
@@ -2575,5 +2587,145 @@ def wilke_chang_diffusivity(
             "VA": sequence(VA, "VA"),
         },
         _build_wilke_chang_diffusivity,
+    )
+    return result
+
+
+@dataclass(frozen=True, slots=True, eq=False, repr=False)
+class GergWaterAlphaBatch(BatchResult):
+    """Result of a batch :func:`azoth.eos.gerg_water_alpha`."""
+
+    #: The temperature-dependent alpha function per element. Dimensionless.
+    alpha: array[float]
+
+
+def _build_gerg_water_alpha(
+    columns: dict[str, object],
+    units: dict[str, str],
+    warnings: tuple[tuple[Warning, ...], ...],
+) -> GergWaterAlphaBatch:
+    return GergWaterAlphaBatch(warnings=warnings, units=units, alpha=columns["alpha"])  # type: ignore[arg-type]
+
+
+def gerg_water_alpha(
+    *,
+    temperature: Sequence[float],
+    critical_temperature: Sequence[float],
+) -> GergWaterAlphaBatch:
+    """The GERG water alpha function, over arrays."""
+    result: GergWaterAlphaBatch = run(
+        _GERG_WATER_ALPHA,
+        {
+            "temperature": sequence(temperature, "temperature"),
+            "critical_temperature": sequence(critical_temperature, "critical_temperature"),
+        },
+        _build_gerg_water_alpha,
+    )
+    return result
+
+
+@dataclass(frozen=True, slots=True, eq=False, repr=False)
+class CpaWaterCaloricAlphaBatch(BatchResult):
+    """Result of a batch :func:`azoth.eos.cpa_water_caloric_alpha`."""
+
+    #: The temperature-dependent alpha function per element. Dimensionless.
+    alpha: array[float]
+
+
+def _build_cpa_water_caloric_alpha(
+    columns: dict[str, object],
+    units: dict[str, str],
+    warnings: tuple[tuple[Warning, ...], ...],
+) -> CpaWaterCaloricAlphaBatch:
+    return CpaWaterCaloricAlphaBatch(warnings=warnings, units=units, alpha=columns["alpha"])  # type: ignore[arg-type]
+
+
+def cpa_water_caloric_alpha(
+    *,
+    temperature: Sequence[float],
+    critical_temperature: Sequence[float],
+) -> CpaWaterCaloricAlphaBatch:
+    """The caloric-fitted SRK-CPA water alpha function, over arrays."""
+    result: CpaWaterCaloricAlphaBatch = run(
+        _CPA_WATER_CALORIC_ALPHA,
+        {
+            "temperature": sequence(temperature, "temperature"),
+            "critical_temperature": sequence(critical_temperature, "critical_temperature"),
+        },
+        _build_cpa_water_caloric_alpha,
+    )
+    return result
+
+
+@dataclass(frozen=True, slots=True, eq=False, repr=False)
+class BukacekWaterInGasBatch(BatchResult):
+    """Result of a batch :func:`azoth.eos.bukacek_water_in_gas`."""
+
+    #: The water mole fraction per element. Dimensionless.
+    water_mole_fraction: array[float]
+
+
+def _build_bukacek_water_in_gas(
+    columns: dict[str, object],
+    units: dict[str, str],
+    warnings: tuple[tuple[Warning, ...], ...],
+) -> BukacekWaterInGasBatch:
+    return BukacekWaterInGasBatch(
+        warnings=warnings,
+        units=units,
+        water_mole_fraction=columns["water_mole_fraction"],  # type: ignore[arg-type]
+    )
+
+
+def bukacek_water_in_gas(
+    *,
+    temperature: Sequence[float],
+    pressure: Sequence[float],
+) -> BukacekWaterInGasBatch:
+    """The Bukacek water content of a gas, over arrays."""
+    result: BukacekWaterInGasBatch = run(
+        _BUKACEK_WATER_IN_GAS,
+        {
+            "temperature": sequence(temperature, "temperature"),
+            "pressure": sequence(pressure, "pressure"),
+        },
+        _build_bukacek_water_in_gas,
+    )
+    return result
+
+
+@dataclass(frozen=True, slots=True, eq=False, repr=False)
+class BukacekWaterDewPointBatch(BatchResult):
+    """Result of a batch :func:`azoth.eos.bukacek_water_dew_point`."""
+
+    #: The water dew-point temperature per element. K.
+    temperature: array[float]
+
+
+def _build_bukacek_water_dew_point(
+    columns: dict[str, object],
+    units: dict[str, str],
+    warnings: tuple[tuple[Warning, ...], ...],
+) -> BukacekWaterDewPointBatch:
+    return BukacekWaterDewPointBatch(
+        warnings=warnings,
+        units=units,
+        temperature=columns["temperature"],  # type: ignore[arg-type]
+    )
+
+
+def bukacek_water_dew_point(
+    *,
+    water_mole_fraction: Sequence[float],
+    pressure: Sequence[float],
+) -> BukacekWaterDewPointBatch:
+    """The Bukacek water dew-point temperature, over arrays."""
+    result: BukacekWaterDewPointBatch = run(
+        _BUKACEK_WATER_DEW_POINT,
+        {
+            "water_mole_fraction": sequence(water_mole_fraction, "water_mole_fraction"),
+            "pressure": sequence(pressure, "pressure"),
+        },
+        _build_bukacek_water_dew_point,
     )
     return result

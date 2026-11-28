@@ -46,6 +46,8 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyBrineMixingScaleEvaluatorResult>()?;
     m.add_class::<crate::transport_gen::PyBubblePressureResult>()?;
     m.add_class::<crate::transport_gen::PyBubbleTemperatureResult>()?;
+    m.add_class::<crate::transport_gen::PyBukacekWaterDewPointResult>()?;
+    m.add_class::<crate::transport_gen::PyBukacekWaterInGasResult>()?;
     m.add_class::<crate::transport_gen::PyBwrsPhaseResult>()?;
     m.add_class::<crate::transport_gen::PyCalcIonicCompositionResult>()?;
     m.add_class::<crate::transport_gen::PyCapillaryDewPointResult>()?;
@@ -58,6 +60,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyCo2PhaseResult>()?;
     m.add_class::<crate::transport_gen::PyCo2WaterDiffusivityResult>()?;
     m.add_class::<crate::transport_gen::PyCostaldMolarVolumeResult>()?;
+    m.add_class::<crate::transport_gen::PyCpaWaterCaloricAlphaResult>()?;
     m.add_class::<crate::transport_gen::PyCriticalPointResult>()?;
     m.add_class::<crate::transport_gen::PyDeWaardMilliamsCorrosionResult>()?;
     m.add_class::<crate::transport_gen::PyDesmukhMatherPhaseResult>()?;
@@ -87,6 +90,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyGeVanLaarAcidPhaseResult>()?;
     m.add_class::<crate::transport_gen::PyGeWilsonPhaseResult>()?;
     m.add_class::<crate::transport_gen::PyGerg2008PhaseResult>()?;
+    m.add_class::<crate::transport_gen::PyGergWaterAlphaResult>()?;
     m.add_class::<crate::transport_gen::PyGtSurfaceTensionResult>()?;
     m.add_class::<crate::transport_gen::PyGtSurfaceTensionSimpleResult>()?;
     m.add_class::<crate::transport_gen::PyHaydukMinhasDiffusivityResult>()?;
@@ -626,6 +630,14 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         crate::wrappers_gen::bubble_temperature,
         m
     )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::bukacek_water_dew_point,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::bukacek_water_in_gas,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::eos::bwrs_phase, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::calc_ionic_composition,
@@ -660,6 +672,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::costald_molar_volume,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::cpa_water_caloric_alpha,
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::critical_point, m)?)?;
@@ -739,6 +755,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::eos::ge_van_laar_acid_phase, m)?)?;
     m.add_function(wrap_pyfunction!(crate::eos::ge_wilson_phase, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gerg2008_phase, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::gerg_water_alpha, m)?)?;
     m.add_function(wrap_pyfunction!(crate::eos::gt_surface_tension, m)?)?;
     m.add_function(wrap_pyfunction!(crate::eos::gt_surface_tension_simple, m)?)?;
     m.add_function(wrap_pyfunction!(
