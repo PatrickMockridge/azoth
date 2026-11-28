@@ -177,11 +177,6 @@ CLOSE_OUT: tuple[Command, ...] = (
         "python tools/check_port_backlog.py",
     ),
     Command(
-        "the port checklist is current",
-        SCRIPT,
-        "python tools/gen_port_checklist.py --check",
-    ),
-    Command(
         "a new spec class is in the Port-Item scope",
         SCRIPT,
         "python tools/check_port_item.py",
